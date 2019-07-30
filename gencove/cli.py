@@ -31,10 +31,23 @@ def cli():
 @cli.command()
 @click.argument("source")
 @click.argument("destination", required=False)
-@click.option("--host", default=HOST)
-@click.option("--email", default=lambda: os.environ.get("GENCOVE_EMAIL", ""))
 @click.option(
-    "--password", default=lambda: os.environ.get("GENCOVE_PASSWORD", "")
+    "--host",
+    default=HOST,
+    help="Optional Gencove API host, including http/s protocol. "
+    "Defaults to https://api.gencove.com",
+)
+@click.option(
+    "--email",
+    default=lambda: os.environ.get("GENCOVE_EMAIL", ""),
+    help="Gencove user email to be used in login. "
+    "Can be passed as GENCOVE_EMAIL environment variable",
+)
+@click.option(
+    "--password",
+    default=lambda: os.environ.get("GENCOVE_PASSWORD", ""),
+    help="Gencove user password to be used in login. "
+    "Can be passed as GENCOVE_PASSWORD environment variable",
 )
 def sync(source, destination, host, email, password):
     """Upload FASTQ files to Gencove system.

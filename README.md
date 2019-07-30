@@ -7,7 +7,7 @@
 Main documentation can be found here: [http://docs.gencove.com](http://docs.gencove.com)
 
 
-## V2 Local Development
+## Local Development
 
 ```bash
 pip install -e .

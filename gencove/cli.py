@@ -104,15 +104,13 @@ def sync(source, destination, host, email, password):
     s3_client = get_s3_client_refreshable(api_client.get_upload_credentials)
 
     for file_path in files_to_upload:
-        filename = get_filename_from_path(file_path)
-        gncv_notated_path = "{}/{}".format(destination, filename)
+        clean_filen_path = get_filename_from_path(file_path)
+        gncv_notated_path = "{}/{}".format(destination, clean_filen_path)
         echo("Uploading {} to {}".format(file_path, gncv_notated_path))
 
         upload_details = api_client.get_upload_details(gncv_notated_path)
         if upload_details["last_status"]["status"] == UPLOAD_STATUSES.done:
-            echo(
-                "File was already uploaded: {}".format(get_filename_from_path)
-            )
+            echo("File was already uploaded: {}".format(clean_filen_path))
             continue
 
         upload_file(

@@ -1,5 +1,4 @@
 """Gencove CLI utils."""
-import ntpath
 import os
 
 import boto3
@@ -87,5 +86,4 @@ def seek_files_to_upload(path, path_root=""):
 
 def get_filename_from_path(path):
     """Cross OS get file name utility."""
-    head, tail = ntpath.split(path)
-    return tail or ntpath.basename(head)
+    return os.path.normpath(path)

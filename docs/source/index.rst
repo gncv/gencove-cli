@@ -6,6 +6,17 @@
 Welcome to Gencove's CLI documentation!
 ===============================================
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
 .. automodule:: gencove.cli
    :members:
 
@@ -21,26 +32,26 @@ Installation
 
 To check your default Python version, open an interactive shell and run:
 
-.. code-block::
+.. code::
 
    python --version
 
 To check if you have Python 3, open an interactive shell and run:
 
-.. code-block::
+.. code::
 
    python3 --version
 
 To install |cli|, open an interactive shell and run:
 
-.. code-block::
+.. code::
 
    python<version> -m pip install gencove
 
 If you want |cli| to be installed for your default Python installation,
 you can instead use:
 
-.. code-block::
+.. code::
 
    python -m pip install gencove
 
@@ -49,7 +60,7 @@ Using Gencove CLI Tool
 
 To start using |cli|, open an interactive shell and run:
 
-.. code-block::
+.. code::
 
    gencove --help
 
@@ -60,15 +71,3 @@ This will output all available commands.
    :show-nested:
    :commands: sync
 
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

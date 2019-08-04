@@ -44,11 +44,10 @@ staging:
   stage: deploy
   script:
     # Generate documentation
-    - cd docs && make html
+    - cd docs && make html && cd ..
     # Install twine for uploading to pypi
     - pip install twine
     # Upload to pypi
-    - ls -la
     - python setup.py sdist
     - python setup.py bdist_wheel --universal
     - twine upload --repository-url https://test.pypi.org/legacy/ dist/*

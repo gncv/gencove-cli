@@ -48,6 +48,7 @@ staging:
     # Install twine for uploading to pypi
     - pip install twine
     # Upload to pypi
+    - ls -la
     - python setup.py sdist
     - python setup.py bdist_wheel --universal
     - twine upload --repository-url https://test.pypi.org/legacy/ dist/*
@@ -62,7 +63,6 @@ production:
     # Install twine for uploading to pypi
     - pip install twine
     # Upload to pypi
-    - ls -la
     - python setup.py sdist
     - python setup.py bdist_wheel --universal
     - twine upload dist/*

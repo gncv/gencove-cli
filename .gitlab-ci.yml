@@ -36,7 +36,14 @@ bandit:
 
 staging:
   script:
-    - echo "Nothing happens here"
+    # Generate documentation
+    - cd docs && make html
+    # Install twine for uploading to pypi
+    - pip install twine
+    # Upload to pypi
+    - python setup.py sdist
+    - python setup.py bdist_wheel --universal
+    - twine upload --repository-url https://test.pypi.org/legacy/ dist/*
   only:
     - master
   

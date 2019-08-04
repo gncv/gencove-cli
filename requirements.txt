@@ -1,1 +1,3 @@
 tox
+sphinx
+sphinx-click

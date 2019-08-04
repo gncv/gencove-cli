@@ -1,4 +1,4 @@
-"""Gencove CLI application."""
+"""Python library which enables you to use Gencoves' research backend."""
 import os
 import uuid
 from datetime import datetime
@@ -50,17 +50,16 @@ def cli():
     "Can be passed as GENCOVE_PASSWORD environment variable",
 )
 def sync(source, destination, host, email, password):
-    """Upload FASTQ files to Gencove system.
+    """Upload FASTQ files to Gencove's system.
 
-    Arguments:
+    :param source: folder that contains fastq files to be uploaded.
+    :type source: .fastq.gz, .fastq.bgz, .fq.gz, .fq.bgz
+    :param destination: (optional) 'gncv://' notated folder
+        on Gencove's system, where the files will be uploaded to.
+    :type destination: str
 
-    source - folder that contains fastq files to be uploaded
-    in one of the following formats:
-
-        .fastq.gz, .fastq.bgz, .fq.gz, .fq.bgz
-
-    destination - (optional) 'gncs://' notated folder on Gencove system,
-    where the files will be uploaded.
+    Example:
+        `gencove sync test_dataset gncv://test`
     """
     echo_debug("Host is {}".format(host))
 

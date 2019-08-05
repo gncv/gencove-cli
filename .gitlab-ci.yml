@@ -9,6 +9,8 @@ before_script:
   - pip install -r requirements.txt
   # Setup package and it's requirements
   - pip install -e .
+  # Generate documentation
+  - cd docs && make html && cd ..
 
 python2:
   image: python:2.7
@@ -43,8 +45,6 @@ bandit:
 staging:
   stage: deploy
   script:
-    # Generate documentation
-    - cd docs && make html && cd ..
     # Install twine for uploading to pypi
     - pip install twine
     # Upload to pypi
@@ -57,10 +57,14 @@ staging:
 production:
   stage: deploy
   script:
-    # Generate documentation
-    - cd docs && make html
     # Install twine for uploading to pypi
     - pip install twine
+    # Upload docs
+    - aws s3 sync docs/_build/html/ s3://$BUCKET_PRODUCTION/api/python/ --delete --region us-east-1
+    # Enable the aws cloudfront command
+    - aws configure set preview.cloudfront true
+    # Clear web cache
+    - aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_PRODUCTION --paths "/*"
     # Upload to pypi
     - python setup.py sdist
     - python setup.py bdist_wheel --universal

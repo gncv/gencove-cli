@@ -47,6 +47,12 @@ staging:
   script:
     # Install twine for uploading to pypi
     - pip install twine
+    # Upload docs
+    - aws s3 sync docs/_build/html/ s3://$BUCKET_STAGING/api/python/ --delete --region us-east-1
+    # Enable the aws cloudfront command
+    - aws configure set preview.cloudfront true
+    # Clear web cache
+    - aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_STAGING --paths "/*"
     # Upload to pypi
     - python setup.py sdist
     - python setup.py bdist_wheel --universal

@@ -1,6 +1,6 @@
 """Gencove API client.
 
-Exclude imports from linters due to install aliases breaking the imports.
+Exclude imports from linters due to install aliases breaking the rules.
 """
 
 # noqa Python 2 and 3 compatibility

@@ -20,7 +20,7 @@ def test_sync(mocker):
             APIClient, "login", return_value=None
         )
         mocked_get_credentials = mocker.patch(
-            "gencove.cli.get_s3_client_refreshable"
+            "gencove.commands.upload.get_s3_client_refreshable"
         )
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
@@ -30,7 +30,9 @@ def test_sync(mocker):
                 "s3": {"bucket": "test", "object_name": "test"},
             },
         )
-        mocked_upload_file = mocker.patch("gencove.cli.upload_file")
+        mocked_upload_file = mocker.patch(
+            "gencove.commands.upload.upload_file"
+        )
         res = runner.invoke(
             sync,
             ["cli_test_data"],

@@ -5,14 +5,16 @@ Exclude imports from linters due to install aliases breaking the rules.
 
 # noqa Python 2 and 3 compatibility
 # pylint: disable=wrong-import-order,wrong-import-position
-from future.standard_library import install_aliases
-
-install_aliases()  # noqa
-
 from builtins import str as text  # noqa
 import datetime  # noqa
 import json  # noqa
-from urllib.parse import urljoin  # noqa
+
+try:
+    # python 3
+    from urllib.parse import urljoin  # noqa
+except ImportError:  # noqa
+    # python 2.7
+    from urlparse import urljoin  # noqa
 
 from requests import get, post, ConnectTimeout, ReadTimeout, codes  # noqa
 

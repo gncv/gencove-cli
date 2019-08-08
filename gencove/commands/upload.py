@@ -2,8 +2,6 @@
 import uuid
 from datetime import datetime
 
-import click
-
 from gencove import client
 from gencove.constants import (
     FASTQ_EXTENSIONS,
@@ -17,7 +15,7 @@ from gencove.utils import (
     get_s3_client_refreshable,
     seek_files_to_upload,
     upload_file,
-)
+    login)
 
 
 def upload(source, destination, host, email, password):
@@ -42,9 +40,7 @@ def upload(source, destination, host, email, password):
 
     if destination and not destination.startswith(UPLOAD_PREFIX):
         echo(
-            "Invalid destination path. Must start with '{}'".format(
-                UPLOAD_PREFIX
-            ),
+            "Invalid destination path. Must start with '{}'".format(UPLOAD_PREFIX),
             err=True,
         )
         return
@@ -53,21 +49,12 @@ def upload(source, destination, host, email, password):
 
     if not destination:
         destination = "{}cli-{}-{}".format(
-            UPLOAD_PREFIX,
-            datetime.utcnow().strftime("%Y%m%d%H%M%S"),
-            uuid.uuid4().hex,
+            UPLOAD_PREFIX, datetime.utcnow().strftime("%Y%m%d%H%M%S"), uuid.uuid4().hex
         )
         echo("Files will be uploaded to: {}".format(destination))
 
-    if not email or not password:
-        click.echo("Login required")
-        email = email or click.prompt("Email", type=str)
-        password = password or click.prompt(
-            "Password", type=str, hide_input=True
-        )
-
     api_client = client.APIClient(host)
-    api_client.login(email, password)
+    login(api_client, email, password)
     s3_client = get_s3_client_refreshable(api_client.get_upload_credentials)
 
     for file_path in files_to_upload:

@@ -173,6 +173,16 @@ class APIClient:
             custom_headers=headers,
         )
 
+    def _get(self, endpoint, query_params=None, timeout=10, authorized=False):
+        headers = {} if not authorized else self._get_authorization()
+        return self._request(
+            endpoint,
+            params=query_params,
+            method="get",
+            timeout=timeout,
+            custom_headers=headers,
+        )
+
     def refresh_token(self, refresh_token):
         """Refresh jwt token."""
         return self._post(
@@ -206,4 +216,18 @@ class APIClient:
         """Get aws credentials for user."""
         return self._post(
             self.endpoints.get_upload_credentials, authorized=True
+        )
+
+    def get_project_samples(self, project_id):
+        """List single project's associated samples."""
+        return self._get(
+            self.endpoints.project_samples.format(id=project_id),
+            authorized=True
+        )
+
+    def get_sample_details(self, sample_id):
+        """Fetch single sample details."""
+        return self._get(
+            self.endpoints.sample_details.format(id=sample_id),
+            authorized=True
         )

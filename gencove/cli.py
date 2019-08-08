@@ -4,8 +4,10 @@ import os
 import click
 
 from gencove import version
+from gencove.commands.download import download_deliverables
 from gencove.commands.upload import upload
 from gencove.constants import HOST
+from gencove.logger import echo_debug
 
 
 @click.group()
@@ -35,7 +37,7 @@ def cli():
     help="Gencove user password to be used in login. "
     "Can be passed as GENCOVE_PASSWORD environment variable",
 )
-def sync(source, destination, host, email, password):
+def upload(source, destination, host, email, password):
     """Upload FASTQ files to Gencove's system.
 
     :param source: folder that contains fastq files to be uploaded.
@@ -48,6 +50,75 @@ def sync(source, destination, host, email, password):
         `gencove sync test_dataset gncv://test`
     """
     upload(source, destination, host, email, password)
+
+
+@cli.command()
+@click.argument("destination")
+@click.option("--project-id", help="Gencove project ID")
+@click.option("--sample-ids", help="A comma separated list of sample ids for which to download the deliverables")
+@click.option("--file-types", help="A comma separated list of deliverable file types to download.")
+@click.option(
+    "--host",
+    default=HOST,
+    help="Optional Gencove API host, including http/s protocol. "
+    "Defaults to https://api.gencove.com",
+)
+@click.option(
+    "--email",
+    default=lambda: os.environ.get("GENCOVE_EMAIL", ""),
+    help="Gencove user email to be used in login. "
+    "Can be passed as GENCOVE_EMAIL environment variable",
+)
+@click.option(
+    "--password",
+    default=lambda: os.environ.get("GENCOVE_PASSWORD", ""),
+    help="Gencove user password to be used in login. "
+    "Can be passed as GENCOVE_PASSWORD environment variable",
+)
+def download(destination, project_id, sample_ids, file_types, host, email, password):
+    """Download deliverables of a project.
+
+    Must specify either project id or sample ids.
+
+    :param destination: path/to/save/deliverables/to.
+    :type destination: str
+    :param project_id: project id in Gencove's system.
+    :type project_id: str
+    :param sample_ids: specific samples for which to download the results.
+    if not specified, download deliverables for all samples.
+    :type sample_ids: list(str)
+    :param file_types: specific deliverables to download results for.
+    if not specified, all file types will be downloaded.
+    :type file_types: list(str)
+
+    Examples:
+        Download all samples results:
+
+        `gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db`
+
+        Download some samples:
+
+        `gencove download ./results --sample-ids 59f5c1fd-cce0-4c4c-90e2-0b6c6c525d71,7edee497-12b5-4a1d-951f-34dc8dce1c1d`
+
+        Download specific deliverables:
+
+        `gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db --file-types alignment-bam,impute-vcf,fastq-r1,fastq-r2`
+    """
+    s_ids = tuple()
+    if sample_ids:
+        s_ids = tuple(s_id.strip() for s_id in sample_ids.split(','))
+
+    f_types = tuple()
+    if file_types:
+        f_types = tuple(f_type.strip() for f_type in file_types.split(','))
+
+    download_deliverables(destination,
+                          project_id=project_id,
+                          sample_ids=s_ids,
+                          file_types=f_types,
+                          host=host,
+                          email=email,
+                          password=password)
 
 
 if __name__ == "__main__":

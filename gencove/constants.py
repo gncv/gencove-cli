@@ -38,6 +38,5 @@ UPLOAD_STATUSES = _UploadStatuses("succeeded", "started", "failed")
 FASTQ_EXTENSIONS = (".fastq.gz", ".fastq.bgz", ".fq.gz", ".fq.bgz")
 UPLOAD_PREFIX = "gncv://"
 
-_SampleStatuses = namedtuple("SampleStatuses", ["succeeded", "failed_unknown", "failed_qc", "failed_lab"])
-SAMPLE_STATUSES = _SampleStatuses("succeeded", "failed_unknown", "failed_qc", "failed_lab")
-ALLOWED_SAMPLE_STATUSES = (SAMPLE_STATUSES.succeeded, SAMPLE_STATUSES.failed_unknown, SAMPLE_STATUSES.failed_qc, SAMPLE_STATUSES.failed_lab)
+_SampleStatuses = namedtuple("SampleStatuses", ["succeeded", "failed"])
+SAMPLE_STATUSES = _SampleStatuses("succeeded", "failed")

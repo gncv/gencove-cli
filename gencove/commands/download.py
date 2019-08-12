@@ -1,13 +1,27 @@
 import os
 import re
-import shutil
+
+try:
+    # python 3.7
+    from urllib.parse import urlparse, parse_qs  # noqa
+except ImportError:
+    # python 2.7
+    from urlparse import urlparse, parse_qs  # noqa
 
 import requests
+from tqdm import tqdm
 
 from gencove import client
-from gencove.constants import ALLOWED_SAMPLE_STATUSES
+from gencove.constants import SAMPLE_STATUSES
 from gencove.logger import echo_debug, echo_warning, echo
 from gencove.utils import login
+
+
+ALLOWED_STATUSES_RE = re.compile("{}|{}".format(SAMPLE_STATUSES.succeeded, SAMPLE_STATUSES.failed), re.IGNORECASE)
+FILENAME_RE = re.compile("filename=(.+)")
+KILOBYTE = 1024
+MEGABYTE = 1000 * KILOBYTE
+CHUNK_SIZE = 3 * MEGABYTE
 
 
 def download_file(download_to, file_prefix, url):
@@ -22,17 +36,56 @@ def download_file(download_to, file_prefix, url):
     :type url: str
     """
     with requests.get(url, stream=True) as req:
-        filename = re.findall("filename=(.+)", req.headers['content-disposition'])
-        file_path = os.path.join(download_to, file_prefix, filename)
-
-        echo("Starting to download file: {}".format(file_path))
-
         req.raise_for_status()
+        filename = get_filename(req.headers['content-disposition'], url)
+        file_path = create_filepath(download_to, file_prefix, filename)
+
+        echo_debug("Starting to download file to: {}".format(file_path))
 
         with open(file_path, 'wb') as downloaded_file:
-            shutil.copyfileobj(req.raw, downloaded_file)
+            total = int(int(req.headers['content-length']) / MEGABYTE)
+            for chunk in tqdm(req.iter_content(chunk_size=CHUNK_SIZE), total=total, unit='MB', leave=True, desc="Progress: ", unit_scale=True, unit_divisor=MEGABYTE):
+                downloaded_file.write(chunk)
 
         echo("Finished downloading a file: {}".format(file_path))
+
+
+def create_filepath(download_to, file_prefix, filename):
+    """Build full file path and ensure that directory structure exists.
+
+    :param download_to: top level directory path
+    :type download_to: str
+    :param file_prefix: subdirectories structure to create under download_to.
+    :type file_prefix: str
+    :param filename: name of the file inside download_to/file_prefix structure.
+    :type filename: str
+    """
+    path = os.path.join(download_to, file_prefix)
+    os.makedirs(path, exist_ok=True)
+    file_path = os.path.join(path, filename)
+    echo_debug("Deduced full file path is {}".format(file_path))
+    return file_path
+
+
+def get_filename(content_disposition, url):
+    """Deduce filename from content disposition or url.
+
+    :param content_disposition: Request header Content-Disposition
+    :type content_disposition: str
+    :param url: URL string
+    :type url: str
+    """
+    filename_match = re.findall(FILENAME_RE, content_disposition)
+    if not filename_match:
+        echo_debug("Content disposition had no filename. Trying url query params")
+        filename = re.findall(FILENAME_RE, parse_qs(urlparse(url).query))
+    else:
+        filename = filename_match[0]
+    if not filename:
+        echo_debug("URL didn't contain filename query argument. Assume filename from url")
+        filename = urlparse(url).path.split('/')[-1]
+    echo_debug("Deduced filename to be: {}".format(filename))
+    return filename
 
 
 def download_deliverables(destination, project_id, sample_ids, file_types, host, email, password):
@@ -55,7 +108,7 @@ def download_deliverables(destination, project_id, sample_ids, file_types, host,
     :param password: login password
     :type password: str
     """
-    echo_debug("Host is {}".format(host))
+    echo_debug("Host is {} downloading to {}".format(host, destination))
     api_client = client.APIClient(host)
     login(api_client, email, password)
     if not project_id and not sample_ids:
@@ -64,17 +117,27 @@ def download_deliverables(destination, project_id, sample_ids, file_types, host,
 
     if project_id:
         echo_debug("Retrieving sample ids for a project: {}".format(project_id))
-        samples = api_client.get_project_samples(project_id)
+        samples = api_client.get_project_samples(project_id)['results']
+        echo_debug("Found {} project samples".format(len(samples)))
+
+        if not samples:
+            echo_warning("Project has no samples to download")
+            return
+
         sample_ids = [s['id'] for s in samples]
 
     for sample_id in sample_ids:
         sample = api_client.get_sample_details(sample_id)
-        if sample["last_status"]['status'] not in ALLOWED_SAMPLE_STATUSES:
+        echo_debug("Processing sample id {}, status {}".format(sample['id'], sample['last_status']['status']))
+
+        if not ALLOWED_STATUSES_RE.match(sample["last_status"]['status']):
             echo_warning("Sample #{} has no deliverable.".format(sample_id), err=True)
             continue
 
+        file_types_re = re.compile("|".join(file_types), re.IGNORECASE)
+
         for deliverable in sample['files']:
-            if file_types and deliverable['file_type'] not in file_types:
+            if file_types and not file_types_re.match(deliverable['file_type']):
                 echo_debug("Deliverable file type is not in desired file types")
                 continue
 

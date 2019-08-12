@@ -28,6 +28,7 @@ setup(
         "requests>=2.19.1",
         "boto3>=1.9.188",
         "future",
+        "tqdm>=4.33.0"
     ],
     setup_requires=[
         "pytest-runner"

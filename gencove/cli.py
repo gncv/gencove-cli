@@ -80,7 +80,15 @@ def upload(source, destination, host, email, password):
     help="Gencove user password to be used in login. "
     "Can be passed as GENCOVE_PASSWORD environment variable",
 )
-def download(destination, project_id, sample_ids, file_types, host, email, password):
+@click.option(
+    '--skip-existing/--no-skip-existing',
+    default=True,
+    help="Skip downloading files that already exist in DESTINATION"
+)
+def download(
+    destination, project_id, sample_ids, file_types, host, email, password,
+    skip_existing
+):
     """Download deliverables of a project.
 
     Must specify either project id or sample ids.
@@ -95,6 +103,8 @@ def download(destination, project_id, sample_ids, file_types, host, email, passw
     :param file_types: specific deliverables to download results for.
     if not specified, all file types will be downloaded.
     :type file_types: list(str)
+    :param skip_existing: skip downloading existing files
+    :type skip_existing: bool
 
     Examples:
         Download all samples results:
@@ -127,6 +137,7 @@ def download(destination, project_id, sample_ids, file_types, host, email, passw
         host=host,
         email=email,
         password=password,
+        skip_existing=skip_existing,
     )
 
 

@@ -26,7 +26,7 @@ MEGABYTE = 1024 * KILOBYTE
 CHUNK_SIZE = 3 * MEGABYTE
 
 
-def download_file(download_to, file_prefix, url):
+def download_file(download_to, file_prefix, url, skip_existing):
     """Downloads a file to file system.
 
     :param download_to: system/path/to/save/file/to
@@ -36,17 +36,28 @@ def download_file(download_to, file_prefix, url):
     :type file_prefix: str
     :param url: signed url from S3 to download the file from.
     :type url: str
+    :param skip_existing: skip downloading existing files
+    :type skip_existing: bool
     """
     with requests.get(url, stream=True) as req:
         req.raise_for_status()
         filename = get_filename(req.headers["content-disposition"], url)
         file_path = create_filepath(download_to, file_prefix, filename)
+        total = int(req.headers["content-length"])
+        total_mb = int(total / MEGABYTE)
+        chunk_size_mb = CHUNK_SIZE / MEGABYTE
+
+        if (
+            skip_existing
+            and os.path.isfile(file_path)
+            and os.path.getsize(file_path) == total
+        ):
+            echo("Skipping existing file: {}".format(file_path))
+            return
 
         echo_debug("Starting to download file to: {}".format(file_path))
 
         with open(file_path, "wb") as downloaded_file:
-            total_mb = int(int(req.headers["content-length"]) / MEGABYTE)
-            chunk_size_mb = CHUNK_SIZE / MEGABYTE
             for chunk in tqdm(
                 req.iter_content(chunk_size=CHUNK_SIZE),
                 total=total_mb / (chunk_size_mb),
@@ -101,7 +112,8 @@ def get_filename(content_disposition, url):
 
 
 def download_deliverables(
-    destination, project_id, sample_ids, file_types, host, email, password
+    destination, project_id, sample_ids, file_types, host, email, password,
+    skip_existing
 ):
     """Download project deliverables to a specified path on user machine.
 
@@ -121,6 +133,8 @@ def download_deliverables(
     :type email: str
     :param password: login password
     :type password: str
+    :param skip_existing: skip downloading existing files
+    :type skip_existing: bool
     """
     echo_debug("Host is {} downloading to {}".format(host, destination))
     api_client = client.APIClient(host)
@@ -163,4 +177,5 @@ def download_deliverables(
                 destination,
                 "{}/{}".format(sample["client_id"], sample["id"]),
                 deliverable["download_url"],
+                skip_existing=skip_existing,
             )

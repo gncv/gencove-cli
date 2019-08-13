@@ -61,7 +61,9 @@ def upload_file(s3_client, file_name, bucket, object_name=None):
         )
         s3_client.upload_file(file_name, bucket, object_name, Config=config)
     except ClientError as err:
-        click.echo("Failed to upload file {}: {}".format(file_name, err), err=True)
+        click.echo(
+            "Failed to upload file {}: {}".format(file_name, err), err=True
+        )
         return False
     return True
 

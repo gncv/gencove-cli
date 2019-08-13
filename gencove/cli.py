@@ -55,13 +55,8 @@ def upload(source, destination, host, email, password):
 @cli.command()
 @click.argument("destination")
 @click.option("--project-id", help="Gencove project ID")
-@click.option(
-    "--sample-ids",
-    help="A comma separated list of sample ids for which to download the deliverables",
-)
-@click.option(
-    "--file-types", help="A comma separated list of deliverable file types to download."
-)
+@click.option("--sample-ids", help="A comma separated list of sample ids for which to download the deliverables")
+@click.option("--file-types", help="A comma separated list of deliverable file types to download.")
 @click.option(
     "--host",
     default=HOST,

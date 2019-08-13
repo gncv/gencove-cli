@@ -68,7 +68,7 @@ def download_file(download_to, file_prefix, url, skip_existing):
             ):
                 downloaded_file.write(chunk)
 
-        echo("Finished downloading file: {}".format(file_path))
+        echo("Finished downloading a file: {}".format(file_path))
 
 
 def create_filepath(download_to, file_prefix, filename):

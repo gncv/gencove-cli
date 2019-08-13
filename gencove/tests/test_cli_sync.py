@@ -1,15 +1,15 @@
-"""Tests sync command of Gencove CLI."""
+"""Tests upload command of Gencove CLI."""
 import os
 
 from click.testing import CliRunner
 
-from gencove.cli import sync
+from gencove.cli import upload
 from gencove.client import APIClient
 from gencove.constants import UPLOAD_PREFIX
 
 
-def test_sync(mocker):
-    """Sanity check that sync is ok."""
+def test_upload(mocker):
+    """Sanity check that upload is ok."""
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
@@ -34,7 +34,7 @@ def test_sync(mocker):
             "gencove.commands.upload.upload_file"
         )
         res = runner.invoke(
-            sync,
+            upload,
             ["cli_test_data"],
             input="\n".join(["foo@bar.com", "123456"]),
         )
@@ -48,8 +48,8 @@ def test_sync(mocker):
         mocked_upload_file.assert_called_once()
 
 
-def test_sync_no_files_found(mocker):
-    """Test that no fastq files found exits sync."""
+def test_upload_no_files_found(mocker):
+    """Test that no fastq files found exits upload."""
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
@@ -57,7 +57,7 @@ def test_sync_no_files_found(mocker):
         mocked_login = mocker.patch.object(
             APIClient, "login", return_value=None
         )
-        res = runner.invoke(sync, ["cli_test_data"])
+        res = runner.invoke(upload, ["cli_test_data"])
         # for debugging, if needed
         print("output is", res.output)
 
@@ -66,8 +66,8 @@ def test_sync_no_files_found(mocker):
         assert not mocked_login.called
 
 
-def test_sync_invalid_destination(mocker):
-    """Test that invalid destination exists sync."""
+def test_upload_invalid_destination(mocker):
+    """Test that invalid destination exists upload."""
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
@@ -77,7 +77,7 @@ def test_sync_invalid_destination(mocker):
         mocked_login = mocker.patch.object(
             APIClient, "login", return_value=None
         )
-        res = runner.invoke(sync, ["cli_test_data", "foobar_dir"])
+        res = runner.invoke(upload, ["cli_test_data", "foobar_dir"])
         # for debugging, if needed
         print("output is", res.output)
 

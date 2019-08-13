@@ -34,95 +34,6 @@ Filters = namedtuple("Filters", ["project_id", "sample_ids", "file_types"])
 Options = namedtuple("Options", ["host", "skip_existing"])
 
 
-def download_file(download_to, file_prefix, url, skip_existing):
-    """Download a file to file system.
-
-    :param download_to: system/path/to/save/file/to
-    :type download_to: str
-    :param file_prefix: <client id>/<gencove sample id> to nest downloaded file
-    under.
-    :type file_prefix: str
-    :param url: signed url from S3 to download the file from.
-    :type url: str
-    :param skip_existing: skip downloading existing files
-    :type skip_existing: bool
-    """
-    with requests.get(url, stream=True) as req:
-        req.raise_for_status()
-        filename = get_filename(req.headers["content-disposition"], url)
-        file_path = create_filepath(download_to, file_prefix, filename)
-        total = int(req.headers["content-length"])
-        total_mb = int(total / MEGABYTE)
-
-        # pylint: disable=C0330
-        if (
-            skip_existing
-            and os.path.isfile(file_path)
-            and os.path.getsize(file_path) == total
-        ):
-            echo("Skipping existing file: {}".format(file_path))
-            return
-
-        echo_debug("Starting to download file to: {}".format(file_path))
-
-        with open(file_path, "wb") as downloaded_file:
-            # pylint: disable=C0330
-            for chunk in tqdm(
-                req.iter_content(chunk_size=CHUNK_SIZE),
-                total=total_mb / NUM_MB_IN_CHUNK,
-                unit="MB",
-                leave=True,
-                desc="Progress: ",
-                unit_scale=NUM_MB_IN_CHUNK,
-            ):
-                downloaded_file.write(chunk)
-
-        echo("Finished downloading a file: {}".format(file_path))
-
-
-def create_filepath(download_to, file_prefix, filename):
-    """Build full file path and ensure that directory structure exists.
-
-    :param download_to: top level directory path
-    :type download_to: str
-    :param file_prefix: subdirectories structure to create under download_to.
-    :type file_prefix: str
-    :param filename: name of the file inside download_to/file_prefix structure.
-    :type filename: str
-    """
-    path = os.path.join(download_to, file_prefix)
-    os.makedirs(path, exist_ok=True)
-    file_path = os.path.join(path, filename)
-    echo_debug("Deduced full file path is {}".format(file_path))
-    return file_path
-
-
-def get_filename(content_disposition, url):
-    """Deduce filename from content disposition or url.
-
-    :param content_disposition: Request header Content-Disposition
-    :type content_disposition: str
-    :param url: URL string
-    :type url: str
-    """
-    filename_match = re.findall(FILENAME_RE, content_disposition)
-    if not filename_match:
-        echo_debug(
-            "Content disposition had no filename. Trying url query params"
-        )
-        filename = re.findall(FILENAME_RE, parse_qs(urlparse(url).query))
-    else:
-        filename = filename_match[0]
-    if not filename:
-        echo_debug(
-            "URL didn't contain filename query argument. "
-            "Assume filename from url"
-        )
-        filename = urlparse(url).path.split("/")[-1]
-    echo_debug("Deduced filename to be: {}".format(filename))
-    return filename
-
-
 def download_deliverables(destination, filters, credentials, options):
     """Download project deliverables to a specified path on user machine.
 
@@ -171,7 +82,7 @@ def download_deliverables(destination, filters, credentials, options):
             return
 
         for sample in samples:
-            process_sample(
+            _process_sample(
                 destination,
                 sample["id"],
                 filters.file_types,
@@ -182,7 +93,7 @@ def download_deliverables(destination, filters, credentials, options):
         return
 
     for sample_id in filters.sample_ids:
-        process_sample(
+        _process_sample(
             destination,
             sample_id,
             filters.file_types,
@@ -191,8 +102,97 @@ def download_deliverables(destination, filters, credentials, options):
         )
 
 
+def _download_file(download_to, file_prefix, url, skip_existing):
+    """Download a file to file system.
+
+    :param download_to: system/path/to/save/file/to
+    :type download_to: str
+    :param file_prefix: <client id>/<gencove sample id> to nest downloaded file
+    under.
+    :type file_prefix: str
+    :param url: signed url from S3 to download the file from.
+    :type url: str
+    :param skip_existing: skip downloading existing files
+    :type skip_existing: bool
+    """
+    with requests.get(url, stream=True) as req:
+        req.raise_for_status()
+        filename = _get_filename(req.headers["content-disposition"], url)
+        file_path = _create_filepath(download_to, file_prefix, filename)
+        total = int(req.headers["content-length"])
+        total_mb = int(total / MEGABYTE)
+
+        # pylint: disable=C0330
+        if (
+            skip_existing
+            and os.path.isfile(file_path)
+            and os.path.getsize(file_path) == total
+        ):
+            echo("Skipping existing file: {}".format(file_path))
+            return
+
+        echo_debug("Starting to download file to: {}".format(file_path))
+
+        with open(file_path, "wb") as downloaded_file:
+            # pylint: disable=C0330
+            for chunk in tqdm(
+                req.iter_content(chunk_size=CHUNK_SIZE),
+                total=total_mb / NUM_MB_IN_CHUNK,
+                unit="MB",
+                leave=True,
+                desc="Progress: ",
+                unit_scale=NUM_MB_IN_CHUNK,
+            ):
+                downloaded_file.write(chunk)
+
+        echo("Finished downloading a file: {}".format(file_path))
+
+
+def _create_filepath(download_to, file_prefix, filename):
+    """Build full file path and ensure that directory structure exists.
+
+    :param download_to: top level directory path
+    :type download_to: str
+    :param file_prefix: subdirectories structure to create under download_to.
+    :type file_prefix: str
+    :param filename: name of the file inside download_to/file_prefix structure.
+    :type filename: str
+    """
+    path = os.path.join(download_to, file_prefix)
+    os.makedirs(path, exist_ok=True)
+    file_path = os.path.join(path, filename)
+    echo_debug("Deduced full file path is {}".format(file_path))
+    return file_path
+
+
+def _get_filename(content_disposition, url):
+    """Deduce filename from content disposition or url.
+
+    :param content_disposition: Request header Content-Disposition
+    :type content_disposition: str
+    :param url: URL string
+    :type url: str
+    """
+    filename_match = re.findall(FILENAME_RE, content_disposition)
+    if not filename_match:
+        echo_debug(
+            "Content disposition had no filename. Trying url query params"
+        )
+        filename = re.findall(FILENAME_RE, parse_qs(urlparse(url).query))
+    else:
+        filename = filename_match[0]
+    if not filename:
+        echo_debug(
+            "URL didn't contain filename query argument. "
+            "Assume filename from url"
+        )
+        filename = urlparse(url).path.split("/")[-1]
+    echo_debug("Deduced filename to be: {}".format(filename))
+    return filename
+
+
 # pylint: disable=C0330
-def process_sample(
+def _process_sample(
     destination, sample_id, file_types, api_client, skip_existing
 ):
     """Download sample deliverables."""
@@ -216,7 +216,7 @@ def process_sample(
             echo_debug("Deliverable file type is not in desired file types")
             continue
 
-        download_file(
+        _download_file(
             destination,
             "{}/{}".format(sample["client_id"], sample["id"]),
             deliverable["download_url"],

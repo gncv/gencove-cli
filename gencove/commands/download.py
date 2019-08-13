@@ -112,8 +112,14 @@ def get_filename(content_disposition, url):
 
 
 def download_deliverables(
-    destination, project_id, sample_ids, file_types, host, email, password,
-    skip_existing
+    destination,
+    project_id,
+    sample_ids,
+    file_types,
+    host,
+    email,
+    password,
+    skip_existing,
 ):
     """Download project deliverables to a specified path on user machine.
 

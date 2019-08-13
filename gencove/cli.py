@@ -81,13 +81,19 @@ def upload(source, destination, host, email, password):
     "Can be passed as GENCOVE_PASSWORD environment variable",
 )
 @click.option(
-    '--skip-existing/--no-skip-existing',
+    "--skip-existing/--no-skip-existing",
     default=True,
-    help="Skip downloading files that already exist in DESTINATION"
+    help="Skip downloading files that already exist in DESTINATION",
 )
 def download(
-    destination, project_id, sample_ids, file_types, host, email, password,
-    skip_existing
+    destination,
+    project_id,
+    sample_ids,
+    file_types,
+    host,
+    email,
+    password,
+    skip_existing,
 ):
     """Download deliverables of a project.
 

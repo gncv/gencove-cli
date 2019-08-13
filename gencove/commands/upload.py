@@ -15,7 +15,8 @@ from gencove.utils import (
     get_s3_client_refreshable,
     seek_files_to_upload,
     upload_file,
-    login)
+    login,
+)
 
 
 def upload_fastqs(source, destination, host, email, password):

@@ -17,7 +17,9 @@ from gencove.logger import echo_debug, echo_warning, echo
 from gencove.utils import login
 
 
-ALLOWED_STATUSES_RE = re.compile("{}|{}".format(SAMPLE_STATUSES.succeeded, SAMPLE_STATUSES.failed), re.IGNORECASE)
+ALLOWED_STATUSES_RE = re.compile(
+    "{}|{}".format(SAMPLE_STATUSES.succeeded, SAMPLE_STATUSES.failed), re.IGNORECASE
+)
 FILENAME_RE = re.compile("filename=(.+)")
 KILOBYTE = 1024
 MEGABYTE = 1000 * KILOBYTE
@@ -37,14 +39,22 @@ def download_file(download_to, file_prefix, url):
     """
     with requests.get(url, stream=True) as req:
         req.raise_for_status()
-        filename = get_filename(req.headers['content-disposition'], url)
+        filename = get_filename(req.headers["content-disposition"], url)
         file_path = create_filepath(download_to, file_prefix, filename)
 
         echo_debug("Starting to download file to: {}".format(file_path))
 
-        with open(file_path, 'wb') as downloaded_file:
-            total = int(int(req.headers['content-length']) / MEGABYTE)
-            for chunk in tqdm(req.iter_content(chunk_size=CHUNK_SIZE), total=total, unit='MB', leave=True, desc="Progress: ", unit_scale=True, unit_divisor=MEGABYTE):
+        with open(file_path, "wb") as downloaded_file:
+            total = int(int(req.headers["content-length"]) / MEGABYTE)
+            for chunk in tqdm(
+                req.iter_content(chunk_size=CHUNK_SIZE),
+                total=total,
+                unit="MB",
+                leave=True,
+                desc="Progress: ",
+                unit_scale=True,
+                unit_divisor=MEGABYTE,
+            ):
                 downloaded_file.write(chunk)
 
         echo("Finished downloading a file: {}".format(file_path))
@@ -82,13 +92,17 @@ def get_filename(content_disposition, url):
     else:
         filename = filename_match[0]
     if not filename:
-        echo_debug("URL didn't contain filename query argument. Assume filename from url")
-        filename = urlparse(url).path.split('/')[-1]
+        echo_debug(
+            "URL didn't contain filename query argument. Assume filename from url"
+        )
+        filename = urlparse(url).path.split("/")[-1]
     echo_debug("Deduced filename to be: {}".format(filename))
     return filename
 
 
-def download_deliverables(destination, project_id, sample_ids, file_types, host, email, password):
+def download_deliverables(
+    destination, project_id, sample_ids, file_types, host, email, password
+):
     """Download project deliverables to a specified path on user machine.
 
     :param destination: path/to/save/deliverables/to.
@@ -117,30 +131,36 @@ def download_deliverables(destination, project_id, sample_ids, file_types, host,
 
     if project_id:
         echo_debug("Retrieving sample ids for a project: {}".format(project_id))
-        samples = api_client.get_project_samples(project_id)['results']
+        samples = api_client.get_project_samples(project_id)["results"]
         echo_debug("Found {} project samples".format(len(samples)))
 
         if not samples:
             echo_warning("Project has no samples to download")
             return
 
-        sample_ids = [s['id'] for s in samples]
+        sample_ids = [s["id"] for s in samples]
 
     for sample_id in sample_ids:
         sample = api_client.get_sample_details(sample_id)
-        echo_debug("Processing sample id {}, status {}".format(sample['id'], sample['last_status']['status']))
+        echo_debug(
+            "Processing sample id {}, status {}".format(
+                sample["id"], sample["last_status"]["status"]
+            )
+        )
 
-        if not ALLOWED_STATUSES_RE.match(sample["last_status"]['status']):
+        if not ALLOWED_STATUSES_RE.match(sample["last_status"]["status"]):
             echo_warning("Sample #{} has no deliverable.".format(sample_id), err=True)
             continue
 
         file_types_re = re.compile("|".join(file_types), re.IGNORECASE)
 
-        for deliverable in sample['files']:
-            if file_types and not file_types_re.match(deliverable['file_type']):
+        for deliverable in sample["files"]:
+            if file_types and not file_types_re.match(deliverable["file_type"]):
                 echo_debug("Deliverable file type is not in desired file types")
                 continue
 
-            download_file(destination,
-                          "{}/{}".format(sample['client_id'], sample['id']),
-                          deliverable['download_url'])
+            download_file(
+                destination,
+                "{}/{}".format(sample["client_id"], sample["id"]),
+                deliverable["download_url"],
+            )

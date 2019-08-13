@@ -55,8 +55,13 @@ def upload(source, destination, host, email, password):
 @cli.command()
 @click.argument("destination")
 @click.option("--project-id", help="Gencove project ID")
-@click.option("--sample-ids", help="A comma separated list of sample ids for which to download the deliverables")
-@click.option("--file-types", help="A comma separated list of deliverable file types to download.")
+@click.option(
+    "--sample-ids",
+    help="A comma separated list of sample ids for which to download the deliverables",
+)
+@click.option(
+    "--file-types", help="A comma separated list of deliverable file types to download."
+)
 @click.option(
     "--host",
     default=HOST,
@@ -106,21 +111,23 @@ def download(destination, project_id, sample_ids, file_types, host, email, passw
     """
     s_ids = tuple()
     if sample_ids:
-        s_ids = tuple(s_id.strip() for s_id in sample_ids.split(','))
+        s_ids = tuple(s_id.strip() for s_id in sample_ids.split(","))
         echo_debug("Sample ids translation: {}".format(s_ids))
 
     f_types = tuple()
     if file_types:
-        f_types = tuple(f_type.strip() for f_type in file_types.split(','))
+        f_types = tuple(f_type.strip() for f_type in file_types.split(","))
         echo_debug("File types translation: {}".format(f_types))
 
-    download_deliverables(destination,
-                          project_id=project_id,
-                          sample_ids=s_ids,
-                          file_types=f_types,
-                          host=host,
-                          email=email,
-                          password=password)
+    download_deliverables(
+        destination,
+        project_id=project_id,
+        sample_ids=s_ids,
+        file_types=f_types,
+        host=host,
+        email=email,
+        password=password,
+    )
 
 
 if __name__ == "__main__":

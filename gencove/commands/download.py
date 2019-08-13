@@ -126,7 +126,7 @@ def download_deliverables(
     api_client = client.APIClient(host)
     login(api_client, email, password)
     if not project_id and not sample_ids:
-        echo_warning("Must specify one of: project id or smaple ids", err=True)
+        echo_warning("Must specify one of: project id or sample ids", err=True)
         return
 
     if project_id:

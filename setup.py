@@ -22,7 +22,7 @@ setup(
     email="tomaz.berisa@gmail.com",
     licence="Apache 2.0",
     version=version(),
-    packages=["gencove"],
+    packages=["gencove", "gencove.commands"],
     install_requires=[
         "Click>=7.0",
         "requests>=2.19.1",

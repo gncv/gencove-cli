@@ -81,4 +81,5 @@ production:
     # - tags
     #
     # SemVer-compliant tags (with no metadata)
-    - /^v?\d+\.\d+\.\d+$/
+    # - /^v?\d+\.\d+\.\d+$/
+    - prod

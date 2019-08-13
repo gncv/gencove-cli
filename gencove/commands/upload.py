@@ -18,7 +18,7 @@ from gencove.utils import (
     login)
 
 
-def upload(source, destination, host, email, password):
+def upload_fastqs(source, destination, host, email, password):
     """Upload FASTQ files to Gencove's system.
 
     :param source: folder that contains fastq files to be uploaded.

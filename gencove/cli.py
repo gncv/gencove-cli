@@ -5,7 +5,7 @@ import click
 
 from gencove import version
 from gencove.commands.download import download_deliverables
-from gencove.commands.upload import upload
+from gencove.commands.upload import upload_fastqs
 from gencove.constants import HOST
 from gencove.logger import echo_debug
 
@@ -49,7 +49,7 @@ def upload(source, destination, host, email, password):
     Example:
         `gencove sync test_dataset gncv://test`
     """
-    upload(source, destination, host, email, password)
+    upload_fastqs(source, destination, host, email, password)
 
 
 @cli.command()

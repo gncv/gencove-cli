@@ -27,9 +27,11 @@ ALLOWED_STATUSES_RE = re.compile(
 FILENAME_RE = re.compile("filename=(.+)")
 KILOBYTE = 1024
 MEGABYTE = 1024 * KILOBYTE
-CHUNK_SIZE = 3 * MEGABYTE
+NUM_MB_IN_CHUNK = 3
+CHUNK_SIZE = NUM_MB_IN_CHUNK * MEGABYTE
 
 Filters = namedtuple("Filters", ["project_id", "sample_ids", "file_types"])
+Options = namedtuple("Options", ["host", "skip_existing"])
 
 
 def download_file(download_to, file_prefix, url, skip_existing):
@@ -52,6 +54,7 @@ def download_file(download_to, file_prefix, url, skip_existing):
         total = int(req.headers["content-length"])
         total_mb = int(total / MEGABYTE)
 
+        # pylint: disable=C0330
         if (
             skip_existing
             and os.path.isfile(file_path)
@@ -66,11 +69,11 @@ def download_file(download_to, file_prefix, url, skip_existing):
             # pylint: disable=C0330
             for chunk in tqdm(
                 req.iter_content(chunk_size=CHUNK_SIZE),
-                total=total_mb / (chunk_size_mb),
+                total=total_mb / NUM_MB_IN_CHUNK,
                 unit="MB",
                 leave=True,
                 desc="Progress: ",
-                unit_scale=chunk_size_mb,
+                unit_scale=NUM_MB_IN_CHUNK,
             ):
                 downloaded_file.write(chunk)
 
@@ -120,7 +123,7 @@ def get_filename(content_disposition, url):
     return filename
 
 
-def download_deliverables(destination, filters, credentials, host, skip_existing):
+def download_deliverables(destination, filters, credentials, options):
     """Download project deliverables to a specified path on user machine.
 
     :param destination: path/to/save/deliverables/to.
@@ -131,8 +134,8 @@ def download_deliverables(destination, filters, credentials, host, skip_existing
     :type host: str
     :param credentials: login username/password
     :type credentials: Credentials
-    :param skip_existing: skip downloading existing files
-    :type skip_existing: bool
+    :param options: different options to tweak execution
+    :type options: Options
     """
     if not filters.project_id and not filters.sample_ids:
         echo_warning(
@@ -146,8 +149,10 @@ def download_deliverables(destination, filters, credentials, host, skip_existing
         )
         return
 
-    echo_debug("Host is {} downloading to {}".format(host, destination))
-    api_client = client.APIClient(host)
+    echo_debug(
+        "Host is {} downloading to {}".format(options.host, destination)
+    )
+    api_client = client.APIClient(options.host)
     login(api_client, credentials.email, credentials.password)
 
     if filters.project_id:
@@ -167,16 +172,29 @@ def download_deliverables(destination, filters, credentials, host, skip_existing
 
         for sample in samples:
             process_sample(
-                destination, sample["id"], filters.file_types, api_client
+                destination,
+                sample["id"],
+                filters.file_types,
+                api_client,
+                options.skip_existing,
             )
 
         return
 
     for sample_id in filters.sample_ids:
-        process_sample(destination, sample_id, filters.file_types, api_client)
+        process_sample(
+            destination,
+            sample_id,
+            filters.file_types,
+            api_client,
+            options.skip_existing,
+        )
 
 
-def process_sample(destination, sample_id, file_types, api_client):
+# pylint: disable=C0330
+def process_sample(
+    destination, sample_id, file_types, api_client, skip_existing
+):
     """Download sample deliverables."""
     sample = api_client.get_sample_details(sample_id)
     echo_debug(

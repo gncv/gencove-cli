@@ -4,7 +4,7 @@ import os
 import click
 
 from gencove import version
-from gencove.commands.download import Filters, download_deliverables
+from gencove.commands.download import Filters, Options, download_deliverables
 from gencove.commands.upload import upload_fastqs
 from gencove.constants import Credentials, HOST
 from gencove.logger import echo_debug
@@ -88,14 +88,14 @@ def upload(source, destination, host, email, password):
     help="Skip downloading files that already exist in DESTINATION",
 )
 def download(  # pylint: disable=C0330,R0913
-        destination,
-        project_id,
-        sample_ids,
-        file_types,
-        host,
-        email,
-        password,
-        skip_existing,
+    destination,
+    project_id,
+    sample_ids,
+    file_types,
+    host,
+    email,
+    password,
+    skip_existing,
 ):  # noqa: D413 # pylint: disable=C0301
     """Download deliverables of a project.
 
@@ -141,8 +141,7 @@ def download(  # pylint: disable=C0330,R0913
         destination,
         Filters(project_id, s_ids, f_types),
         Credentials(email, password),
-        host=host,
-        skip_existing=skip_existing,
+        Options(host, skip_existing),
     )
 
 

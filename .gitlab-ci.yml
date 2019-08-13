@@ -29,15 +29,15 @@ black:
   stage: test
   script: tox -e black
 
-flake8:
-  image: python:3.7
-  stage: test
-  script: tox -e flake8
+# flake8:
+#   image: python:3.7
+#   stage: test
+#   script: tox -e flake8
 
-pylint:
-  image: python:3.7
-  stage: test
-  script: tox -e pylint
+# pylint:
+#   image: python:3.7
+#   stage: test
+#   script: tox -e pylint
 
 bandit:
   image: python:3.7

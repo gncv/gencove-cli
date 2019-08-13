@@ -1,31 +1,19 @@
 """Python library which enables you to use Gencoves' research backend."""
 import os
-import uuid
-from datetime import datetime
 
 import click
 
-from gencove import client, version
-from gencove.constants import (
-    FASTQ_EXTENSIONS,
-    HOST,
-    TMP_UPLOADS_WARNING,
-    UPLOAD_PREFIX,
-    UPLOAD_STATUSES,
-)
-from gencove.logger import echo, echo_debug, echo_warning
-from gencove.utils import (
-    get_filename_from_path,
-    get_s3_client_refreshable,
-    seek_files_to_upload,
-    upload_file,
-)
+from gencove import version
+from gencove.commands.download import download_deliverables
+from gencove.commands.upload import upload_fastqs
+from gencove.constants import HOST
+from gencove.logger import echo_debug
 
 
 @click.group()
 @click.version_option(version=version.version())
 def cli():
-    """Gencove command line interface."""
+    """Gencove's command line interface."""
 
 
 @cli.command()
@@ -49,7 +37,7 @@ def cli():
     help="Gencove user password to be used in login. "
     "Can be passed as GENCOVE_PASSWORD environment variable",
 )
-def sync(source, destination, host, email, password):
+def upload(source, destination, host, email, password):
     """Upload FASTQ files to Gencove's system.
 
     :param source: folder that contains fastq files to be uploaded.
@@ -61,65 +49,102 @@ def sync(source, destination, host, email, password):
     Example:
         `gencove sync test_dataset gncv://test`
     """
-    echo_debug("Host is {}".format(host))
+    upload_fastqs(source, destination, host, email, password)
 
-    files_to_upload = list(seek_files_to_upload(source))
-    if not files_to_upload:
-        echo(
-            "No FASTQ files found in the path. "
-            "Only following files are accepted: {}".format(FASTQ_EXTENSIONS),
-            err=True,
-        )
-        return
 
-    if destination and not destination.startswith(UPLOAD_PREFIX):
-        echo(
-            "Invalid destination path. Must start with '{}'".format(
-                UPLOAD_PREFIX
-            ),
-            err=True,
-        )
-        return
+@cli.command()
+@click.argument("destination")
+@click.option("--project-id", help="Gencove project ID")
+@click.option(
+    "--sample-ids",
+    help="A comma separated list of sample ids for which to download the deliverables",
+)
+@click.option(
+    "--file-types", help="A comma separated list of deliverable file types to download."
+)
+@click.option(
+    "--host",
+    default=HOST,
+    help="Optional Gencove API host, including http/s protocol. "
+    "Defaults to https://api.gencove.com",
+)
+@click.option(
+    "--email",
+    default=lambda: os.environ.get("GENCOVE_EMAIL", ""),
+    help="Gencove user email to be used in login. "
+    "Can be passed as GENCOVE_EMAIL environment variable",
+)
+@click.option(
+    "--password",
+    default=lambda: os.environ.get("GENCOVE_PASSWORD", ""),
+    help="Gencove user password to be used in login. "
+    "Can be passed as GENCOVE_PASSWORD environment variable",
+)
+@click.option(
+    "--skip-existing/--no-skip-existing",
+    default=True,
+    help="Skip downloading files that already exist in DESTINATION",
+)
+def download(
+    destination,
+    project_id,
+    sample_ids,
+    file_types,
+    host,
+    email,
+    password,
+    skip_existing,
+):
+    """Download deliverables of a project.
 
-    echo_warning(TMP_UPLOADS_WARNING, err=True)
+    Must specify either project id or sample ids.
 
-    if not destination:
-        destination = "{}cli-{}-{}".format(
-            UPLOAD_PREFIX,
-            datetime.utcnow().strftime("%Y%m%d%H%M%S"),
-            uuid.uuid4().hex,
-        )
-        echo("Files will be uploaded to: {}".format(destination))
+    :param destination: path/to/save/deliverables/to.
+    :type destination: str
+    :param project_id: project id in Gencove's system.
+    :type project_id: str
+    :param sample_ids: specific samples for which to download the results.
+    if not specified, download deliverables for all samples.
+    :type sample_ids: list(str)
+    :param file_types: specific deliverables to download results for.
+    if not specified, all file types will be downloaded.
+    :type file_types: list(str)
+    :param skip_existing: skip downloading existing files
+    :type skip_existing: bool
 
-    if not email or not password:
-        click.echo("Login required")
-        email = email or click.prompt("Email", type=str)
-        password = password or click.prompt(
-            "Password", type=str, hide_input=True
-        )
+    Examples:
+        Download all samples results:
 
-    api_client = client.APIClient(host)
-    api_client.login(email, password)
-    s3_client = get_s3_client_refreshable(api_client.get_upload_credentials)
+        `gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db`
 
-    for file_path in files_to_upload:
-        clean_filen_path = get_filename_from_path(file_path)
-        gncv_notated_path = "{}/{}".format(destination, clean_filen_path)
-        echo("Uploading {} to {}".format(file_path, gncv_notated_path))
+        Download some samples:
 
-        upload_details = api_client.get_upload_details(gncv_notated_path)
-        if upload_details["last_status"]["status"] == UPLOAD_STATUSES.done:
-            echo("File was already uploaded: {}".format(clean_filen_path))
-            continue
+        `gencove download ./results --sample-ids 59f5c1fd-cce0-4c4c-90e2-0b6c6c525d71,7edee497-12b5-4a1d-951f-34dc8dce1c1d`
 
-        upload_file(
-            s3_client=s3_client,
-            file_name=file_path,
-            bucket=upload_details["s3"]["bucket"],
-            object_name=upload_details["s3"]["object_name"],
-        )
+        Download specific deliverables:
 
-    echo("All files were successfully synced.")
+        `gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db --file-types alignment-bam,impute-vcf,fastq-r1,fastq-r2`
+    """
+    s_ids = tuple()
+    if sample_ids:
+        s_ids = tuple(s_id.strip() for s_id in sample_ids.split(","))
+        echo_debug("Sample ids translation: {}".format(s_ids))
+
+    f_types = tuple()
+    if file_types:
+        f_types = tuple(f_type.strip() for f_type in file_types.split(","))
+        echo_debug("File types translation: {}".format(f_types))
+
+    download_deliverables(
+        destination,
+        project_id=project_id,
+        sample_ids=s_ids,
+        file_types=f_types,
+        host=host,
+        email=email,
+        password=password,
+        skip_existing=skip_existing,
+    )
 
 
 if __name__ == "__main__":

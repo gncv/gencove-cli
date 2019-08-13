@@ -17,6 +17,8 @@ _APIEndpoint = namedtuple(
         "verify_jwt",
         "upload_details",
         "get_upload_credentials",
+        "project_samples",
+        "sample_details",
     ],
 )
 API_ENDPOINTS = _APIEndpoint(
@@ -25,6 +27,8 @@ API_ENDPOINTS = _APIEndpoint(
     "/api/v2/jwt-verify/",
     "/api/v2/uploads-post-data/",
     "/api/v2/upload-credentials/",
+    "/api/v2/project-samples/{id}",
+    "/api/v2/samples/{id}",
 )
 
 _UploadStatuses = namedtuple("UploadStatuses", ["done", "started", "failed"])
@@ -33,3 +37,6 @@ UPLOAD_STATUSES = _UploadStatuses("succeeded", "started", "failed")
 
 FASTQ_EXTENSIONS = (".fastq.gz", ".fastq.bgz", ".fq.gz", ".fq.bgz")
 UPLOAD_PREFIX = "gncv://"
+
+_SampleStatuses = namedtuple("SampleStatuses", ["succeeded", "failed"])
+SAMPLE_STATUSES = _SampleStatuses("succeeded", "failed")

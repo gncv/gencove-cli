@@ -61,9 +61,7 @@ def upload_file(s3_client, file_name, bucket, object_name=None):
         )
         s3_client.upload_file(file_name, bucket, object_name, Config=config)
     except ClientError as err:
-        click.echo(
-            "Failed to upload file {}: {}".format(file_name, err), err=True
-        )
+        click.echo("Failed to upload file {}: {}".format(file_name, err), err=True)
         return False
     return True
 
@@ -87,3 +85,14 @@ def seek_files_to_upload(path, path_root=""):
 def get_filename_from_path(path):
     """Cross OS get file name utility."""
     return os.path.normpath(path)
+
+
+def login(api_client, email, password):
+    """Login user into Gencove's system."""
+    if not email or not password:
+        click.echo("Login required")
+        email = email or click.prompt("Email", type=str)
+        password = password or click.prompt("Password", type=str, hide_input=True)
+    api_client.login(email, password)
+    echo_debug("User logged in successfully")
+    return api_client

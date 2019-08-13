@@ -11,9 +11,7 @@ LOG_LEVEL = os.environ.get("GENCOVE_LOG", INFO)
 
 def output_warning(text):
     """Click echo warning."""
-    return click.style(
-        "WARNING: {}".format(text), bg="red", fg="white", bold=True
-    )
+    return click.style("WARNING: {}".format(text), bg="red", fg="white", bold=True)
 
 
 def echo(msg, **kwargs):

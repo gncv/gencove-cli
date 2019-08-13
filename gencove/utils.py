@@ -94,7 +94,9 @@ def login(api_client, email, password):
     if not email or not password:
         click.echo("Login required")
         email = email or click.prompt("Email", type=str)
-        password = password or click.prompt("Password", type=str, hide_input=True)
+        password = password or click.prompt(
+            "Password", type=str, hide_input=True
+        )
     api_client.login(email, password)
     echo_debug("User logged in successfully")
     return api_client

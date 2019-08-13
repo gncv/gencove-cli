@@ -222,12 +222,12 @@ class APIClient:
         """List single project's associated samples."""
         return self._get(
             self.endpoints.project_samples.format(id=project_id),
-            authorized=True
+            authorized=True,
         )
 
     def get_sample_details(self, sample_id):
         """Fetch single sample details."""
         return self._get(
             self.endpoints.sample_details.format(id=sample_id),
-            authorized=True
+            authorized=True,
         )

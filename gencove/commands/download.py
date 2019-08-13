@@ -45,11 +45,11 @@ def download_file(download_to, file_prefix, url):
         echo_debug("Starting to download file to: {}".format(file_path))
 
         with open(file_path, "wb") as downloaded_file:
-            total_mb = int(int(req.headers["content-length"])/MEGABYTE)
-            chunk_size_mb = CHUNK_SIZE/MEGABYTE
+            total_mb = int(int(req.headers["content-length"]) / MEGABYTE)
+            chunk_size_mb = CHUNK_SIZE / MEGABYTE
             for chunk in tqdm(
                 req.iter_content(chunk_size=CHUNK_SIZE),
-                total=total_mb/(chunk_size_mb),
+                total=total_mb / (chunk_size_mb),
                 unit="MB",
                 leave=True,
                 desc="Progress: ",

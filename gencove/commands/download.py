@@ -22,7 +22,7 @@ ALLOWED_STATUSES_RE = re.compile(
 )
 FILENAME_RE = re.compile("filename=(.+)")
 KILOBYTE = 1024
-MEGABYTE = 1000 * KILOBYTE
+MEGABYTE = 1024 * KILOBYTE
 CHUNK_SIZE = 3 * MEGABYTE
 
 
@@ -45,19 +45,19 @@ def download_file(download_to, file_prefix, url):
         echo_debug("Starting to download file to: {}".format(file_path))
 
         with open(file_path, "wb") as downloaded_file:
-            total = int(int(req.headers["content-length"]) / MEGABYTE)
+            total_mb = int(int(req.headers["content-length"])/MEGABYTE)
+            chunk_size_mb = CHUNK_SIZE/MEGABYTE
             for chunk in tqdm(
                 req.iter_content(chunk_size=CHUNK_SIZE),
-                total=total,
+                total=total_mb/(chunk_size_mb),
                 unit="MB",
                 leave=True,
                 desc="Progress: ",
-                unit_scale=True,
-                unit_divisor=MEGABYTE,
+                unit_scale=chunk_size_mb,
             ):
                 downloaded_file.write(chunk)
 
-        echo("Finished downloading a file: {}".format(file_path))
+        echo("Finished downloading file: {}".format(file_path))
 
 
 def create_filepath(download_to, file_prefix, filename):

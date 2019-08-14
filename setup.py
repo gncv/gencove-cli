@@ -1,5 +1,5 @@
 """Packaging for Gencove CLI."""
-from setuptools import setup
+from setuptools import find_packages, setup
 
 
 def version():
@@ -22,7 +22,7 @@ setup(
     email="tomaz.berisa@gmail.com",
     licence="Apache 2.0",
     version=version(),
-    packages=["gencove", "gencove.commands"],
+    packages=find_packages("gencove", exclude=["tests"]),
     install_requires=[
         "Click>=7.0",
         "requests>=2.19.1",

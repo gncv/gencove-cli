@@ -1,3 +1,4 @@
 tox
 sphinx
 sphinx-click
+pre-commit

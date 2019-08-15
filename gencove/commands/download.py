@@ -148,7 +148,7 @@ def _download_file(download_to, file_prefix, url, skip_existing):
             ):
                 downloaded_file.write(chunk)
 
-        os.rename(file_path_tmp, file_path)
+        os.replace(file_path_tmp, file_path)
         echo("Finished downloading a file: {}".format(file_path))
 
 

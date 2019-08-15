@@ -1,5 +1,7 @@
+"""CLI command to download project results."""
 import os
 import re
+from collections import namedtuple
 
 try:
     # python 3.7
@@ -8,26 +10,100 @@ except ImportError:
     # python 2.7
     from urlparse import urlparse, parse_qs  # noqa
 
-import requests
+import requests  # noqa: I100
+
 from tqdm import tqdm
 
-from gencove import client
+from gencove import client  # noqa: I100
 from gencove.constants import SAMPLE_STATUSES
-from gencove.logger import echo_debug, echo_warning, echo
+from gencove.logger import echo, echo_debug, echo_warning
 from gencove.utils import login
 
 
 ALLOWED_STATUSES_RE = re.compile(
-    "{}|{}".format(SAMPLE_STATUSES.succeeded, SAMPLE_STATUSES.failed), re.IGNORECASE
+    "{}|{}".format(SAMPLE_STATUSES.succeeded, SAMPLE_STATUSES.failed),
+    re.IGNORECASE,
 )
 FILENAME_RE = re.compile("filename=(.+)")
 KILOBYTE = 1024
 MEGABYTE = 1024 * KILOBYTE
-CHUNK_SIZE = 3 * MEGABYTE
+NUM_MB_IN_CHUNK = 3
+CHUNK_SIZE = NUM_MB_IN_CHUNK * MEGABYTE
+
+Filters = namedtuple("Filters", ["project_id", "sample_ids", "file_types"])
+Options = namedtuple("Options", ["host", "skip_existing"])
 
 
-def download_file(download_to, file_prefix, url, skip_existing):
-    """Downloads a file to file system.
+def download_deliverables(destination, filters, credentials, options):
+    """Download project deliverables to a specified path on user machine.
+
+    :param destination: path/to/save/deliverables/to.
+    :type destination: str
+    :param filters: allows to filter project deliverables to be downloaded
+    :type filters: Filters
+    :param host: API host to interact with.
+    :type host: str
+    :param credentials: login username/password
+    :type credentials: Credentials
+    :param options: different options to tweak execution
+    :type options: Options
+    """
+    if not filters.project_id and not filters.sample_ids:
+        echo_warning(
+            "Must specify one of: project id or sample ids", err=True
+        )
+        return
+
+    if filters.project_id and filters.sample_ids:
+        echo_warning(
+            "Must specify only one of: project id or sample ids", err=True
+        )
+        return
+
+    echo_debug(
+        "Host is {} downloading to {}".format(options.host, destination)
+    )
+    api_client = client.APIClient(options.host)
+    login(api_client, credentials.email, credentials.password)
+
+    if filters.project_id:
+        echo_debug(
+            "Retrieving sample ids for a project: {}".format(
+                filters.project_id
+            )
+        )
+        samples = api_client.get_project_samples(filters.project_id)[
+            "results"
+        ]
+        echo_debug("Found {} project samples".format(len(samples)))
+
+        if not samples:
+            echo_warning("Project has no samples to download")
+            return
+
+        for sample in samples:
+            _process_sample(
+                destination,
+                sample["id"],
+                filters.file_types,
+                api_client,
+                options.skip_existing,
+            )
+
+        return
+
+    for sample_id in filters.sample_ids:
+        _process_sample(
+            destination,
+            sample_id,
+            filters.file_types,
+            api_client,
+            options.skip_existing,
+        )
+
+
+def _download_file(download_to, file_prefix, url, skip_existing):
+    """Download a file to file system.
 
     :param download_to: system/path/to/save/file/to
     :type download_to: str
@@ -41,12 +117,12 @@ def download_file(download_to, file_prefix, url, skip_existing):
     """
     with requests.get(url, stream=True) as req:
         req.raise_for_status()
-        filename = get_filename(req.headers["content-disposition"], url)
-        file_path = create_filepath(download_to, file_prefix, filename)
+        filename = _get_filename(req.headers["content-disposition"], url)
+        file_path = _create_filepath(download_to, file_prefix, filename)
         total = int(req.headers["content-length"])
         total_mb = int(total / MEGABYTE)
-        chunk_size_mb = CHUNK_SIZE / MEGABYTE
 
+        # pylint: disable=C0330
         if (
             skip_existing
             and os.path.isfile(file_path)
@@ -58,20 +134,21 @@ def download_file(download_to, file_prefix, url, skip_existing):
         echo_debug("Starting to download file to: {}".format(file_path))
 
         with open(file_path, "wb") as downloaded_file:
+            # pylint: disable=C0330
             for chunk in tqdm(
                 req.iter_content(chunk_size=CHUNK_SIZE),
-                total=total_mb / (chunk_size_mb),
+                total=total_mb / NUM_MB_IN_CHUNK,
                 unit="MB",
                 leave=True,
                 desc="Progress: ",
-                unit_scale=chunk_size_mb,
+                unit_scale=NUM_MB_IN_CHUNK,
             ):
                 downloaded_file.write(chunk)
 
-        echo("Finished downloading file: {}".format(file_path))
+        echo("Finished downloading a file: {}".format(file_path))
 
 
-def create_filepath(download_to, file_prefix, filename):
+def _create_filepath(download_to, file_prefix, filename):
     """Build full file path and ensure that directory structure exists.
 
     :param download_to: top level directory path
@@ -88,7 +165,7 @@ def create_filepath(download_to, file_prefix, filename):
     return file_path
 
 
-def get_filename(content_disposition, url):
+def _get_filename(content_disposition, url):
     """Deduce filename from content disposition or url.
 
     :param content_disposition: Request header Content-Disposition
@@ -98,90 +175,50 @@ def get_filename(content_disposition, url):
     """
     filename_match = re.findall(FILENAME_RE, content_disposition)
     if not filename_match:
-        echo_debug("Content disposition had no filename. Trying url query params")
+        echo_debug(
+            "Content disposition had no filename. Trying url query params"
+        )
         filename = re.findall(FILENAME_RE, parse_qs(urlparse(url).query))
     else:
         filename = filename_match[0]
     if not filename:
         echo_debug(
-            "URL didn't contain filename query argument. Assume filename from url"
+            "URL didn't contain filename query argument. "
+            "Assume filename from url"
         )
         filename = urlparse(url).path.split("/")[-1]
     echo_debug("Deduced filename to be: {}".format(filename))
     return filename
 
 
-def download_deliverables(
-    destination,
-    project_id,
-    sample_ids,
-    file_types,
-    host,
-    email,
-    password,
-    skip_existing,
+# pylint: disable=C0330
+def _process_sample(
+    destination, sample_id, file_types, api_client, skip_existing
 ):
-    """Download project deliverables to a specified path on user machine.
+    """Download sample deliverables."""
+    sample = api_client.get_sample_details(sample_id)
+    echo_debug(
+        "Processing sample id {}, status {}".format(
+            sample["id"], sample["last_status"]["status"]
+        )
+    )
 
-    :param destination: path/to/save/deliverables/to.
-    :type destination: str
-    :param project_id: project id in Gencove's system.
-    :type project_id: str
-    :param sample_ids: specific samples for which to download the results.
-    if not specified, download deliverables for all samples.
-    :type sample_ids: list(str)
-    :param file_types: specific deliverables to download results for.
-    if not specified, all file types will be downloaded.
-    :type file_types: list(str)
-    :param host: API host to interact with.
-    :type host: str
-    :param email: login username
-    :type email: str
-    :param password: login password
-    :type password: str
-    :param skip_existing: skip downloading existing files
-    :type skip_existing: bool
-    """
-    echo_debug("Host is {} downloading to {}".format(host, destination))
-    api_client = client.APIClient(host)
-    login(api_client, email, password)
-    if not project_id and not sample_ids:
-        echo_warning("Must specify one of: project id or sample ids", err=True)
+    if not ALLOWED_STATUSES_RE.match(sample["last_status"]["status"]):
+        echo_warning(
+            "Sample #{} has no deliverable.".format(sample_id), err=True
+        )
         return
 
-    if project_id:
-        echo_debug("Retrieving sample ids for a project: {}".format(project_id))
-        samples = api_client.get_project_samples(project_id)["results"]
-        echo_debug("Found {} project samples".format(len(samples)))
+    file_types_re = re.compile("|".join(file_types), re.IGNORECASE)
 
-        if not samples:
-            echo_warning("Project has no samples to download")
-            return
-
-        sample_ids = [s["id"] for s in samples]
-
-    for sample_id in sample_ids:
-        sample = api_client.get_sample_details(sample_id)
-        echo_debug(
-            "Processing sample id {}, status {}".format(
-                sample["id"], sample["last_status"]["status"]
-            )
-        )
-
-        if not ALLOWED_STATUSES_RE.match(sample["last_status"]["status"]):
-            echo_warning("Sample #{} has no deliverable.".format(sample_id), err=True)
+    for deliverable in sample["files"]:
+        if file_types and not file_types_re.match(deliverable["file_type"]):
+            echo_debug("Deliverable file type is not in desired file types")
             continue
 
-        file_types_re = re.compile("|".join(file_types), re.IGNORECASE)
-
-        for deliverable in sample["files"]:
-            if file_types and not file_types_re.match(deliverable["file_type"]):
-                echo_debug("Deliverable file type is not in desired file types")
-                continue
-
-            download_file(
-                destination,
-                "{}/{}".format(sample["client_id"], sample["id"]),
-                deliverable["download_url"],
-                skip_existing=skip_existing,
-            )
+        _download_file(
+            destination,
+            "{}/{}".format(sample["client_id"], sample["id"]),
+            deliverable["download_url"],
+            skip_existing=skip_existing,
+        )

@@ -4,9 +4,9 @@ import os
 import click
 
 from gencove import version
-from gencove.commands.download import download_deliverables
+from gencove.commands.download import Filters, Options, download_deliverables
 from gencove.commands.upload import upload_fastqs
-from gencove.constants import HOST
+from gencove.constants import Credentials, HOST
 from gencove.logger import echo_debug
 
 
@@ -57,10 +57,12 @@ def upload(source, destination, host, email, password):
 @click.option("--project-id", help="Gencove project ID")
 @click.option(
     "--sample-ids",
-    help="A comma separated list of sample ids for which to download the deliverables",
+    help="A comma separated list of sample ids for "
+    "which to download the deliverables",
 )
 @click.option(
-    "--file-types", help="A comma separated list of deliverable file types to download."
+    "--file-types",
+    help="A comma separated list of deliverable file types to download.",
 )
 @click.option(
     "--host",
@@ -85,7 +87,7 @@ def upload(source, destination, host, email, password):
     default=True,
     help="Skip downloading files that already exist in DESTINATION",
 )
-def download(
+def download(  # pylint: disable=C0330,R0913
     destination,
     project_id,
     sample_ids,
@@ -94,7 +96,7 @@ def download(
     email,
     password,
     skip_existing,
-):
+):  # noqa: D413 # pylint: disable=C0301
     """Download deliverables of a project.
 
     Must specify either project id or sample ids.
@@ -124,7 +126,7 @@ def download(
         Download specific deliverables:
 
         `gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db --file-types alignment-bam,impute-vcf,fastq-r1,fastq-r2`
-    """
+    """  # noqa: E501
     s_ids = tuple()
     if sample_ids:
         s_ids = tuple(s_id.strip() for s_id in sample_ids.split(","))
@@ -137,13 +139,9 @@ def download(
 
     download_deliverables(
         destination,
-        project_id=project_id,
-        sample_ids=s_ids,
-        file_types=f_types,
-        host=host,
-        email=email,
-        password=password,
-        skip_existing=skip_existing,
+        Filters(project_id, s_ids, f_types),
+        Credentials(email, password),
+        Options(host, skip_existing),
     )
 
 

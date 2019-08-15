@@ -19,10 +19,9 @@ setup(
     description="Gencove API and CLI tool",
     url="http://docs.gencove.com",
     author="Tomaz Berisa",
-    email="tomaz.berisa@gmail.com",
-    licence="Apache 2.0",
+    license="Apache 2.0",
     version=version(),
-    packages=find_packages("gencove", exclude=["tests"]),
+    packages=find_packages(exclude=["tests"]),
     install_requires=[
         "Click>=7.0",
         "requests>=2.19.1",

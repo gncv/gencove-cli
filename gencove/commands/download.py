@@ -119,9 +119,11 @@ def _download_file(download_to, file_prefix, url, skip_existing):
     with requests.get(url, stream=True) as req:
         req.raise_for_status()
         filename = _get_filename(req.headers["content-disposition"], url)
-        filename_tmp = f"download-{uuid.uuid4().hex}.tmp"
+        filename_tmp = "download-{}.tmp".format(uuid.uuid4().hex)
         file_path = _create_filepath(download_to, file_prefix, filename)
-        file_path_tmp = _create_filepath(download_to, file_prefix, filename_tmp)
+        file_path_tmp = _create_filepath(
+            download_to, file_prefix, filename_tmp
+        )
         total = int(req.headers["content-length"])
         total_mb = int(total / MEGABYTE)
 
@@ -148,7 +150,7 @@ def _download_file(download_to, file_prefix, url, skip_existing):
             ):
                 downloaded_file.write(chunk)
 
-        os.rename(file_path_tmp, file_path)
+        os.replace(file_path_tmp, file_path)
         echo("Finished downloading a file: {}".format(file_path))
 
 

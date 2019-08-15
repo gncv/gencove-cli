@@ -83,7 +83,12 @@ class APIClient:
 
     # pylint: disable=too-many-arguments,bad-continuation
     def _request(
-        self, endpoint="", params=None, method="get", custom_headers=None, timeout=60
+        self,
+        endpoint="",
+        params=None,
+        method="get",
+        custom_headers=None,
+        timeout=60,
     ):
         url = urljoin(text(self.host), text(endpoint))
         headers = {"content-type": "application/json", "date": None}
@@ -97,11 +102,16 @@ class APIClient:
 
         try:
             if method == "get":
-                response = get(url=url, params=params, headers=headers, timeout=timeout)
+                response = get(
+                    url=url, params=params, headers=headers, timeout=timeout
+                )
             else:
                 post_payload = APIClient._serialize_post_payload(params)
                 response = post(
-                    url=url, data=post_payload, headers=headers, timeout=timeout
+                    url=url,
+                    data=post_payload,
+                    headers=headers,
+                    timeout=timeout,
                 )
         except ConnectTimeout:
             # If request timed out,
@@ -109,7 +119,9 @@ class APIClient:
             # one place might want to retry another might not.
             raise APIClientTimeout("Could not connect to the api server")
         except ReadTimeout:
-            raise APIClientTimeout("API server did not respond in timely manner")
+            raise APIClientTimeout(
+                "API server did not respond in timely manner"
+            )
 
         echo_debug(
             "API response is {} status is {}".format(
@@ -118,7 +130,10 @@ class APIClient:
         )
 
         # pylint: disable=no-member
-        if response.status_code == codes.ok or response.status_code == codes.created:
+        if (
+            response.status_code == codes.ok
+            or response.status_code == codes.created
+        ):
             return response.json() if response.text else {}
 
         http_error_msg = ""
@@ -170,7 +185,9 @@ class APIClient:
 
     def refresh_token(self, refresh_token):
         """Refresh jwt token."""
-        return self._post(self.endpoints.refresh_jwt, {"refresh": refresh_token})
+        return self._post(
+            self.endpoints.refresh_jwt, {"refresh": refresh_token}
+        )
 
     def validate_token(self, token):
         """Validate jwt token."""
@@ -178,7 +195,9 @@ class APIClient:
 
     def get_jwt(self, email, password):
         """Get jwt token."""
-        return self._post(self.endpoints.get_jwt, dict(email=email, password=password))
+        return self._post(
+            self.endpoints.get_jwt, dict(email=email, password=password)
+        )
 
     def login(self, email, password):
         """Log user in."""
@@ -195,16 +214,20 @@ class APIClient:
 
     def get_upload_credentials(self):
         """Get aws credentials for user."""
-        return self._post(self.endpoints.get_upload_credentials, authorized=True)
+        return self._post(
+            self.endpoints.get_upload_credentials, authorized=True
+        )
 
     def get_project_samples(self, project_id):
         """List single project's associated samples."""
         return self._get(
-            self.endpoints.project_samples.format(id=project_id), authorized=True
+            self.endpoints.project_samples.format(id=project_id),
+            authorized=True,
         )
 
     def get_sample_details(self, sample_id):
         """Fetch single sample details."""
         return self._get(
-            self.endpoints.sample_details.format(id=sample_id), authorized=True
+            self.endpoints.sample_details.format(id=sample_id),
+            authorized=True,
         )

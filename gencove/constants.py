@@ -40,3 +40,5 @@ UPLOAD_PREFIX = "gncv://"
 
 _SampleStatuses = namedtuple("SampleStatuses", ["succeeded", "failed"])
 SAMPLE_STATUSES = _SampleStatuses("succeeded", "failed")
+
+Credentials = namedtuple("Credentials", ["email", "password"])

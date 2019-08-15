@@ -13,9 +13,9 @@ from gencove.logger import echo, echo_debug, echo_warning
 from gencove.utils import (
     get_filename_from_path,
     get_s3_client_refreshable,
+    login,
     seek_files_to_upload,
     upload_file,
-    login,
 )
 
 
@@ -41,7 +41,9 @@ def upload_fastqs(source, destination, host, email, password):
 
     if destination and not destination.startswith(UPLOAD_PREFIX):
         echo(
-            "Invalid destination path. Must start with '{}'".format(UPLOAD_PREFIX),
+            "Invalid destination path. Must start with '{}'".format(
+                UPLOAD_PREFIX
+            ),
             err=True,
         )
         return
@@ -50,7 +52,9 @@ def upload_fastqs(source, destination, host, email, password):
 
     if not destination:
         destination = "{}cli-{}-{}".format(
-            UPLOAD_PREFIX, datetime.utcnow().strftime("%Y%m%d%H%M%S"), uuid.uuid4().hex
+            UPLOAD_PREFIX,
+            datetime.utcnow().strftime("%Y%m%d%H%M%S"),
+            uuid.uuid4().hex,
         )
         echo("Files will be uploaded to: {}".format(destination))
 

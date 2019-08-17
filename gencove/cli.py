@@ -39,15 +39,22 @@ def cli():
 )
 def upload(source, destination, host, email, password):
     """Upload FASTQ files to Gencove's system.
+    
+    SOURCE: folder that contains fastq files to be uploaded (acceptable file extensions are .fastq.gz, .fastq.bgz, .fq.gz, .fq.bgz)
+    
+    DESTINATION (optional): gncv://[folder], where the folder is the location on Gencove systems
+    
+    Example: `gencove upload test_dataset gncv://test`
+    \f
 
-    :param source: folder that contains fastq files to be uploaded.
+    :param source: folder that contains fastq files to be uploaded. 
     :type source: .fastq.gz, .fastq.bgz, .fq.gz, .fq.bgz
     :param destination: (optional) 'gncv://' notated folder
         on Gencove's system, where the files will be uploaded to.
     :type destination: str
 
     Example:
-        `gencove sync test_dataset gncv://test`
+        `gencove upload test_dataset gncv://test`
     """
     upload_fastqs(source, destination, host, email, password)
 

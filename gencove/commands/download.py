@@ -165,7 +165,9 @@ def _create_filepath(download_to, file_prefix, filename):
     :type filename: str
     """
     path = os.path.join(download_to, file_prefix)
-    os.makedirs(path, exist_ok=True)
+    # Cross-platform cross-python-version directory creation
+    if not os.path.exists(path):
+        os.makedirs(path)
     file_path = os.path.join(path, filename)
     echo_debug("Deduced full file path is {}".format(file_path))
     return file_path

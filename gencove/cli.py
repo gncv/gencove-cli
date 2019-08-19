@@ -40,11 +40,11 @@ def cli():
 def upload(source, destination, host, email, password):  # noqa: D301
     """Upload FASTQ files to Gencove's system.
 
-    SOURCE: folder that contains fastq files to be uploaded (acceptable file extensions
-    are .fastq.gz, .fastq.bgz, .fq.gz, .fq.bgz)
+    SOURCE: folder that contains fastq files to be uploaded (acceptable file
+    extensions are .fastq.gz, .fastq.bgz, .fq.gz, .fq.bgz)
 
-    DESTINATION (optional): gncv://[folder], where the folder is the location on Gencove
-    systems
+    DESTINATION (optional): gncv://[folder], where the folder is the location
+    on Gencove systems
 
     Example:
 

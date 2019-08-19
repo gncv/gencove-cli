@@ -37,24 +37,25 @@ def cli():
     help="Gencove user password to be used in login. "
     "Can be passed as GENCOVE_PASSWORD environment variable",
 )
-def upload(source, destination, host, email, password):
+def upload(source, destination, host, email, password):  # noqa: D301
     """Upload FASTQ files to Gencove's system.
-    
-    SOURCE: folder that contains fastq files to be uploaded (acceptable file extensions are .fastq.gz, .fastq.bgz, .fq.gz, .fq.bgz)
-    
-    DESTINATION (optional): gncv://[folder], where the folder is the location on Gencove systems
-    
-    Example: `gencove upload test_dataset gncv://test`
+
+    SOURCE: folder that contains fastq files to be uploaded (acceptable file extensions
+    are .fastq.gz, .fastq.bgz, .fq.gz, .fq.bgz)
+
+    DESTINATION (optional): gncv://[folder], where the folder is the location on Gencove
+    systems
+
+    Example:
+
+        gencove upload test_dataset gncv://test
     \f
 
-    :param source: folder that contains fastq files to be uploaded. 
+    :param source: folder that contains fastq files to be uploaded.
     :type source: .fastq.gz, .fastq.bgz, .fq.gz, .fq.bgz
     :param destination: (optional) 'gncv://' notated folder
         on Gencove's system, where the files will be uploaded to.
     :type destination: str
-
-    Example:
-        `gencove upload test_dataset gncv://test`
     """
     upload_fastqs(source, destination, host, email, password)
 
@@ -103,10 +104,26 @@ def download(  # pylint: disable=C0330,R0913
     email,
     password,
     skip_existing,
-):  # noqa: D413 # pylint: disable=C0301
+):  # noqa: D413,D301,D412 # pylint: disable=C0301
     """Download deliverables of a project.
 
     Must specify either project id or sample ids.
+
+    Examples:
+
+        Download all samples results:
+
+        gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db
+
+        Download some samples:
+
+        gencove download ./results --sample-ids 59f5c1fd-cce0-4c4c-90e2-0b6c6c525d71,7edee497-12b5-4a1d-951f-34dc8dce1c1d
+
+        Download specific deliverables:
+
+        gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db --file-types alignment-bam,impute-vcf,fastq-r1,fastq-r2
+
+    \f
 
     :param destination: path/to/save/deliverables/to.
     :type destination: str
@@ -120,19 +137,6 @@ def download(  # pylint: disable=C0330,R0913
     :type file_types: list(str)
     :param skip_existing: skip downloading existing files
     :type skip_existing: bool
-
-    Examples:
-        Download all samples results:
-
-        `gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db`
-
-        Download some samples:
-
-        `gencove download ./results --sample-ids 59f5c1fd-cce0-4c4c-90e2-0b6c6c525d71,7edee497-12b5-4a1d-951f-34dc8dce1c1d`
-
-        Download specific deliverables:
-
-        `gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db --file-types alignment-bam,impute-vcf,fastq-r1,fastq-r2`
     """  # noqa: E501
     s_ids = tuple()
     if sample_ids:

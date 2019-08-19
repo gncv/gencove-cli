@@ -150,7 +150,10 @@ def _download_file(download_to, file_prefix, url, skip_existing):
             ):
                 downloaded_file.write(chunk)
 
-        os.replace(file_path_tmp, file_path)
+        # Cross-platform cross-python-version file overwriting
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        os.rename(file_path_tmp, file_path)
         echo("Finished downloading a file: {}".format(file_path))
 
 

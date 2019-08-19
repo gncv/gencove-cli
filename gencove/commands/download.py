@@ -150,7 +150,10 @@ def _download_file(download_to, file_prefix, url, skip_existing):
             ):
                 downloaded_file.write(chunk)
 
-        os.replace(file_path_tmp, file_path)
+        # Cross-platform cross-python-version file overwriting
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        os.rename(file_path_tmp, file_path)
         echo("Finished downloading a file: {}".format(file_path))
 
 
@@ -165,7 +168,9 @@ def _create_filepath(download_to, file_prefix, filename):
     :type filename: str
     """
     path = os.path.join(download_to, file_prefix)
-    os.makedirs(path, exist_ok=True)
+    # Cross-platform cross-python-version directory creation
+    if not os.path.exists(path):
+        os.makedirs(path)
     file_path = os.path.join(path, filename)
     echo_debug("Deduced full file path is {}".format(file_path))
     return file_path

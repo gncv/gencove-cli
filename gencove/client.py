@@ -9,12 +9,11 @@ from builtins import str as text  # noqa
 import datetime  # noqa
 import json  # noqa
 
-try:
-    # python 3
-    from urllib.parse import urljoin, urlparse  # noqa
-except ImportError:  # noqa
-    # python 2.7
-    from urlparse import urljoin, urlparse  # noqa
+from future.standard_library import install_aliases
+
+install_aliases()
+
+from urllib.parse import urljoin, urlparse  # noqa
 
 from requests import get, post, ConnectTimeout, ReadTimeout, codes  # noqa
 

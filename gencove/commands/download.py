@@ -4,6 +4,8 @@ import re
 import uuid
 from collections import namedtuple
 
+from gencove.client import APIClientError
+
 try:
     # python 3.7
     from urllib.parse import urlparse, parse_qs  # noqa
@@ -217,7 +219,12 @@ def _process_sample(
     destination, sample_id, file_types, api_client, skip_existing
 ):
     """Download sample deliverables."""
-    sample = api_client.get_sample_details(sample_id)
+    try:
+        sample = api_client.get_sample_details(sample_id)
+    except APIClientError:
+        echo_warning("Sample with id {} not found".format(sample_id))
+        return
+
     echo_debug(
         "Processing sample id {}, status {}".format(
             sample["id"], sample["last_status"]["status"]

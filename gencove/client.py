@@ -13,7 +13,7 @@ from future.standard_library import install_aliases
 
 install_aliases()
 
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse  # noqa
 
 from requests import get, post, ConnectTimeout, ReadTimeout, codes  # noqa
 

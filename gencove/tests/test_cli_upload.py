@@ -20,7 +20,7 @@ def test_upload(mocker):
             APIClient, "login", return_value=None
         )
         mocked_get_credentials = mocker.patch(
-            "gencove.commands.upload.get_s3_client_refreshable"
+            "gencove.command.upload.get_s3_client_refreshable"
         )
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
@@ -31,7 +31,7 @@ def test_upload(mocker):
             },
         )
         mocked_upload_file = mocker.patch(
-            "gencove.commands.upload.upload_file"
+            "gencove.command.upload.upload_file"
         )
         res = runner.invoke(
             upload,

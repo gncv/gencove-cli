@@ -4,8 +4,8 @@ import os
 import click
 
 from gencove import version
-from gencove.commands.download import Filters, Options, download_deliverables
-from gencove.commands.upload import upload_fastqs
+from gencove.command.download import Filters, Options, download_deliverables
+from gencove.command.upload import upload_fastqs
 from gencove.constants import Credentials, HOST
 from gencove.logger import echo_debug
 

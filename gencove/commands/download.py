@@ -4,8 +4,6 @@ import re
 import uuid
 from collections import namedtuple
 
-from gencove.client import APIClientError
-
 try:
     # python 3.7
     from urllib.parse import urlparse, parse_qs  # noqa
@@ -76,21 +74,31 @@ def download_deliverables(destination, filters, credentials, options):
             )
         )
         count = 0
-        for sample in _get_paginated_samples(filters.project_id, api_client):
-            _process_sample(
-                destination,
-                sample["id"],
-                filters.file_types,
-                api_client,
-                options.skip_existing,
+        try:
+            samples_generator = _get_paginated_samples(
+                filters.project_id, api_client
             )
+            for sample in samples_generator:
+                _process_sample(
+                    destination,
+                    sample["id"],
+                    filters.file_types,
+                    api_client,
+                    options.skip_existing,
+                )
+                count += 1
 
-        if not count:
-            echo_warning("Project has no samples to download")
+            if not count:
+                echo_warning("Project has no samples to download")
+                return
+
+            echo_debug("Processed {} samples".format(count))
             return
-
-        echo_debug("Processed {} samples".format(count))
-        return
+        except client.APIClientError:
+            echo_warning(
+                "Project id {} not found.".format(filters.project_id)
+            )
+            return
 
     for sample_id in filters.sample_ids:
         _process_sample(
@@ -156,7 +164,6 @@ def _download_file(download_to, file_prefix, url, skip_existing):
                 req.iter_content(chunk_size=CHUNK_SIZE),
                 total=total_mb / NUM_MB_IN_CHUNK,
                 unit="MB",
-                leave=True,
                 desc="Progress: ",
                 unit_scale=NUM_MB_IN_CHUNK,
             ):
@@ -221,8 +228,11 @@ def _process_sample(
     """Download sample deliverables."""
     try:
         sample = api_client.get_sample_details(sample_id)
-    except APIClientError:
-        echo_warning("Sample with id {} not found".format(sample_id))
+    except client.APIClientError:
+        echo_warning(
+            "Sample with id {} not found. "
+            "Are you using client id instead of sample id.".format(sample_id)
+        )
         return
 
     echo_debug(

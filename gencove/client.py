@@ -218,10 +218,10 @@ class APIClient:
             self.endpoints.get_upload_credentials, authorized=True
         )
 
-    def get_project_samples(self, project_id):
+    def get_project_samples(self, project_id, next_link=None):
         """List single project's associated samples."""
         return self._get(
-            self.endpoints.project_samples.format(id=project_id),
+            next_link or self.endpoints.project_samples.format(id=project_id),
             authorized=True,
         )
 

@@ -73,16 +73,8 @@ def download_deliverables(destination, filters, credentials, options):
                 filters.project_id
             )
         )
-        samples = api_client.get_project_samples(filters.project_id)[
-            "results"
-        ]
-        echo_debug("Found {} project samples".format(len(samples)))
-
-        if not samples:
-            echo_warning("Project has no samples to download")
-            return
-
-        for sample in samples:
+        count = 0
+        for sample in _get_paginated_samples(filters.project_id, api_client):
             _process_sample(
                 destination,
                 sample["id"],
@@ -91,6 +83,11 @@ def download_deliverables(destination, filters, credentials, options):
                 options.skip_existing,
             )
 
+        if not count:
+            echo_warning("Project has no samples to download")
+            return
+
+        echo_debug("Processed {} samples".format(count))
         return
 
     for sample_id in filters.sample_ids:
@@ -101,6 +98,19 @@ def download_deliverables(destination, filters, credentials, options):
             api_client,
             options.skip_existing,
         )
+
+
+def _get_paginated_samples(project_id, api_client):
+    """Generate for project samples that traverses all pages."""
+    get_samples = True
+    next_page = None
+    while get_samples:
+        echo_debug("Getting page: {}".format(next_page or 1))
+        req = api_client.get_project_samples(project_id, next_page)
+        for sample in req["results"]:
+            yield sample
+        next_page = req["meta"]["next"]
+        get_samples = next_page is not None
 
 
 def _download_file(download_to, file_prefix, url, skip_existing):

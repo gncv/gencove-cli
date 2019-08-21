@@ -32,7 +32,7 @@ def test_project_id_provided(mocker):
         mocked_project_samples = mocker.patch.object(
             APIClient,
             "get_project_samples",
-            return_value={"results": [{"id": 0}]},
+            return_value={"results": [{"id": 0}], "meta": {"next": None}},
         )
         mocked_sample_details = mocker.patch.object(
             APIClient,

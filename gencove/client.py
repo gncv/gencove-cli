@@ -11,10 +11,10 @@ import json  # noqa
 
 try:
     # python 3
-    from urllib.parse import urljoin  # noqa
+    from urllib.parse import urljoin, urlparse  # noqa
 except ImportError:  # noqa
     # python 2.7
-    from urlparse import urljoin  # noqa
+    from urlparse import urljoin, urlparse  # noqa
 
 from requests import get, post, ConnectTimeout, ReadTimeout, codes  # noqa
 
@@ -218,12 +218,14 @@ class APIClient:
             self.endpoints.get_upload_credentials, authorized=True
         )
 
-    def get_project_samples(self, project_id):
+    def get_project_samples(self, project_id, next_link=None):
         """List single project's associated samples."""
-        return self._get(
-            self.endpoints.project_samples.format(id=project_id),
-            authorized=True,
+        url_parts = urlparse(next_link)
+        project_endpoint = self.endpoints.project_samples.format(
+            id=project_id
         )
+        next_endpoint = "{}?{}".format(project_endpoint, url_parts.query)
+        return self._get(next_endpoint or project_endpoint, authorized=True)
 
     def get_sample_details(self, sample_id):
         """Fetch single sample details."""

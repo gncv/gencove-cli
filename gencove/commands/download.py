@@ -73,25 +73,32 @@ def download_deliverables(destination, filters, credentials, options):
                 filters.project_id
             )
         )
-        samples = api_client.get_project_samples(filters.project_id)[
-            "results"
-        ]
-        echo_debug("Found {} project samples".format(len(samples)))
-
-        if not samples:
-            echo_warning("Project has no samples to download")
-            return
-
-        for sample in samples:
-            _process_sample(
-                destination,
-                sample["id"],
-                filters.file_types,
-                api_client,
-                options.skip_existing,
+        count = 0
+        try:
+            samples_generator = _get_paginated_samples(
+                filters.project_id, api_client
             )
+            for sample in samples_generator:
+                _process_sample(
+                    destination,
+                    sample["id"],
+                    filters.file_types,
+                    api_client,
+                    options.skip_existing,
+                )
+                count += 1
 
-        return
+            if not count:
+                echo_warning("Project has no samples to download")
+                return
+
+            echo_debug("Processed {} samples".format(count))
+            return
+        except client.APIClientError:
+            echo_warning(
+                "Project id {} not found.".format(filters.project_id)
+            )
+            return
 
     for sample_id in filters.sample_ids:
         _process_sample(
@@ -101,6 +108,19 @@ def download_deliverables(destination, filters, credentials, options):
             api_client,
             options.skip_existing,
         )
+
+
+def _get_paginated_samples(project_id, api_client):
+    """Generate for project samples that traverses all pages."""
+    get_samples = True
+    next_page = None
+    while get_samples:
+        echo_debug("Getting page: {}".format(next_page or 1))
+        req = api_client.get_project_samples(project_id, next_page)
+        for sample in req["results"]:
+            yield sample
+        next_page = req["meta"]["next"]
+        get_samples = next_page is not None
 
 
 def _download_file(download_to, file_prefix, url, skip_existing):
@@ -144,7 +164,6 @@ def _download_file(download_to, file_prefix, url, skip_existing):
                 req.iter_content(chunk_size=CHUNK_SIZE),
                 total=total_mb / NUM_MB_IN_CHUNK,
                 unit="MB",
-                leave=True,
                 desc="Progress: ",
                 unit_scale=NUM_MB_IN_CHUNK,
             ):
@@ -207,7 +226,15 @@ def _process_sample(
     destination, sample_id, file_types, api_client, skip_existing
 ):
     """Download sample deliverables."""
-    sample = api_client.get_sample_details(sample_id)
+    try:
+        sample = api_client.get_sample_details(sample_id)
+    except client.APIClientError:
+        echo_warning(
+            "Sample with id {} not found. "
+            "Are you using client id instead of sample id?".format(sample_id)
+        )
+        return
+
     echo_debug(
         "Processing sample id {}, status {}".format(
             sample["id"], sample["last_status"]["status"]

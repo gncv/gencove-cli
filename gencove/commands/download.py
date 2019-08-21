@@ -231,7 +231,7 @@ def _process_sample(
     except client.APIClientError:
         echo_warning(
             "Sample with id {} not found. "
-            "Are you using client id instead of sample id.".format(sample_id)
+            "Are you using client id instead of sample id?".format(sample_id)
         )
         return
 

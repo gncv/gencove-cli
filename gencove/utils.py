@@ -9,6 +9,7 @@ from botocore.exceptions import ClientError
 from botocore.session import get_session
 
 import click
+from tqdm import tqdm
 
 from gencove.constants import FASTQ_EXTENSIONS
 from gencove.logger import echo_debug
@@ -16,6 +17,8 @@ from gencove.logger import echo_debug
 KB = 1024
 MB = KB * 1024
 GB = MB * 1024
+NUM_MB_IN_CHUNK = 100
+CHUNK_SIZE = NUM_MB_IN_CHUNK * MB
 
 
 def get_s3_client_refreshable(refresh_method):
@@ -33,8 +36,16 @@ def get_s3_client_refreshable(refresh_method):
     session._credentials = session_credentials
     boto3_session = boto3.Session(botocore_session=session)
     return boto3_session.client(
-        "s3", endpoint_url=os.environ.get("GENCOVE_LOCALSTACK_S3_ENDPOINT")
+        "s3",
+        endpoint_url=os.environ.get("GENCOVE_LOCALSTACK_S3_ENDPOINT") or None,
     )
+
+
+def _progress_bar_update(pbar):
+    def _update_pbar(chunk_uploaded_in_bytes):
+        pbar.update(chunk_uploaded_in_bytes / MB)
+
+    return _update_pbar
 
 
 def upload_file(s3_client, file_name, bucket, object_name=None):
@@ -54,12 +65,22 @@ def upload_file(s3_client, file_name, bucket, object_name=None):
     try:
         # Set desired multipart threshold value of 5GB
         config = TransferConfig(
-            multipart_threshold=100 * MB,
-            multipart_chunksize=100 * MB,
+            multipart_threshold=CHUNK_SIZE,
+            multipart_chunksize=CHUNK_SIZE,
             use_threads=True,
             max_concurrency=10,
         )
-        s3_client.upload_file(file_name, bucket, object_name, Config=config)
+        num_chunks = int(os.path.getsize(file_name) / MB)
+        with tqdm(
+            total=num_chunks, unit="MB", desc="Progress: "
+        ) as progress_bar:
+            s3_client.upload_file(
+                file_name,
+                bucket,
+                object_name,
+                Config=config,
+                Callback=_progress_bar_update(progress_bar),
+            )
     except ClientError as err:
         click.echo(
             "Failed to upload file {}: {}".format(file_name, err), err=True

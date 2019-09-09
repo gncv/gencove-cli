@@ -9,10 +9,12 @@ from botocore.exceptions import ClientError
 from botocore.session import get_session
 
 import click
+
 from tqdm import tqdm
 
-from gencove.constants import FASTQ_EXTENSIONS
+from gencove.constants import FASTQ_EXTENSIONS  # noqa: I100
 from gencove.logger import echo_debug
+
 
 KB = 1024
 MB = KB * 1024
@@ -70,9 +72,15 @@ def upload_file(s3_client, file_name, bucket, object_name=None):
             use_threads=True,
             max_concurrency=10,
         )
-        num_chunks = int(os.path.getsize(file_name) / MB)
+        # pylint: disable=C0330
         with tqdm(
-            total=num_chunks, unit="MB", desc="Progress: "
+            total=int(os.path.getsize(file_name) / MB),
+            unit="MB",
+            desc="Progress: ",
+            unit_scale=True,
+            unit_divisor=MB,
+            ncols=150,
+            leave=True,
         ) as progress_bar:
             s3_client.upload_file(
                 file_name,

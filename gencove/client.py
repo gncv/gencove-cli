@@ -9,11 +9,12 @@ from builtins import str as text  # noqa
 import datetime  # noqa
 import json  # noqa
 
-from future.standard_library import install_aliases
-
-install_aliases()
-
-from urllib.parse import urljoin, urlparse  # noqa
+try:
+    # python 3
+    from urllib.parse import urljoin, urlparse  # noqa
+except ImportError:  # noqa
+    # python 2.7
+    from urlparse import urljoin, urlparse  # noqa
 
 from requests import get, post, ConnectTimeout, ReadTimeout, codes  # noqa
 
@@ -219,11 +220,13 @@ class APIClient:
 
     def get_project_samples(self, project_id, next_link=None):
         """List single project's associated samples."""
-        url_parts = urlparse(next_link)
         project_endpoint = self.endpoints.project_samples.format(
             id=project_id
         )
-        next_endpoint = "{}?{}".format(project_endpoint, url_parts.query)
+        next_endpoint = None
+        if next_link:
+            url_parts = urlparse(next_link)
+            next_endpoint = "{}?{}".format(project_endpoint, url_parts.query)
         return self._get(next_endpoint or project_endpoint, authorized=True)
 
     def get_sample_details(self, sample_id):

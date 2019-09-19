@@ -13,4 +13,15 @@ Main documentation can be found here: [http://docs.gencove.com](http://docs.genc
 pip install -e .
 ```
 
-Work as needed, package is installed in editable mode.
+Install local requirements:
+```bash
+pip install -r requirements.txt
+```
+
+Before pushing run:
+
+```bash
+tox
+```
+
+This will run tests, black formatter and linters.

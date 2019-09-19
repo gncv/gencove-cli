@@ -10,12 +10,17 @@ from botocore.session import get_session
 
 import click
 
-from gencove.constants import FASTQ_EXTENSIONS
+import progressbar
+
+from gencove.constants import FASTQ_EXTENSIONS  # noqa: I100
 from gencove.logger import echo_debug
+
 
 KB = 1024
 MB = KB * 1024
 GB = MB * 1024
+NUM_MB_IN_CHUNK = 100
+CHUNK_SIZE = NUM_MB_IN_CHUNK * MB
 
 
 def get_s3_client_refreshable(refresh_method):
@@ -33,7 +38,53 @@ def get_s3_client_refreshable(refresh_method):
     session._credentials = session_credentials
     boto3_session = boto3.Session(botocore_session=session)
     return boto3_session.client(
-        "s3", endpoint_url=os.environ.get("GENCOVE_LOCALSTACK_S3_ENDPOINT")
+        "s3",
+        endpoint_url=os.environ.get("GENCOVE_LOCALSTACK_S3_ENDPOINT") or None,
+    )
+
+
+def _progress_bar_update(pbar):
+    """Update progress bar manually.
+
+    Helper method for S3 Transfer,
+    which needs a callback to update the progressbar.
+
+    :param pbar: progressbar.ProgressBar instance
+    :returns
+        a function that in turn accepts chunk that is used to update the
+        progressbar.
+    """
+    # noqa: D202
+    def _update_pbar(chunk_uploaded_in_bytes):
+        pbar.update(pbar.value + chunk_uploaded_in_bytes)
+
+    return _update_pbar
+
+
+def get_progress_bar(total_size, action):
+    """Get progressbar.ProgressBar instance.
+
+    :param total_size: int
+    :param action: str that will be prepended to the progressbar.
+        i.e "Uploading: " or "Downloading: "
+
+    :returns progressbar.ProgressBar instance
+    """
+    return progressbar.ProgressBar(
+        max_value=total_size,
+        widgets=[
+            action,
+            progressbar.Percentage(),
+            " ",
+            progressbar.Bar(marker="#", left="[", right="]"),
+            " ",
+            progressbar.ETA(),
+            " ",
+            progressbar.Timer(),
+            " ",
+            progressbar.FileTransferSpeed(),
+        ],
+        redirect_stdout=True,
     )
 
 
@@ -54,12 +105,24 @@ def upload_file(s3_client, file_name, bucket, object_name=None):
     try:
         # Set desired multipart threshold value of 5GB
         config = TransferConfig(
-            multipart_threshold=100 * MB,
-            multipart_chunksize=100 * MB,
+            multipart_threshold=CHUNK_SIZE,
+            multipart_chunksize=CHUNK_SIZE,
             use_threads=True,
             max_concurrency=10,
         )
-        s3_client.upload_file(file_name, bucket, object_name, Config=config)
+
+        progress_bar = get_progress_bar(
+            os.path.getsize(file_name), "Uploading: "
+        )
+        progress_bar.start()
+        s3_client.upload_file(
+            file_name,
+            bucket,
+            object_name,
+            Config=config,
+            Callback=_progress_bar_update(progress_bar),
+        )
+        progress_bar.finish()
     except ClientError as err:
         click.echo(
             "Failed to upload file {}: {}".format(file_name, err), err=True

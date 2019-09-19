@@ -8,6 +8,25 @@ INFO = "INFO"
 DEBUG = "DEBUG"
 LOG_LEVEL = os.environ.get("GENCOVE_LOG", INFO)
 
+if LOG_LEVEL == DEBUG:
+    import sys
+    import logging
+    from platform import platform
+    import boto3
+    from gencove.version import version
+
+    click.echo(
+        "Python version: {}.{}.{}".format(
+            sys.version_info.major,
+            sys.version_info.minor,
+            sys.version_info.micro,
+        )
+    )
+    click.echo("CLI version: {}".format(version()))
+    click.echo("OS details: {}".format(platform()))
+    click.echo("boto3 version: {}".format(boto3.__version__))
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+
 
 def output_warning(text):
     """Click echo warning."""

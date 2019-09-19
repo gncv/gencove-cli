@@ -10,7 +10,7 @@ from botocore.session import get_session
 
 import click
 
-from tqdm import tqdm
+import progressbar
 
 from gencove.constants import FASTQ_EXTENSIONS  # noqa: I100
 from gencove.logger import echo_debug
@@ -44,10 +44,48 @@ def get_s3_client_refreshable(refresh_method):
 
 
 def _progress_bar_update(pbar):
+    """Update progress bar manually.
+
+    Helper method for S3 Transfer,
+    which needs a callback to update the progressbar.
+
+    :param pbar: progressbar.ProgressBar instance
+    :returns
+        a function that in turn accepts chunk that is used to update the
+        progressbar.
+    """
+    # noqa: D202
     def _update_pbar(chunk_uploaded_in_bytes):
-        pbar.update(chunk_uploaded_in_bytes / MB)
+        pbar.update(pbar.value + chunk_uploaded_in_bytes)
 
     return _update_pbar
+
+
+def get_progress_bar(total_size, action):
+    """Get progressbar.ProgressBar instance.
+
+    :param total_size: int
+    :param action: str that will be prepended to the progressbar.
+        i.e "Uploading: " or "Downloading: "
+
+    :returns progressbar.ProgressBar instance
+    """
+    return progressbar.ProgressBar(
+        max_value=total_size,
+        widgets=[
+            action,
+            progressbar.Percentage(),
+            " ",
+            progressbar.Bar(marker="#", left="[", right="]"),
+            " ",
+            progressbar.ETA(),
+            " ",
+            progressbar.Timer(),
+            " ",
+            progressbar.FileTransferSpeed(),
+        ],
+        redirect_stdout=True,
+    )
 
 
 def upload_file(s3_client, file_name, bucket, object_name=None):
@@ -72,23 +110,19 @@ def upload_file(s3_client, file_name, bucket, object_name=None):
             use_threads=True,
             max_concurrency=10,
         )
-        # pylint: disable=C0330
-        with tqdm(
-            total=int(os.path.getsize(file_name) / MB),
-            unit="MB",
-            desc="Progress: ",
-            unit_scale=True,
-            unit_divisor=MB,
-            ncols=150,
-            leave=True,
-        ) as progress_bar:
-            s3_client.upload_file(
-                file_name,
-                bucket,
-                object_name,
-                Config=config,
-                Callback=_progress_bar_update(progress_bar),
-            )
+
+        progress_bar = get_progress_bar(
+            os.path.getsize(file_name), "Uploading: "
+        )
+        progress_bar.start()
+        s3_client.upload_file(
+            file_name,
+            bucket,
+            object_name,
+            Config=config,
+            Callback=_progress_bar_update(progress_bar),
+        )
+        progress_bar.finish()
     except ClientError as err:
         click.echo(
             "Failed to upload file {}: {}".format(file_name, err), err=True

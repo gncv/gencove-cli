@@ -11,14 +11,12 @@ except ImportError:
     # python 2.7
     from urlparse import urlparse, parse_qs  # noqa
 
-import requests  # noqa: I100
-
-from tqdm import tqdm
+import requests
 
 from gencove import client  # noqa: I100
 from gencove.constants import SAMPLE_STATUSES
 from gencove.logger import echo, echo_debug, echo_warning
-from gencove.utils import login
+from gencove.utils import get_progress_bar, login
 
 
 ALLOWED_STATUSES_RE = re.compile(
@@ -145,7 +143,6 @@ def _download_file(download_to, file_prefix, url, skip_existing):
             download_to, file_prefix, filename_tmp
         )
         total = int(req.headers["content-length"])
-        total_mb = int(total / MEGABYTE)
 
         # pylint: disable=C0330
         if (
@@ -159,15 +156,12 @@ def _download_file(download_to, file_prefix, url, skip_existing):
         echo_debug("Starting to download file to: {}".format(file_path))
 
         with open(file_path_tmp, "wb") as downloaded_file:
-            # pylint: disable=C0330
-            for chunk in tqdm(
-                req.iter_content(chunk_size=CHUNK_SIZE),
-                total=total_mb / NUM_MB_IN_CHUNK,
-                unit="MB",
-                desc="Progress: ",
-                unit_scale=NUM_MB_IN_CHUNK,
-            ):
+            pbar = get_progress_bar(total, "Downloading: ")
+            pbar.start()
+            for chunk in req.iter_content(chunk_size=CHUNK_SIZE):
                 downloaded_file.write(chunk)
+                pbar.update(pbar.value + len(chunk))
+            pbar.finish()
 
         # Cross-platform cross-python-version file overwriting
         if os.path.exists(file_path):

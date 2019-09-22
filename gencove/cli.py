@@ -4,8 +4,12 @@ import os
 import click
 
 from gencove import version
-from gencove.command.download import Filters, Options, download_deliverables
-from gencove.command.upload import upload_fastqs
+from gencove.command.download import (
+    DownloadFilters,
+    DownloadOptions,
+    download_deliverables,
+)
+from gencove.command.upload import UploadOptions, upload_fastqs
 from gencove.constants import Credentials, HOST
 from gencove.logger import echo_debug
 
@@ -37,7 +41,14 @@ def cli():
     help="Gencove user password to be used in login. "
     "Can be passed as GENCOVE_PASSWORD environment variable",
 )
-def upload(source, destination, host, email, password):  # noqa: D301
+@click.option(
+    "--run-project-id",
+    default=None,
+    help="Immediately assign all uploaded files to this project and run them",
+)
+def upload(  # pylint: disable=C0330,R0913
+    source, destination, host, email, password, run_project_id
+):  # noqa: D301
     """Upload FASTQ files to Gencove's system.
 
     SOURCE: folder that contains fastq files to be uploaded (acceptable file
@@ -56,8 +67,16 @@ def upload(source, destination, host, email, password):  # noqa: D301
     :param destination: (optional) 'gncv://' notated folder
         on Gencove's system, where the files will be uploaded to.
     :type destination: str
+    :param run_project_id: ID of a project to which all files in this upload
+        will be assigned to and then immediately analyzed.
+    :type run_project_id: UUID
     """
-    upload_fastqs(source, destination, host, email, password)
+    upload_fastqs(
+        source,
+        destination,
+        Credentials(email, password),
+        UploadOptions(host, run_project_id),
+    )
 
 
 @cli.command()
@@ -150,9 +169,9 @@ def download(  # pylint: disable=C0330,R0913
 
     download_deliverables(
         destination,
-        Filters(project_id, s_ids, f_types),
+        DownloadFilters(project_id, s_ids, f_types),
         Credentials(email, password),
-        Options(host, skip_existing),
+        DownloadOptions(host, skip_existing),
     )
 
 

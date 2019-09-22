@@ -1,10 +1,12 @@
 """Uploads fastq files to Gencove's system."""
 import uuid
+from collections import namedtuple
 from datetime import datetime
 
 from gencove import client
 from gencove.constants import (
     FASTQ_EXTENSIONS,
+    Optionals,
     TMP_UPLOADS_WARNING,
     UPLOAD_PREFIX,
     UPLOAD_STATUSES,
@@ -19,7 +21,12 @@ from gencove.utils import (
 )
 
 
-def upload_fastqs(source, destination, host, email, password):
+UploadOptions = namedtuple(  # pylint: disable=invalid-name
+    "UploadOptions", Optionals._fields + ("project_id",)
+)
+
+
+def upload_fastqs(source, destination, credentials, options):
     """Upload FASTQ files to Gencove's system.
 
     :param source: folder that contains fastq files to be uploaded.
@@ -27,8 +34,12 @@ def upload_fastqs(source, destination, host, email, password):
     :param destination: (optional) 'gncv://' notated folder
         on Gencove's system, where the files will be uploaded to.
     :type destination: str
+    :param credentials: Gencove username/password to authentication.
+    :type credentials: Credentials named tuple
+    :param options: cli optional parameters
+    :type options: UploadOptions named tuple
     """
-    echo_debug("Host is {}".format(host))
+    echo_debug("Host is {}".format(options.host))
 
     files_to_upload = list(seek_files_to_upload(source))
     if not files_to_upload:
@@ -58,8 +69,8 @@ def upload_fastqs(source, destination, host, email, password):
         )
         echo("Files will be uploaded to: {}".format(destination))
 
-    api_client = client.APIClient(host)
-    login(api_client, email, password)
+    api_client = client.APIClient(options.host)
+    login(api_client, credentials.email, credentials.password)
     s3_client = get_s3_client_refreshable(api_client.get_upload_credentials)
 
     for file_path in files_to_upload:

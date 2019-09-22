@@ -42,3 +42,4 @@ _SampleStatuses = namedtuple("SampleStatuses", ["succeeded", "failed"])
 SAMPLE_STATUSES = _SampleStatuses("succeeded", "failed")
 
 Credentials = namedtuple("Credentials", ["email", "password"])
+Optionals = namedtuple("Optionals", ["host"])

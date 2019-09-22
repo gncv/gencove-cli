@@ -14,7 +14,7 @@ except ImportError:
 import requests
 
 from gencove import client  # noqa: I100
-from gencove.constants import SAMPLE_STATUSES
+from gencove.constants import Optionals, SAMPLE_STATUSES
 from gencove.logger import echo, echo_debug, echo_warning
 from gencove.utils import get_progress_bar, login
 
@@ -29,8 +29,12 @@ MEGABYTE = 1024 * KILOBYTE
 NUM_MB_IN_CHUNK = 3
 CHUNK_SIZE = NUM_MB_IN_CHUNK * MEGABYTE
 
-Filters = namedtuple("Filters", ["project_id", "sample_ids", "file_types"])
-Options = namedtuple("Options", ["host", "skip_existing"])
+DownloadFilters = namedtuple(
+    "Filters", ["project_id", "sample_ids", "file_types"]
+)
+DownloadOptions = namedtuple(  # pylint: disable=invalid-name
+    "DownloadOptions", Optionals._fields + ("skip_existing",)
+)
 
 
 def download_deliverables(destination, filters, credentials, options):
@@ -40,8 +44,6 @@ def download_deliverables(destination, filters, credentials, options):
     :type destination: str
     :param filters: allows to filter project deliverables to be downloaded
     :type filters: Filters
-    :param host: API host to interact with.
-    :type host: str
     :param credentials: login username/password
     :type credentials: Credentials
     :param options: different options to tweak execution

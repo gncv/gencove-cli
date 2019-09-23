@@ -142,14 +142,14 @@ def download(  # pylint: disable=C0330,R0913
         gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db --file-types alignment-bam,impute-vcf,fastq-r1,fastq-r2
 
     \f
-    
+
     Args:
         destination (str): path/to/save/deliverables/to.
         project_id (str): project id in Gencove's system.
-        sample_ids (list(str), optional): specific samples for which 
-            to download the results. if not specified, download deliverables 
+        sample_ids (list(str), optional): specific samples for which
+            to download the results. if not specified, download deliverables
             for all samples.
-        file_types (list(str), optional): specific deliverables to download 
+        file_types (list(str), optional): specific deliverables to download
             results for. if not specified, all file types will be downloaded.
         skip_existing (bool, optional, default True): skip downloading existing
             files.

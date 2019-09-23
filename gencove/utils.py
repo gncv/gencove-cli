@@ -43,7 +43,7 @@ def get_s3_client_refreshable(refresh_method):
     )
 
 
-def _progress_bar_update(pbar):
+def _progress_bar_update(pbar):  # noqa: D413
     """Update progress bar manually.
 
     Helper method for S3 Transfer,
@@ -90,7 +90,7 @@ def get_progress_bar(total_size, action):
     )
 
 
-def upload_file(s3_client, file_name, bucket, object_name=None):
+def upload_file(s3_client, file_name, bucket, object_name=None):  # noqa: D413
     """Upload a file to an S3 bucket.
 
     Args:

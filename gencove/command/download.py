@@ -172,7 +172,8 @@ def _create_filepath(download_to, file_prefix, filename):
 
     Args:
         download_to (str): top level directory path
-        file_prefix (str): subdirectories structure to create under download_to.
+        file_prefix (str): subdirectories structure to create under
+            download_to.
         filename (str): name of the file inside download_to/file_prefix
             structure.
     """

@@ -90,12 +90,15 @@ def upload_fastqs(source, destination, credentials, options):
         )
 
 
-def upload_via_file_path(file_path, destination, api_client, s3_client):
+def upload_via_file_path(  # pylint: disable=bad-continuation
+    file_path, destination, api_client, s3_client
+):  # noqa: D413,E501
     """Prepare file and upload, if it wasn't uploaded yet.
 
     Args:
         file_path (str): a local system path to a file to be uploaded.
-        destination (str): destination path in Gencove bucket. gncv notated path.
+        destination (str): destination path in Gencove bucket.
+            gncv notated path.
         api_client (APIClient): instantiated Gencove api client.
         s3_client (boto3 s3 client): instantiated boto3 S3 client.
 

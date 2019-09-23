@@ -18,8 +18,9 @@ except ImportError:  # noqa
 
 from requests import get, post, ConnectTimeout, ReadTimeout, codes  # noqa
 
-from gencove import constants  # noqa
-from gencove.logger import echo_debug  # noqa
+from gencove import constants  # noqa: I100
+from gencove.constants import SAMPLE_ASSIGNMENT_STATUS
+from gencove.logger import echo_debug
 
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -229,9 +230,40 @@ class APIClient:
             next_endpoint = "{}?{}".format(project_endpoint, url_parts.query)
         return self._get(next_endpoint or project_endpoint, authorized=True)
 
+    def add_samples_to_project(self, samples, project_id):
+        """Assign samples to a project.
+
+        :param samples: sample sheet results
+        :type samples: list of dicts
+        :param project_id: project to which to assign the samples
+        :type project_id: str
+        """
+        return self._post(
+            self.endpoints.project_samples.format(id=project_id),
+            samples,
+            authorized=True,
+        )
+
     def get_sample_details(self, sample_id):
         """Fetch single sample details."""
         return self._get(
             self.endpoints.sample_details.format(id=sample_id),
+            authorized=True,
+        )
+
+    def get_sample_sheet(
+        self, gncv_path=None, is_assigned=SAMPLE_ASSIGNMENT_STATUS.all
+    ):
+        """Fetch user samples.
+
+        :param gncv_path: filter samples by gncv notated path
+        :type gncv_path: str
+        :param is_assigned: filter samples by assignment status.
+            One of SAMPLE_ASSIGNMENT_STATUS
+        :type is_assigned: str
+        """
+        return self._get(
+            self.endpoints.sample_sheet,
+            query_params={"search": gncv_path, "status": is_assigned},
             authorized=True,
         )

@@ -19,6 +19,7 @@ _APIEndpoint = namedtuple(
         "get_upload_credentials",
         "project_samples",
         "sample_details",
+        "sample_sheet",
     ],
 )
 API_ENDPOINTS = _APIEndpoint(
@@ -29,6 +30,7 @@ API_ENDPOINTS = _APIEndpoint(
     "/api/v2/upload-credentials/",
     "/api/v2/project-samples/{id}",
     "/api/v2/samples/{id}",
+    "/api/v2/sample-sheet/",
 )
 
 _UploadStatuses = namedtuple("UploadStatuses", ["done", "started", "failed"])
@@ -40,6 +42,12 @@ UPLOAD_PREFIX = "gncv://"
 
 _SampleStatuses = namedtuple("SampleStatuses", ["succeeded", "failed"])
 SAMPLE_STATUSES = _SampleStatuses("succeeded", "failed")
+_SampleAssignmentStatus = namedtuple(
+    "SampleAssignmentStatus", ["all", "unassigned", "assigned"]
+)
+SAMPLE_ASSIGNMENT_STATUS = _SampleAssignmentStatus(
+    "all", "unassigned", "assigned"
+)
 
 Credentials = namedtuple("Credentials", ["email", "password"])
 Optionals = namedtuple("Optionals", ["host"])

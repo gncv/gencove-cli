@@ -62,14 +62,13 @@ def upload(  # pylint: disable=C0330,R0913
         gencove upload test_dataset gncv://test
     \f
 
-    :param source: folder that contains fastq files to be uploaded.
-    :type source: .fastq.gz, .fastq.bgz, .fq.gz, .fq.bgz
-    :param destination: (optional) 'gncv://' notated folder
-        on Gencove's system, where the files will be uploaded to.
-    :type destination: str
-    :param run_project_id: ID of a project to which all files in this upload
-        will be assigned to and then immediately analyzed.
-    :type run_project_id: UUID
+    Args:
+        source (.fastq.gz, .fastq.bgz, .fq.gz, .fq.bgz):
+            folder that contains fastq files to be uploaded.
+        destination (str, optional): 'gncv://' notated folder
+            on Gencove's system, where the files will be uploaded to.
+        run_project_id (UUID, optional): ID of a project to which all files
+            in this upload will be assigned to and then immediately analyzed.
     """
     upload_fastqs(
         source,
@@ -143,19 +142,17 @@ def download(  # pylint: disable=C0330,R0913
         gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db --file-types alignment-bam,impute-vcf,fastq-r1,fastq-r2
 
     \f
-
-    :param destination: path/to/save/deliverables/to.
-    :type destination: str
-    :param project_id: project id in Gencove's system.
-    :type project_id: str
-    :param sample_ids: specific samples for which to download the results.
-    if not specified, download deliverables for all samples.
-    :type sample_ids: list(str)
-    :param file_types: specific deliverables to download results for.
-    if not specified, all file types will be downloaded.
-    :type file_types: list(str)
-    :param skip_existing: skip downloading existing files
-    :type skip_existing: bool
+    
+    Args:
+        destination (str): path/to/save/deliverables/to.
+        project_id (str): project id in Gencove's system.
+        sample_ids (list(str), optional): specific samples for which 
+            to download the results. if not specified, download deliverables 
+            for all samples.
+        file_types (list(str), optional): specific deliverables to download 
+            results for. if not specified, all file types will be downloaded.
+        skip_existing (bool, optional, default True): skip downloading existing
+            files.
     """  # noqa: E501
     s_ids = tuple()
     if sample_ids:

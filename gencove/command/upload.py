@@ -31,15 +31,14 @@ UploadOptions = namedtuple(  # pylint: disable=invalid-name
 def upload_fastqs(source, destination, credentials, options):
     """Upload FASTQ files to Gencove's system.
 
-    :param source: folder that contains fastq files to be uploaded.
-    :type source: .fastq.gz, .fastq.bgz, .fq.gz, .fq.bgz
-    :param destination: (optional) 'gncv://' notated folder
-        on Gencove's system, where the files will be uploaded to.
-    :type destination: str
-    :param credentials: Gencove username/password to authentication.
-    :type credentials: Credentials named tuple
-    :param options: cli optional parameters
-    :type options: UploadOptions named tuple
+    Args:
+        source (.fastq.gz, .fastq.bgz, .fq.gz, .fq.bgz):
+            folder that contains fastq files to be uploaded.
+        destination (str, optional): 'gncv://' notated folder
+            on Gencove's system, where the files will be uploaded to.
+        credentials (Credentials named tuple, optional):
+            Gencove username/password to authentication.
+        options (UploadOptions named tuple, optional): cli optional parameters.
     """
     echo_debug("Host is {}".format(options.host))
 
@@ -94,16 +93,14 @@ def upload_fastqs(source, destination, credentials, options):
 def upload_via_file_path(file_path, destination, api_client, s3_client):
     """Prepare file and upload, if it wasn't uploaded yet.
 
-    :param file_path: a local system path to a file to be uploaded
-    :type file_path: str
-    :param destination: destination path in Gencove bucket. gncv notated path.
-    :type destination: str
-    :param api_client: instantiated Gencove api client
-    :type api_client: APIClient
-    :param s3_client: instantiated boto3 S3 client
-    :type s3_client: boto3 s3 client
+    Args:
+        file_path (str): a local system path to a file to be uploaded.
+        destination (str): destination path in Gencove bucket. gncv notated path.
+        api_client (APIClient): instantiated Gencove api client.
+        s3_client (boto3 s3 client): instantiated boto3 S3 client.
 
-    :returns: gncv_notated_path
+    Returns:
+        gncv_notated_path
     """
     clean_file_path = get_filename_from_path(file_path)
     gncv_notated_path = "{}/{}".format(destination, clean_file_path)
@@ -128,12 +125,11 @@ def upload_via_file_path(file_path, destination, api_client, s3_client):
 def assign_samples_to_project(uploads_gncv_paths, project_id, api_client):
     """Assign samples to a project and trigger a run.
 
-    :param uploads_gncv_paths: used to retrieve related unassigned samples
-    :type uploads_gncv_paths: list of str
-    :param project_id: samples will be assigned to this project
-    :type project_id: str
-    :param api_client: instantiated gencove api client
-    :type api_client: APIClient
+    Args:
+        uploads_gncv_paths (list(str)): used to retrieve related
+            unassigned samples.
+        project_id (str): samples will be assigned to this project.
+        api_client (APIClient): instantiated gencove api client.
     """
     echo("Assigning uploads to project {}".format(project_id))
     samples = []

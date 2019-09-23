@@ -49,8 +49,10 @@ def _progress_bar_update(pbar):
     Helper method for S3 Transfer,
     which needs a callback to update the progressbar.
 
-    :param pbar: progressbar.ProgressBar instance
-    :returns
+    Args:
+        pbar: progressbar.ProgressBar instance
+
+    Returns:
         a function that in turn accepts chunk that is used to update the
         progressbar.
     """
@@ -91,11 +93,15 @@ def get_progress_bar(total_size, action):
 def upload_file(s3_client, file_name, bucket, object_name=None):
     """Upload a file to an S3 bucket.
 
-    :param s3_client: Boto s3 client
-    :param file_name: File to upload
-    :param bucket: Bucket to upload to
-    :param object_name: S3 object name. If not specified then file_name is used
-    :return: True if file was uploaded, else False
+    Args:
+        s3_client: Boto s3 client.
+        file_name (str): File to upload.
+        bucket (str): Bucket to upload to.
+        object_name (str): S3 object name.
+            If not specified then file_name is used
+
+    Returns:
+        True if file was uploaded, else False
     """
     # If S3 object_name was not specified, use file_name
     if object_name is None:

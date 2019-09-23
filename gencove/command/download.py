@@ -40,14 +40,12 @@ DownloadOptions = namedtuple(  # pylint: disable=invalid-name
 def download_deliverables(destination, filters, credentials, options):
     """Download project deliverables to a specified path on user machine.
 
-    :param destination: path/to/save/deliverables/to.
-    :type destination: str
-    :param filters: allows to filter project deliverables to be downloaded
-    :type filters: Filters
-    :param credentials: login username/password
-    :type credentials: Credentials
-    :param options: different options to tweak execution
-    :type options: Options
+    Args:
+        destination (str): path/to/save/deliverables/to.
+        filters (DownloadFilters): allows to filter project deliverables
+            to be downloaded.
+        credentials (constants.Credentials): login email/password.
+        options (DownloadOptions): different options to tweak execution.
     """
     if not filters.project_id and not filters.sample_ids:
         echo_warning(
@@ -126,15 +124,12 @@ def _get_paginated_samples(project_id, api_client):
 def _download_file(download_to, file_prefix, url, skip_existing):
     """Download a file to file system.
 
-    :param download_to: system/path/to/save/file/to
-    :type download_to: str
-    :param file_prefix: <client id>/<gencove sample id> to nest downloaded file
-    under.
-    :type file_prefix: str
-    :param url: signed url from S3 to download the file from.
-    :type url: str
-    :param skip_existing: skip downloading existing files
-    :type skip_existing: bool
+    Args:
+        download_to (str): system/path/to/save/file/to
+        file_prefix (str): <client id>/<gencove sample id> to nest downloaded
+            file.
+        url (str): signed url from S3 to download the file from.
+        skip_existing (bool): skip downloading existing files.
     """
     with requests.get(url, stream=True) as req:
         req.raise_for_status()
@@ -175,12 +170,11 @@ def _download_file(download_to, file_prefix, url, skip_existing):
 def _create_filepath(download_to, file_prefix, filename):
     """Build full file path and ensure that directory structure exists.
 
-    :param download_to: top level directory path
-    :type download_to: str
-    :param file_prefix: subdirectories structure to create under download_to.
-    :type file_prefix: str
-    :param filename: name of the file inside download_to/file_prefix structure.
-    :type filename: str
+    Args:
+        download_to (str): top level directory path
+        file_prefix (str): subdirectories structure to create under download_to.
+        filename (str): name of the file inside download_to/file_prefix
+            structure.
     """
     path = os.path.join(download_to, file_prefix)
     # Cross-platform cross-python-version directory creation
@@ -194,10 +188,9 @@ def _create_filepath(download_to, file_prefix, filename):
 def _get_filename(content_disposition, url):
     """Deduce filename from content disposition or url.
 
-    :param content_disposition: Request header Content-Disposition
-    :type content_disposition: str
-    :param url: URL string
-    :type url: str
+    Args:
+        content_disposition (str): Request header Content-Disposition
+        url (str): URL string
     """
     filename_match = re.findall(FILENAME_RE, content_disposition)
     if not filename_match:

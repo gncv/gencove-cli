@@ -233,10 +233,9 @@ class APIClient:
     def add_samples_to_project(self, samples, project_id):
         """Assign samples to a project.
 
-        :param samples: sample sheet results
-        :type samples: list of dicts
-        :param project_id: project to which to assign the samples
-        :type project_id: str
+        Args:
+            samples (list of dicts): sample sheet results
+            project_id (str): project to which to assign the samples
         """
         return self._post(
             self.endpoints.project_samples.format(id=project_id),
@@ -256,11 +255,10 @@ class APIClient:
     ):
         """Fetch user samples.
 
-        :param gncv_path: filter samples by gncv notated path
-        :type gncv_path: str
-        :param is_assigned: filter samples by assignment status.
-            One of SAMPLE_ASSIGNMENT_STATUS
-        :type is_assigned: str
+        Args:
+            gncv_path (str): filter samples by gncv notated path
+            is_assigned (str, optional, default 'all'): filter samples by
+                assignment status. One of SAMPLE_ASSIGNMENT_STATUS
         """
         return self._get(
             self.endpoints.sample_sheet,

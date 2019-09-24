@@ -133,9 +133,11 @@ def upload_via_file_path(  # pylint: disable=bad-continuation
 def get_sample_for_upload(upload_id, sample_sheet):
     """Get sample for the upload."""
     for sample in sample_sheet:
-        if (  # pylint: disable=C0330
-            sample["fastq"]["r1"]["upload"] == upload_id
-            or sample["fastq"]["r2"]["upload"]
+        if (
+            "r1" in sample["fastq"]
+            and sample["fastq"]["r1"]["upload"] == upload_id
+            or "r2" in sample["fastq"]
+            and sample["fastq"]["r2"]["upload"] == upload_id
         ):
             return sample
     return None

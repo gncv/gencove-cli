@@ -154,7 +154,7 @@ def test_upload_and_run_immediately(mocker):
         mocked_get_credentials.assert_called_once()
         mocked_get_upload_details.assert_called_once()
         mocked_upload_file.assert_called_once()
-        mocked_get_sample_sheet.assert_called_once()
+        mocked_get_sample_sheet.assert_called()
         mocked_assign_sample.assert_called_once()
 
 
@@ -209,5 +209,5 @@ def test_upload_and_run_immediately_something_went_wrong(mocker):
         mocked_get_credentials.assert_called_once()
         mocked_get_upload_details.assert_called_once()
         mocked_upload_file.assert_called_once()
-        mocked_get_sample_sheet.assert_called_once()
+        mocked_get_sample_sheet.assert_called()
         mocked_assign_sample.assert_not_called()

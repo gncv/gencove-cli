@@ -84,7 +84,7 @@ def upload_fastqs(source, destination, credentials, options):
         upload = upload_via_file_path(
             file_path, destination, api_client, s3_client
         )
-        if options.project_id:
+        if options.project_id and upload:
             uploaded_ids.append(upload["id"])
 
     echo("All files were successfully uploaded.")
@@ -139,7 +139,10 @@ def get_sample_for_upload(upload_id, sample_sheet):
             or "r2" in sample["fastq"]
             and sample["fastq"]["r2"]["upload"] == upload_id
         ):
+            echo_debug("Found sample for upload: {}".format(upload_id))
             return sample
+
+    echo_debug("No sample found for upload: {}".format(upload_id))
     return None
 
 
@@ -159,26 +162,40 @@ def assign_samples_to_project(  # pylint: disable=C0330
     echo("Assigning uploads to project {}".format(project_id))
 
     try:
-        resp = api_client.get_sample_sheet(
+        unassigned_sheet = api_client.get_sample_sheet(
             destination, SAMPLE_ASSIGNMENT_STATUS.unassigned
+        )
+        assigned_sheet = api_client.get_sample_sheet(
+            destination, SAMPLE_ASSIGNMENT_STATUS.assigned
         )
     except APIClientError as err:
         echo_debug(err)
         echo_warning(ASSIGN_ERROR.format(project_id))
         return
 
-    if not resp["results"]:
+    if not unassigned_sheet["results"]:
         echo_warning(ASSIGN_ERROR.format(project_id))
         return
 
     samples = []
     for uid in upload_ids:
-        sample = get_sample_for_upload(uid, resp["results"])
+        sample = get_sample_for_upload(uid, unassigned_sheet["results"])
         if sample:
             samples.append(sample)
-        else:
-            echo_warning(ASSIGN_ERROR.format(project_id))
-            return
+            continue
+
+        sample = get_sample_for_upload(uid, assigned_sheet["results"])
+        if sample:
+            echo(
+                "Sample {} was already assigned to project {}".format(
+                    uid, project_id
+                )
+            )
+            continue
+
+        echo_debug("Missing sample for upload: {}".format(uid))
+        echo_warning(ASSIGN_ERROR.format(project_id))
+        return
 
     echo_debug("Sample sheet now is: {}".format(samples))
 

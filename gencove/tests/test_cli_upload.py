@@ -109,6 +109,7 @@ def test_upload_and_run_immediately(mocker):
             APIClient,
             "get_upload_details",
             return_value={
+                "id": "test",
                 "last_status": {"status": ""},
                 "s3": {"bucket": "test", "object_name": "test"},
             },
@@ -119,7 +120,17 @@ def test_upload_and_run_immediately(mocker):
         mocked_get_sample_sheet = mocker.patch.object(
             APIClient,
             "get_sample_sheet",
-            return_value={"results": [{"foo": "test"}]},
+            return_value={
+                "results": [
+                    {
+                        "client_id": "foo",
+                        "fastq": {
+                            "r1": {"upload": "test"},
+                            "r2": {"upload": "test2"},
+                        },
+                    }
+                ]
+            },
         )
         mocked_assign_sample = mocker.patch.object(
             APIClient, "add_samples_to_project", return_value={}
@@ -165,6 +176,7 @@ def test_upload_and_run_immediately_something_went_wrong(mocker):
             APIClient,
             "get_upload_details",
             return_value={
+                "id": "test",
                 "last_status": {"status": ""},
                 "s3": {"bucket": "test", "object_name": "test"},
             },

@@ -26,6 +26,11 @@ from gencove.utils import (
 UploadOptions = namedtuple(  # pylint: disable=invalid-name
     "UploadOptions", Optionals._fields + ("project_id",)
 )
+ASSIGN_ERROR = (
+    "Your files were successfully uploaded, "
+    "but there was an error automatically running them "
+    "and assigning them to project id {}."
+)
 
 
 def upload_fastqs(source, destination, credentials, options):
@@ -73,20 +78,20 @@ def upload_fastqs(source, destination, credentials, options):
     api_client = client.APIClient(options.host)
     login(api_client, credentials.email, credentials.password)
     s3_client = get_s3_client_refreshable(api_client.get_upload_credentials)
-    uploads_gncv_paths = []
+    uploaded_ids = []
 
     for file_path in files_to_upload:
-        gncv_notated_path = upload_via_file_path(
+        upload = upload_via_file_path(
             file_path, destination, api_client, s3_client
         )
         if options.project_id:
-            uploads_gncv_paths.append(gncv_notated_path)
+            uploaded_ids.append(upload["id"])
 
     echo("All files were successfully uploaded.")
 
     if options.project_id:
         assign_samples_to_project(
-            uploads_gncv_paths, options.project_id, api_client
+            destination, uploaded_ids, options.project_id, api_client
         )
 
 
@@ -103,7 +108,7 @@ def upload_via_file_path(  # pylint: disable=bad-continuation
         s3_client (boto3 s3 client): instantiated boto3 S3 client.
 
     Returns:
-        gncv_notated_path
+        dict representing upload details
     """
     clean_file_path = get_filename_from_path(file_path)
     gncv_notated_path = "{}/{}".format(destination, clean_file_path)
@@ -113,7 +118,7 @@ def upload_via_file_path(  # pylint: disable=bad-continuation
     upload_details = api_client.get_upload_details(gncv_notated_path)
     if upload_details["last_status"]["status"] == UPLOAD_STATUSES.done:
         echo("File was already uploaded: {}".format(clean_file_path))
-        return gncv_notated_path
+        return upload_details
 
     echo("Uploading {} to {}".format(file_path, gncv_notated_path))
     upload_file(
@@ -122,36 +127,58 @@ def upload_via_file_path(  # pylint: disable=bad-continuation
         bucket=upload_details["s3"]["bucket"],
         object_name=upload_details["s3"]["object_name"],
     )
-    return gncv_notated_path
+    return upload_details
 
 
-def assign_samples_to_project(uploads_gncv_paths, project_id, api_client):
+def get_sample_for_upload(upload_id, sample_sheet):
+    """Get sample for the upload."""
+    for sample in sample_sheet:
+        if (  # pylint: disable=C0330
+            sample["fastq"]["r1"]["upload"] == upload_id
+            or sample["fastq"]["r2"]["upload"]
+        ):
+            return sample
+    return None
+
+
+def assign_samples_to_project(  # pylint: disable=C0330
+    destination, upload_ids, project_id, api_client
+):
     """Assign samples to a project and trigger a run.
 
     Args:
-        uploads_gncv_paths (list(str)): used to retrieve related
+        destination (str): gncv notated destination. Used to retrieve related
             unassigned samples.
+        upload_ids (list(str)): used to select only the uploaded
+            samples.
         project_id (str): samples will be assigned to this project.
         api_client (APIClient): instantiated gencove api client.
     """
     echo("Assigning uploads to project {}".format(project_id))
+
+    try:
+        resp = api_client.get_sample_sheet(
+            destination, SAMPLE_ASSIGNMENT_STATUS.unassigned
+        )
+    except APIClientError as err:
+        echo_debug(err)
+        echo_warning(ASSIGN_ERROR.format(project_id))
+        return
+
+    if not resp["results"]:
+        echo_warning(ASSIGN_ERROR.format(project_id))
+        return
+
     samples = []
-    for gncv_path in uploads_gncv_paths:
-        try:
-            resp = api_client.get_sample_sheet(
-                gncv_path, SAMPLE_ASSIGNMENT_STATUS.unassigned
-            )
-        except APIClientError as err:
-            echo_debug(err)
-            echo_warning("Upload not found: {}".format(gncv_path))
-            continue
+    for uid in upload_ids:
+        sample = get_sample_for_upload(uid, resp["results"])
+        if sample:
+            samples.append(sample)
+        else:
+            echo_warning(ASSIGN_ERROR.format(project_id))
+            return
 
-        if not resp["results"]:
-            echo_warning("Upload not found: {}".format(gncv_path))
-            continue
-
-        samples.extend(resp["results"])
-        echo_debug("Sample sheet now is: {}".format(samples))
+    echo_debug("Sample sheet now is: {}".format(samples))
 
     if samples:
         echo_debug("Assigning samples to project ({})".format(project_id))

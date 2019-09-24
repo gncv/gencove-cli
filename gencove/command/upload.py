@@ -76,7 +76,10 @@ def upload_fastqs(source, destination, credentials, options):
         echo("Files will be uploaded to: {}".format(destination))
 
     api_client = client.APIClient(options.host)
-    login(api_client, credentials.email, credentials.password)
+    is_logged_in = login(api_client, credentials.email, credentials.password)
+    if not is_logged_in:
+        return
+
     s3_client = get_s3_client_refreshable(api_client.get_upload_credentials)
     uploaded_ids = []
 

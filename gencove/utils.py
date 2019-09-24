@@ -12,9 +12,9 @@ import click
 
 import progressbar
 
-from gencove.constants import FASTQ_EXTENSIONS  # noqa: I100
-from gencove.logger import echo_debug
-
+from gencove.client import APIClientError  # noqa: I100
+from gencove.constants import FASTQ_EXTENSIONS
+from gencove.logger import echo_debug, echo_warning
 
 KB = 1024
 MB = KB * 1024
@@ -166,6 +166,14 @@ def login(api_client, email, password):
         password = password or click.prompt(
             "Password", type=str, hide_input=True
         )
-    api_client.login(email, password)
-    echo_debug("User logged in successfully")
-    return api_client
+
+    try:
+        api_client.login(email, password)
+        echo_debug("User logged in successfully")
+        return True
+    except APIClientError as err:
+        echo_debug("Failed to login: {}".format(err))
+        echo_warning(
+            "Failed to login. Please verify your credentials and try again"
+        )
+        return False

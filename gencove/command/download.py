@@ -63,7 +63,9 @@ def download_deliverables(destination, filters, credentials, options):
         "Host is {} downloading to {}".format(options.host, destination)
     )
     api_client = client.APIClient(options.host)
-    login(api_client, credentials.email, credentials.password)
+    is_logged_in = login(api_client, credentials.email, credentials.password)
+    if not is_logged_in:
+        return
 
     if filters.project_id:
         echo_debug(

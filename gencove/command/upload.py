@@ -178,6 +178,7 @@ def sample_sheet_generator(destination, uploads, api_client):
             echo_debug("Sample sheet returned empty.")
             raise UploadError
 
+        # todo remove uploads that were already found, for better performance
         for upload in uploads:
             sample = get_related_sample(upload["id"], samples)
             if sample:

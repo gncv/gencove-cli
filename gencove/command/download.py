@@ -33,7 +33,8 @@ DownloadFilters = namedtuple(
     "Filters", ["project_id", "sample_ids", "file_types"]
 )
 DownloadOptions = namedtuple(  # pylint: disable=invalid-name
-    "DownloadOptions", Optionals._fields + ("skip_existing",)
+    "DownloadOptions",
+    Optionals._fields + ("skip_existing", "download_template"),
 )
 
 

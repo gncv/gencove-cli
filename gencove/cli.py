@@ -113,6 +113,15 @@ def upload(  # pylint: disable=C0330,R0913
     default=True,
     help="Skip downloading files that already exist in DESTINATION",
 )
+@click.option(
+    "--download-template",
+    default="{client_id}/{gencove_id}/{gencove_id}_{file_type}{file_extension}",
+    help=(
+        "Change downloads structure. "
+        "Defaults to: "
+        "{client_id}/{gencove_id}/{gencove_id}_{file_type}{file_extension}"
+    ),
+)
 def download(  # pylint: disable=C0330,R0913
     destination,
     project_id,
@@ -122,6 +131,7 @@ def download(  # pylint: disable=C0330,R0913
     email,
     password,
     skip_existing,
+    download_template,
 ):  # noqa: D413,D301,D412 # pylint: disable=C0301
     """Download deliverables of a project.
 
@@ -168,7 +178,7 @@ def download(  # pylint: disable=C0330,R0913
         destination,
         DownloadFilters(project_id, s_ids, f_types),
         Credentials(email, password),
-        DownloadOptions(host, skip_existing),
+        DownloadOptions(host, skip_existing, download_template),
     )
 
 

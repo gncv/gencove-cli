@@ -168,9 +168,6 @@ def assign_samples_to_project(  # pylint: disable=C0330
         unassigned_sheet = api_client.get_sample_sheet(
             destination, SAMPLE_ASSIGNMENT_STATUS.unassigned
         )
-        assigned_sheet = api_client.get_sample_sheet(
-            destination, SAMPLE_ASSIGNMENT_STATUS.assigned
-        )
     except APIClientError as err:
         echo_debug(err)
         echo_warning(ASSIGN_ERROR.format(project_id))
@@ -182,29 +179,23 @@ def assign_samples_to_project(  # pylint: disable=C0330
 
     samples = []
     for uid in upload_ids:
+        # todo add pagination
+        # todo add backoff factor and a couple retries
         sample = get_sample_for_upload(uid, unassigned_sheet["results"])
         if sample:
             samples.append(sample)
             continue
-
-        sample = get_sample_for_upload(uid, assigned_sheet["results"])
-        if sample:
-            echo(
-                "Sample {} was already assigned to project {}".format(
-                    uid, project_id
-                )
-            )
-            continue
-
-        echo_debug("Missing sample for upload: {}".format(uid))
-        echo_warning(ASSIGN_ERROR.format(project_id))
-        return
+        else:
+            echo_debug("Missing sample for upload: {}".format(uid))
+            echo_warning(ASSIGN_ERROR.format(project_id))
+            return
 
     echo_debug("Sample sheet now is: {}".format(samples))
 
     if samples:
         echo_debug("Assigning samples to project ({})".format(project_id))
         try:
+            # todo add submit in batch of 500
             api_client.add_samples_to_project(samples, project_id)
         except APIClientError as err:
             echo_debug(err)

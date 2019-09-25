@@ -121,6 +121,7 @@ def test_upload_and_run_immediately(mocker):
             APIClient,
             "get_sample_sheet",
             return_value={
+                "meta": {"next": None},
                 "results": [
                     {
                         "client_id": "foo",
@@ -129,7 +130,7 @@ def test_upload_and_run_immediately(mocker):
                             "r2": {"upload": "test2"},
                         },
                     }
-                ]
+                ],
             },
         )
         mocked_assign_sample = mocker.patch.object(
@@ -185,7 +186,9 @@ def test_upload_and_run_immediately_something_went_wrong(mocker):
             "gencove.command.upload.upload_file"
         )
         mocked_get_sample_sheet = mocker.patch.object(
-            APIClient, "get_sample_sheet", return_value={"results": []}
+            APIClient,
+            "get_sample_sheet",
+            return_value={"meta": {"next": None}, "results": []},
         )
         mocked_assign_sample = mocker.patch.object(
             APIClient, "add_samples_to_project", return_value={}

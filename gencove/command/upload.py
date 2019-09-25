@@ -3,6 +3,8 @@ import uuid
 from collections import namedtuple
 from datetime import datetime
 
+import backoff
+
 from gencove import client
 from gencove.client import APIClientError
 from gencove.constants import (
@@ -31,6 +33,10 @@ ASSIGN_ERROR = (
     "but there was an error automatically running them "
     "and assigning them to project id {}."
 )
+
+
+class UploadError(Exception):
+    pass
 
 
 def upload_fastqs(source, destination, credentials, options):
@@ -81,20 +87,20 @@ def upload_fastqs(source, destination, credentials, options):
         return
 
     s3_client = get_s3_client_refreshable(api_client.get_upload_credentials)
-    uploaded_ids = []
+    uploads = []
 
     for file_path in files_to_upload:
         upload = upload_via_file_path(
             file_path, destination, api_client, s3_client
         )
         if options.project_id and upload:
-            uploaded_ids.append(upload["id"])
+            uploads.append(upload)
 
     echo("All files were successfully uploaded.")
 
     if options.project_id:
         assign_samples_to_project(
-            destination, uploaded_ids, options.project_id, api_client
+            destination, uploads, options.project_id, api_client
         )
 
 
@@ -133,7 +139,7 @@ def upload_via_file_path(  # pylint: disable=bad-continuation
     return upload_details
 
 
-def get_sample_for_upload(upload_id, sample_sheet):
+def get_related_sample(upload_id, sample_sheet):
     """Get sample for the upload."""
     for sample in sample_sheet:
         if (  # pylint: disable=C0330
@@ -149,15 +155,52 @@ def get_sample_for_upload(upload_id, sample_sheet):
     return None
 
 
+def samples_generator(destination, api_client):
+    more = True
+    next_link = None
+    while more:
+        echo_debug("Get sample sheet page")
+        try:
+            resp = api_client.get_sample_sheet(
+                destination, SAMPLE_ASSIGNMENT_STATUS.unassigned, next_link
+            )
+            yield resp["results"]
+            next_link = resp["meta"]["next"]
+            more = next_link is not None
+        except APIClientError as err:
+            echo_debug(err)
+            raise UploadError
+
+
+def sample_sheet_generator(destination, uploads, api_client):
+    for samples in samples_generator(destination, api_client):
+        if not samples:
+            echo_debug("Sample sheet returned empty.")
+            raise UploadError
+
+        for upload in uploads:
+            sample = get_related_sample(upload["id"], samples)
+            if sample:
+                echo_debug("Found sample for upload: {}".format(upload["id"]))
+                yield sample
+
+
+@backoff.on_predicate(backoff.expo, lambda x: not x, max_tries=2)
+def get_specific_sample(full_gncv_path, api_client):
+    return api_client.get_sample_sheet(
+        full_gncv_path, SAMPLE_ASSIGNMENT_STATUS.unassigned
+    )["results"]
+
+
 def assign_samples_to_project(  # pylint: disable=C0330
-    destination, upload_ids, project_id, api_client
+    destination, uploads, project_id, api_client
 ):
     """Assign samples to a project and trigger a run.
 
     Args:
         destination (str): gncv notated destination. Used to retrieve related
             unassigned samples.
-        upload_ids (list(str)): used to select only the uploaded
+        uploads (list(dict)): used to select only the uploaded
             samples.
         project_id (str): samples will be assigned to this project.
         api_client (APIClient): instantiated gencove api client.
@@ -165,28 +208,32 @@ def assign_samples_to_project(  # pylint: disable=C0330
     echo("Assigning uploads to project {}".format(project_id))
 
     try:
-        unassigned_sheet = api_client.get_sample_sheet(
-            destination, SAMPLE_ASSIGNMENT_STATUS.unassigned
+        samples = list(
+            sample_sheet_generator(destination, uploads, api_client)
         )
-    except APIClientError as err:
-        echo_debug(err)
+    except UploadError:
         echo_warning(ASSIGN_ERROR.format(project_id))
         return
 
-    if not unassigned_sheet["results"]:
+    if not samples:
+        echo_debug("No related samples were found")
         echo_warning(ASSIGN_ERROR.format(project_id))
         return
 
-    samples = []
-    for uid in upload_ids:
-        # todo add pagination
-        # todo add backoff factor and a couple retries
-        sample = get_sample_for_upload(uid, unassigned_sheet["results"])
-        if sample:
-            samples.append(sample)
-            continue
+    missing_uploads = []
+    for upload in uploads:
+        sample = get_related_sample(upload["id"], samples)
+        if not sample:
+            missing_uploads.append(upload)
+            echo_debug("Missing sample for upload: {}".format(upload["id"]))
+
+    for upload in missing_uploads:
+        upload_samples = get_specific_sample(
+            upload["destination_path"], api_client
+        )
+        if upload_samples:
+            samples.append(upload_samples[0])
         else:
-            echo_debug("Missing sample for upload: {}".format(uid))
             echo_warning(ASSIGN_ERROR.format(project_id))
             return
 

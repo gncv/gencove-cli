@@ -184,6 +184,13 @@ class APIClient:
             custom_headers=headers,
         )
 
+    def _get_next_endpoint(self, next_link, endpoint):
+        next_endpoint = None
+        if next_link:
+            url_parts = urlparse(next_link)
+            next_endpoint = "{}?{}".format(endpoint, url_parts.query)
+        return next_endpoint
+
     def refresh_token(self, refresh_token):
         """Refresh jwt token."""
         return self._post(
@@ -224,10 +231,7 @@ class APIClient:
         project_endpoint = self.endpoints.project_samples.format(
             id=project_id
         )
-        next_endpoint = None
-        if next_link:
-            url_parts = urlparse(next_link)
-            next_endpoint = "{}?{}".format(project_endpoint, url_parts.query)
+        next_endpoint = self._get_next_endpoint(next_link, project_endpoint)
         return self._get(next_endpoint or project_endpoint, authorized=True)
 
     def add_samples_to_project(self, samples, project_id):
@@ -251,17 +255,25 @@ class APIClient:
         )
 
     def get_sample_sheet(
-        self, gncv_path=None, is_assigned=SAMPLE_ASSIGNMENT_STATUS.all
+        self,
+        gncv_path=None,
+        is_assigned=SAMPLE_ASSIGNMENT_STATUS.all,
+        next_link=None,
     ):
         """Fetch user samples.
 
         Args:
-            gncv_path (str): filter samples by gncv notated path
+            gncv_path (str): filter samples by gncv notated path.
             is_assigned (str, optional, default 'all'): filter samples by
-                assignment status. One of SAMPLE_ASSIGNMENT_STATUS
+                assignment status. One of SAMPLE_ASSIGNMENT_STATUS.
+            next_link (str, optional): url from previous
+                response['meta']['next'].
         """
+        next_endpoint = self._get_next_endpoint(
+            next_link, self.endpoints.sample_sheet
+        )
         return self._get(
-            self.endpoints.sample_sheet,
+            next_endpoint or self.endpoints.sample_sheet,
             query_params={"search": gncv_path, "status": is_assigned},
             authorized=True,
         )

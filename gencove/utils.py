@@ -179,7 +179,7 @@ def login(api_client, email, password):
         return False
 
 
-def batchify(items_list, batch_size=500):  # noqa: D413
+def batchify(items_list, batch_size=500):
     """Generate batches from items list.
 
     Args:

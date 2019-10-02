@@ -17,6 +17,7 @@ from gencove.constants import (
 )
 from gencove.logger import echo, echo_debug, echo_warning
 from gencove.utils import (
+    batchify,
     get_filename_from_path,
     get_s3_client_refreshable,
     login,
@@ -36,7 +37,7 @@ ASSIGN_ERROR = (
 
 
 class UploadError(Exception):
-    pass
+    """Upload related error."""
 
 
 def upload_fastqs(source, destination, credentials, options):
@@ -156,6 +157,15 @@ def get_related_sample(upload_id, sample_sheet):
 
 
 def samples_generator(destination, api_client):
+    """Paginate over all samples.
+
+    Args:
+        destination (str): gncv notated path to filter for related samples.
+        api_client (APIClient): instantiated api client to use for requests.
+
+    Yields:
+        paginated lists of samples
+    """
     more = True
     next_link = None
     while more:
@@ -173,21 +183,36 @@ def samples_generator(destination, api_client):
 
 
 def sample_sheet_generator(destination, uploads, api_client):
+    """Get samples for uploads.
+
+    Args:
+        destination (str): gncv notated path to filter for related samples.
+        api_client (APIClient): instantiated api client to use for requests.
+        uploads (list of dict): uploads objects from the api.
+
+    Yields:
+        Sample object
+    """
+    # make a copy of uploads so as not to change the input
+    search_uploads = uploads[:]
     for samples in samples_generator(destination, api_client):
         if not samples:
             echo_debug("Sample sheet returned empty.")
             raise UploadError
 
-        # todo remove uploads that were already found, for better performance
-        for upload in uploads:
+        # for each iteration make a copy of search uploads in order to avoid
+        # errors in iteration
+        for upload in search_uploads[:]:
             sample = get_related_sample(upload["id"], samples)
             if sample:
                 echo_debug("Found sample for upload: {}".format(upload["id"]))
                 yield sample
+                search_uploads.remove(upload)
 
 
 @backoff.on_predicate(backoff.expo, lambda x: not x, max_tries=2)
 def get_specific_sample(full_gncv_path, api_client):
+    """Get sample by full gncv path."""
     return api_client.get_sample_sheet(
         full_gncv_path, SAMPLE_ASSIGNMENT_STATUS.unassigned
     )["results"]
@@ -242,12 +267,13 @@ def assign_samples_to_project(  # pylint: disable=C0330
 
     if samples:
         echo_debug("Assigning samples to project ({})".format(project_id))
-        try:
-            # todo add submit in batch of 500
-            api_client.add_samples_to_project(samples, project_id)
-        except APIClientError as err:
-            echo_debug(err)
-            echo_warning(
-                "There was an error assigning/running samples. "
-                "Please try again later"
-            )
+        for samples_batch in batchify(samples):
+            try:
+                api_client.add_samples_to_project(samples_batch, project_id)
+            except APIClientError as err:
+                echo_debug(err)
+                echo_warning(
+                    "There was an error assigning/running samples. "
+                    "Some of the samples might have been assigned."
+                )
+                return

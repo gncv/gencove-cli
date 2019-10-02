@@ -177,3 +177,25 @@ def login(api_client, email, password):
             "Failed to login. Please verify your credentials and try again"
         )
         return False
+
+
+def batchify(items_list, batch_size=500):  # noqa: D413
+    """Generate batches from items list.
+
+    Args:
+        items_list (list): list that will be batchified.
+        batch_size (int, default=500): batch size that will be returned.
+            last batch is not promised to be exactly the length of batch_size.
+
+    Returns:
+        subset of items_list
+    """
+    total = len(items_list)
+    start = 0
+    while total >= 0:
+        end = start + batch_size
+        if end > total:
+            end = len(items_list)
+        yield items_list[start:end]
+        start += batch_size
+        total -= batch_size

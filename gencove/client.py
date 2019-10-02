@@ -184,7 +184,8 @@ class APIClient:
             custom_headers=headers,
         )
 
-    def _get_next_endpoint(self, next_link, endpoint):
+    @staticmethod
+    def _get_next_endpoint(next_link, endpoint):
         next_endpoint = None
         if next_link:
             url_parts = urlparse(next_link)

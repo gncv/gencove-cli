@@ -6,6 +6,13 @@ from collections import namedtuple
 
 import backoff
 
+import requests
+
+from gencove import client  # noqa: I100
+from gencove.constants import MAX_RETRY_TIME_SECONDS, SAMPLE_STATUSES
+from gencove.logger import echo, echo_debug, echo_warning
+from gencove.utils import fatal_request_error, get_progress_bar, login
+
 try:
     # python 3.7
     from urllib.parse import urlparse, parse_qs  # noqa
@@ -13,12 +20,6 @@ except ImportError:
     # python 2.7
     from urlparse import urlparse, parse_qs  # noqa
 
-import requests
-
-from gencove import client  # noqa: I100
-from gencove.constants import SAMPLE_STATUSES, MAX_RETRY_TIME_SECONDS
-from gencove.logger import echo, echo_debug, echo_warning
-from gencove.utils import get_progress_bar, login, fatal_request_error
 
 ALLOWED_STATUSES_RE = re.compile(
     "{}|{}".format(SAMPLE_STATUSES.succeeded, SAMPLE_STATUSES.failed),

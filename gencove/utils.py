@@ -191,11 +191,12 @@ def batchify(items_list, batch_size=500):
         subset of items_list
     """
     total = len(items_list)
+    left_to_process = total
     start = 0
-    while total >= 0:
+    while left_to_process >= 0:
         end = start + batch_size
         if end > total:
-            end = len(items_list)
+            end = total
         yield items_list[start:end]
         start += batch_size
-        total -= batch_size
+        left_to_process -= batch_size

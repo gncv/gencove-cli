@@ -275,6 +275,8 @@ class APIClient:
         )
         return self._get(
             next_endpoint or self.endpoints.sample_sheet,
-            query_params={"search": gncv_path, "status": is_assigned},
+            query_params={"search": gncv_path, "status": is_assigned}
+            if not next_endpoint
+            else {},
             authorized=True,
         )

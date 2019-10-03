@@ -119,7 +119,7 @@ def upload(  # pylint: disable=C0330,R0913
     help=(
         "Change downloads structure. "
         "Defaults to: "
-        "{client_id}/{gencove_id}/{gencove_id}_{file_type}{file_extension}"
+        "{client_id}/{gencove_id}/{gencove_id}_"
     ),
 )
 def download(  # pylint: disable=C0330,R0913

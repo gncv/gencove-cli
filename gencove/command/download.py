@@ -37,7 +37,6 @@ DownloadOptions = namedtuple(  # pylint: disable=invalid-name
     Optionals._fields + ("skip_existing", "download_template"),
 )
 
-# todo download template shouldn't include file type and file extension
 # todo remember already downloaded paths and if we meet same downloadabe again - fail due to error in a template
 def download_deliverables(destination, filters, credentials, options):
     """Download project deliverables to a specified path on user machine.

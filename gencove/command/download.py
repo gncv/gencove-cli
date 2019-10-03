@@ -131,7 +131,7 @@ def _get_paginated_samples(project_id, api_client):
         requests.exceptions.Timeout,
     ),
     max_time=MAX_RETRY_TIME_SECONDS,
-    givup=fatal_request_error,
+    giveup=fatal_request_error,
 )
 def _download_file(download_to, file_prefix, url, skip_existing):
     """Download a file to file system.

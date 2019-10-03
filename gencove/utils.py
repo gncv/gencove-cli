@@ -168,5 +168,5 @@ def login(api_client, email, password):
 def fatal_request_error(err=None):
     """Give up retrying if the error code is in fatal range."""
     if not err:
-        return True
+        return False
     return 400 <= err.response.status_code < 500

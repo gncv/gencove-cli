@@ -275,7 +275,6 @@ def assign_samples_to_project(  # pylint: disable=C0330
                 assigned_count += len(samples_batch)
             except APIClientError as err:
                 echo_debug(err)
-                # todo add destination
                 echo_warning("There was an error assigning/running samples.")
                 if assigned_count > 0:
                     echo_warning(

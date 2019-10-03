@@ -28,6 +28,7 @@ setup(
         "boto3>=1.9.188",
         "future",
         "progressbar2",
+        "backoff",
     ],
     setup_requires=["pytest-runner"],
     tests_require=["pytest", "pytest-mock"],

@@ -267,15 +267,27 @@ def assign_samples_to_project(  # pylint: disable=C0330
 
     if samples:
         echo_debug("Assigning samples to project ({})".format(project_id))
-        for samples_batch in batchify(samples):
+        assigned_count = 0
+        for samples_batch in batchify(samples, batch_size=100):
             try:
                 echo_debug("Assigning batch: {}".format(len(samples_batch)))
                 api_client.add_samples_to_project(samples_batch, project_id)
+                assigned_count += len(samples_batch)
             except APIClientError as err:
                 echo_debug(err)
-                echo_warning(
-                    "There was an error assigning/running samples. "
-                    "Some of the samples might have been assigned."
-                )
+                # todo add destination
+                echo_warning("There was an error assigning/running samples.")
+                if assigned_count > 0:
+                    echo_warning(
+                        "Some of the samples were assigned. "
+                        "Please use the Web UI to assign "
+                        "the rest of the samples"
+                    )
+                else:
+                    echo_warning(
+                        "You can retry assignment without uploading again "
+                        "via upload command using "
+                        "destination: {}".format(destination)
+                    )
                 return
         echo("Assigned all samples to a project")

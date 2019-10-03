@@ -163,3 +163,10 @@ def login(api_client, email, password):
     api_client.login(email, password)
     echo_debug("User logged in successfully")
     return api_client
+
+
+def fatal_request_error(err=None):
+    """Give up retrying if the error code is in fatal range."""
+    if not err:
+        return False
+    return 400 <= err.response.status_code < 500

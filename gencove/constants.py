@@ -42,3 +42,5 @@ _SampleStatuses = namedtuple("SampleStatuses", ["succeeded", "failed"])
 SAMPLE_STATUSES = _SampleStatuses("succeeded", "failed")
 
 Credentials = namedtuple("Credentials", ["email", "password"])
+
+MAX_RETRY_TIME_SECONDS = 300  # 5 minutes

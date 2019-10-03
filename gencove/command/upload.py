@@ -246,12 +246,7 @@ def assign_samples_to_project(  # pylint: disable=C0330
         echo_warning(ASSIGN_ERROR.format(project_id))
         return
 
-    missing_uploads = []
-    for upload in uploads:
-        sample = get_related_sample(upload["id"], samples)
-        if not sample:
-            missing_uploads.append(upload)
-            echo_debug("Missing sample for upload: {}".format(upload["id"]))
+    missing_uploads = find_missing_uploads(samples, uploads)
 
     for upload in missing_uploads:
         upload_samples = get_specific_sample(
@@ -273,6 +268,7 @@ def assign_samples_to_project(  # pylint: disable=C0330
                 echo_debug("Assigning batch: {}".format(len(samples_batch)))
                 api_client.add_samples_to_project(samples_batch, project_id)
                 assigned_count += len(samples_batch)
+                echo_debug("Total assigned: {}".format(assigned_count))
             except APIClientError as err:
                 echo_debug(err)
                 echo_warning("There was an error assigning/running samples.")
@@ -290,3 +286,11 @@ def assign_samples_to_project(  # pylint: disable=C0330
                     )
                 return
         echo("Assigned all samples to a project")
+
+
+def find_missing_uploads(samples, uploads):
+    """Find and yield missing uploads."""
+    for upload in uploads:
+        if not get_related_sample(upload["id"], samples):
+            yield upload
+            echo_debug("Missing sample for upload: {}".format(upload["id"]))

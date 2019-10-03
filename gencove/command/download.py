@@ -4,6 +4,8 @@ import re
 import uuid
 from collections import namedtuple
 
+import backoff
+
 try:
     # python 3.7
     from urllib.parse import urlparse, parse_qs  # noqa
@@ -14,10 +16,9 @@ except ImportError:
 import requests
 
 from gencove import client  # noqa: I100
-from gencove.constants import SAMPLE_STATUSES
+from gencove.constants import SAMPLE_STATUSES, MAX_RETRY_TIME_SECONDS
 from gencove.logger import echo, echo_debug, echo_warning
-from gencove.utils import get_progress_bar, login
-
+from gencove.utils import get_progress_bar, login, fatal_request_error
 
 ALLOWED_STATUSES_RE = re.compile(
     "{}|{}".format(SAMPLE_STATUSES.succeeded, SAMPLE_STATUSES.failed),
@@ -121,6 +122,16 @@ def _get_paginated_samples(project_id, api_client):
         get_samples = next_page is not None
 
 
+@backoff.on_exception(
+    backoff.expo,
+    (
+        requests.exceptions.HTTPError,
+        requests.exceptions.ConnectionError,
+        requests.exceptions.Timeout,
+    ),
+    max_time=MAX_RETRY_TIME_SECONDS,
+    givup=fatal_request_error,
+)
 def _download_file(download_to, file_prefix, url, skip_existing):
     """Download a file to file system.
 

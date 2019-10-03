@@ -210,7 +210,7 @@ def sample_sheet_generator(destination, uploads, api_client):
                 search_uploads.remove(upload)
 
 
-@backoff.on_predicate(backoff.expo, lambda x: not x, max_tries=2)
+@backoff.on_predicate(backoff.expo, lambda x: not x, max_tries=5)
 def get_specific_sample(full_gncv_path, api_client):
     """Get sample by full gncv path."""
     return api_client.get_sample_sheet(

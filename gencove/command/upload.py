@@ -269,6 +269,7 @@ def assign_samples_to_project(  # pylint: disable=C0330
         echo_debug("Assigning samples to project ({})".format(project_id))
         for samples_batch in batchify(samples):
             try:
+                echo_debug("Assigning batch: {}".format(len(samples_batch)))
                 api_client.add_samples_to_project(samples_batch, project_id)
             except APIClientError as err:
                 echo_debug(err)
@@ -277,3 +278,4 @@ def assign_samples_to_project(  # pylint: disable=C0330
                     "Some of the samples might have been assigned."
                 )
                 return
+        echo("Assigned all samples to a project")

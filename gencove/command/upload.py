@@ -19,11 +19,11 @@ from gencove.logger import echo, echo_debug, echo_warning
 from gencove.utils import (
     batchify,
     get_filename_from_path,
+    get_regular_progress_bar,
     get_s3_client_refreshable,
     login,
     seek_files_to_upload,
     upload_file,
-    get_regular_progress_bar,
 )
 
 

@@ -23,6 +23,7 @@ from gencove.utils import (
     login,
     seek_files_to_upload,
     upload_file,
+    get_regular_progress_bar,
 )
 
 
@@ -263,11 +264,15 @@ def assign_samples_to_project(  # pylint: disable=C0330
     if samples:
         echo_debug("Assigning samples to project ({})".format(project_id))
         assigned_count = 0
-        for samples_batch in batchify(samples, batch_size=100):
+        progress_bar = get_regular_progress_bar(len(samples), "Assigning: ")
+        progress_bar.start()
+        for samples_batch in batchify(samples, batch_size=220):
             try:
-                echo_debug("Assigning batch: {}".format(len(samples_batch)))
+                samples_batch_len = len(samples_batch)
+                echo_debug("Assigning batch: {}".format(samples_batch_len))
                 api_client.add_samples_to_project(samples_batch, project_id)
-                assigned_count += len(samples_batch)
+                assigned_count += samples_batch_len
+                progress_bar.update(samples_batch_len)
                 echo_debug("Total assigned: {}".format(assigned_count))
             except APIClientError as err:
                 echo_debug(err)
@@ -284,7 +289,9 @@ def assign_samples_to_project(  # pylint: disable=C0330
                         "via upload command using "
                         "destination: {}".format(destination)
                     )
+                progress_bar.finish()
                 return
+        progress_bar.finish()
         echo("Assigned all samples to a project")
 
 

@@ -64,13 +64,15 @@ def _progress_bar_update(pbar):  # noqa: D413
 
 
 def get_progress_bar(total_size, action):
-    """Get progressbar.ProgressBar instance.
+    """Get progressbar.ProgressBar instance for file transfer.
 
-    :param total_size: int
-    :param action: str that will be prepended to the progressbar.
-        i.e "Uploading: " or "Downloading: "
+    Args:
+        total_size: int
+        action: str that will be prepended to the progressbar.
+            i.e "Uploading: " or "Downloading: "
 
-    :returns progressbar.ProgressBar instance
+    Returns:
+        progressbar.ProgressBar instance
     """
     return progressbar.ProgressBar(
         max_value=total_size,
@@ -87,6 +89,33 @@ def get_progress_bar(total_size, action):
             progressbar.FileTransferSpeed(),
         ],
         redirect_stdout=True,
+    )
+
+
+def get_regular_progress_bar(total_size, action):
+    """Get progressbar.ProgressBar instance.
+
+    Args:
+        total_size: int
+        action: str that will be prepended to the progressbar.
+            i.e "Uploading: " or "Downloading: "
+
+    Returns:
+        progressbar.ProgressBar instance
+    """
+    return progressbar.ProgressBar(
+        max_value=total_size,
+        redirect_stdout=True,
+        widgets=[
+            action,
+            progressbar.Percentage(),
+            " ",
+            progressbar.Bar(marker="#", left="[", right="]"),
+            " ",
+            progressbar.ETA(),
+            " ",
+            progressbar.Timer(),
+        ],
     )
 
 

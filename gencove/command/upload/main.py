@@ -2,8 +2,13 @@
 import uuid
 from collections import namedtuple
 from datetime import datetime
+from time import sleep
 
-from gencove.client import APIClientError
+import backoff
+
+import requests
+
+from gencove.client import APIClientError  # noqa: I100
 from gencove.command.base import Command, ValidationError
 from gencove.constants import Optionals, SAMPLE_ASSIGNMENT_STATUS
 from gencove.utils import (
@@ -20,12 +25,7 @@ from .constants import (
     UPLOAD_PREFIX,
     UPLOAD_STATUSES,
 )
-from .utils import (
-    get_related_sample,
-    get_specific_sample,
-    seek_files_to_upload,
-    upload_file,
-)
+from .utils import get_related_sample, seek_files_to_upload, upload_file
 
 
 UploadOptions = namedtuple(  # pylint: disable=invalid-name
@@ -43,6 +43,10 @@ class UploadError(Exception):
     """Upload related error."""
 
 
+class SampleSheetError(Exception):
+    """Error to generate the sample sheet for uploads."""
+
+
 class Upload(Command):
     """Upload command executor."""
 
@@ -52,7 +56,7 @@ class Upload(Command):
         self.destination = destination
         self.project_id = options.project_id
         self.fastqs = []
-        self.uploads = []
+        self.upload_ids = set()
 
     @staticmethod
     def generate_gncv_destination():
@@ -123,11 +127,13 @@ class Upload(Command):
         for file_path in self.fastqs:
             upload = self.upload_from_file_path(file_path, s3_client)
             if self.project_id and upload:
-                self.uploads.append(upload)
+                self.upload_ids.add(upload["id"])
 
         self.echo("All files were successfully uploaded.")
 
         if self.project_id:
+            self.echo_debug("Cooling down period.")
+            sleep(10)
             self.assign_uploads_to_project()
 
     def upload_from_file_path(self, file_path, s3_client):
@@ -168,8 +174,8 @@ class Upload(Command):
         self.echo("Assigning uploads to project {}".format(self.project_id))
 
         try:
-            samples = list(self.sample_sheet_generator())
-        except UploadError:
+            samples = list(self.samples_generator(self.upload_ids))
+        except (UploadError, SampleSheetError):
             self.echo_warning(ASSIGN_ERROR.format(self.project_id))
             return
 
@@ -177,18 +183,6 @@ class Upload(Command):
             self.echo_debug("No related samples were found")
             self.echo_warning(ASSIGN_ERROR.format(self.project_id))
             return
-
-        missing_uploads = self.find_missing_uploads(samples)
-
-        for upload in missing_uploads:
-            upload_samples = get_specific_sample(
-                upload["destination_path"], self.api_client
-            )
-            if upload_samples:
-                samples.append(upload_samples[0])
-            else:
-                self.echo_warning(ASSIGN_ERROR.format(self.project_id))
-                return
 
         self.echo_debug("Sample sheet now is: {}".format(samples))
 
@@ -233,40 +227,39 @@ class Upload(Command):
         progress_bar.finish()
         self.echo("Assigned all samples to a project")
 
-    def find_missing_uploads(self, samples):
-        """Find and yield missing uploads that are not in the samples."""
-        for upload in self.uploads:
-            if not get_related_sample(upload["id"], samples):
-                yield upload
-                self.echo_debug(
-                    "Missing sample for upload: {}".format(upload["id"])
-                )
-
-    def sample_sheet_generator(self):
+    @backoff.on_exception(backoff.expo, SampleSheetError, max_tries=5)
+    def samples_generator(self, uploads):
         """Get samples for current uploads.
 
         Yields:
             Sample object
         """
         # make a copy of uploads so as not to change the input
-        search_uploads = self.uploads[:]
-        for samples in self.samples_generator():
+        search_uploads = set(uploads)
+        for samples in self.sample_sheet_paginator():
             if not samples:
                 self.echo_debug("Sample sheet returned empty.")
                 raise UploadError
 
             # for each iteration make a copy of search uploads
             # in order to avoid errors in iteration
-            for upload in search_uploads[:]:
-                sample = get_related_sample(upload["id"], samples)
+            for uid in set(search_uploads):
+                sample, r1_uid, r2_uid = get_related_sample(uid, samples)
                 if sample:
-                    self.echo_debug(
-                        "Found sample for upload: {}".format(upload["id"])
-                    )
+                    self.echo_debug("Found sample for upload: {}".format(uid))
                     yield sample
-                    search_uploads.remove(upload)
+                    if r1_uid and r1_uid in search_uploads:
+                        search_uploads.remove(r1_uid)
+                    if r2_uid and r2_uid in search_uploads:
+                        search_uploads.remove(r2_uid)
 
-    def samples_generator(self):
+        if search_uploads:
+            self.echo_debug(
+                "Have uploads without samples: {}".format(search_uploads)
+            )
+            raise SampleSheetError
+
+    def sample_sheet_paginator(self):
         """Paginate over all sample sheets for the destination.
 
         Yields:
@@ -277,14 +270,22 @@ class Upload(Command):
         while more:
             self.echo_debug("Get sample sheet page")
             try:
-                resp = self.api_client.get_sample_sheet(
-                    self.destination,
-                    SAMPLE_ASSIGNMENT_STATUS.unassigned,
-                    next_link,
-                )
+                resp = self.get_sample_sheet(next_link)
                 yield resp["results"]
                 next_link = resp["meta"]["next"]
                 more = next_link is not None
             except APIClientError as err:
                 self.echo_debug(err)
                 raise UploadError
+
+    @backoff.on_exception(
+        backoff.expo,
+        (requests.exceptions.ConnectionError, requests.exceptions.Timeout),
+        max_tries=5,
+        max_time=30,
+    )
+    def get_sample_sheet(self, next_link=None):
+        """Get samples by gncv path."""
+        return self.api_client.get_sample_sheet(
+            self.destination, SAMPLE_ASSIGNMENT_STATUS.unassigned, next_link
+        )

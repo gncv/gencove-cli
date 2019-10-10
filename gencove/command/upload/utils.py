@@ -1,13 +1,10 @@
 """Utils for upload command."""
 import os
 
-import backoff
-
 from boto3.s3.transfer import TransferConfig
 
 from botocore.exceptions import ClientError
 
-from gencove.constants import SAMPLE_ASSIGNMENT_STATUS
 from gencove.logger import echo, echo_debug
 from gencove.utils import CHUNK_SIZE, get_progress_bar
 
@@ -95,25 +92,21 @@ def seek_files_to_upload(path, path_root=""):
             seek_files_to_upload(folder, root)
 
 
-@backoff.on_predicate(backoff.expo, lambda x: not x, max_tries=5)
-def get_specific_sample(full_gncv_path, api_client):
-    """Get sample by full gncv path."""
-    return api_client.get_sample_sheet(
-        full_gncv_path, SAMPLE_ASSIGNMENT_STATUS.unassigned
-    )["results"]
-
-
 def get_related_sample(upload_id, sample_sheet):
     """Get sample for the upload."""
     for sample in sample_sheet:
-        if (  # pylint: disable=C0330
-            "r1" in sample["fastq"]
-            and sample["fastq"]["r1"]["upload"] == upload_id
-            or "r2" in sample["fastq"]
-            and sample["fastq"]["r2"]["upload"] == upload_id
-        ):
+        if "r1" in sample["fastq"] and sample["fastq"]["r1"]["upload"]:
+            r1_uid = sample["fastq"]["r1"]["upload"]
+        else:
+            r1_uid = None
+        if "r2" in sample["fastq"] and sample["fastq"]["r2"]["upload"]:
+            r2_uid = sample["fastq"]["r2"]["upload"]
+        else:
+            r2_uid = None
+
+        if upload_id in (r1_uid, r2_uid):
             echo_debug("Found sample for upload: {}".format(upload_id))
-            return sample
+            return sample, r1_uid, r2_uid
 
     echo_debug("No sample found for upload: {}".format(upload_id))
     return None

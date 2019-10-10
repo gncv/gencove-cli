@@ -8,6 +8,7 @@ import backoff
 from gencove import client
 from gencove.client import APIClientError
 from gencove.constants import (
+    ASSIGN_BATCH_SIZE,
     FASTQ_EXTENSIONS,
     Optionals,
     SAMPLE_ASSIGNMENT_STATUS,

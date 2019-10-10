@@ -9,7 +9,7 @@ from gencove.command.download import (
     DownloadOptions,
     download_deliverables,
 )
-from gencove.command.upload import UploadOptions, upload_fastqs
+from gencove.command.upload import Upload, UploadOptions
 from gencove.constants import Credentials, HOST
 from gencove.logger import echo_debug
 
@@ -70,12 +70,12 @@ def upload(  # pylint: disable=C0330,R0913
         run_project_id (UUID, optional): ID of a project to which all files
             in this upload will be assigned to and then immediately analyzed.
     """
-    upload_fastqs(
+    Upload(
         source,
         destination,
         Credentials(email, password),
         UploadOptions(host, run_project_id),
-    )
+    ).run()
 
 
 @cli.command()

@@ -5,7 +5,7 @@ from click.testing import CliRunner
 
 from gencove.cli import upload
 from gencove.client import APIClient
-from gencove.constants import UPLOAD_PREFIX
+from gencove.command.upload.constants import UPLOAD_PREFIX
 
 
 def test_upload(mocker):
@@ -20,7 +20,7 @@ def test_upload(mocker):
             APIClient, "login", return_value=None
         )
         mocked_get_credentials = mocker.patch(
-            "gencove.command.upload.get_s3_client_refreshable"
+            "gencove.command.upload.main.get_s3_client_refreshable"
         )
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
@@ -31,7 +31,7 @@ def test_upload(mocker):
             },
         )
         mocked_upload_file = mocker.patch(
-            "gencove.command.upload.upload_file"
+            "gencove.command.upload.main.upload_file"
         )
         res = runner.invoke(
             upload,
@@ -57,13 +57,17 @@ def test_upload_no_files_found(mocker):
         mocked_login = mocker.patch.object(
             APIClient, "login", return_value=None
         )
-        res = runner.invoke(upload, ["cli_test_data"])
+        res = runner.invoke(
+            upload,
+            ["cli_test_data"],
+            input="\n".join(["foo@bar.com", "123456"]),
+        )
         # for debugging, if needed
         print("output is", res.output)
 
         assert res.exit_code == 0
         assert "No FASTQ files found in the path" in res.output
-        assert not mocked_login.called
+        mocked_login.assert_called_once()
 
 
 def test_upload_invalid_destination(mocker):
@@ -77,7 +81,11 @@ def test_upload_invalid_destination(mocker):
         mocked_login = mocker.patch.object(
             APIClient, "login", return_value=None
         )
-        res = runner.invoke(upload, ["cli_test_data", "foobar_dir"])
+        res = runner.invoke(
+            upload,
+            ["cli_test_data", "foobar_dir"],
+            input="\n".join(["foo@bar.com", "123456"]),
+        )
         # for debugging, if needed
         print("output is", res.output)
 
@@ -88,7 +96,7 @@ def test_upload_invalid_destination(mocker):
             )
             in res.output
         )
-        assert not mocked_login.called
+        mocked_login.assert_called_once()
 
 
 def test_upload_and_run_immediately(mocker):
@@ -103,7 +111,7 @@ def test_upload_and_run_immediately(mocker):
             APIClient, "login", return_value=None
         )
         mocked_get_credentials = mocker.patch(
-            "gencove.command.upload.get_s3_client_refreshable"
+            "gencove.command.upload.main.get_s3_client_refreshable"
         )
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
@@ -115,7 +123,7 @@ def test_upload_and_run_immediately(mocker):
             },
         )
         mocked_upload_file = mocker.patch(
-            "gencove.command.upload.upload_file"
+            "gencove.command.upload.main.upload_file"
         )
         mocked_get_sample_sheet = mocker.patch.object(
             APIClient,
@@ -171,7 +179,7 @@ def test_upload_and_run_immediately_something_went_wrong(mocker):
             APIClient, "login", return_value=None
         )
         mocked_get_credentials = mocker.patch(
-            "gencove.command.upload.get_s3_client_refreshable"
+            "gencove.command.upload.main.get_s3_client_refreshable"
         )
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
@@ -183,7 +191,7 @@ def test_upload_and_run_immediately_something_went_wrong(mocker):
             },
         )
         mocked_upload_file = mocker.patch(
-            "gencove.command.upload.upload_file"
+            "gencove.command.upload.main.upload_file"
         )
         mocked_get_sample_sheet = mocker.patch.object(
             APIClient,

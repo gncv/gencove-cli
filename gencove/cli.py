@@ -10,7 +10,7 @@ from gencove.command.download import (
     download_deliverables,
 )
 from gencove.command.upload import Upload, UploadOptions
-from gencove.constants import Credentials, HOST
+from gencove.constants import Credentials, HOST, DOWNLOAD_TEMPLATE
 from gencove.logger import echo_debug
 
 
@@ -115,11 +115,10 @@ def upload(  # pylint: disable=C0330,R0913
 )
 @click.option(
     "--download-template",
-    default="{client_id}/{gencove_id}/{gencove_id}_{file_type}{file_extension}",
+    default=DOWNLOAD_TEMPLATE,
     help=(
         "Change downloads structure. "
-        "Defaults to: "
-        "{client_id}/{gencove_id}/{gencove_id}_"
+        "Defaults to: {}".format(DOWNLOAD_TEMPLATE)
     ),
 )
 def download(  # pylint: disable=C0330,R0913

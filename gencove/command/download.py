@@ -14,10 +14,18 @@ except ImportError:
 import requests
 
 from gencove import client  # noqa: I100
-from gencove.constants import Optionals, SAMPLE_STATUSES
+from gencove.constants import (
+    Optionals,
+    SAMPLE_STATUSES,
+    DownloadTemplateParts,
+)
 from gencove.logger import echo, echo_debug, echo_warning
-from gencove.utils import get_progress_bar, login
-
+from gencove.utils import (
+    get_progress_bar,
+    login,
+    get_filename_from_download_url,
+    deliverable_type_from_filename,
+)
 
 ALLOWED_STATUSES_RE = re.compile(
     "{}|{}".format(SAMPLE_STATUSES.succeeded, SAMPLE_STATUSES.failed),
@@ -81,11 +89,7 @@ def download_deliverables(destination, filters, credentials, options):
             )
             for sample in samples_generator:
                 _process_sample(
-                    destination,
-                    sample["id"],
-                    filters.file_types,
-                    api_client,
-                    options.skip_existing,
+                    destination, sample["id"], api_client, filters, options
                 )
                 count += 1
 
@@ -102,13 +106,7 @@ def download_deliverables(destination, filters, credentials, options):
             return
 
     for sample_id in filters.sample_ids:
-        _process_sample(
-            destination,
-            sample_id,
-            filters.file_types,
-            api_client,
-            options.skip_existing,
-        )
+        _process_sample(destination, sample_id, api_client, filters, options)
 
 
 def _get_paginated_samples(project_id, api_client):
@@ -124,29 +122,47 @@ def _get_paginated_samples(project_id, api_client):
         get_samples = next_page is not None
 
 
-def _download_file(download_to, file_prefix, url, skip_existing):
+def _download_file(download_to, file_prefix, deliverable, options):
     """Download a file to file system.
 
     Args:
         download_to (str): system/path/to/save/file/to
         file_prefix (str): <client id>/<gencove sample id> to nest downloaded
             file.
-        url (str): signed url from S3 to download the file from.
-        skip_existing (bool): skip downloading existing files.
+        deliverable (dict): file object from api.
+        options (:obj:`tuple` of type DownloadOptions):
+            contains additional flags for download processing.
     """
-    with requests.get(url, stream=True) as req:
+    echo_debug(
+        "Downloading file to {} with prefix {}".format(
+            download_to, file_prefix
+        )
+    )
+    prefix_parts = file_prefix.split("/")
+    filename_prefix = prefix_parts[-1]
+    dirs_prefix = "/".join(prefix_parts[:-1])
+    with requests.get(deliverable["download_url"], stream=True) as req:
         req.raise_for_status()
-        filename = _get_filename(req.headers["content-disposition"], url)
+        source_filename = get_filename_from_download_url(
+            req.headers["content-disposition"], deliverable["download_url"]
+        )
+        destination_filename = "{}.{}".format(
+            filename_prefix, deliverable_type_from_filename(source_filename)
+        )
         filename_tmp = "download-{}.tmp".format(uuid.uuid4().hex)
-        file_path = _create_filepath(download_to, file_prefix, filename)
+        file_path = _create_filepath(
+            download_to, dirs_prefix, destination_filename
+        )
         file_path_tmp = _create_filepath(
             download_to, file_prefix, filename_tmp
         )
         total = int(req.headers["content-length"])
-
+        # todo refactor destination filename deduction to outside of this func based on deliverable from sample details
+        # todo move skip existing check to outside of download file func
+        # todo on the same par as skip existing, remember downloaded files and do todo on line 43
         # pylint: disable=C0330
         if (
-            skip_existing
+            options.skip_existing
             and os.path.isfile(file_path)
             and os.path.getsize(file_path) == total
         ):
@@ -189,35 +205,8 @@ def _create_filepath(download_to, file_prefix, filename):
     return file_path
 
 
-def _get_filename(content_disposition, url):
-    """Deduce filename from content disposition or url.
-
-    Args:
-        content_disposition (str): Request header Content-Disposition
-        url (str): URL string
-    """
-    filename_match = re.findall(FILENAME_RE, content_disposition)
-    if not filename_match:
-        echo_debug(
-            "Content disposition had no filename. Trying url query params"
-        )
-        filename = re.findall(FILENAME_RE, parse_qs(urlparse(url).query))
-    else:
-        filename = filename_match[0]
-    if not filename:
-        echo_debug(
-            "URL didn't contain filename query argument. "
-            "Assume filename from url"
-        )
-        filename = urlparse(url).path.split("/")[-1]
-    echo_debug("Deduced filename to be: {}".format(filename))
-    return filename
-
-
 # pylint: disable=C0330
-def _process_sample(
-    destination, sample_id, file_types, api_client, skip_existing
-):
+def _process_sample(destination, sample_id, api_client, filters, options):
     """Download sample deliverables."""
     try:
         sample = api_client.get_sample_details(sample_id)
@@ -236,20 +225,23 @@ def _process_sample(
 
     if not ALLOWED_STATUSES_RE.match(sample["last_status"]["status"]):
         echo_warning(
-            "Sample #{} has no deliverable.".format(sample_id), err=True
+            "Sample #{} has no deliverable.".format(sample["id"]), err=True
         )
         return
 
-    file_types_re = re.compile("|".join(file_types), re.IGNORECASE)
+    file_types_re = re.compile("|".join(filters.file_types), re.IGNORECASE)
+    file_prefix = options.download_template.format(
+        **{
+            DownloadTemplateParts.client_id: sample["client_id"],
+            DownloadTemplateParts.gencove_id: sample["id"],
+        }
+    )
 
     for deliverable in sample["files"]:
-        if file_types and not file_types_re.match(deliverable["file_type"]):
+        if filters.file_types and not file_types_re.match(
+            deliverable["file_type"]
+        ):
             echo_debug("Deliverable file type is not in desired file types")
             continue
 
-        _download_file(
-            destination,
-            "{}/{}".format(sample["client_id"], sample["id"]),
-            deliverable["download_url"],
-            skip_existing=skip_existing,
-        )
+        _download_file(destination, file_prefix, deliverable, options)

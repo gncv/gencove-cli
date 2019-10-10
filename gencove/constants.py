@@ -39,3 +39,13 @@ SAMPLE_ASSIGNMENT_STATUS = _SampleAssignmentStatus(
 
 Credentials = namedtuple("Credentials", ["email", "password"])
 Optionals = namedtuple("Optionals", ["host"])
+
+_DownloadTemplateParts = namedtuple(
+    "DownloadTemplateParts", ["client_id", "gencove_id"]
+)
+DownloadTemplateParts = _DownloadTemplateParts("client_id", "gencove_id")
+DOWNLOAD_TEMPLATE = "{{{}}}/{{{}}}/{{{}}}_".format(
+    DownloadTemplateParts.client_id,
+    DownloadTemplateParts.gencove_id,
+    DownloadTemplateParts.gencove_id,
+)

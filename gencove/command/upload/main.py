@@ -25,8 +25,12 @@ from .constants import (
     UPLOAD_PREFIX,
     UPLOAD_STATUSES,
 )
-from .utils import get_related_sample, seek_files_to_upload, upload_file
-
+from .utils import (
+    get_get_upload_details_retry_predicate,
+    get_related_sample,
+    seek_files_to_upload,
+    upload_file,
+)
 
 UploadOptions = namedtuple(  # pylint: disable=invalid-name
     "UploadOptions", Optionals._fields + ("project_id",)
@@ -155,7 +159,7 @@ class Upload(Command):
             )
         )
 
-        upload_details = self.api_client.get_upload_details(gncv_notated_path)
+        upload_details = self.get_upload_details(gncv_notated_path)
         if upload_details["last_status"]["status"] == UPLOAD_STATUSES.done:
             self.echo("File was already uploaded: {}".format(clean_file_path))
             return upload_details
@@ -168,6 +172,13 @@ class Upload(Command):
             object_name=upload_details["s3"]["object_name"],
         )
         return upload_details
+
+    @backoff.on_predicate(
+        backoff.expo, get_get_upload_details_retry_predicate, max_tries=5
+    )
+    def get_upload_details(self, gncv_path):
+        """Get upload details with retry for last status update."""
+        return self.api_client.get_upload_details(gncv_path)
 
     def assign_uploads_to_project(self):
         """Assign uploads to a project and trigger a run."""

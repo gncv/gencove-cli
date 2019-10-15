@@ -110,3 +110,8 @@ def get_related_sample(upload_id, sample_sheet):
 
     echo_debug("No sample found for upload: {}".format(upload_id))
     return None, None, None
+
+
+def get_get_upload_details_retry_predicate(resp):
+    """Triggers retry if upload details came back without last status."""
+    return not resp["last_status"]

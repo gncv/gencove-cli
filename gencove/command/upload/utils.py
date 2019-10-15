@@ -109,4 +109,4 @@ def get_related_sample(upload_id, sample_sheet):
             return sample, r1_uid, r2_uid
 
     echo_debug("No sample found for upload: {}".format(upload_id))
-    return None
+    return None, None, None

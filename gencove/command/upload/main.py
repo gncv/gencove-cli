@@ -174,7 +174,7 @@ class Upload(Command):
         return upload_details
 
     @backoff.on_predicate(
-        backoff.expo, get_get_upload_details_retry_predicate, max_tries=5
+        backoff.expo, get_get_upload_details_retry_predicate, max_tries=10
     )
     def get_upload_details(self, gncv_path):
         """Get upload details with retry for last status update."""
@@ -238,7 +238,7 @@ class Upload(Command):
         progress_bar.finish()
         self.echo("Assigned all samples to a project")
 
-    @backoff.on_exception(backoff.expo, SampleSheetError, max_tries=5)
+    @backoff.on_exception(backoff.expo, SampleSheetError, max_time=300)
     def samples_generator(self, uploads):
         """Get samples for current uploads.
 

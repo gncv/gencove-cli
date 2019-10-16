@@ -43,6 +43,7 @@ Optionals = namedtuple("Optionals", ["host"])
 _DownloadTemplateParts = namedtuple(
     "DownloadTemplateParts", ["client_id", "gencove_id"]
 )
+# pylint: disable=C0103
 DownloadTemplateParts = _DownloadTemplateParts("client_id", "gencove_id")
 DOWNLOAD_TEMPLATE = "{{{}}}/{{{}}}/{{{}}}_".format(
     DownloadTemplateParts.client_id,

@@ -1,7 +1,13 @@
 """Gencove CLI utils."""
 import os
 import re
-from urllib.parse import parse_qs, urlparse
+
+try:
+    # python 3.7
+    from urllib.parse import urlparse, parse_qs  # noqa
+except ImportError:
+    # python 2.7
+    from urlparse import urlparse, parse_qs  # noqa
 
 import boto3
 
@@ -20,6 +26,7 @@ MB = KB * 1024
 GB = MB * 1024
 NUM_MB_IN_CHUNK = 100
 CHUNK_SIZE = NUM_MB_IN_CHUNK * MB
+FILENAME_RE = re.compile("filename=(.+)")
 
 
 def get_s3_client_refreshable(refresh_method):
@@ -169,4 +176,9 @@ def get_filename_from_download_url(content_disposition, url):
 
 def deliverable_type_from_filename(filename):
     """Deduce deliverable type based on dot notation."""
-    return ".".join(filename.split(".")[1:])
+    filetype = ".".join(filename.split(".")[1:])
+    echo_debug(
+        "Deduced filetype to be: {} "
+        "from filename: {}".format(filetype, filename)
+    )
+    return filetype

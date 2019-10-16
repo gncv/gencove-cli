@@ -10,7 +10,7 @@ from gencove.command.download import (
     download_deliverables,
 )
 from gencove.command.upload import Upload, UploadOptions
-from gencove.constants import Credentials, HOST, DOWNLOAD_TEMPLATE
+from gencove.constants import Credentials, DOWNLOAD_TEMPLATE, HOST
 from gencove.logger import echo_debug
 
 

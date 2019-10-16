@@ -4,34 +4,26 @@ import re
 import uuid
 from collections import namedtuple
 
-try:
-    # python 3.7
-    from urllib.parse import urlparse, parse_qs  # noqa
-except ImportError:
-    # python 2.7
-    from urlparse import urlparse, parse_qs  # noqa
-
 import requests
 
 from gencove import client  # noqa: I100
 from gencove.constants import (
+    DownloadTemplateParts,
     Optionals,
     SAMPLE_STATUSES,
-    DownloadTemplateParts,
 )
 from gencove.logger import echo, echo_debug, echo_warning
 from gencove.utils import (
+    deliverable_type_from_filename,
+    get_filename_from_download_url,
     get_progress_bar,
     login,
-    get_filename_from_download_url,
-    deliverable_type_from_filename,
 )
 
 ALLOWED_STATUSES_RE = re.compile(
     "{}|{}".format(SAMPLE_STATUSES.succeeded, SAMPLE_STATUSES.failed),
     re.IGNORECASE,
 )
-FILENAME_RE = re.compile("filename=(.+)")
 KILOBYTE = 1024
 MEGABYTE = 1024 * KILOBYTE
 NUM_MB_IN_CHUNK = 3
@@ -44,8 +36,9 @@ DownloadOptions = namedtuple(  # pylint: disable=invalid-name
     "DownloadOptions",
     Optionals._fields + ("skip_existing", "download_template"),
 )
+FilePrefix = namedtuple("FilePrefix", ["dirs", "filename"])
 
-# todo remember already downloaded paths and if we meet same downloadabe again - fail due to error in a template
+
 def download_deliverables(destination, filters, credentials, options):
     """Download project deliverables to a specified path on user machine.
 
@@ -71,6 +64,7 @@ def download_deliverables(destination, filters, credentials, options):
     echo_debug(
         "Host is {} downloading to {}".format(options.host, destination)
     )
+
     api_client = client.APIClient(options.host)
     is_logged_in = login(api_client, credentials.email, credentials.password)
     if not is_logged_in:
@@ -122,6 +116,36 @@ def _get_paginated_samples(project_id, api_client):
         get_samples = next_page is not None
 
 
+def _get_filename_dirs_prefix(full_prefix):
+    """Extract directories prefix and filename prefix separately."""
+    prefix_parts = full_prefix.split("/")
+    return FilePrefix("/".join(prefix_parts[:-1]), prefix_parts[-1])
+
+
+def _build_file_path(req, deliverable, file_prefix, download_to):
+    """Create and return file system path where the file will be downloaded to.
+
+    Args:
+        req (requests object): used to get content disposition
+        deliverable (dict): used to get download url and file type
+        file_prefix (str): used as a template for download path
+        download_to (str): general location where to download the file to
+
+    Returns:
+         str : file path on current file system
+    """
+    prefix = _get_filename_dirs_prefix(file_prefix)
+    source_filename = get_filename_from_download_url(
+        req.headers["content-disposition"], deliverable["download_url"]
+    )
+    destination_filename = "{}{}.{}".format(
+        prefix.filename,
+        deliverable["file_type"],
+        deliverable_type_from_filename(source_filename),
+    )
+    return _create_filepath(download_to, prefix.dirs, destination_filename)
+
+
 def _download_file(download_to, file_prefix, deliverable, options):
     """Download a file to file system.
 
@@ -132,34 +156,28 @@ def _download_file(download_to, file_prefix, deliverable, options):
         deliverable (dict): file object from api.
         options (:obj:`tuple` of type DownloadOptions):
             contains additional flags for download processing.
+
+    Returns:
+        str : file path
+            location of the downloaded file
     """
     echo_debug(
         "Downloading file to {} with prefix {}".format(
             download_to, file_prefix
         )
     )
-    prefix_parts = file_prefix.split("/")
-    filename_prefix = prefix_parts[-1]
-    dirs_prefix = "/".join(prefix_parts[:-1])
+
     with requests.get(deliverable["download_url"], stream=True) as req:
         req.raise_for_status()
-        source_filename = get_filename_from_download_url(
-            req.headers["content-disposition"], deliverable["download_url"]
-        )
-        destination_filename = "{}.{}".format(
-            filename_prefix, deliverable_type_from_filename(source_filename)
+
+        file_path = _build_file_path(
+            req, deliverable, file_prefix, download_to
         )
         filename_tmp = "download-{}.tmp".format(uuid.uuid4().hex)
-        file_path = _create_filepath(
-            download_to, dirs_prefix, destination_filename
-        )
         file_path_tmp = _create_filepath(
             download_to, file_prefix, filename_tmp
         )
         total = int(req.headers["content-length"])
-        # todo refactor destination filename deduction to outside of this func based on deliverable from sample details
-        # todo move skip existing check to outside of download file func
-        # todo on the same par as skip existing, remember downloaded files and do todo on line 43
         # pylint: disable=C0330
         if (
             options.skip_existing
@@ -167,7 +185,7 @@ def _download_file(download_to, file_prefix, deliverable, options):
             and os.path.getsize(file_path) == total
         ):
             echo("Skipping existing file: {}".format(file_path))
-            return
+            return file_path
 
         echo_debug("Starting to download file to: {}".format(file_path))
 
@@ -181,9 +199,14 @@ def _download_file(download_to, file_prefix, deliverable, options):
 
         # Cross-platform cross-python-version file overwriting
         if os.path.exists(file_path):
+            echo_debug(
+                "Found old file under same name: {}. "
+                "Removing it.".format(file_path)
+            )
             os.remove(file_path)
         os.rename(file_path_tmp, file_path)
         echo("Finished downloading a file: {}".format(file_path))
+        return file_path
 
 
 def _create_filepath(download_to, file_prefix, filename):
@@ -237,6 +260,7 @@ def _process_sample(destination, sample_id, api_client, filters, options):
         }
     )
 
+    downloaded_files = set()
     for deliverable in sample["files"]:
         if filters.file_types and not file_types_re.match(
             deliverable["file_type"]
@@ -244,4 +268,11 @@ def _process_sample(destination, sample_id, api_client, filters, options):
             echo_debug("Deliverable file type is not in desired file types")
             continue
 
-        _download_file(destination, file_prefix, deliverable, options)
+        file_path = _download_file(
+            destination, file_prefix, deliverable, options
+        )
+        if file_path in downloaded_files:
+            echo_warning("Bad template! Multiple files have the same name.")
+            return
+
+        downloaded_files.add(file_path)

@@ -39,6 +39,11 @@ DownloadOptions = namedtuple(  # pylint: disable=invalid-name
 FilePrefix = namedtuple("FilePrefix", ["dirs", "filename"])
 
 
+class TemplateError(Exception):
+    """Download error due to template causing multiple files to have same path.
+    """
+
+
 def download_deliverables(destination, filters, credentials, options):
     """Download project deliverables to a specified path on user machine.
 
@@ -82,10 +87,17 @@ def download_deliverables(destination, filters, credentials, options):
                 filters.project_id, api_client
             )
             for sample in samples_generator:
-                _process_sample(
-                    destination, sample["id"], api_client, filters, options
-                )
-                count += 1
+                try:
+                    _process_sample(
+                        destination,
+                        sample["id"],
+                        api_client,
+                        filters,
+                        options,
+                    )
+                    count += 1
+                except TemplateError:
+                    return
 
             if not count:
                 echo_warning("Project has no samples to download")
@@ -100,7 +112,12 @@ def download_deliverables(destination, filters, credentials, options):
             return
 
     for sample_id in filters.sample_ids:
-        _process_sample(destination, sample_id, api_client, filters, options)
+        try:
+            _process_sample(
+                destination, sample_id, api_client, filters, options
+            )
+        except TemplateError:
+            return
 
 
 def _get_paginated_samples(project_id, api_client):
@@ -272,7 +289,11 @@ def _process_sample(destination, sample_id, api_client, filters, options):
             destination, file_prefix, deliverable, options
         )
         if file_path in downloaded_files:
-            echo_warning("Bad template! Multiple files have the same name.")
-            return
+            echo_warning(
+                "Bad template! Multiple files have the same name. "
+                "Please fix the template and try again."
+            )
+            raise TemplateError
 
+        echo_debug("Adding file path: {}".format(file_path))
         downloaded_files.add(file_path)

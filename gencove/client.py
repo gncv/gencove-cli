@@ -164,7 +164,7 @@ class APIClient:
 
         return {"Authorization": "Bearer {}".format(self._jwt_token)}
 
-    def _post(self, endpoint, payload=None, timeout=10, authorized=False):
+    def _post(self, endpoint, payload=None, timeout=120, authorized=False):
         headers = {} if not authorized else self._get_authorization()
         return self._request(
             endpoint,
@@ -174,7 +174,9 @@ class APIClient:
             custom_headers=headers,
         )
 
-    def _get(self, endpoint, query_params=None, timeout=10, authorized=False):
+    def _get(
+        self, endpoint, query_params=None, timeout=120, authorized=False
+    ):
         headers = {} if not authorized else self._get_authorization()
         return self._request(
             endpoint,

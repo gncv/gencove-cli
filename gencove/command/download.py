@@ -101,9 +101,8 @@ def download_deliverables(destination, filters, credentials, options):
 
             if not count:
                 echo_warning("Project has no samples to download")
-                return
-
-            echo_debug("Processed {} samples".format(count))
+            else:
+                echo_debug("Processed {} samples".format(count))
             return
         except client.APIClientError:
             echo_warning(
@@ -117,7 +116,7 @@ def download_deliverables(destination, filters, credentials, options):
                 destination, sample_id, api_client, filters, options
             )
         except TemplateError:
-            return
+            break
 
 
 def _get_paginated_samples(project_id, api_client):

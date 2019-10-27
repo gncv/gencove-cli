@@ -15,6 +15,11 @@ def _echo_with_datetime(msg, **kwargs):
     click.echo("{}  {}".format(datetime.utcnow().isoformat(), msg), **kwargs)
 
 
+def _echo(msg, **kwargs):
+    """Output click echo message without datetime."""
+    click.echo(msg, **kwargs)
+
+
 if LOG_LEVEL == DEBUG:
     import sys
     import logging
@@ -44,7 +49,10 @@ def output_warning(text):
 
 def echo(msg, **kwargs):
     """Output click echo msg."""
-    _echo_with_datetime(msg, **kwargs)
+    if LOG_LEVEL == DEBUG:
+        _echo_with_datetime(msg, **kwargs)
+    else:
+        _echo(msg, **kwargs)
 
 
 def echo_debug(msg, **kwargs):
@@ -55,4 +63,7 @@ def echo_debug(msg, **kwargs):
 
 def echo_warning(msg, **kwargs):
     """Output click echo msg with background."""
-    _echo_with_datetime(output_warning(msg), **kwargs)
+    if LOG_LEVEL == DEBUG:
+        _echo_with_datetime(msg, **kwargs)
+    else:
+        _echo(msg, **kwargs)

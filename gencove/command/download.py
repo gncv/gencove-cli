@@ -75,48 +75,56 @@ def download_deliverables(destination, filters, credentials, options):
     if not is_logged_in:
         return
 
+    deliverables = []
+
     if filters.project_id:
         echo_debug(
             "Retrieving sample ids for a project: {}".format(
                 filters.project_id
             )
         )
-        count = 0
+
         try:
             samples_generator = _get_paginated_samples(
                 filters.project_id, api_client
             )
             for sample in samples_generator:
-                try:
-                    _process_sample(
-                        destination,
-                        sample["id"],
-                        api_client,
-                        filters,
-                        options,
-                    )
-                    count += 1
-                except TemplateError:
-                    return
-
-            if not count:
-                echo_warning("Project has no samples to download")
-            else:
-                echo_debug("Processed {} samples".format(count))
-            return
+                sample_files = filter_sample_deliverables(
+                    sample["id"], api_client, filters
+                )
+                deliverables.extend(sample_files)
         except client.APIClientError:
             echo_warning(
                 "Project id {} not found.".format(filters.project_id)
             )
             return
-
-    for sample_id in filters.sample_ids:
-        try:
-            _process_sample(
-                destination, sample_id, api_client, filters, options
+    else:
+        for sample_id in filters.sample_ids:
+            sample_files = filter_sample_deliverables(
+                sample_id, api_client, filters
             )
-        except TemplateError:
-            break
+            deliverables.extend(sample_files)
+
+    downloaded_files = []
+    for deliverable in deliverables:
+        file_prefix = options.download_template.format(
+            **{
+                DownloadTemplateParts.client_id: deliverable["client_id"],
+                DownloadTemplateParts.gencove_id: deliverable["sample_id"],
+            }
+        )
+        file_path = _download_file(
+            destination, file_prefix, deliverable, options
+        )
+        if file_path in downloaded_files:
+            echo_warning(
+                "Bad template! Multiple files have the same name. "
+                "Please fix the template and try again."
+            )
+            raise TemplateError
+
+        echo_debug("Adding file path: {}".format(file_path))
+        downloaded_files.append(file_path)
 
 
 def _get_paginated_samples(project_id, api_client):
@@ -246,7 +254,11 @@ def _create_filepath(download_to, file_prefix, filename):
 
 # pylint: disable=C0330
 def _process_sample(destination, sample_id, api_client, filters, options):
-    """Download sample deliverables."""
+    """Download sample deliverables.
+
+    Returns:
+        list of str: list of downloaded file paths
+    """
     try:
         sample = api_client.get_sample_details(sample_id)
     except client.APIClientError:
@@ -296,3 +308,46 @@ def _process_sample(destination, sample_id, api_client, filters, options):
 
         echo_debug("Adding file path: {}".format(file_path))
         downloaded_files.add(file_path)
+
+    return downloaded_files
+
+
+def filter_sample_deliverables(sample_id, api_client, filters):
+    try:
+        sample = api_client.get_sample_details(sample_id)
+    except client.APIClientError:
+        echo_warning(
+            "Sample with id {} not found. "
+            "Are you using client id instead of sample id?".format(sample_id)
+        )
+        return []
+
+    echo_debug(
+        "Processing sample id {}, status {}".format(
+            sample["id"], sample["last_status"]["status"]
+        )
+    )
+
+    if not ALLOWED_STATUSES_RE.match(sample["last_status"]["status"]):
+        echo_warning(
+            "Sample #{} has no deliverable.".format(sample["id"]), err=True
+        )
+        return []
+
+    file_types_re = re.compile("|".join(filters.file_types), re.IGNORECASE)
+
+    deliverables = []
+    for sample_file in sample["files"]:
+        if filters.file_types and not file_types_re.match(
+            sample_file["file_type"]
+        ):
+            echo_debug("Deliverable file type is not in desired file types")
+            continue
+        deliverable = {
+            **sample_file,
+            "client_id": sample["client_id"],
+            "sample_id": sample["id"],
+        }
+        deliverables.append(deliverable)
+
+    return deliverables

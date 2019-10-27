@@ -252,66 +252,6 @@ def _create_filepath(download_to, file_prefix, filename):
     return file_path
 
 
-# pylint: disable=C0330
-def _process_sample(destination, sample_id, api_client, filters, options):
-    """Download sample deliverables.
-
-    Returns:
-        list of str: list of downloaded file paths
-    """
-    try:
-        sample = api_client.get_sample_details(sample_id)
-    except client.APIClientError:
-        echo_warning(
-            "Sample with id {} not found. "
-            "Are you using client id instead of sample id?".format(sample_id)
-        )
-        return
-
-    echo_debug(
-        "Processing sample id {}, status {}".format(
-            sample["id"], sample["last_status"]["status"]
-        )
-    )
-
-    if not ALLOWED_STATUSES_RE.match(sample["last_status"]["status"]):
-        echo_warning(
-            "Sample #{} has no deliverable.".format(sample["id"]), err=True
-        )
-        return
-
-    file_types_re = re.compile("|".join(filters.file_types), re.IGNORECASE)
-    file_prefix = options.download_template.format(
-        **{
-            DownloadTemplateParts.client_id: sample["client_id"],
-            DownloadTemplateParts.gencove_id: sample["id"],
-        }
-    )
-
-    downloaded_files = set()
-    for deliverable in sample["files"]:
-        if filters.file_types and not file_types_re.match(
-            deliverable["file_type"]
-        ):
-            echo_debug("Deliverable file type is not in desired file types")
-            continue
-
-        file_path = _download_file(
-            destination, file_prefix, deliverable, options
-        )
-        if file_path in downloaded_files:
-            echo_warning(
-                "Bad template! Multiple files have the same name. "
-                "Please fix the template and try again."
-            )
-            raise TemplateError
-
-        echo_debug("Adding file path: {}".format(file_path))
-        downloaded_files.add(file_path)
-
-    return downloaded_files
-
-
 def filter_sample_deliverables(sample_id, api_client, filters):
     try:
         sample = api_client.get_sample_details(sample_id)

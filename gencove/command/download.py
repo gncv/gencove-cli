@@ -120,7 +120,7 @@ def download_deliverables(destination, filters, credentials, options):
                 "Bad template! Multiple files have the same name. "
                 "Please fix the template and try again."
             )
-            raise TemplateError
+            return
 
         _download_file(
             destination, file_prefix, file_path, deliverable, options
@@ -198,7 +198,9 @@ def _download_file(download_to, file_prefix, file_path, deliverable, options):
     with requests.get(deliverable["download_url"], stream=True) as req:
         req.raise_for_status()
         filename_tmp = "download-{}.tmp".format(uuid.uuid4().hex)
-        file_path_tmp = _create_filepath("/tmp", "", filename_tmp)
+        file_path_tmp = _create_filepath(
+            download_to, file_prefix, filename_tmp
+        )
         total = int(req.headers["content-length"])
         # pylint: disable=C0330
         if (
@@ -256,6 +258,17 @@ def _create_filepath(download_to, file_prefix, filename):
 
 
 def filter_sample_deliverables(sample_id, api_client, filters):
+    """Get sample details and returns viable files for download.
+
+    Args:
+        sample_id (str): sample id
+        api_client (:obj:`APIClient`): gencove api client instantiated
+            and after login
+        filters (:obj:`DownloadFilters`): tuple with active filters
+
+    Returns:
+        list of dicts: sample files, augmented with sample id and client id.
+    """
     try:
         sample = api_client.get_sample_details(sample_id)
     except client.APIClientError:
@@ -281,16 +294,15 @@ def filter_sample_deliverables(sample_id, api_client, filters):
 
     deliverables = []
     for sample_file in sample["files"]:
+        # pylint: disable=C0330
         if filters.file_types and not file_types_re.match(
             sample_file["file_type"]
         ):
             echo_debug("Deliverable file type is not in desired file types")
             continue
-        deliverable = {
-            **sample_file,
-            "client_id": sample["client_id"],
-            "sample_id": sample["id"],
-        }
+        deliverable = dict(**sample_file)
+        deliverable["client_id"] = sample["client_id"]
+        deliverable["sample_id"] = sample["id"]
         deliverables.append(deliverable)
 
     return deliverables

@@ -113,15 +113,18 @@ def download_deliverables(destination, filters, credentials, options):
                 DownloadTemplateParts.gencove_id: deliverable["sample_id"],
             }
         )
-        file_path = _download_file(
-            destination, file_prefix, deliverable, options
-        )
+        file_path = _build_file_path(deliverable, file_prefix, destination)
+
         if file_path in downloaded_files:
             echo_warning(
                 "Bad template! Multiple files have the same name. "
                 "Please fix the template and try again."
             )
             raise TemplateError
+
+        _download_file(
+            destination, file_prefix, file_path, deliverable, options
+        )
 
         echo_debug("Adding file path: {}".format(file_path))
         downloaded_files.append(file_path)
@@ -146,11 +149,10 @@ def _get_filename_dirs_prefix(full_prefix):
     return FilePrefix("/".join(prefix_parts[:-1]), prefix_parts[-1])
 
 
-def _build_file_path(req, deliverable, file_prefix, download_to):
+def _build_file_path(deliverable, file_prefix, download_to):
     """Create and return file system path where the file will be downloaded to.
 
     Args:
-        req (requests object): used to get content disposition
         deliverable (dict): used to get download url and file type
         file_prefix (str): used as a template for download path
         download_to (str): general location where to download the file to
@@ -160,7 +162,7 @@ def _build_file_path(req, deliverable, file_prefix, download_to):
     """
     prefix = _get_filename_dirs_prefix(file_prefix)
     source_filename = get_filename_from_download_url(
-        req.headers["content-disposition"], deliverable["download_url"]
+        deliverable["download_url"]
     )
     destination_filename = "{}{}.{}".format(
         prefix.filename,
@@ -170,13 +172,15 @@ def _build_file_path(req, deliverable, file_prefix, download_to):
     return _create_filepath(download_to, prefix.dirs, destination_filename)
 
 
-def _download_file(download_to, file_prefix, deliverable, options):
+def _download_file(download_to, file_prefix, file_path, deliverable, options):
     """Download a file to file system.
 
     Args:
         download_to (str): system/path/to/save/file/to
         file_prefix (str): <client id>/<gencove sample id> to nest downloaded
             file.
+        file_path (str): full file path, according to destination
+            and download template
         deliverable (dict): file object from api.
         options (:obj:`tuple` of type DownloadOptions):
             contains additional flags for download processing.
@@ -193,14 +197,8 @@ def _download_file(download_to, file_prefix, deliverable, options):
 
     with requests.get(deliverable["download_url"], stream=True) as req:
         req.raise_for_status()
-
-        file_path = _build_file_path(
-            req, deliverable, file_prefix, download_to
-        )
         filename_tmp = "download-{}.tmp".format(uuid.uuid4().hex)
-        file_path_tmp = _create_filepath(
-            download_to, file_prefix, filename_tmp
-        )
+        file_path_tmp = _create_filepath("/tmp", "", filename_tmp)
         total = int(req.headers["content-length"])
         # pylint: disable=C0330
         if (
@@ -243,10 +241,15 @@ def _create_filepath(download_to, file_prefix, filename):
         filename (str): name of the file inside download_to/file_prefix
             structure.
     """
+    echo_debug("_create_filepath Downloading to: {}".format(download_to))
+    echo_debug("_create_filepath file prefix is: {}".format(file_prefix))
+
     path = os.path.join(download_to, file_prefix)
     # Cross-platform cross-python-version directory creation
     if not os.path.exists(path):
+        echo_debug("creating path: {}".format(path))
         os.makedirs(path)
+
     file_path = os.path.join(path, filename)
     echo_debug("Deduced full file path is {}".format(file_path))
     return file_path

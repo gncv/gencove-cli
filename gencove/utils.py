@@ -149,28 +149,27 @@ def batchify(items_list, batch_size=500):
         left_to_process -= batch_size
 
 
-def get_filename_from_download_url(content_disposition, url):
-    """Deduce filename from content disposition or url.
+def get_filename_from_download_url(url):
+    """Deduce filename from url.
 
     Args:
-        content_disposition (str): Request header Content-Disposition
         url (str): URL string
+
+    Returns:
+        str: filename
     """
-    filename_match = re.findall(FILENAME_RE, content_disposition)
-    if not filename_match:
-        echo_debug(
-            "Content disposition had no filename. Trying url query params"
-        )
-        filename = re.findall(FILENAME_RE, parse_qs(urlparse(url).query))
-    else:
-        filename = filename_match[0]
-    if not filename:
+    try:
+        filename = re.findall(
+            FILENAME_RE,
+            parse_qs(urlparse(url).query)["response-content-disposition"][0],
+        )[0]
+    except (KeyError, IndexError):
         echo_debug(
             "URL didn't contain filename query argument. "
             "Assume filename from url"
         )
         filename = urlparse(url).path.split("/")[-1]
-    echo_debug("Deduced filename to be: {}".format(filename))
+
     return filename
 
 

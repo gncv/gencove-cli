@@ -131,13 +131,7 @@ def test_upload_and_run_immediately(mocker):
             return_value={
                 "meta": {"next": None},
                 "results": [
-                    {
-                        "client_id": "foo",
-                        "fastq": {
-                            "r1": {"upload": "test"},
-                            "r2": {"upload": "test2"},
-                        },
-                    }
+                    {"client_id": "foo", "fastq": {"r1": {"upload": "test"}}}
                 ],
             },
         )

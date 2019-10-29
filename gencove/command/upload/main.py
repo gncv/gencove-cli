@@ -27,7 +27,6 @@ from .constants import (
 from .utils import (
     get_filename_from_path,
     get_get_upload_details_retry_predicate,
-    get_related_sample,
     seek_files_to_upload,
     upload_file,
 )
@@ -44,6 +43,10 @@ ASSIGN_BATCH_SIZE = 200
 
 
 class UploadError(Exception):
+    """Upload related error."""
+
+
+class UploadNotFound(Exception):
     """Upload related error."""
 
 
@@ -134,6 +137,7 @@ class Upload(Command):
                 self.upload_ids.add(upload["id"])
 
         self.echo("All files were successfully uploaded.")
+        self.echo("Upload ids are now: {}".format(self.upload_ids))
 
         if self.project_id:
             self.echo_debug("Cooling down period.")
@@ -185,7 +189,7 @@ class Upload(Command):
         self.echo("Assigning uploads to project {}".format(self.project_id))
 
         try:
-            samples = list(self.samples_generator(self.upload_ids))
+            samples = self.build_samples(self.upload_ids)
         except (UploadError, SampleSheetError):
             self.echo_warning(ASSIGN_ERROR.format(self.project_id))
             return
@@ -238,37 +242,69 @@ class Upload(Command):
         progress_bar.finish()
         self.echo("Assigned all samples to a project")
 
-    @backoff.on_exception(backoff.expo, SampleSheetError, max_time=300)
-    def samples_generator(self, uploads):
+    @backoff.on_exception(
+        backoff.expo, (SampleSheetError, UploadNotFound), max_time=300
+    )
+    def build_samples(self, uploads):
         """Get samples for current uploads.
 
-        Yields:
-            Sample object
+        Returns:
+            list of dict: a list of samples for the uploads.
         """
         # make a copy of uploads so as not to change the input
-        search_uploads = set(uploads)
-        for samples in self.sample_sheet_paginator():
-            if not samples:
+        search_uploads = uploads.copy()
+        samples = []
+        for sample_sheet in self.sample_sheet_paginator():
+            if not sample_sheet:
                 self.echo_debug("Sample sheet returned empty.")
                 raise UploadError
 
-            for sample in samples:
-                yield_it = False
+            for sample in sample_sheet:
+                self.echo_debug("Checking sample: {}".format(sample))
+                add_it = False
                 if "r1" in sample["fastq"]:
-                    search_uploads.remove(sample["fastq"]["r1"]["upload"])
-                    yield_it = True
+                    if sample["fastq"]["r1"]["upload"] in search_uploads:
+                        add_it = True
+                        search_uploads.remove(sample["fastq"]["r1"]["upload"])
+                        self.echo_debug(
+                            "Found sample for upload r1: {}".format(
+                                sample["fastq"]["r1"]["upload"]
+                            )
+                        )
+                    else:
+                        self.echo_debug(
+                            "R1 upload not found. sample {} uploads {}".format(
+                                sample, search_uploads
+                            )
+                        )
+                        raise UploadNotFound
                 if "r2" in sample["fastq"]:
-                    search_uploads.remove(sample["fastq"]["r2"]["upload"])
-                    yield_it = True
+                    if sample["fastq"]["r2"]["upload"] in search_uploads:
+                        add_it = True
+                        search_uploads.remove(sample["fastq"]["r2"]["upload"])
+                        self.echo_debug(
+                            "Found sample for upload r2: {}".format(
+                                sample["fastq"]["r2"]["upload"]
+                            )
+                        )
+                    else:
+                        self.echo_debug(
+                            "R2 upload not found. sample {} uploads {}".format(
+                                sample, search_uploads
+                            )
+                        )
+                        raise UploadNotFound
 
-                if yield_it:
-                    yield sample
+                if add_it:
+                    samples.append(sample)
 
         if search_uploads:
             self.echo_debug(
                 "Have uploads without samples: {}".format(search_uploads)
             )
             raise SampleSheetError
+
+        return samples
 
     def sample_sheet_paginator(self):
         """Paginate over all sample sheets for the destination.

@@ -13,7 +13,6 @@ from gencove.command.base import Command, ValidationError
 from gencove.constants import Optionals, SAMPLE_ASSIGNMENT_STATUS
 from gencove.utils import (
     batchify,
-    get_filename_from_path,
     get_regular_progress_bar,
     get_s3_client_refreshable,
     login,
@@ -26,6 +25,7 @@ from .constants import (
     UPLOAD_STATUSES,
 )
 from .utils import (
+    get_filename_from_path,
     get_get_upload_details_retry_predicate,
     get_related_sample,
     seek_files_to_upload,
@@ -150,7 +150,7 @@ class Upload(Command):
         Returns:
             dict representing upload details
         """
-        clean_file_path = get_filename_from_path(file_path)
+        clean_file_path = get_filename_from_path(file_path, self.source)
         gncv_notated_path = "{}/{}".format(self.destination, clean_file_path)
 
         self.echo(
@@ -252,17 +252,17 @@ class Upload(Command):
                 self.echo_debug("Sample sheet returned empty.")
                 raise UploadError
 
-            # for each iteration make a copy of search uploads
-            # in order to avoid errors in iteration
-            for uid in set(search_uploads):
-                sample, r1_uid, r2_uid = get_related_sample(uid, samples)
-                if sample:
-                    self.echo_debug("Found sample for upload: {}".format(uid))
+            for sample in samples:
+                yield_it = False
+                if "r1" in sample["fastq"]:
+                    search_uploads.remove(sample["fastq"]["r1"]["upload"])
+                    yield_it = True
+                if "r2" in sample["fastq"]:
+                    search_uploads.remove(sample["fastq"]["r2"]["upload"])
+                    yield_it = True
+
+                if yield_it:
                     yield sample
-                    if r1_uid and r1_uid in search_uploads:
-                        search_uploads.remove(r1_uid)
-                    if r2_uid and r2_uid in search_uploads:
-                        search_uploads.remove(r2_uid)
 
         if search_uploads:
             self.echo_debug(

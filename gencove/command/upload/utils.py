@@ -92,26 +92,6 @@ def seek_files_to_upload(path, path_root=""):
             seek_files_to_upload(folder, root)
 
 
-def get_related_sample(upload_id, sample_sheet):
-    """Get sample for the upload."""
-    for sample in sample_sheet:
-        if "r1" in sample["fastq"] and sample["fastq"]["r1"]["upload"]:
-            r1_uid = sample["fastq"]["r1"]["upload"]
-        else:
-            r1_uid = None
-        if "r2" in sample["fastq"] and sample["fastq"]["r2"]["upload"]:
-            r2_uid = sample["fastq"]["r2"]["upload"]
-        else:
-            r2_uid = None
-
-        if upload_id in (r1_uid, r2_uid):
-            echo_debug("Found sample for upload: {}".format(upload_id))
-            return sample, r1_uid, r2_uid
-
-    echo_debug("No sample found for upload: {}".format(upload_id))
-    return None, None, None
-
-
 def get_get_upload_details_retry_predicate(resp):
     """Triggers retry if upload details came back without last status."""
     return not resp["last_status"]

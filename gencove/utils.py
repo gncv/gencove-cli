@@ -96,11 +96,6 @@ def get_regular_progress_bar(total_size, action):
     )
 
 
-def get_filename_from_path(path):
-    """Cross OS get file name utility."""
-    return os.path.normpath(path)
-
-
 def login(api_client, email, password):
     """Login user into Gencove's system."""
     if not email or not password:

@@ -115,3 +115,8 @@ def get_related_sample(upload_id, sample_sheet):
 def get_get_upload_details_retry_predicate(resp):
     """Triggers retry if upload details came back without last status."""
     return not resp["last_status"]
+
+
+def get_filename_from_path(full_path, source):
+    """Cross OS get file name utility."""
+    return os.path.normpath(full_path).split(os.path.normpath(source))[1]

@@ -99,4 +99,10 @@ def get_get_upload_details_retry_predicate(resp):
 
 def get_filename_from_path(full_path, source):
     """Cross OS get file name utility."""
-    return os.path.normpath(full_path).split(os.path.normpath(source))[1]
+    clean_path = os.path.normpath(full_path)
+    if source in (".", "./"):
+        return clean_path
+    normpath = os.path.normpath(clean_path.split(os.path.normpath(source))[1])
+    if normpath[0] == "/":
+        normpath = normpath[1:]
+    return normpath

@@ -155,6 +155,9 @@ class Upload(Command):
             dict representing upload details
         """
         clean_file_path = get_filename_from_path(file_path, self.source)
+        self.echo_debug(
+            "Uploading clean file path: {}".format(clean_file_path)
+        )
         gncv_notated_path = "{}/{}".format(self.destination, clean_file_path)
 
         self.echo(

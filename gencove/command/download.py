@@ -122,9 +122,7 @@ def download_deliverables(destination, filters, credentials, options):
             )
             return
 
-        _download_file(
-            destination, file_prefix, file_path, deliverable, options
-        )
+        _download_file(file_path, deliverable["download_url"], options)
 
         echo_debug("Adding file path: {}".format(file_path))
         downloaded_files.append(file_path)
@@ -172,35 +170,25 @@ def _build_file_path(deliverable, file_prefix, download_to):
     return _create_filepath(download_to, prefix.dirs, destination_filename)
 
 
-def _download_file(download_to, prefix_dirs, file_path, deliverable, options):
+def _download_file(file_path, download_url, options):
     """Download a file to file system.
 
     Args:
-        download_to (str): system/path/to/save/file/to
-        prefix_dirs (str): <client id>/<gencove sample id> to nest downloaded
-            file.
         file_path (str): full file path, according to destination
             and download template
-        deliverable (dict): file object from api.
+        download_url (str): url of the file to download
         options (:obj:`tuple` of type DownloadOptions):
-            contains additional flags for download processing.
+            contains additional flags for download processing
 
     Returns:
         str : file path
             location of the downloaded file
     """
-    echo_debug(
-        "Downloading file to {} with prefix {}".format(
-            download_to, prefix_dirs
-        )
-    )
+    echo_debug("Downloading file to {}".format(file_path))
 
-    with requests.get(deliverable["download_url"], stream=True) as req:
+    with requests.get(download_url, stream=True) as req:
         req.raise_for_status()
-        filename_tmp = "download-{}.tmp".format(uuid.uuid4().hex)
-        file_path_tmp = _create_filepath(
-            download_to, prefix_dirs, filename_tmp
-        )
+
         total = int(req.headers["content-length"])
         # pylint: disable=C0330
         if (
@@ -213,6 +201,7 @@ def _download_file(download_to, prefix_dirs, file_path, deliverable, options):
 
         echo_debug("Starting to download file to: {}".format(file_path))
 
+        file_path_tmp = "{}.tmp".format(file_path)
         with open(file_path_tmp, "wb") as downloaded_file:
             pbar = get_progress_bar(total, "Downloading: ")
             pbar.start()

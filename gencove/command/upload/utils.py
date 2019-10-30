@@ -1,5 +1,6 @@
 """Utils for upload command."""
 import os
+import platform
 
 from boto3.s3.transfer import TransferConfig
 
@@ -99,4 +100,7 @@ def get_get_upload_details_retry_predicate(resp):
 
 def get_filename_from_path(full_path, source):
     """Cross OS get file name utility."""
-    return os.path.relpath(os.path.normpath(full_path), start=source)
+    relpath = os.path.relpath(os.path.normpath(full_path), start=source)
+    if platform.system() == "Windows":
+        return relpath.replace("\\", "/")
+    return relpath

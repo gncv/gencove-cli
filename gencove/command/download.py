@@ -172,12 +172,12 @@ def _build_file_path(deliverable, file_prefix, download_to):
     return _create_filepath(download_to, prefix.dirs, destination_filename)
 
 
-def _download_file(download_to, file_prefix, file_path, deliverable, options):
+def _download_file(download_to, prefix_dirs, file_path, deliverable, options):
     """Download a file to file system.
 
     Args:
         download_to (str): system/path/to/save/file/to
-        file_prefix (str): <client id>/<gencove sample id> to nest downloaded
+        prefix_dirs (str): <client id>/<gencove sample id> to nest downloaded
             file.
         file_path (str): full file path, according to destination
             and download template
@@ -191,7 +191,7 @@ def _download_file(download_to, file_prefix, file_path, deliverable, options):
     """
     echo_debug(
         "Downloading file to {} with prefix {}".format(
-            download_to, file_prefix
+            download_to, prefix_dirs
         )
     )
 
@@ -199,7 +199,7 @@ def _download_file(download_to, file_prefix, file_path, deliverable, options):
         req.raise_for_status()
         filename_tmp = "download-{}.tmp".format(uuid.uuid4().hex)
         file_path_tmp = _create_filepath(
-            download_to, file_prefix, filename_tmp
+            download_to, prefix_dirs, filename_tmp
         )
         total = int(req.headers["content-length"])
         # pylint: disable=C0330
@@ -233,20 +233,20 @@ def _download_file(download_to, file_prefix, file_path, deliverable, options):
         return file_path
 
 
-def _create_filepath(download_to, file_prefix, filename):
+def _create_filepath(download_to, prefix_dirs, filename):
     """Build full file path and ensure that directory structure exists.
 
     Args:
         download_to (str): top level directory path
-        file_prefix (str): subdirectories structure to create under
+        prefix_dirs (str): subdirectories structure to create under
             download_to.
         filename (str): name of the file inside download_to/file_prefix
             structure.
     """
     echo_debug("_create_filepath Downloading to: {}".format(download_to))
-    echo_debug("_create_filepath file prefix is: {}".format(file_prefix))
+    echo_debug("_create_filepath file prefix is: {}".format(prefix_dirs))
 
-    path = os.path.join(download_to, file_prefix)
+    path = os.path.join(download_to, prefix_dirs)
     # Cross-platform cross-python-version directory creation
     if not os.path.exists(path):
         echo_debug("creating path: {}".format(path))

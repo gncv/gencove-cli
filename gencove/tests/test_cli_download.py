@@ -50,7 +50,7 @@ def test_project_id_provided(mocker):
             },
         )
         mocked_download_file = mocker.patch(
-            "gencove.command.download._download_file"
+            "gencove.command.download.main.download_file"
         )
         res = runner.invoke(
             download,

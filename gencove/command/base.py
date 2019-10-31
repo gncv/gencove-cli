@@ -4,6 +4,7 @@ All commands must implement this interface.
 """
 from gencove.client import APIClient
 from gencove.logger import echo, echo_debug, echo_warning
+from gencove.utils import login
 
 
 class Command(object):  # pylint: disable=R0205
@@ -38,6 +39,12 @@ class Command(object):  # pylint: disable=R0205
         except ValidationError:
             return
         self.execute()
+
+    def login(self):
+        self.is_logged_in = login(
+            self.api_client, self.credentials.email, self.credentials.password
+        )
+        return self.is_logged_in
 
     @staticmethod
     def echo(msg, **kwargs):

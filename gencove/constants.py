@@ -27,9 +27,6 @@ API_ENDPOINTS = _APIEndpoint(
     "/api/v2/sample-sheet/",
 )
 
-_SampleStatuses = namedtuple("SampleStatuses", ["succeeded", "failed"])
-SAMPLE_STATUSES = _SampleStatuses("succeeded", "failed")
-
 _SampleAssignmentStatus = namedtuple(
     "SampleAssignmentStatus", ["all", "unassigned", "assigned"]
 )

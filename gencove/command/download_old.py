@@ -1,7 +1,6 @@
 """CLI command to download project results."""
 import os
 import re
-import uuid
 from collections import namedtuple
 
 import requests

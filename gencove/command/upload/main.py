@@ -87,9 +87,7 @@ class Upload(Command):
                 "Files will be uploaded to: {}".format(self.destination)
             )
 
-        self.is_logged_in = login(
-            self.api_client, self.credentials.email, self.credentials.password
-        )
+        self.login()
 
     def validate(self):
         """Validate command setup before execution.

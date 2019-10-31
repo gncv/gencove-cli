@@ -17,8 +17,8 @@ import requests
 
 from gencove import client  # noqa: I100
 from gencove.constants import (
-    Optionals,
     MAX_RETRY_TIME_SECONDS,
+    Optionals,
     SAMPLE_STATUSES,
 )
 from gencove.logger import echo, echo_debug, echo_warning

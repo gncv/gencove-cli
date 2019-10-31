@@ -25,3 +25,15 @@ tox
 ```
 
 This will run tests, black formatter and linters.
+
+To run only a specific job from tox (i.e. only the tests for python 3.7):
+
+```bash
+tox -e py37
+```
+
+To create docs:
+
+```bash
+cd docs && make html
+```

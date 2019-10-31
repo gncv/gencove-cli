@@ -1,7 +1,7 @@
 """Tests for utils of Gencove CLI."""
 from click.testing import CliRunner
 
-from gencove.utils import upload_file
+from gencove.command.upload.utils import upload_file
 
 
 def test_upload_file(mocker):

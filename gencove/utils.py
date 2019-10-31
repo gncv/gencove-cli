@@ -2,13 +2,6 @@
 import os
 import re
 
-try:
-    # python 3.7
-    from urllib.parse import urlparse, parse_qs  # noqa
-except ImportError:
-    # python 2.7
-    from urlparse import urlparse, parse_qs  # noqa
-
 import boto3
 
 from botocore.credentials import RefreshableCredentials
@@ -149,42 +142,9 @@ def batchify(items_list, batch_size=500):
         left_to_process -= batch_size
 
 
-def get_filename_from_download_url(url):
-    """Deduce filename from url.
-
-    Args:
-        url (str): URL string
-
-    Returns:
-        str: filename
-    """
-    try:
-        filename = re.findall(
-            FILENAME_RE,
-            parse_qs(urlparse(url).query)["response-content-disposition"][0],
-        )[0]
-    except (KeyError, IndexError):
-        echo_debug(
-            "URL didn't contain filename query argument. "
-            "Assume filename from url"
-        )
-        filename = urlparse(url).path.split("/")[-1]
-
-    return filename
-
-
-def deliverable_type_from_filename(filename):
-    """Deduce deliverable type based on dot notation."""
-    filetype = ".".join(filename.split(".")[1:])
-    echo_debug(
-        "Deduced filetype to be: {} "
-        "from filename: {}".format(filetype, filename)
-    )
-    return filetype
-
-
 def fatal_request_error(err=None):
     """Give up retrying if the error code is in fatal range."""
     if not err:
         return False
-    return 400 <= err.response.status_code < 500
+    # retry 4xx or 5xx and all else not
+    return not 400 <= err.response.status_code <= 600

@@ -41,6 +41,7 @@ class Command(object):  # pylint: disable=R0205
         self.execute()
 
     def login(self):
+        """Login current user."""
         self.is_logged_in = login(
             self.api_client, self.credentials.email, self.credentials.password
         )

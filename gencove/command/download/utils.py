@@ -1,10 +1,6 @@
+"""Download command utilities."""
 import os
 import re
-
-import requests
-
-from gencove.logger import echo_debug, echo
-from gencove.utils import get_progress_bar
 
 try:
     # python 3.7
@@ -13,7 +9,15 @@ except ImportError:
     # python 2.7
     from urlparse import urlparse, parse_qs  # noqa
 
-from .constants import FilePrefix, CHUNK_SIZE
+import backoff
+
+import requests
+
+from gencove.constants import MAX_RETRY_TIME_SECONDS  # noqa: I100
+from gencove.logger import echo, echo_debug
+from gencove.utils import fatal_request_error, get_progress_bar
+
+from .constants import CHUNK_SIZE, FilePrefix
 
 FILENAME_RE = re.compile("filename=(.+)")
 
@@ -105,6 +109,16 @@ def build_file_path(deliverable, file_prefix, download_to):
     return _create_filepath(download_to, prefix.dirs, destination_filename)
 
 
+@backoff.on_exception(
+    backoff.expo,
+    (
+        requests.exceptions.HTTPError,
+        requests.exceptions.ConnectionError,
+        requests.exceptions.Timeout,
+    ),
+    max_time=MAX_RETRY_TIME_SECONDS,
+    giveup=fatal_request_error,
+)
 def download_file(file_path, download_url, skip_existing=True):
     """Download a file to file system.
 

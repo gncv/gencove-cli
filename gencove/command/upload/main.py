@@ -14,7 +14,6 @@ from gencove.utils import (
     batchify,
     get_regular_progress_bar,
     get_s3_client_refreshable,
-    login,
 )
 
 from .constants import (

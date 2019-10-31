@@ -1,3 +1,4 @@
+"""Download command constants."""
 import re
 from collections import namedtuple
 

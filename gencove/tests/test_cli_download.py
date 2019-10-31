@@ -1,4 +1,6 @@
 """Test download command."""
+import os
+
 from click.testing import CliRunner
 
 from gencove.cli import download
@@ -8,17 +10,42 @@ from gencove.client import APIClient
 def test_no_required_options():
     """Test that command exits without project id or sample id provided."""
     runner = CliRunner()
-    res = runner.invoke(download, ["cli_test_data"])
-    assert res.exit_code == 0
+    with runner.isolated_filesystem():
+        os.mkdir("cli_test_data")
+        res = runner.invoke(
+            download,
+            [
+                "cli_test_data",
+                "--project-id",
+                "123",
+                "--email",
+                "foo@bar.com",
+                "--password",
+                "12345",
+            ],
+        )
+        assert res.exit_code == 0
 
 
 def test_both_project_id_and_sample_ids_provided():
     """Command exits if both project id and sample ids are provided."""
     runner = CliRunner()
-    res = runner.invoke(
-        download,
-        ["cli_test_data", "--project-id", "123", "--sample-ids", "1,2,3"],
-    )
+    with runner.isolated_filesystem():
+        os.mkdir("cli_test_data")
+        res = runner.invoke(
+            download,
+            [
+                "cli_test_data",
+                "--project-id",
+                "123",
+                "--sample-ids",
+                "1,2,3",
+                "--email",
+                "foo@bar.com",
+                "--password",
+                "12345",
+            ],
+        )
     assert res.exit_code == 0
 
 

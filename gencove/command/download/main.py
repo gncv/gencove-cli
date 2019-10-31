@@ -1,24 +1,18 @@
-import os
+"""Download command executor."""
 import re
 
 from gencove import client
 from gencove.command.base import Command, ValidationError
-from gencove.constants import Credentials, DownloadTemplateParts
+from gencove.constants import DownloadTemplateParts
 
-from .constants import DownloadFilters, DownloadOptions, ALLOWED_STATUSES_RE
+from .constants import ALLOWED_STATUSES_RE
 from .utils import build_file_path, download_file
 
 
 class Download(Command):
     """Download command executor."""
 
-    def __init__(
-        self,
-        download_to: str,
-        filters: DownloadFilters,
-        credentials: Credentials,
-        options: DownloadOptions,
-    ):
+    def __init__(self, download_to, filters, credentials, options):
         super(Download, self).__init__(credentials, options)
         self.download_to = download_to
         self.project_id = filters.project_id
@@ -109,7 +103,7 @@ class Download(Command):
                     "Sample #{} has no deliverable.".format(sample["id"]),
                     err=True,
                 )
-                return []
+                return
 
             file_types_re = re.compile(
                 "|".join(self.file_types), re.IGNORECASE

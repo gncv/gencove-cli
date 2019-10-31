@@ -128,7 +128,7 @@ class Upload(Command):
                 self.upload_ids.add(upload["id"])
 
         self.echo("All files were successfully uploaded.")
-        self.echo("Upload ids are now: {}".format(self.upload_ids))
+        self.echo_debug("Upload ids are now: {}".format(self.upload_ids))
 
         if self.project_id:
             self.echo_debug("Cooling down period.")

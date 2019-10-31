@@ -185,12 +185,16 @@ class Upload(Command):
         try:
             samples = self.build_samples(self.upload_ids)
         except (UploadError, SampleSheetError):
-            self.echo_warning(ASSIGN_ERROR.format(self.project_id))
+            self.echo_warning(
+                ASSIGN_ERROR.format(self.project_id, self.destination)
+            )
             return
 
         if not samples:
             self.echo_debug("No related samples were found")
-            self.echo_warning(ASSIGN_ERROR.format(self.project_id))
+            self.echo_warning(
+                ASSIGN_ERROR.format(self.project_id, self.destination)
+            )
             return
 
         self.echo_debug("Sample sheet now is: {}".format(samples))
@@ -227,12 +231,11 @@ class Upload(Command):
                     )
                 else:
                     self.echo_warning(
-                        "You can retry assignment without uploading again "
-                        "via upload command using "
-                        "destination: {}".format(self.destination)
+                        ASSIGN_ERROR.format(self.project_id, self.destination)
                     )
                 progress_bar.finish()
                 return
+
         progress_bar.finish()
         self.echo("Assigned all samples to a project")
 

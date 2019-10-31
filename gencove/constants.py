@@ -39,3 +39,5 @@ SAMPLE_ASSIGNMENT_STATUS = _SampleAssignmentStatus(
 
 Credentials = namedtuple("Credentials", ["email", "password"])
 Optionals = namedtuple("Optionals", ["host"])
+
+MAX_RETRY_TIME_SECONDS = 300  # 5 minutes

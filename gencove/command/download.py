@@ -11,12 +11,18 @@ except ImportError:
     # python 2.7
     from urlparse import urlparse, parse_qs  # noqa
 
+import backoff
+
 import requests
 
 from gencove import client  # noqa: I100
-from gencove.constants import Optionals, SAMPLE_STATUSES
+from gencove.constants import (
+    Optionals,
+    MAX_RETRY_TIME_SECONDS,
+    SAMPLE_STATUSES,
+)
 from gencove.logger import echo, echo_debug, echo_warning
-from gencove.utils import get_progress_bar, login
+from gencove.utils import fatal_request_error, get_progress_bar, login
 
 
 ALLOWED_STATUSES_RE = re.compile(
@@ -123,6 +129,16 @@ def _get_paginated_samples(project_id, api_client):
         get_samples = next_page is not None
 
 
+@backoff.on_exception(
+    backoff.expo,
+    (
+        requests.exceptions.HTTPError,
+        requests.exceptions.ConnectionError,
+        requests.exceptions.Timeout,
+    ),
+    max_time=MAX_RETRY_TIME_SECONDS,
+    giveup=fatal_request_error,
+)
 def _download_file(download_to, file_prefix, url, skip_existing):
     """Download a file to file system.
 

@@ -1,6 +1,5 @@
 """Entry point into upload command."""
 import uuid
-from collections import namedtuple
 from datetime import datetime
 from time import sleep
 
@@ -10,7 +9,7 @@ import requests
 
 from gencove.client import APIClientError  # noqa: I100
 from gencove.command.base import Command, ValidationError
-from gencove.constants import Optionals, SAMPLE_ASSIGNMENT_STATUS
+from gencove.constants import SAMPLE_ASSIGNMENT_STATUS
 from gencove.utils import (
     batchify,
     get_regular_progress_bar,
@@ -19,6 +18,8 @@ from gencove.utils import (
 )
 
 from .constants import (
+    ASSIGN_BATCH_SIZE,
+    ASSIGN_ERROR,
     FASTQ_EXTENSIONS,
     TMP_UPLOADS_WARNING,
     UPLOAD_PREFIX,
@@ -30,16 +31,6 @@ from .utils import (
     seek_files_to_upload,
     upload_file,
 )
-
-UploadOptions = namedtuple(  # pylint: disable=invalid-name
-    "UploadOptions", Optionals._fields + ("project_id",)
-)
-ASSIGN_ERROR = (
-    "Your files were successfully uploaded, "
-    "but there was an error automatically running them "
-    "and assigning them to project id {}."
-)
-ASSIGN_BATCH_SIZE = 200
 
 
 class UploadError(Exception):

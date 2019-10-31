@@ -47,3 +47,5 @@ DOWNLOAD_TEMPLATE = "{{{}}}/{{{}}}/{{{}}}_".format(
     DownloadTemplateParts.gencove_id,
     DownloadTemplateParts.gencove_id,
 )
+
+MAX_RETRY_TIME_SECONDS = 300  # 5 minutes

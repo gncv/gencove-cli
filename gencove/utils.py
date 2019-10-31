@@ -181,3 +181,10 @@ def deliverable_type_from_filename(filename):
         "from filename: {}".format(filetype, filename)
     )
     return filetype
+
+
+def fatal_request_error(err=None):
+    """Give up retrying if the error code is in fatal range."""
+    if not err:
+        return False
+    return 400 <= err.response.status_code < 500

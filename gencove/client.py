@@ -11,10 +11,10 @@ import json  # noqa
 
 try:
     # python 3
-    from urllib.parse import urljoin, urlparse  # noqa
+    from urllib.parse import urljoin, urlparse, parse_qs  # noqa
 except ImportError:  # noqa
     # python 2.7
-    from urlparse import urljoin, urlparse  # noqa
+    from urlparse import urljoin, urlparse, parse_qs  # noqa
 
 from requests import get, post, ConnectTimeout, ReadTimeout, codes  # noqa
 
@@ -187,12 +187,15 @@ class APIClient:
         )
 
     @staticmethod
-    def _get_next_endpoint(next_link, endpoint):
-        next_endpoint = None
+    def _add_query_params(next_link, query_params=None):
+        if not query_params:
+            query_params = {}
+        query_params.update({"offset": 0, "limit": 200})
         if next_link:
-            url_parts = urlparse(next_link)
-            next_endpoint = "{}?{}".format(endpoint, url_parts.query)
-        return next_endpoint
+            query_params["offset"] = parse_qs(urlparse(next_link).query)[
+                "offset"
+            ]
+        return query_params
 
     def refresh_token(self, refresh_token):
         """Refresh jwt token."""
@@ -234,8 +237,10 @@ class APIClient:
         project_endpoint = self.endpoints.project_samples.format(
             id=project_id
         )
-        next_endpoint = self._get_next_endpoint(next_link, project_endpoint)
-        return self._get(next_endpoint or project_endpoint, authorized=True)
+        params = self._add_query_params(next_link)
+        return self._get(
+            project_endpoint, query_params=params, authorized=True
+        )
 
     def add_samples_to_project(self, samples, project_id):
         """Assign samples to a project.
@@ -272,13 +277,9 @@ class APIClient:
             next_link (str, optional): url from previous
                 response['meta']['next'].
         """
-        next_endpoint = self._get_next_endpoint(
-            next_link, self.endpoints.sample_sheet
+        params = self._add_query_params(
+            next_link, {"search": gncv_path, "status": is_assigned}
         )
         return self._get(
-            next_endpoint or self.endpoints.sample_sheet,
-            query_params={"search": gncv_path, "status": is_assigned}
-            if not next_endpoint
-            else {},
-            authorized=True,
+            self.endpoints.sample_sheet, query_params=params, authorized=True
         )

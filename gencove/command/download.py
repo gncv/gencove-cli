@@ -4,21 +4,25 @@ import re
 import uuid
 from collections import namedtuple
 
-import backoff
-
-import requests
-
-from gencove import client  # noqa: I100
-from gencove.constants import MAX_RETRY_TIME_SECONDS, SAMPLE_STATUSES
-from gencove.logger import echo, echo_debug, echo_warning
-from gencove.utils import fatal_request_error, get_progress_bar, login
-
 try:
     # python 3.7
     from urllib.parse import urlparse, parse_qs  # noqa
 except ImportError:
     # python 2.7
     from urlparse import urlparse, parse_qs  # noqa
+
+import backoff
+
+import requests
+
+from gencove import client  # noqa: I100
+from gencove.constants import (
+    MAX_RETRY_TIME_SECONDS,
+    Optionals,
+    SAMPLE_STATUSES,
+)
+from gencove.logger import echo, echo_debug, echo_warning
+from gencove.utils import fatal_request_error, get_progress_bar, login
 
 
 ALLOWED_STATUSES_RE = re.compile(
@@ -31,23 +35,23 @@ MEGABYTE = 1024 * KILOBYTE
 NUM_MB_IN_CHUNK = 3
 CHUNK_SIZE = NUM_MB_IN_CHUNK * MEGABYTE
 
-Filters = namedtuple("Filters", ["project_id", "sample_ids", "file_types"])
-Options = namedtuple("Options", ["host", "skip_existing"])
+DownloadFilters = namedtuple(
+    "Filters", ["project_id", "sample_ids", "file_types"]
+)
+DownloadOptions = namedtuple(  # pylint: disable=invalid-name
+    "DownloadOptions", Optionals._fields + ("skip_existing",)
+)
 
 
 def download_deliverables(destination, filters, credentials, options):
     """Download project deliverables to a specified path on user machine.
 
-    :param destination: path/to/save/deliverables/to.
-    :type destination: str
-    :param filters: allows to filter project deliverables to be downloaded
-    :type filters: Filters
-    :param host: API host to interact with.
-    :type host: str
-    :param credentials: login username/password
-    :type credentials: Credentials
-    :param options: different options to tweak execution
-    :type options: Options
+    Args:
+        destination (str): path/to/save/deliverables/to.
+        filters (DownloadFilters): allows to filter project deliverables
+            to be downloaded.
+        credentials (constants.Credentials): login email/password.
+        options (DownloadOptions): different options to tweak execution.
     """
     if not filters.project_id and not filters.sample_ids:
         echo_warning(
@@ -65,7 +69,9 @@ def download_deliverables(destination, filters, credentials, options):
         "Host is {} downloading to {}".format(options.host, destination)
     )
     api_client = client.APIClient(options.host)
-    login(api_client, credentials.email, credentials.password)
+    is_logged_in = login(api_client, credentials.email, credentials.password)
+    if not is_logged_in:
+        return
 
     if filters.project_id:
         echo_debug(
@@ -136,15 +142,12 @@ def _get_paginated_samples(project_id, api_client):
 def _download_file(download_to, file_prefix, url, skip_existing):
     """Download a file to file system.
 
-    :param download_to: system/path/to/save/file/to
-    :type download_to: str
-    :param file_prefix: <client id>/<gencove sample id> to nest downloaded file
-    under.
-    :type file_prefix: str
-    :param url: signed url from S3 to download the file from.
-    :type url: str
-    :param skip_existing: skip downloading existing files
-    :type skip_existing: bool
+    Args:
+        download_to (str): system/path/to/save/file/to
+        file_prefix (str): <client id>/<gencove sample id> to nest downloaded
+            file.
+        url (str): signed url from S3 to download the file from.
+        skip_existing (bool): skip downloading existing files.
     """
     with requests.get(url, stream=True) as req:
         req.raise_for_status()
@@ -185,12 +188,12 @@ def _download_file(download_to, file_prefix, url, skip_existing):
 def _create_filepath(download_to, file_prefix, filename):
     """Build full file path and ensure that directory structure exists.
 
-    :param download_to: top level directory path
-    :type download_to: str
-    :param file_prefix: subdirectories structure to create under download_to.
-    :type file_prefix: str
-    :param filename: name of the file inside download_to/file_prefix structure.
-    :type filename: str
+    Args:
+        download_to (str): top level directory path
+        file_prefix (str): subdirectories structure to create under
+            download_to.
+        filename (str): name of the file inside download_to/file_prefix
+            structure.
     """
     path = os.path.join(download_to, file_prefix)
     # Cross-platform cross-python-version directory creation
@@ -204,10 +207,9 @@ def _create_filepath(download_to, file_prefix, filename):
 def _get_filename(content_disposition, url):
     """Deduce filename from content disposition or url.
 
-    :param content_disposition: Request header Content-Disposition
-    :type content_disposition: str
-    :param url: URL string
-    :type url: str
+    Args:
+        content_disposition (str): Request header Content-Disposition
+        url (str): URL string
     """
     filename_match = re.findall(FILENAME_RE, content_disposition)
     if not filename_match:

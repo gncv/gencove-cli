@@ -80,6 +80,7 @@ class Download(Command):
 
     def execute(self):
         self.echo("Processing samples")
+        downloaded_files = set()
         for sample_id in self.sample_ids:
             try:
                 sample = self.api_client.get_sample_details(sample_id)
@@ -108,7 +109,6 @@ class Download(Command):
             file_types_re = re.compile(
                 "|".join(self.file_types), re.IGNORECASE
             )
-            downloaded_files = set()
 
             for sample_file in sample["files"]:
                 # pylint: disable=C0330
@@ -136,7 +136,7 @@ class Download(Command):
                         "Please fix the template and try again."
                     )
 
-                    continue
+                    return
 
                 download_file(
                     file_path, sample_file["download_url"], self.skip_existing

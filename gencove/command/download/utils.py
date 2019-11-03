@@ -15,7 +15,7 @@ import requests
 
 from gencove.constants import MAX_RETRY_TIME_SECONDS  # noqa: I100
 from gencove.logger import echo, echo_debug
-from gencove.utils import fatal_request_error, get_progress_bar
+from gencove.utils import get_progress_bar
 
 from .constants import CHUNK_SIZE, FilePrefix
 
@@ -109,6 +109,21 @@ def build_file_path(deliverable, file_prefix, download_to):
     return _create_filepath(download_to, prefix.dirs, destination_filename)
 
 
+def fatal_request_error(err=None):
+    """Give up retrying if the error code is in fatal range.
+
+    Returns:
+        bool: True if to giveup on backing off, False it to continue.
+    """
+    if not err:
+        return False
+    if err.response.status_code == 403:
+        # download url needs to be refreshed, give up on backoff
+        return True
+    # retry 4xx or 5xx and all else not
+    return not 400 <= err.response.status_code <= 600
+
+
 @backoff.on_exception(
     backoff.expo,
     (
@@ -169,3 +184,15 @@ def download_file(file_path, download_url, skip_existing=True):
         os.rename(file_path_tmp, file_path)
         echo("Finished downloading a file: {}".format(file_path))
         return file_path
+
+
+def fatal_process_sample_error(err):
+    """Give up retrying if the error code is different from 403.
+
+    If the error code is 403, we need to refresh the download url and try
+    processing the sample again.
+
+    Returns:
+        bool: True if to giveup on backing off, False it to continue.
+    """
+    return err.response.status_code != 403

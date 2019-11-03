@@ -140,11 +140,3 @@ def batchify(items_list, batch_size=500):
         yield items_list[start:end]
         start += batch_size
         left_to_process -= batch_size
-
-
-def fatal_request_error(err=None):
-    """Give up retrying if the error code is in fatal range."""
-    if not err:
-        return False
-    # retry 4xx or 5xx and all else not
-    return not 400 <= err.response.status_code <= 600

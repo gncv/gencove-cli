@@ -132,7 +132,7 @@ def download_file(file_path, download_url, skip_existing=True):
         str : file path
             location of the downloaded file
     """
-    echo_debug("Downloading file to {}".format(file_path))
+    echo("Downloading file to {}".format(file_path))
 
     with requests.get(download_url, stream=True) as req:
         req.raise_for_status()

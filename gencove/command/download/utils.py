@@ -114,7 +114,7 @@ def fatal_request_error(err=None):
     Returns:
         bool: True if to giveup on backing off, False it to continue.
     """
-    if not err:
+    if not err or not err.response:
         return False
     if err.response.status_code == 403:
         # download url needs to be refreshed, give up on backoff
@@ -146,11 +146,25 @@ def download_file(file_path, download_url, skip_existing=True):
         str : file path
             location of the downloaded file
     """
-    echo("Downloading file to {}".format(file_path))
-    # pylint: disable=C0330
-    with requests.get(
-        download_url, stream=True, allow_redirects=False
-    ) as req:
+
+    file_path_tmp = "{}.tmp".format(file_path)
+    if os.path.exists(file_path_tmp):
+        file_mode = "ab"
+        headers = dict(
+            Range="bytes={}-".format(os.path.getsize(file_path_tmp))
+        )
+        echo("Resuming previous download: {}".format(file_path))
+    else:
+        file_mode = "wb"
+        headers = dict()
+        echo("Downloading file to {}".format(file_path))
+
+    stream_params = dict(
+        stream=True, allow_redirects=False, headers=headers, timeout=120
+    )
+    print(stream_params)
+
+    with requests.get(download_url, **stream_params) as req:
         req.raise_for_status()
         total = int(req.headers["content-length"])
         # pylint: disable=C0330
@@ -164,8 +178,7 @@ def download_file(file_path, download_url, skip_existing=True):
 
         echo_debug("Starting to download file to: {}".format(file_path))
 
-        file_path_tmp = "{}.tmp".format(file_path)
-        with open(file_path_tmp, "wb") as downloaded_file:
+        with open(file_path_tmp, file_mode) as downloaded_file:
             pbar = get_progress_bar(
                 int(req.headers["content-length"]), "Downloading: "
             )

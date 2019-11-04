@@ -148,8 +148,10 @@ def download_file(file_path, download_url, skip_existing=True):
             location of the downloaded file
     """
     echo("Downloading file to {}".format(file_path))
-
-    with requests.get(download_url, stream=True) as req:
+    # pylint: disable=C0330
+    with requests.get(
+        download_url, stream=True, allow_redirects=False
+    ) as req:
         req.raise_for_status()
         total = int(req.headers["content-length"])
         # pylint: disable=C0330

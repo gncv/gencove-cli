@@ -17,9 +17,7 @@ from gencove.constants import MAX_RETRY_TIME_SECONDS  # noqa: I100
 from gencove.logger import echo, echo_debug
 from gencove.utils import get_progress_bar
 
-from .constants import CHUNK_SIZE, FilePrefix
-
-FILENAME_RE = re.compile("filename=(.+)")
+from .constants import CHUNK_SIZE, FILENAME_RE, FILE_TYPES_MAPPER, FilePrefix
 
 
 def _get_filename_dirs_prefix(full_prefix):
@@ -103,7 +101,8 @@ def build_file_path(deliverable, file_prefix, download_to):
     )
     destination_filename = "{}{}.{}".format(
         prefix.filename,
-        deliverable["file_type"],
+        FILE_TYPES_MAPPER.get(deliverable["file_type"])
+        or deliverable["file_type"],
         deliverable_type_from_filename(source_filename),
     )
     return _create_filepath(download_to, prefix.dirs, destination_filename)

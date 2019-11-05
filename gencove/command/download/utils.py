@@ -162,7 +162,6 @@ def download_file(file_path, download_url, skip_existing=True):
     stream_params = dict(
         stream=True, allow_redirects=False, headers=headers, timeout=120
     )
-    print(stream_params)
 
     with requests.get(download_url, **stream_params) as req:
         req.raise_for_status()

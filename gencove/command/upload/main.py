@@ -14,7 +14,6 @@ from gencove.utils import (
     batchify,
     get_regular_progress_bar,
     get_s3_client_refreshable,
-    login,
 )
 
 from .constants import (
@@ -83,9 +82,7 @@ class Upload(Command):
         if self.destination != UPLOAD_PREFIX:
             self.destination = self.destination.rstrip("/") + "/"
 
-        self.is_logged_in = login(
-            self.api_client, self.credentials.email, self.credentials.password
-        )
+        self.login()
 
     def validate(self):
         """Validate command setup before execution.

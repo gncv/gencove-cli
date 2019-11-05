@@ -78,6 +78,11 @@ class Upload(Command):
                 "Files will be uploaded to: {}".format(self.destination)
             )
 
+        # Make sure there is just one trailing slash. Only exception is
+        # UPLOAD_PREFIX itself, which can have two trailing slashes.
+        if self.destination != UPLOAD_PREFIX:
+            self.destination = self.destination.rstrip("/") + "/"
+
         self.is_logged_in = login(
             self.api_client, self.credentials.email, self.credentials.password
         )
@@ -149,7 +154,7 @@ class Upload(Command):
         self.echo_debug(
             "Uploading clean file path: {}".format(clean_file_path)
         )
-        gncv_notated_path = "{}/{}".format(self.destination, clean_file_path)
+        gncv_notated_path = self.destination + clean_file_path
 
         self.echo(
             "Checking if file was already uploaded: {}".format(

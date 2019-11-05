@@ -160,7 +160,7 @@ def download_file(file_path, download_url, skip_existing=True):
         echo("Downloading file to {}".format(file_path))
 
     stream_params = dict(
-        stream=True, allow_redirects=False, headers=headers, timeout=120
+        stream=True, allow_redirects=False, headers=headers, timeout=30
     )
 
     with requests.get(download_url, **stream_params) as req:

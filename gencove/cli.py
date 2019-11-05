@@ -5,12 +5,12 @@ import click
 
 from gencove import version
 from gencove.command.download import (
+    Download,
     DownloadFilters,
     DownloadOptions,
-    download_deliverables,
 )
 from gencove.command.upload import Upload, UploadOptions
-from gencove.constants import Credentials, HOST
+from gencove.constants import Credentials, DOWNLOAD_TEMPLATE, HOST
 from gencove.logger import echo_debug
 
 
@@ -113,6 +113,14 @@ def upload(  # pylint: disable=C0330,R0913
     default=True,
     help="Skip downloading files that already exist in DESTINATION",
 )
+@click.option(
+    "--download-template",
+    default=DOWNLOAD_TEMPLATE,
+    help=(
+        "Change downloads structure. "
+        "Defaults to: {}".format(DOWNLOAD_TEMPLATE)
+    ),
+)
 def download(  # pylint: disable=C0330,R0913
     destination,
     project_id,
@@ -122,6 +130,7 @@ def download(  # pylint: disable=C0330,R0913
     email,
     password,
     skip_existing,
+    download_template,
 ):  # noqa: D413,D301,D412 # pylint: disable=C0301
     """Download deliverables of a project.
 
@@ -164,12 +173,12 @@ def download(  # pylint: disable=C0330,R0913
         f_types = tuple(f_type.strip() for f_type in file_types.split(","))
         echo_debug("File types translation: {}".format(f_types))
 
-    download_deliverables(
+    Download(
         destination,
         DownloadFilters(project_id, s_ids, f_types),
         Credentials(email, password),
-        DownloadOptions(host, skip_existing),
-    )
+        DownloadOptions(host, skip_existing, download_template),
+    ).run()
 
 
 if __name__ == "__main__":

@@ -27,9 +27,6 @@ API_ENDPOINTS = _APIEndpoint(
     "/api/v2/sample-sheet/",
 )
 
-_SampleStatuses = namedtuple("SampleStatuses", ["succeeded", "failed"])
-SAMPLE_STATUSES = _SampleStatuses("succeeded", "failed")
-
 _SampleAssignmentStatus = namedtuple(
     "SampleAssignmentStatus", ["all", "unassigned", "assigned"]
 )
@@ -39,5 +36,16 @@ SAMPLE_ASSIGNMENT_STATUS = _SampleAssignmentStatus(
 
 Credentials = namedtuple("Credentials", ["email", "password"])
 Optionals = namedtuple("Optionals", ["host"])
+
+_DownloadTemplateParts = namedtuple(
+    "DownloadTemplateParts", ["client_id", "gencove_id"]
+)
+# pylint: disable=C0103
+DownloadTemplateParts = _DownloadTemplateParts("client_id", "gencove_id")
+DOWNLOAD_TEMPLATE = "{{{}}}/{{{}}}/{{{}}}_".format(
+    DownloadTemplateParts.client_id,
+    DownloadTemplateParts.gencove_id,
+    DownloadTemplateParts.gencove_id,
+)
 
 MAX_RETRY_TIME_SECONDS = 300  # 5 minutes

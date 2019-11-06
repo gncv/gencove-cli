@@ -61,7 +61,7 @@ def upload(  # pylint: disable=C0330,R0913
 
         Upload directory contents:
 
-            :command:`gencove upload test_dataset gncv://test`
+            gencove upload test_dataset gncv://test
 
     \f
 
@@ -143,15 +143,15 @@ def download(  # pylint: disable=C0330,R0913
 
         Download all samples results:
 
-            :command:`gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db`
+            gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db
 
         Download some samples:
 
-            :command:`gencove download ./results --sample-ids 59f5c1fd-cce0-4c4c-90e2-0b6c6c525d71,7edee497-12b5-4a1d-951f-34dc8dce1c1d`
+            gencove download ./results --sample-ids 59f5c1fd-cce0-4c4c-90e2-0b6c6c525d71,7edee497-12b5-4a1d-951f-34dc8dce1c1d
 
         Download specific deliverables:
 
-            :command:`gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db --file-types alignment-bam,impute-vcf,fastq-r1,fastq-r2`
+            gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db --file-types alignment-bam,impute-vcf,fastq-r1,fastq-r2
 
     \f
 

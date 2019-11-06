@@ -23,6 +23,7 @@ setup(
     version=version(),
     packages=find_packages(exclude=["tests"]),
     install_requires=[
+        "six==1.12.0",
         "Click>=7.0",
         "requests>=2.19.1",
         "boto3>=1.9.188",

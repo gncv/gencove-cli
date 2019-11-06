@@ -57,9 +57,12 @@ def upload(  # pylint: disable=C0330,R0913
     DESTINATION (optional): gncv://[folder], where the folder is the location
     on Gencove systems
 
-    Example:
+    Examples:
 
-        gencove upload test_dataset gncv://test
+        Upload directory contents:
+
+            :command:`gencove upload test_dataset gncv://test`
+
     \f
 
     Args:
@@ -140,15 +143,15 @@ def download(  # pylint: disable=C0330,R0913
 
         Download all samples results:
 
-        gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db
+            :command:`gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db`
 
         Download some samples:
 
-        gencove download ./results --sample-ids 59f5c1fd-cce0-4c4c-90e2-0b6c6c525d71,7edee497-12b5-4a1d-951f-34dc8dce1c1d
+            :command:`gencove download ./results --sample-ids 59f5c1fd-cce0-4c4c-90e2-0b6c6c525d71,7edee497-12b5-4a1d-951f-34dc8dce1c1d`
 
         Download specific deliverables:
 
-        gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db --file-types alignment-bam,impute-vcf,fastq-r1,fastq-r2
+            :command:`gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db --file-types alignment-bam,impute-vcf,fastq-r1,fastq-r2`
 
     \f
 

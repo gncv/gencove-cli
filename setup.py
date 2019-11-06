@@ -23,8 +23,15 @@ setup(
     version=version(),
     packages=find_packages(exclude=["tests"]),
     install_requires=[
-        "six==1.12.0",
-        "python-dateutil==2.8.0",
+        # For the python-dateutil requirement, see:
+        # https://github.com/awslabs/aws-shell/issues/161
+        # and
+        # https://stackoverflow.com/questions/27630114/matplotlib-issue-on-os-x-importerror-cannot-import-name-thread
+        "python-dateutil>=2.2.0",
+        # This six requirement is related to the python-dateutil requirement above - we
+        # are attempting to keep the requirement as loose as possible in terms of
+        # minimal required version
+        "six>=1.5",
         "Click>=7.0",
         "requests>=2.19.1",
         "boto3>=1.9.188",

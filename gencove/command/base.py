@@ -3,7 +3,7 @@
 All commands must implement this interface.
 """
 from gencove.client import APIClient, APIClientError
-from gencove.logger import echo, echo_debug, echo_warning, DEBUG, LOG_LEVEL
+from gencove.logger import DEBUG, LOG_LEVEL, echo, echo_debug, echo_warning
 from gencove.utils import login
 
 

@@ -38,6 +38,7 @@ class APIError(Exception):
     """Base API Error."""
 
     def __init__(self, message):
+        super(APIError, self).__init__(message)
         self.message = message
 
 

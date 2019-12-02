@@ -34,7 +34,7 @@ SAMPLE_ASSIGNMENT_STATUS = _SampleAssignmentStatus(
     "all", "unassigned", "assigned"
 )
 
-Credentials = namedtuple("Credentials", ["email", "password"])
+Credentials = namedtuple("Credentials", ["email", "password", "api_key"])
 Optionals = namedtuple("Optionals", ["host"])
 
 _DownloadTemplateParts = namedtuple(

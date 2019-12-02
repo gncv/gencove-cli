@@ -2,8 +2,8 @@
 
 All commands must implement this interface.
 """
-from gencove.client import APIClient
-from gencove.logger import echo, echo_debug, echo_warning
+from gencove.client import APIClient, APIClientError
+from gencove.logger import echo, echo_debug, echo_warning, DEBUG, LOG_LEVEL
 from gencove.utils import login
 
 
@@ -33,18 +33,21 @@ class Command(object):  # pylint: disable=R0205
 
         No need to override this, unless more customized behaviour is needed.
         """
-        self.initialize()
         try:
-            self.validate()
-        except ValidationError:
-            return
-        self.execute()
+            self.initialize()
+            try:
+                self.validate()
+            except ValidationError:
+                return
+            self.execute()
+        except APIClientError as err:
+            echo(err.message, err=True)
+            if LOG_LEVEL == DEBUG:
+                raise err
 
     def login(self):
         """Login current user."""
-        self.is_logged_in = login(
-            self.api_client, self.credentials.email, self.credentials.password
-        )
+        self.is_logged_in = login(self.api_client, self.credentials)
         return self.is_logged_in
 
     @staticmethod

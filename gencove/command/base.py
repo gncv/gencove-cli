@@ -15,7 +15,6 @@ class Command(object):  # pylint: disable=R0205
         self.is_logged_in = False
         self.credentials = credentials
         self.options = options
-
         self.is_credentials_valid = validate_credentials(credentials)
 
     def initialize(self):
@@ -30,6 +29,13 @@ class Command(object):  # pylint: disable=R0205
         """Execute command logic."""
         raise NotImplementedError
 
+    def validate_login_success(self):
+        """Check if login succeeded."""
+        if not self.is_logged_in:
+            raise ValidationError(
+                "Please check your credentials and try again"
+            )
+
     def run(self):
         """Run the command.
 
@@ -38,6 +44,7 @@ class Command(object):  # pylint: disable=R0205
         try:
             self.initialize()
             try:
+                self.validate_login_success()
                 self.validate()
             except ValidationError:
                 return

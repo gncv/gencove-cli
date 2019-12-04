@@ -49,6 +49,8 @@ class Download(Command):
                     "Project id {} not found.".format(self.filters.project_id)
                 )
                 return
+        else:
+            self.sample_ids = self.filters.sample_ids
 
     def validate(self):
         """Validate command configuration before execution.
@@ -72,14 +74,14 @@ class Download(Command):
                 "Must specify only one of: project id or sample ids"
             )
 
+        if not self.sample_ids:
+            raise ValidationError("No samples to process. Exiting.")
+
         self.echo_debug(
             "Host is {} downloading to {}".format(
                 self.options.host, self.download_to
             )
         )
-
-        if not self.is_logged_in:
-            raise ValidationError("User must login. Exiting.")
 
     def execute(self):
         self.echo("Processing samples")

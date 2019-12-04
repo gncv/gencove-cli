@@ -2,9 +2,9 @@
 
 All commands must implement this interface.
 """
-from gencove.client import APIClient
-from gencove.logger import echo, echo_debug, echo_warning
-from gencove.utils import login
+from gencove.client import APIClient, APIClientError
+from gencove.logger import DEBUG, LOG_LEVEL, echo, echo_debug, echo_warning
+from gencove.utils import login, validate_credentials
 
 
 class Command(object):  # pylint: disable=R0205
@@ -15,6 +15,7 @@ class Command(object):  # pylint: disable=R0205
         self.is_logged_in = False
         self.credentials = credentials
         self.options = options
+        self.is_credentials_valid = validate_credentials(credentials)
 
     def initialize(self):
         """Put any initializing logic here, such as login."""
@@ -28,23 +29,36 @@ class Command(object):  # pylint: disable=R0205
         """Execute command logic."""
         raise NotImplementedError
 
+    def validate_login_success(self):
+        """Check if login succeeded."""
+        if not self.is_logged_in:
+            raise ValidationError(
+                "Please check your credentials and try again"
+            )
+
     def run(self):
         """Run the command.
 
         No need to override this, unless more customized behaviour is needed.
         """
-        self.initialize()
         try:
-            self.validate()
-        except ValidationError:
-            return
-        self.execute()
+            self.initialize()
+            try:
+                self.validate_login_success()
+                self.validate()
+            except ValidationError:
+                return
+            self.execute()
+        except APIClientError as err:
+            echo(err.message, err=True)
+            if LOG_LEVEL == DEBUG:
+                raise err
 
     def login(self):
         """Login current user."""
-        self.is_logged_in = login(
-            self.api_client, self.credentials.email, self.credentials.password
-        )
+        if not self.is_credentials_valid:
+            return False
+        self.is_logged_in = login(self.api_client, self.credentials)
         return self.is_logged_in
 
     @staticmethod

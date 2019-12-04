@@ -98,9 +98,26 @@ def get_regular_progress_bar(total_size, action):
     )
 
 
-def login(api_client, email, password):
+def validate_credentials(credentials):
+    """Validate user credentials."""
+    if credentials.email and credentials.password and credentials.api_key:
+        echo_debug("User provided 2 sets of credentials.")
+        return False
+
+    return True
+
+
+def login(api_client, credentials):
     """Login user into Gencove's system."""
-    if not email or not password:
+    if credentials.api_key:
+        echo_debug("User authorized via api key")
+        api_client.set_api_key(credentials.api_key)
+        return True
+
+    email = credentials.email
+    password = credentials.password
+
+    if not credentials.email or not credentials.password:
         echo("Login required")
         email = email or click.prompt("Email", type=str)
         password = password or click.prompt(

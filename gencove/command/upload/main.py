@@ -111,9 +111,6 @@ class Upload(Command):
             )
             raise ValidationError("Bad configuration. Exiting.")
 
-        if not self.is_logged_in:
-            raise ValidationError("User must login. Exiting.")
-
     def execute(self):
         """Upload fastq files from host system to Gencove cloud.
 

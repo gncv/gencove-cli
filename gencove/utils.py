@@ -98,6 +98,14 @@ def get_regular_progress_bar(total_size, action):
     )
 
 
+def validate_credentials(credentials):
+    """Validate user credentials."""
+    if credentials.email and credentials.password and credentials.api_key:
+        return False
+
+    return True
+
+
 def login(api_client, credentials):
     """Login user into Gencove's system."""
     if credentials.api_key:

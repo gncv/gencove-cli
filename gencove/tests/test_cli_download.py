@@ -96,3 +96,46 @@ def test_project_id_provided(mocker):
         mocked_project_samples.assert_called_once()
         mocked_download_file.assert_called_once()
         mocked_sample_details.assert_called_once()
+
+
+def test_sample_ids_provided(mocker):
+    """Check happy flow with sample ids."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        mocked_login = mocker.patch.object(
+            APIClient, "login", return_value=None
+        )
+        mocked_sample_details = mocker.patch.object(
+            APIClient,
+            "get_sample_details",
+            return_value={
+                "id": 0,
+                "client_id": 1,
+                "last_status": {"status": "succeeded"},
+                "files": [
+                    {
+                        "file_type": "txt",
+                        "download_url": "https://foo.com/bar.txt",
+                    }
+                ],
+            },
+        )
+        mocked_download_file = mocker.patch(
+            "gencove.command.download.main.download_file"
+        )
+        res = runner.invoke(
+            download,
+            [
+                "cli_test_data",
+                "--sample-ids",
+                "0",
+                "--email",
+                "foo@bar.com",
+                "--password",
+                "123",
+            ],
+        )
+        assert res.exit_code == 0
+        mocked_login.assert_called_once()
+        mocked_download_file.assert_called_once()
+        mocked_sample_details.assert_called_once()

@@ -42,12 +42,18 @@ def cli():
     "Can be passed as GENCOVE_PASSWORD environment variable",
 )
 @click.option(
+    "--api-key",
+    default=lambda: os.environ.get("GENCOVE_API_KEY", ""),
+    help="Gencove api key. "
+    "Can be passed as GENCOVE_API_KEY environment variable",
+)
+@click.option(
     "--run-project-id",
     default=None,
     help="Immediately assign all uploaded files to this project and run them",
 )
 def upload(  # pylint: disable=C0330,R0913
-    source, destination, host, email, password, run_project_id
+    source, destination, host, email, password, api_key, run_project_id
 ):  # noqa: D301
     """Upload FASTQ files to Gencove's system.
 
@@ -76,7 +82,7 @@ def upload(  # pylint: disable=C0330,R0913
     Upload(
         source,
         destination,
-        Credentials(email, password),
+        Credentials(email, password, api_key),
         UploadOptions(host, run_project_id),
     ).run()
 
@@ -112,6 +118,12 @@ def upload(  # pylint: disable=C0330,R0913
     "Can be passed as GENCOVE_PASSWORD environment variable",
 )
 @click.option(
+    "--api-key",
+    default=lambda: os.environ.get("GENCOVE_API_KEY", ""),
+    help="Gencove api key. "
+    "Can be passed as GENCOVE_API_KEY environment variable",
+)
+@click.option(
     "--skip-existing/--no-skip-existing",
     default=True,
     help="Skip downloading files that already exist in DESTINATION",
@@ -132,6 +144,7 @@ def download(  # pylint: disable=C0330,R0913
     host,
     email,
     password,
+    api_key,
     skip_existing,
     download_template,
 ):  # noqa: D413,D301,D412 # pylint: disable=C0301
@@ -179,7 +192,7 @@ def download(  # pylint: disable=C0330,R0913
     Download(
         destination,
         DownloadFilters(project_id, s_ids, f_types),
-        Credentials(email, password),
+        Credentials(email, password, api_key),
         DownloadOptions(host, skip_existing, download_template),
     ).run()
 

@@ -37,6 +37,10 @@ class DateTimeEncoder(json.JSONEncoder):
 class APIError(Exception):
     """Base API Error."""
 
+    def __init__(self, message):
+        super(APIError, self).__init__(message)
+        self.message = message
+
 
 class APIClientError(APIError):
     """Base HTTP error."""
@@ -76,6 +80,7 @@ class APIClient:
         """Initialize api client."""
         self._jwt_token = None
         self._jwt_refresh_token = None
+        self._api_key = None
         self.host = host if host is not None else constants.HOST
 
     @staticmethod
@@ -156,6 +161,9 @@ class APIClient:
             self._jwt_refresh_token = refresh_token
 
     def _get_authorization(self):
+        if self._api_key:
+            return {"Authorization": "Api-Key {}".format(self._api_key)}
+
         try:
             self.validate_token(self._jwt_token)
         except APIClientError:
@@ -196,6 +204,10 @@ class APIClient:
                 "offset"
             ]
         return query_params
+
+    def set_api_key(self, api_key):
+        """Set api key on this instance."""
+        self._api_key = api_key
 
     def refresh_token(self, refresh_token):
         """Refresh jwt token."""

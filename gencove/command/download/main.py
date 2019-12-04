@@ -72,14 +72,14 @@ class Download(Command):
                 "Must specify only one of: project id or sample ids"
             )
 
+        if not self.sample_ids:
+            raise ValidationError("No samples to process. Exiting.")
+
         self.echo_debug(
             "Host is {} downloading to {}".format(
                 self.options.host, self.download_to
             )
         )
-
-        if not self.is_logged_in:
-            raise ValidationError("User must login. Exiting.")
 
     def execute(self):
         self.echo("Processing samples")

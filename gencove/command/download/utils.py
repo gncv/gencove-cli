@@ -13,7 +13,10 @@ import backoff
 
 import requests
 
-from gencove.constants import MAX_RETRY_TIME_SECONDS  # noqa: I100
+from gencove.constants import (
+    MAX_RETRY_TIME_SECONDS,
+    DownloadTemplateParts,
+)  # noqa: I100
 from gencove.logger import echo, echo_debug
 from gencove.utils import get_progress_bar
 
@@ -23,7 +26,8 @@ from .constants import CHUNK_SIZE, FILENAME_RE, FILE_TYPES_MAPPER, FilePrefix
 def _get_filename_dirs_prefix(full_prefix):
     """Extract directories prefix and filename prefix separately."""
     prefix_parts = full_prefix.split("/")
-    return FilePrefix("/".join(prefix_parts[:-1]), prefix_parts[-1])
+    file_name, file_ext = prefix_parts[-1].split(".")
+    return FilePrefix("/".join(prefix_parts[:-1]), file_name, file_ext)
 
 
 def get_filename_from_download_url(url):
@@ -84,26 +88,38 @@ def _create_filepath(download_to, prefix_dirs, filename):
     return file_path
 
 
-def build_file_path(deliverable, file_prefix, download_to):
+def build_file_path(deliverable, file_with_prefix, download_to):
     """Create and return file system path where the file will be downloaded to.
 
     Args:
         deliverable (dict): used to get download url and file type
-        file_prefix (str): used as a template for download path
+        file_with_prefix (str): used as a template for download path
         download_to (str): general location where to download the file to
 
     Returns:
          str : file path on current file system
     """
-    prefix = _get_filename_dirs_prefix(file_prefix)
+    prefix = _get_filename_dirs_prefix(file_with_prefix)
     source_filename = get_filename_from_download_url(
         deliverable["download_url"]
     )
-    destination_filename = "{}{}.{}".format(
-        prefix.filename,
-        FILE_TYPES_MAPPER.get(deliverable["file_type"])
-        or deliverable["file_type"],
-        deliverable_type_from_filename(source_filename),
+    destination_filename = "{}.{}".format(
+        prefix.filename, prefix.file_extension
+    )
+
+    destination_filename = destination_filename.format(
+        **{
+            DownloadTemplateParts.file_type: FILE_TYPES_MAPPER.get(
+                deliverable["file_type"]
+            )
+            or deliverable["file_type"],
+            DownloadTemplateParts.file_extension: deliverable_type_from_filename(
+                source_filename
+            ),
+        }
+    )
+    echo_debug(
+        "Calculated destination filename: {}".format(destination_filename)
     )
     return _create_filepath(download_to, prefix.dirs, destination_filename)
 

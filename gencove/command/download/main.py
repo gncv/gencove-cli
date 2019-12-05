@@ -142,14 +142,20 @@ class Download(Command):
                 )
                 continue
 
-            file_prefix = self.options.download_template.format(
+            file_with_prefix = self.options.download_template.format(
                 **{
                     DownloadTemplateParts.client_id: sample["client_id"],
                     DownloadTemplateParts.gencove_id: sample["id"],
+                    DownloadTemplateParts.file_type: "{{{}}}".format(
+                        DownloadTemplateParts.file_type
+                    ),
+                    DownloadTemplateParts.file_extension: "{{{}}}".format(
+                        DownloadTemplateParts.file_extension
+                    ),
                 }
             )
             file_path = build_file_path(
-                sample_file, file_prefix, self.download_to
+                sample_file, file_with_prefix, self.download_to
             )
 
             if file_path in self.downloaded_files:

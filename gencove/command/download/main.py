@@ -8,7 +8,7 @@ import requests
 from gencove import client  # noqa: I100
 from gencove.command.base import Command, ValidationError
 from gencove.command.download.exceptions import DownloadTemplateError
-from gencove.constants import DownloadTemplateParts
+from gencove.utils import get_download_template_format_params
 
 from .constants import ALLOWED_STATUSES_RE
 from .utils import build_file_path, download_file, fatal_process_sample_error
@@ -145,16 +145,9 @@ class Download(Command):
                 continue
 
             file_with_prefix = self.options.download_template.format(
-                **{
-                    DownloadTemplateParts.client_id: sample["client_id"],
-                    DownloadTemplateParts.gencove_id: sample["id"],
-                    DownloadTemplateParts.file_type: "{{{}}}".format(
-                        DownloadTemplateParts.file_type
-                    ),
-                    DownloadTemplateParts.file_extension: "{{{}}}".format(
-                        DownloadTemplateParts.file_extension
-                    ),
-                }
+                **get_download_template_format_params(
+                    sample["client_id"], sample["id"]
+                )
             )
             file_path = build_file_path(
                 sample_file, file_with_prefix, self.download_to

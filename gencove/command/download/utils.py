@@ -13,10 +13,10 @@ import backoff
 
 import requests
 
-from gencove.constants import (
-    MAX_RETRY_TIME_SECONDS,
+from gencove.constants import (  # noqa: I100
     DownloadTemplateParts,
-)  # noqa: I100
+    MAX_RETRY_TIME_SECONDS,
+)
 from gencove.logger import echo, echo_debug
 from gencove.utils import get_progress_bar
 
@@ -112,8 +112,8 @@ def build_file_path(deliverable, file_with_prefix, download_to):
             DownloadTemplateParts.file_type: FILE_TYPES_MAPPER.get(
                 deliverable["file_type"]
             )
-            or deliverable["file_type"],
-            DownloadTemplateParts.file_extension: deliverable_type_from_filename(
+            or deliverable["file_type"],  # pylint: disable=C0330
+            DownloadTemplateParts.file_extension: deliverable_type_from_filename(  # noqa: E501
                 source_filename
             ),
         }

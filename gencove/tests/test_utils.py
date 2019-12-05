@@ -1,9 +1,10 @@
 """Tests for utils of Gencove CLI."""
 from click.testing import CliRunner
 
-from gencove.command.upload.utils import upload_file
 from gencove.command.download.utils import _get_filename_dirs_prefix
+from gencove.command.upload.utils import upload_file
 from gencove.constants import DOWNLOAD_TEMPLATE, DownloadTemplateParts
+from gencove.utils import get_download_template_format_params
 
 
 def test_upload_file(mocker):
@@ -23,19 +24,11 @@ def test_upload_file(mocker):
 
 
 def test___get_filename_dirs_prefix():
+    """Test proper processing of parts in download template."""
     client_id = "12345"
     gencove_id = "1"
     template = DOWNLOAD_TEMPLATE.format(
-        **{
-            DownloadTemplateParts.client_id: client_id,
-            DownloadTemplateParts.gencove_id: gencove_id,
-            DownloadTemplateParts.file_type: "{{{}}}".format(
-                DownloadTemplateParts.file_type
-            ),
-            DownloadTemplateParts.file_extension: "{{{}}}".format(
-                DownloadTemplateParts.file_extension
-            ),
-        }
+        **get_download_template_format_params(client_id, gencove_id)
     )
 
     resp = _get_filename_dirs_prefix(template)

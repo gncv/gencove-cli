@@ -49,6 +49,8 @@ class Download(Command):
                     "Project id {} not found.".format(self.filters.project_id)
                 )
                 return
+        else:
+            self.sample_ids = self.filters.sample_ids
 
     def validate(self):
         """Validate command configuration before execution.

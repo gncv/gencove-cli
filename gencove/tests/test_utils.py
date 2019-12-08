@@ -1,7 +1,7 @@
 """Tests for utils of Gencove CLI."""
 from click.testing import CliRunner
 
-from gencove.command.download.utils import _get_filename_dirs_prefix
+from gencove.command.download.utils import _get_prefix_parts
 from gencove.command.upload.utils import upload_file
 from gencove.constants import DOWNLOAD_TEMPLATE, DownloadTemplateParts
 from gencove.utils import get_download_template_format_params
@@ -31,7 +31,7 @@ def test___get_filename_dirs_prefix():
         **get_download_template_format_params(client_id, gencove_id)
     )
 
-    resp = _get_filename_dirs_prefix(template)
+    resp = _get_prefix_parts(template)
 
     assert resp.dirs == "{}/{}".format(client_id, gencove_id)
     assert resp.filename == "{}_{{{}}}".format(
@@ -40,3 +40,23 @@ def test___get_filename_dirs_prefix():
     assert resp.file_extension == "{{{}}}".format(
         DownloadTemplateParts.file_extension
     )
+
+    template2 = "{client_id}-{gencove_id}_{file_type}".format(
+        **get_download_template_format_params(client_id, gencove_id)
+    )
+    resp = _get_prefix_parts(template2)
+    assert resp.dirs == ""
+    assert resp.filename == "{}-{}_{{{}}}".format(
+        client_id, gencove_id, DownloadTemplateParts.file_type
+    )
+    assert resp.file_extension == ""
+
+    template3 = "{client_id}-{gencove_id}_{file_type}.vcf.gz".format(
+        **get_download_template_format_params(client_id, gencove_id)
+    )
+    resp = _get_prefix_parts(template3)
+    assert resp.dirs == ""
+    assert resp.filename == "{}-{}_{{{}}}".format(
+        client_id, gencove_id, DownloadTemplateParts.file_type
+    )
+    assert resp.file_extension == "vcf.gz"

@@ -23,10 +23,10 @@ from gencove.utils import get_progress_bar
 from .constants import CHUNK_SIZE, FILENAME_RE, FILE_TYPES_MAPPER, FilePrefix
 
 
-def _get_filename_dirs_prefix(full_prefix):
-    """Extract directories prefix and filename prefix separately."""
+def _get_prefix_parts(full_prefix):
+    """Extract directories prefix parts from."""
     prefix_parts = full_prefix.split("/")
-    file_name, file_ext = prefix_parts[-1].split(".")
+    file_name, _, file_ext = prefix_parts[-1].partition(".")
     return FilePrefix("/".join(prefix_parts[:-1]), file_name, file_ext)
 
 
@@ -99,13 +99,19 @@ def build_file_path(deliverable, file_with_prefix, download_to):
     Returns:
          str : file path on current file system
     """
-    prefix = _get_filename_dirs_prefix(file_with_prefix)
+    prefix = _get_prefix_parts(file_with_prefix)
     source_filename = get_filename_from_download_url(
         deliverable["download_url"]
     )
-    destination_filename = "{}.{}".format(
-        prefix.filename, prefix.file_extension
-    )
+
+    if prefix.file_extension:
+        destination_filename = "{}.{}".format(
+            prefix.filename, prefix.file_extension
+        )
+    else:
+        destination_filename = "{}.{{{}}}".format(
+            prefix.filename, DownloadTemplateParts.file_extension
+        )
 
     destination_filename = destination_filename.format(
         **{

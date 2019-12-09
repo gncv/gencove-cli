@@ -24,7 +24,7 @@ DownloadOptions = namedtuple(  # pylint: disable=invalid-name
     "DownloadOptions",
     Optionals._fields + ("skip_existing", "download_template"),
 )
-FilePrefix = namedtuple("FilePrefix", ["dirs", "filename"])
+FilePrefix = namedtuple("FilePrefix", ["dirs", "filename", "file_extension"])
 FILENAME_RE = re.compile("filename=(.+)")
 
 FILE_TYPES_MAPPER = {"fastq-r1": "fastq-r1_R1", "fastq-r2": "fastq-r2_R2"}

@@ -21,7 +21,7 @@ def cli():
 
 
 @cli.command()
-@click.argument("source")
+@click.argument("source", required=False)
 @click.argument("destination", required=False)
 @click.option(
     "--host",
@@ -52,8 +52,20 @@ def cli():
     default=None,
     help="Immediately assign all uploaded files to this project and run them",
 )
+@click.option(
+    "--map-fastqs",
+    default=None,
+    help="A file in CSV format that maps FASTQ files to samples",
+)
 def upload(  # pylint: disable=C0330,R0913
-    source, destination, host, email, password, api_key, run_project_id
+    source,
+    destination,
+    host,
+    email,
+    password,
+    api_key,
+    run_project_id,
+    map_fastqs,
 ):  # noqa: D301
     """Upload FASTQ files to Gencove's system.
 
@@ -83,7 +95,7 @@ def upload(  # pylint: disable=C0330,R0913
         source,
         destination,
         Credentials(email, password, api_key),
-        UploadOptions(host, run_project_id),
+        UploadOptions(host, run_project_id, map_fastqs),
     ).run()
 
 

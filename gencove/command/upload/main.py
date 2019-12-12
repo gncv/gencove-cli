@@ -20,28 +20,23 @@ from .constants import (
     ASSIGN_BATCH_SIZE,
     ASSIGN_ERROR,
     FASTQ_EXTENSIONS,
+    GNCV_TEMPLATE,
+    GncvTemplateParts,
     TMP_UPLOADS_WARNING,
     UPLOAD_PREFIX,
     UPLOAD_STATUSES,
 )
+from .exceptions import SampleSheetError, UploadError, UploadNotFound
+from .multi_file_reader import MultiFileReader
 from .utils import (
     get_filename_from_path,
     get_get_upload_details_retry_predicate,
+    get_uuid_hex,
+    parse_fastqs_map_file,
     seek_files_to_upload,
     upload_file,
+    upload_multi_file,
 )
-
-
-class UploadError(Exception):
-    """Upload related error."""
-
-
-class UploadNotFound(Exception):
-    """Upload related error."""
-
-
-class SampleSheetError(Exception):
-    """Error to generate the sample sheet for uploads."""
 
 
 class Upload(Command):
@@ -53,6 +48,7 @@ class Upload(Command):
         self.destination = destination
         self.project_id = options.project_id
         self.fastqs = []
+        self.fastqs_map = {}
         self.upload_ids = set()
 
     @staticmethod
@@ -69,9 +65,10 @@ class Upload(Command):
         self.echo_debug("Host is {}".format(self.options.host))
         self.echo_warning(TMP_UPLOADS_WARNING, err=True)
 
-        self.fastqs = list(seek_files_to_upload(self.source))
+        if self.source:
+            self.fastqs = list(seek_files_to_upload(self.source))
 
-        if not self.destination:
+        if not self.destination and not self.options.fastqs_map_filepath:
             self.destination = self.generate_gncv_destination()
             self.echo(
                 "Files will be uploaded to: {}".format(self.destination)
@@ -81,6 +78,11 @@ class Upload(Command):
         # UPLOAD_PREFIX itself, which can have two trailing slashes.
         if self.destination != UPLOAD_PREFIX:
             self.destination = self.destination.rstrip("/") + "/"
+
+        if self.options.fastqs_map_filepath:
+            self.fastqs_map = parse_fastqs_map_file(
+                self.options.fastqs_map_filepath
+            )
 
         self.login()
 
@@ -101,7 +103,14 @@ class Upload(Command):
             )
             raise ValidationError("Bad configuration. Exiting.")
 
-        if not self.fastqs:
+        if self.fastqs and self.options.fastqs_map_filepath:
+            self.echo(
+                "Cannot read source and FASTQs map at the same time.",
+                err=True,
+            )
+            raise ValidationError("Bad configuration. Exiting")
+
+        if not self.fastqs and not self.fastqs_map:
             self.echo(
                 "No FASTQ files found in the path. "
                 "Only following files are accepted: {}".format(
@@ -121,18 +130,69 @@ class Upload(Command):
             self.api_client.get_upload_credentials
         )
 
+        if self.fastqs:
+            self.upload_from_source(s3_client)
+        if self.fastqs_map:
+            self.upload_from_map_file(s3_client)
+
+        self.echo_debug("Upload ids are now: {}".format(self.upload_ids))
+        if self.project_id:
+            self.echo_debug("Cooling down period.")
+            sleep(10)
+            self.assign_uploads_to_project()
+
+    def upload_from_source(self, s3_client):
+        """Upload command with <source> argument provided."""
         for file_path in self.fastqs:
             upload = self.upload_from_file_path(file_path, s3_client)
             if self.project_id and upload:
                 self.upload_ids.add(upload["id"])
 
         self.echo("All files were successfully uploaded.")
-        self.echo_debug("Upload ids are now: {}".format(self.upload_ids))
 
-        if self.project_id:
-            self.echo_debug("Cooling down period.")
-            sleep(10)
-            self.assign_uploads_to_project()
+    def upload_from_map_file(self, s3_client):
+        """Upload fastq files from a csv file."""
+        for key, fastqs in self.fastqs_map.items():
+            upload = self.concatenate_and_upload_fastqs(
+                key, fastqs, s3_client
+            )
+            if self.project_id and upload:
+                self.upload_ids.add(upload["id"])
+
+        self.echo("All files were successfully uploaded.")
+
+    def concatenate_and_upload_fastqs(self, key, fastqs, s3_client):
+        """Upload fastqs parts as one file."""
+        batch, client_id, r_notation = key
+        self.echo_debug(
+            "Uploading fastq. batch={} client_id={} r_notation={}".format(
+                batch, client_id, r_notation
+            )
+        )
+
+        gncv_path = GNCV_TEMPLATE.format(
+            **{
+                GncvTemplateParts.gnvc_prefix: UPLOAD_PREFIX,
+                GncvTemplateParts.datetime: datetime.utcnow().isoformat(),
+                GncvTemplateParts.uuid_hex: get_uuid_hex(),
+            }
+        )
+        self.echo_debug("Calculated gncv path: {}".format(gncv_path))
+
+        upload_details = self.get_upload_details(gncv_path)
+
+        if upload_details["last_status"]["status"] == UPLOAD_STATUSES.done:
+            self.echo("File was already uploaded: {}".format(fastqs[0]))
+            return upload_details
+
+        self.echo("Uploading {} to {}".format(fastqs[0], gncv_path))
+        upload_multi_file(
+            s3_client,
+            MultiFileReader(fastqs),
+            upload_details["s3"]["bucket"],
+            upload_details["s3"]["object_name"],
+        )
+        return upload_details
 
     def upload_from_file_path(self, file_path, s3_client):
         """Prepare file and upload, if it wasn't uploaded yet.

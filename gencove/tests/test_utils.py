@@ -1,10 +1,12 @@
 """Tests for utils of Gencove CLI."""
 from click.testing import CliRunner
 
-from gencove.command.download.utils import _get_prefix_parts
+from gencove.command.download.utils import (
+    _get_prefix_parts,
+    get_download_template_format_params,
+)
 from gencove.command.upload.utils import upload_file
 from gencove.constants import DOWNLOAD_TEMPLATE, DownloadTemplateParts
-from gencove.utils import get_download_template_format_params
 
 
 def test_upload_file(mocker):

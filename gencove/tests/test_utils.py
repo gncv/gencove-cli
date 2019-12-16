@@ -8,7 +8,7 @@ from gencove.command.download.utils import (
     _get_prefix_parts,
     get_download_template_format_params,
 )
-from gencove.command.upload.utils import upload_file, parse_fastqs_map_file
+from gencove.command.upload.utils import parse_fastqs_map_file, upload_file
 from gencove.constants import DOWNLOAD_TEMPLATE, DownloadTemplateParts
 
 
@@ -68,6 +68,7 @@ def test___get_filename_dirs_prefix():
 
 
 def test_parse_fastqs_map_file():
+    """Test parsing of map file into dict."""
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("test_dir")

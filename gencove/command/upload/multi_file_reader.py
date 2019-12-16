@@ -82,7 +82,6 @@ class MultiFileReader(object):
         """
         if not size:
             size = self.get_size()
-            print("size is", size)
 
         buf = b""
         while size > 0:

@@ -172,7 +172,8 @@ class Upload(Command):
                 batch, client_id, r_notation
             )
         )
-        print("FASTQS", fastqs)
+        self.echo_debug("FASTQS: {}".format(fastqs))
+
         gncv_path = GNCV_TEMPLATE.format(
             **{
                 GncvTemplateParts.gnvc_prefix: UPLOAD_PREFIX,

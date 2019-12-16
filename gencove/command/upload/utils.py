@@ -190,8 +190,10 @@ def parse_fastqs_map_file(fastqs_map_path):
     """
     fastqs = defaultdict(list)
     with open(fastqs_map_path) as fastqs_file:
-        reader = csv.DictReader(fastqs_file)
-        for fastq in map(FastQ._make, reader):
+        reader = csv.DictReader(fastqs_file, fieldnames=FastQ._fields)
+        _headers = next(reader)
+        for row in reader:
+            fastq = FastQ(**row)
             fastqs[(fastq.batch, fastq.client_id, fastq.r_notation)].append(
                 fastq.path
             )

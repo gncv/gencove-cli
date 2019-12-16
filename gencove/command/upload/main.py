@@ -1,4 +1,5 @@
 """Entry point into upload command."""
+import os
 import uuid
 from datetime import datetime
 from time import sleep
@@ -66,9 +67,16 @@ class Upload(Command):
         self.echo_warning(TMP_UPLOADS_WARNING, err=True)
 
         if self.source:
+            self.echo_debug("Seeking files to upload")
             self.fastqs = list(seek_files_to_upload(self.source))
 
-        if not self.destination and not self.options.fastqs_map_filepath:
+        if self.options.fastqs_map_filepath:
+            self.echo_debug("Scanning fastqs map file")
+            self.fastqs_map = parse_fastqs_map_file(
+                self.options.fastqs_map_filepath
+            )
+
+        if not self.destination and not self.fastqs_map:
             self.destination = self.generate_gncv_destination()
             self.echo(
                 "Files will be uploaded to: {}".format(self.destination)
@@ -76,13 +84,8 @@ class Upload(Command):
 
         # Make sure there is just one trailing slash. Only exception is
         # UPLOAD_PREFIX itself, which can have two trailing slashes.
-        if self.destination != UPLOAD_PREFIX:
+        if not self.fastqs_map and self.destination != UPLOAD_PREFIX:
             self.destination = self.destination.rstrip("/") + "/"
-
-        if self.options.fastqs_map_filepath:
-            self.fastqs_map = parse_fastqs_map_file(
-                self.options.fastqs_map_filepath
-            )
 
         self.login()
 
@@ -169,12 +172,13 @@ class Upload(Command):
                 batch, client_id, r_notation
             )
         )
-
+        print("FASTQS", fastqs)
         gncv_path = GNCV_TEMPLATE.format(
             **{
                 GncvTemplateParts.gnvc_prefix: UPLOAD_PREFIX,
                 GncvTemplateParts.datetime: datetime.utcnow().isoformat(),
                 GncvTemplateParts.uuid_hex: get_uuid_hex(),
+                GncvTemplateParts.path: fastqs[0].lstrip(os.path.sep),
             }
         )
         self.echo_debug("Calculated gncv path: {}".format(gncv_path))

@@ -1,11 +1,14 @@
 """Tests for utils of Gencove CLI."""
+import csv
+import os
+
 from click.testing import CliRunner
 
 from gencove.command.download.utils import (
     _get_prefix_parts,
     get_download_template_format_params,
 )
-from gencove.command.upload.utils import upload_file
+from gencove.command.upload.utils import upload_file, parse_fastqs_map_file
 from gencove.constants import DOWNLOAD_TEMPLATE, DownloadTemplateParts
 
 
@@ -62,3 +65,38 @@ def test___get_filename_dirs_prefix():
         client_id, gencove_id, DownloadTemplateParts.file_type
     )
     assert resp.file_extension == "vcf.gz"
+
+
+def test_parse_fastqs_map_file():
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("test_dir")
+        with open("test_dir/test.fastq.gz", "w") as fastq_file1:
+            fastq_file1.write("AAABBB")
+
+        with open("test_dir/test_2.fastq.gz", "w") as fastq_file2:
+            fastq_file2.write("AAABBB")
+
+        with open("test_dir/test_3.fastq.gz", "w") as fastq_file3:
+            fastq_file3.write("AAABBB")
+
+        with open("test_map.csv", "w") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["batch", "client_id", "r1_notation", "path"],
+                    ["foob", "barid", "r1", "test_dir/test.fastq.gz"],
+                    ["foob", "barid", "r2", "test_dir/test_2.fastq.gz"],
+                    ["foob", "barid", "r1", "test_dir/test_3.fastq.gz"],
+                ]
+            )
+
+        fastqs = parse_fastqs_map_file("test_map.csv")
+        assert len(fastqs) == 2
+        assert ("foob", "barid", "r1") in fastqs
+        assert ("foob", "barid", "r2") in fastqs
+        assert len(fastqs[("foob", "barid", "r1")]) == 2
+        assert fastqs[("foob", "barid", "r1")][0] == "test_dir/test.fastq.gz"
+        assert (
+            fastqs[("foob", "barid", "r1")][1] == "test_dir/test_3.fastq.gz"
+        )

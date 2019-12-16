@@ -179,7 +179,10 @@ class Upload(Command):
         )
         self.echo_debug("Calculated gncv path: {}".format(gncv_path))
 
-        upload_details = self.get_upload_details(gncv_path)
+        upload_details = self.get_upload_details(
+            gncv_path,
+            dict(batch=batch, client_id=client_id, r_notation=r_notation),
+        )
 
         if upload_details["last_status"]["status"] == UPLOAD_STATUSES.done:
             self.echo("File was already uploaded: {}".format(fastqs[0]))
@@ -233,9 +236,9 @@ class Upload(Command):
     @backoff.on_predicate(
         backoff.expo, get_get_upload_details_retry_predicate, max_tries=10
     )
-    def get_upload_details(self, gncv_path):
+    def get_upload_details(self, gncv_path, extra_params=None):
         """Get upload details with retry for last status update."""
-        return self.api_client.get_upload_details(gncv_path)
+        return self.api_client.get_upload_details(gncv_path, extra_params)
 
     def assign_uploads_to_project(self):
         """Assign uploads to a project and trigger a run."""

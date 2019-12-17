@@ -139,3 +139,24 @@ def test_sample_ids_provided(mocker):
         mocked_login.assert_called_once()
         mocked_download_file.assert_called_once()
         mocked_sample_details.assert_called_once()
+
+
+def test_multiple_credentials_not_allowed():
+    """Test that in providing multiple credentials is not allowed."""
+    runner = CliRunner()
+    res = runner.invoke(
+        download,
+        [
+            "some_test_data",
+            "--sample-ids",
+            "0",
+            "--email",
+            "foo@bar.com",
+            "--password",
+            "123",
+            "--api-key",
+            "foobar",
+        ],
+    )
+    assert res.exit_code == 0
+    assert "Please provide either username/password or API key." in res.output

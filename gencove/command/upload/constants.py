@@ -30,14 +30,14 @@ ASSIGN_ERROR = (
 ASSIGN_BATCH_SIZE = 200
 
 _GncvTemplateParts = namedtuple(
-    "GncvTemplateParts", ["gnvc_prefix", "datetime", "uuid_hex", "path"]
+    "GncvTemplateParts", ["gnvc_prefix", "batch", "client_id", "r_notation"]
 )
 GncvTemplateParts = _GncvTemplateParts(  # pylint: disable=invalid-name
     "gnvc_prefix", "datetime", "uuid_hex", "path"
 )
-GNCV_TEMPLATE = "{{{}}}cli-{{{}}}-{{{}}}/{{{}}}".format(
+GNCV_TEMPLATE = "{{{}}}{{{}}}/{{{}}}_{{{}}}.fastq.gz".format(
     GncvTemplateParts.gnvc_prefix,
-    GncvTemplateParts.datetime,
-    GncvTemplateParts.uuid_hex,
-    GncvTemplateParts.path,
+    GncvTemplateParts.batch,
+    GncvTemplateParts.client_id,
+    GncvTemplateParts.r_notation,
 )

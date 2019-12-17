@@ -1,5 +1,4 @@
 """Entry point into upload command."""
-import os
 import uuid
 from datetime import datetime
 from time import sleep
@@ -32,7 +31,6 @@ from .multi_file_reader import MultiFileReader
 from .utils import (
     get_filename_from_path,
     get_get_upload_details_retry_predicate,
-    get_uuid_hex,
     parse_fastqs_map_file,
     seek_files_to_upload,
     upload_file,
@@ -177,9 +175,9 @@ class Upload(Command):
         gncv_path = GNCV_TEMPLATE.format(
             **{
                 GncvTemplateParts.gnvc_prefix: UPLOAD_PREFIX,
-                GncvTemplateParts.datetime: datetime.utcnow().isoformat(),
-                GncvTemplateParts.uuid_hex: get_uuid_hex(),
-                GncvTemplateParts.path: fastqs[0].lstrip(os.path.sep),
+                GncvTemplateParts.batch: batch,
+                GncvTemplateParts.client_id: client_id,
+                GncvTemplateParts.r_notation: r_notation,
             }
         )
         self.echo_debug("Calculated gncv path: {}".format(gncv_path))

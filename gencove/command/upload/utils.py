@@ -2,18 +2,17 @@
 import csv
 import os
 import platform
-from collections import defaultdict, namedtuple
-from hashlib import md5
-from uuid import uuid4
+from collections import defaultdict
 
 from boto3.s3.transfer import TransferConfig
 
 from botocore.exceptions import ClientError
 
+from gencove.command.base import ValidationError
 from gencove.logger import echo, echo_debug
 from gencove.utils import CHUNK_SIZE, get_progress_bar
 
-from .constants import FASTQ_EXTENSIONS
+from .constants import FASTQ_EXTENSIONS, FastQ, R_NOTATION_MAP
 
 
 def upload_file(s3_client, file_name, bucket, object_name=None):  # noqa: D413
@@ -159,14 +158,6 @@ def get_filename_from_path(full_path, source):
     return relpath
 
 
-FastQ = namedtuple("FastQ", ["batch", "client_id", "r_notation", "path"])
-
-
-def get_uuid_hex(digest_size=8):
-    """Generate hex of uuid4 with the defined size."""
-    return md5(uuid4().bytes).hexdigest()[digest_size]  # nosec
-
-
 def parse_fastqs_map_file(fastqs_map_path):
     """Parse fastq map file.
 
@@ -175,9 +166,9 @@ def parse_fastqs_map_file(fastqs_map_path):
 
     Example fastqs map file:
         batch,client_id,r_notation,path
-        dir1,sample1,r1,dir1/sample1_L001_R1.fastq.gz
-        dir1,sample1,r1,dir1/sample1_L002_R1.fastq.gz
-        dir2,sample2,r2,dir2/sample1_L001_R2.fastq.gz
+        dir1,sample1,R1,dir1/sample1_L001_R1.fastq.gz
+        dir1,sample1,R1,dir1/sample1_L002_R1.fastq.gz
+        dir2,sample2,R2,dir2/sample1_L001_R2.fastq.gz
 
     Args:
         fastqs_map_path (str): path to CSV file
@@ -195,7 +186,16 @@ def parse_fastqs_map_file(fastqs_map_path):
         _ = next(reader)
         for row in reader:
             fastq = FastQ(**row)
-            fastqs[(fastq.batch, fastq.client_id, fastq.r_notation)].append(
-                fastq.path
-            )
+            if not fastq.path.lower().endswith(FASTQ_EXTENSIONS):
+                raise ValidationError(
+                    "Bad file extension in path: {}".format(fastq.path)
+                )
+
+            fastqs[
+                (
+                    fastq.batch,
+                    fastq.client_id,
+                    R_NOTATION_MAP[fastq.r_notation],
+                )
+            ].append(fastq.path)
     return fastqs

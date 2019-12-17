@@ -41,3 +41,7 @@ GNCV_TEMPLATE = "{{{}}}{{{}}}/{{{}}}_{{{}}}.fastq.gz".format(
     GncvTemplateParts.client_id,
     GncvTemplateParts.r_notation,
 )
+
+FastQ = namedtuple("FastQ", ["batch", "client_id", "r_notation", "path"])
+
+R_NOTATION_MAP = {"R1": "R1", "R2": "R2", "r1": "R1", "r2": "R2"}

@@ -188,7 +188,7 @@ class Upload(Command):
         )
 
         if upload_details["last_status"]["status"] == UPLOAD_STATUSES.done:
-            self.echo("File was already uploaded: {}".format(fastqs[0]))
+            self.echo("File was already uploaded: {}".format(gncv_path))
             return upload_details
 
         self.echo("Uploading to {}".format(gncv_path))

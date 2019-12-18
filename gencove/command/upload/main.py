@@ -191,7 +191,7 @@ class Upload(Command):
             self.echo("File was already uploaded: {}".format(fastqs[0]))
             return upload_details
 
-        self.echo("Uploading {} to {}".format(fastqs[0], gncv_path))
+        self.echo("Uploading to {}".format(gncv_path))
         upload_multi_file(
             s3_client,
             MultiFileReader(fastqs),

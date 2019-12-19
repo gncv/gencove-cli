@@ -17,7 +17,7 @@ FASTQ_EXTENSIONS = (".fastq.gz", ".fastq.bgz", ".fq.gz", ".fq.bgz")
 UPLOAD_PREFIX = "gncv://"
 
 UploadOptions = namedtuple(  # pylint: disable=invalid-name
-    "UploadOptions", Optionals._fields + ("project_id", "fastqs_map_filepath")
+    "UploadOptions", Optionals._fields + ("project_id",)
 )
 
 ASSIGN_ERROR = (
@@ -28,19 +28,6 @@ ASSIGN_ERROR = (
 )
 
 ASSIGN_BATCH_SIZE = 200
-
-_GncvTemplateParts = namedtuple(
-    "GncvTemplateParts", ["gnvc_prefix", "batch", "client_id", "r_notation"]
-)
-GncvTemplateParts = _GncvTemplateParts(  # pylint: disable=invalid-name
-    "gnvc_prefix", "datetime", "uuid_hex", "path"
-)
-GNCV_TEMPLATE = "{{{}}}{{{}}}/{{{}}}_{{{}}}.fastq.gz".format(
-    GncvTemplateParts.gnvc_prefix,
-    GncvTemplateParts.batch,
-    GncvTemplateParts.client_id,
-    GncvTemplateParts.r_notation,
-)
 
 FastQ = namedtuple("FastQ", ["batch", "client_id", "r_notation", "path"])
 

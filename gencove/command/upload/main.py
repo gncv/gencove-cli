@@ -1,4 +1,5 @@
 """Entry point into upload command."""
+import os
 import uuid
 from datetime import datetime
 from time import sleep
@@ -20,8 +21,6 @@ from .constants import (
     ASSIGN_BATCH_SIZE,
     ASSIGN_ERROR,
     FASTQ_EXTENSIONS,
-    GNCV_TEMPLATE,
-    GncvTemplateParts,
     TMP_UPLOADS_WARNING,
     UPLOAD_PREFIX,
     UPLOAD_STATUSES,
@@ -64,17 +63,16 @@ class Upload(Command):
         self.echo_debug("Host is {}".format(self.options.host))
         self.echo_warning(TMP_UPLOADS_WARNING, err=True)
 
-        if self.source:
+        if os.path.isfile(self.source) and self.source.endswith(
+            ".fastq-map.csv"
+        ):
+            self.echo_debug("Scanning fastqs map file")
+            self.fastqs_map = parse_fastqs_map_file(self.source)
+        else:
             self.echo_debug("Seeking files to upload")
             self.fastqs = list(seek_files_to_upload(self.source))
 
-        if self.options.fastqs_map_filepath:
-            self.echo_debug("Scanning fastqs map file")
-            self.fastqs_map = parse_fastqs_map_file(
-                self.options.fastqs_map_filepath
-            )
-
-        if not self.destination and not self.fastqs_map:
+        if not self.destination:
             self.destination = self.generate_gncv_destination()
             self.echo(
                 "Files will be uploaded to: {}".format(self.destination)
@@ -82,8 +80,9 @@ class Upload(Command):
 
         # Make sure there is just one trailing slash. Only exception is
         # UPLOAD_PREFIX itself, which can have two trailing slashes.
-        if not self.fastqs_map and self.destination != UPLOAD_PREFIX:
-            self.destination = self.destination.rstrip("/") + "/"
+        if self.destination != UPLOAD_PREFIX:
+            self.destination = self.destination.rstrip("/")
+            self.destination += "/"
 
         self.login()
 
@@ -103,13 +102,6 @@ class Upload(Command):
                 err=True,
             )
             raise ValidationError("Bad configuration. Exiting.")
-
-        if self.fastqs and self.options.fastqs_map_filepath:
-            self.echo(
-                "Cannot read source and FASTQs map at the same time.",
-                err=True,
-            )
-            raise ValidationError("Bad configuration. Exiting")
 
         if not self.fastqs and not self.fastqs_map:
             self.echo(
@@ -133,7 +125,7 @@ class Upload(Command):
 
         if self.fastqs:
             self.upload_from_source(s3_client)
-        if self.fastqs_map:
+        elif self.fastqs_map:
             self.upload_from_map_file(s3_client)
 
         self.echo_debug("Upload ids are now: {}".format(self.upload_ids))
@@ -172,14 +164,7 @@ class Upload(Command):
         )
         self.echo_debug("FASTQS: {}".format(fastqs))
 
-        gncv_path = GNCV_TEMPLATE.format(
-            **{
-                GncvTemplateParts.gnvc_prefix: UPLOAD_PREFIX,
-                GncvTemplateParts.batch: batch,
-                GncvTemplateParts.client_id: client_id,
-                GncvTemplateParts.r_notation: r_notation,
-            }
-        )
+        gncv_path = self.destination + fastqs[0]
         self.echo_debug("Calculated gncv path: {}".format(gncv_path))
 
         upload_details = self.get_upload_details(

@@ -10,7 +10,7 @@ import requests
 
 from gencove.client import APIClientError  # noqa: I100
 from gencove.command.base import Command, ValidationError
-from gencove.constants import SAMPLE_ASSIGNMENT_STATUS
+from gencove.constants import FASTQ_MAP_EXTENSION, SAMPLE_ASSIGNMENT_STATUS
 from gencove.utils import (
     batchify,
     get_regular_progress_bar,
@@ -64,7 +64,7 @@ class Upload(Command):
         self.echo_warning(TMP_UPLOADS_WARNING, err=True)
 
         if os.path.isfile(self.source) and self.source.endswith(
-            ".fastq-map.csv"
+            FASTQ_MAP_EXTENSION  # pylint: disable=C0330
         ):
             self.echo_debug("Scanning fastqs map file")
             self.fastqs_map = parse_fastqs_map_file(self.source)
@@ -164,7 +164,7 @@ class Upload(Command):
         )
         self.echo_debug("FASTQS: {}".format(fastqs))
 
-        gncv_path = self.destination + fastqs[0]
+        gncv_path = self.destination + fastqs[0].lstrip(os.path.sep)
         self.echo_debug("Calculated gncv path: {}".format(gncv_path))
 
         upload_details = self.get_upload_details(

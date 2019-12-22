@@ -3,6 +3,8 @@ from collections import namedtuple
 
 from gencove.constants import Optionals
 
+# pylint: disable=invalid-name
+
 TMP_UPLOADS_WARNING = (
     "The Gencove upload area is a temporary storage. "
     "Log into the dashboard and assign uploaded files "
@@ -16,7 +18,7 @@ FASTQ_EXTENSIONS = (".fastq.gz", ".fastq.bgz", ".fq.gz", ".fq.bgz")
 
 UPLOAD_PREFIX = "gncv://"
 
-UploadOptions = namedtuple(  # pylint: disable=invalid-name
+UploadOptions = namedtuple(
     "UploadOptions", Optionals._fields + ("project_id",)
 )
 
@@ -32,3 +34,11 @@ ASSIGN_BATCH_SIZE = 200
 FastQ = namedtuple("FastQ", ["client_id", "r_notation", "path"])
 
 R_NOTATION_MAP = {"R1": "R1", "R2": "R2", "r1": "R1", "r2": "R2"}
+
+_PathTemplateParts = namedtuple(
+    "PathTemplateParts", ["client_id", "r_notation"]
+)
+PathTemplateParts = _PathTemplateParts("client_id", "r_notation")
+PATH_TEMPLATE = "{{{}}}_{{{}}}.fastq.gz".format(
+    PathTemplateParts.client_id, PathTemplateParts.r_notation
+)

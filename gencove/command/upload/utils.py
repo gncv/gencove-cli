@@ -12,7 +12,13 @@ from gencove.command.base import ValidationError
 from gencove.logger import echo, echo_debug
 from gencove.utils import CHUNK_SIZE, get_progress_bar
 
-from .constants import FASTQ_EXTENSIONS, FastQ, R_NOTATION_MAP
+from .constants import (
+    FASTQ_EXTENSIONS,
+    FastQ,
+    PATH_TEMPLATE,
+    PathTemplateParts,
+    R_NOTATION_MAP,
+)
 
 
 def upload_file(s3_client, file_name, bucket, object_name=None):  # noqa: D413
@@ -195,3 +201,21 @@ def parse_fastqs_map_file(fastqs_map_path):
                 (fastq.client_id, R_NOTATION_MAP[fastq.r_notation])
             ].append(fastq.path)
     return fastqs
+
+
+def get_gncv_path(client_id, r_notation):
+    """Build gncv upload path.
+
+    Args:
+        client_id (str): sample client id
+        r_notation (str): upload R1/2 notation
+
+    Returns:
+        str: gncv upload path
+    """
+    return PATH_TEMPLATE.format(
+        **{
+            PathTemplateParts.client_id: client_id,
+            PathTemplateParts.r_notation: r_notation,
+        }
+    )

@@ -30,6 +30,7 @@ from .multi_file_reader import MultiFileReader
 from .utils import (
     get_filename_from_path,
     get_get_upload_details_retry_predicate,
+    get_gncv_path,
     parse_fastqs_map_file,
     seek_files_to_upload,
     upload_file,
@@ -164,7 +165,7 @@ class Upload(Command):
         )
         self.echo_debug("FASTQS: {}".format(fastqs))
 
-        gncv_path = self.destination + fastqs[0].lstrip(os.path.sep)
+        gncv_path = self.destination + get_gncv_path(client_id, r_notation)
         self.echo_debug("Calculated gncv path: {}".format(gncv_path))
 
         upload_details = self.get_upload_details(

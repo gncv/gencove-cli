@@ -162,13 +162,13 @@ def parse_fastqs_map_file(fastqs_map_path):
     """Parse fastq map file.
 
     Map file has to have following columns/headers:
-        batch, client_id, r_notation, path
+        client_id, r_notation, path
 
     Example fastqs map file:
-        batch,client_id,r_notation,path
-        dir1,sample1,R1,dir1/sample1_L001_R1.fastq.gz
-        dir1,sample1,R1,dir1/sample1_L002_R1.fastq.gz
-        dir2,sample2,R2,dir2/sample1_L001_R2.fastq.gz
+        client_id,r_notation,path
+        sample1,R1,dir1/sample1_L001_R1.fastq.gz
+        sample1,R1,dir1/sample1_L002_R1.fastq.gz
+        sample2,R2,dir2/sample1_L001_R2.fastq.gz
 
     Args:
         fastqs_map_path (str): path to CSV file
@@ -176,7 +176,7 @@ def parse_fastqs_map_file(fastqs_map_path):
     Returns:
         defaultdict: map of fastq file to samples
             {
-                (<batch>, <client_id>, <r_notation>): [path1, path2, ...],
+                (<client_id>, <r_notation>): [path1, path2, ...],
             }
     """
     fastqs = defaultdict(list)
@@ -192,10 +192,6 @@ def parse_fastqs_map_file(fastqs_map_path):
                 )
 
             fastqs[
-                (
-                    fastq.batch,
-                    fastq.client_id,
-                    R_NOTATION_MAP[fastq.r_notation],
-                )
+                (fastq.client_id, R_NOTATION_MAP[fastq.r_notation])
             ].append(fastq.path)
     return fastqs

@@ -156,10 +156,10 @@ class Upload(Command):
 
     def concatenate_and_upload_fastqs(self, key, fastqs, s3_client):
         """Upload fastqs parts as one file."""
-        batch, client_id, r_notation = key
+        client_id, r_notation = key
         self.echo_debug(
-            "Uploading fastq. batch={} client_id={} r_notation={}".format(
-                batch, client_id, r_notation
+            "Uploading fastq. client_id={} r_notation={}".format(
+                client_id, r_notation
             )
         )
         self.echo_debug("FASTQS: {}".format(fastqs))
@@ -168,8 +168,7 @@ class Upload(Command):
         self.echo_debug("Calculated gncv path: {}".format(gncv_path))
 
         upload_details = self.get_upload_details(
-            gncv_path,
-            dict(batch=batch, client_id=client_id, r_notation=r_notation),
+            gncv_path, dict(client_id=client_id, r_notation=r_notation)
         )
 
         if upload_details["last_status"]["status"] == UPLOAD_STATUSES.done:

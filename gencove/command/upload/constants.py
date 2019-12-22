@@ -29,6 +29,6 @@ ASSIGN_ERROR = (
 
 ASSIGN_BATCH_SIZE = 200
 
-FastQ = namedtuple("FastQ", ["batch", "client_id", "r_notation", "path"])
+FastQ = namedtuple("FastQ", ["client_id", "r_notation", "path"])
 
 R_NOTATION_MAP = {"R1": "R1", "R2": "R2", "r1": "R1", "r2": "R2"}

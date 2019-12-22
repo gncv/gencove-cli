@@ -86,22 +86,20 @@ def test_parse_fastqs_map_file():
             writer = csv.writer(map_file)
             writer.writerows(
                 [
-                    ["batch", "client_id", "r1_notation", "path"],
-                    ["foob", "barid", "r1", "test_dir/test.fastq.gz"],
-                    ["foob", "barid", "r2", "test_dir/test_2.fastq.gz"],
-                    ["foob", "barid", "r1", "test_dir/test_3.fastq.gz"],
+                    ["client_id", "r1_notation", "path"],
+                    ["barid", "r1", "test_dir/test.fastq.gz"],
+                    ["barid", "r2", "test_dir/test_2.fastq.gz"],
+                    ["barid", "r1", "test_dir/test_3.fastq.gz"],
                 ]
             )
 
         fastqs = parse_fastqs_map_file("test_map.csv")
         assert len(fastqs) == 2
-        assert ("foob", "barid", "R1") in fastqs
-        assert ("foob", "barid", "R2") in fastqs
-        assert len(fastqs[("foob", "barid", "R1")]) == 2
-        assert fastqs[("foob", "barid", "R1")][0] == "test_dir/test.fastq.gz"
-        assert (
-            fastqs[("foob", "barid", "R1")][1] == "test_dir/test_3.fastq.gz"
-        )
+        assert ("barid", "R1") in fastqs
+        assert ("barid", "R2") in fastqs
+        assert len(fastqs[("barid", "R1")]) == 2
+        assert fastqs[("barid", "R1")][0] == "test_dir/test.fastq.gz"
+        assert fastqs[("barid", "R1")][1] == "test_dir/test_3.fastq.gz"
 
 
 def test_invalid_fastqs_map_file():
@@ -122,10 +120,10 @@ def test_invalid_fastqs_map_file():
             writer = csv.writer(map_file)
             writer.writerows(
                 [
-                    ["batch", "client_id", "r1_notation", "path"],
-                    ["foob", "barid", "r1", "test_dir/test.fastq.gz"],
-                    ["foob", "barid", "r2", "test_dir/test_2.fastq.zip"],
-                    ["foob", "barid", "r1", "test_dir/test_3.fastq.gz"],
+                    ["client_id", "r1_notation", "path"],
+                    ["barid", "r1", "test_dir/test.fastq.gz"],
+                    ["barid", "r2", "test_dir/test_2.fastq.zip"],
+                    ["barid", "r1", "test_dir/test_3.fastq.gz"],
                 ]
             )
         try:

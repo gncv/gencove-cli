@@ -130,3 +130,33 @@ def test_invalid_fastqs_map_file():
             parse_fastqs_map_file("test_map.csv")
         except ValidationError as err:
             assert "Bad file extension in path" in err.args[0]
+
+
+def test_fastqs_map_file_path_does_not_exist():
+    """Test that error is raised if file is invalid."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("test_dir")
+        with open("test_dir/test.fastq.gz", "w") as fastq_file1:
+            fastq_file1.write("AAABBB")
+
+        with open("test_dir/test_2.fastq.gz", "w") as fastq_file2:
+            fastq_file2.write("AAABBB")
+
+        with open("test_dir/test_3.fastq.gz", "w") as fastq_file3:
+            fastq_file3.write("AAABBB")
+
+        with open("test_map.csv", "w") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r1_notation", "path"],
+                    ["barid", "r1", "test_dir/test.fastq.gz"],
+                    ["barid", "r1", "test_dir/test_3.fastq.gz"],
+                    ["barid", "r1", "test_dir/i_dont_exist.fastq.gz"],
+                ]
+            )
+        try:
+            parse_fastqs_map_file("test_map.csv")
+        except ValidationError as err:
+            assert "Could not find" in err.args[0]

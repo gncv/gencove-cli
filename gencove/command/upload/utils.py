@@ -164,6 +164,26 @@ def get_filename_from_path(full_path, source):
     return relpath
 
 
+def _validate_fastq(fastq):
+    """Validate fastq object.
+
+    Args:
+        fastq (FastQ:namedtuple): fastq object
+    Returns:
+        None if all good
+    Raises:
+        ValidationError if fastq is not valid
+    """
+    if not fastq.path.lower().endswith(FASTQ_EXTENSIONS):
+        raise ValidationError(
+            "Bad file extension in path: {}".format(fastq.path)
+        )
+    if "_" in fastq.client_id:
+        raise ValidationError("Underscore is not allowed in client id")
+    if not os.path.exists(fastq.path):
+        raise ValidationError("Could not find: {}".format(fastq.path))
+
+
 def parse_fastqs_map_file(fastqs_map_path):
     """Parse fastq map file.
 
@@ -192,11 +212,7 @@ def parse_fastqs_map_file(fastqs_map_path):
         _ = next(reader)
         for row in reader:
             fastq = FastQ(**row)
-            if not fastq.path.lower().endswith(FASTQ_EXTENSIONS):
-                raise ValidationError(
-                    "Bad file extension in path: {}".format(fastq.path)
-                )
-
+            _validate_fastq(fastq)
             fastqs[
                 (fastq.client_id, R_NOTATION_MAP[fastq.r_notation])
             ].append(fastq.path)

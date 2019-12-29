@@ -175,13 +175,20 @@ def _validate_fastq(fastq):
         ValidationError if fastq is not valid
     """
     if not fastq.path.lower().endswith(FASTQ_EXTENSIONS):
+        echo("Unsupported file type found: {}".format(fastq.path))
         raise ValidationError(
             "Bad file extension in path: {}".format(fastq.path)
         )
     if "_" in fastq.client_id:
+        echo("Underscore is not allowed in client id")
         raise ValidationError("Underscore is not allowed in client id")
     if not os.path.exists(fastq.path):
+        echo("Path does not exist: {}".format(fastq.path))
         raise ValidationError("Could not find: {}".format(fastq.path))
+    if fastq.r_notation not in R_NOTATION_MAP:
+        echo("Wrong R notation: {}".format(fastq.r_notation))
+        echo("Valid R notations are: {}".format(R_NOTATION_MAP.keys()))
+        raise ValidationError("Wrong R notation: {}".format(fastq.r_notation))
 
 
 def parse_fastqs_map_file(fastqs_map_path):

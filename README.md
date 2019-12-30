@@ -6,7 +6,6 @@
 ## Documentation ##
 Main documentation can be found here: [http://docs.gencove.com](http://docs.gencove.com)
 
-
 ## Local Development
 
 ```bash

@@ -12,7 +12,6 @@ import click
 import progressbar
 
 from gencove.client import APIClientError  # noqa: I100
-from gencove.constants import DownloadTemplateParts
 from gencove.logger import echo, echo_debug, echo_warning
 
 KB = 1024
@@ -162,25 +161,3 @@ def batchify(items_list, batch_size=500):
         yield items_list[start:end]
         start += batch_size
         left_to_process -= batch_size
-
-
-def get_download_template_format_params(client_id, gencove_id):
-    """Return format parts for download template.
-
-    Args:
-        client_id (str): sample client id
-        gencove_id (str): sample gencove id
-
-    Returns:
-        format parts : dict
-    """
-    return {
-        DownloadTemplateParts.client_id: client_id,
-        DownloadTemplateParts.gencove_id: gencove_id,
-        DownloadTemplateParts.file_type: "{{{}}}".format(
-            DownloadTemplateParts.file_type
-        ),
-        DownloadTemplateParts.file_extension: "{{{}}}".format(
-            DownloadTemplateParts.file_extension
-        ),
-    }

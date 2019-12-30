@@ -54,3 +54,4 @@ DOWNLOAD_TEMPLATE = "{{{}}}/{{{}}}/{{{}}}_{{{}}}.{{{}}}".format(
 )
 
 MAX_RETRY_TIME_SECONDS = 300  # 5 minutes
+FASTQ_MAP_EXTENSION = ".fastq-map.csv"

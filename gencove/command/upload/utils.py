@@ -1,15 +1,24 @@
 """Utils for upload command."""
+import csv
 import os
 import platform
+from collections import defaultdict
 
 from boto3.s3.transfer import TransferConfig
 
 from botocore.exceptions import ClientError
 
+from gencove.command.base import ValidationError
 from gencove.logger import echo, echo_debug
 from gencove.utils import CHUNK_SIZE, get_progress_bar
 
-from .constants import FASTQ_EXTENSIONS
+from .constants import (
+    FASTQ_EXTENSIONS,
+    FastQ,
+    PATH_TEMPLATE,
+    PathTemplateParts,
+    R_NOTATION_MAP,
+)
 
 
 def upload_file(s3_client, file_name, bucket, object_name=None):  # noqa: D413
@@ -53,6 +62,55 @@ def upload_file(s3_client, file_name, bucket, object_name=None):  # noqa: D413
         progress_bar.finish()
     except ClientError as err:
         echo("Failed to upload file {}: {}".format(file_name, err), err=True)
+        return False
+    return True
+
+
+def upload_multi_file(
+    s3_client, file_obj, bucket, object_name=None  # pylint: disable=C0330
+):  # noqa: D413
+    """Upload a file to an S3 bucket.
+
+    Args:
+        s3_client: Boto s3 client.
+        file_obj (MultiFileReader): File-like object with read() and
+            __iter__ methods
+        bucket (str): Bucket to upload to.
+        object_name (str): S3 object name.
+            If not specified then file_name is used
+
+    Returns:
+        True if file was uploaded, else False
+    """
+    # If S3 object_name was not specified, use file_name
+    if object_name is None:
+        object_name = file_obj.name
+
+    # Upload the file
+    try:
+        # Set desired multipart threshold value of 5GB
+        config = TransferConfig(
+            multipart_threshold=CHUNK_SIZE,
+            multipart_chunksize=CHUNK_SIZE,
+            use_threads=True,
+            max_concurrency=10,
+        )
+
+        progress_bar = get_progress_bar(file_obj.get_size(), "Uploading: ")
+        progress_bar.start()
+        s3_client.upload_fileobj(
+            file_obj,
+            bucket,
+            object_name,
+            Config=config,
+            Callback=_progress_bar_update(progress_bar),
+        )
+        progress_bar.finish()
+    except ClientError as err:
+        echo(
+            "Failed to upload file {}: {}".format(file_obj.name, err),
+            err=True,
+        )
         return False
     return True
 
@@ -104,3 +162,83 @@ def get_filename_from_path(full_path, source):
     if platform.system() == "Windows":
         return relpath.replace("\\", "/")
     return relpath
+
+
+def _validate_fastq(fastq):
+    """Validate fastq object.
+
+    Args:
+        fastq (FastQ:namedtuple): fastq object
+    Returns:
+        None if all good
+    Raises:
+        ValidationError if fastq is not valid
+    """
+    if not fastq.path.lower().endswith(FASTQ_EXTENSIONS):
+        echo("Unsupported file type found: {}".format(fastq.path))
+        raise ValidationError(
+            "Bad file extension in path: {}".format(fastq.path)
+        )
+    if "_" in fastq.client_id:
+        echo("Underscore is not allowed in client id")
+        raise ValidationError("Underscore is not allowed in client id")
+    if not os.path.exists(fastq.path):
+        echo("Path does not exist: {}".format(fastq.path))
+        raise ValidationError("Could not find: {}".format(fastq.path))
+    if fastq.r_notation not in R_NOTATION_MAP:
+        echo("Wrong R notation: {}".format(fastq.r_notation))
+        echo("Valid R notations are: {}".format(R_NOTATION_MAP.keys()))
+        raise ValidationError("Wrong R notation: {}".format(fastq.r_notation))
+
+
+def parse_fastqs_map_file(fastqs_map_path):
+    """Parse fastq map file.
+
+    Map file has to have following columns/headers:
+        client_id, r_notation, path
+
+    Example fastqs map file:
+        client_id,r_notation,path
+        sample1,R1,dir1/sample1_L001_R1.fastq.gz
+        sample1,R1,dir1/sample1_L002_R1.fastq.gz
+        sample2,R2,dir2/sample1_L001_R2.fastq.gz
+
+    Args:
+        fastqs_map_path (str): path to CSV file
+
+    Returns:
+        defaultdict: map of fastq file to samples
+            {
+                (<client_id>, <r_notation>): [path1, path2, ...],
+            }
+    """
+    fastqs = defaultdict(list)
+    with open(fastqs_map_path) as fastqs_file:
+        reader = csv.DictReader(fastqs_file, fieldnames=FastQ._fields)
+        # read headers row
+        _ = next(reader)
+        for row in reader:
+            fastq = FastQ(**row)
+            _validate_fastq(fastq)
+            fastqs[
+                (fastq.client_id, R_NOTATION_MAP[fastq.r_notation])
+            ].append(fastq.path)
+    return fastqs
+
+
+def get_gncv_path(client_id, r_notation):
+    """Build gncv upload path.
+
+    Args:
+        client_id (str): sample client id
+        r_notation (str): upload R1/2 notation
+
+    Returns:
+        str: gncv upload path
+    """
+    return PATH_TEMPLATE.format(
+        **{
+            PathTemplateParts.client_id: client_id,
+            PathTemplateParts.r_notation: r_notation,
+        }
+    )

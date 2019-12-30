@@ -8,10 +8,14 @@ import requests
 from gencove import client  # noqa: I100
 from gencove.command.base import Command, ValidationError
 from gencove.command.download.exceptions import DownloadTemplateError
-from gencove.utils import get_download_template_format_params
 
 from .constants import ALLOWED_STATUSES_RE
-from .utils import build_file_path, download_file, fatal_process_sample_error
+from .utils import (
+    build_file_path,
+    download_file,
+    fatal_process_sample_error,
+    get_download_template_format_params,
+)
 
 
 class Download(Command):

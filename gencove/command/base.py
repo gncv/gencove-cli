@@ -43,12 +43,11 @@ class Command(object):  # pylint: disable=R0205
         """
         try:
             self.initialize()
-            try:
-                self.validate_login_success()
-                self.validate()
-            except ValidationError:
-                return
+            self.validate_login_success()
+            self.validate()
             self.execute()
+        except ValidationError as err:
+            self.echo_debug(repr(err))
         except APIClientError as err:
             echo(err.message, err=True)
             if LOG_LEVEL == DEBUG:

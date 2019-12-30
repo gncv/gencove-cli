@@ -231,3 +231,25 @@ def fatal_process_sample_error(err):
         bool: True if to giveup on backing off, False it to continue.
     """
     return err.response.status_code != 403
+
+
+def get_download_template_format_params(client_id, gencove_id):
+    """Return format parts for download template.
+
+    Args:
+        client_id (str): sample client id
+        gencove_id (str): sample gencove id
+
+    Returns:
+        format parts : dict
+    """
+    return {
+        DownloadTemplateParts.client_id: client_id,
+        DownloadTemplateParts.gencove_id: gencove_id,
+        DownloadTemplateParts.file_type: "{{{}}}".format(
+            DownloadTemplateParts.file_type
+        ),
+        DownloadTemplateParts.file_extension: "{{{}}}".format(
+            DownloadTemplateParts.file_extension
+        ),
+    }

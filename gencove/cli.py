@@ -58,7 +58,8 @@ def upload(  # pylint: disable=C0330,R0913
     """Upload FASTQ files to Gencove's system.
 
     SOURCE: folder that contains fastq files to be uploaded (acceptable file
-    extensions are .fastq.gz, .fastq.bgz, .fq.gz, .fq.bgz)
+    extensions are .fastq.gz, .fastq.bgz, .fq.gz, .fq.bgz), or .fastq-map.csv
+    file with the mapping of R1/R2 files to related sample by client_id
 
     DESTINATION (optional): gncv://[folder], where the folder is the location
     on Gencove systems
@@ -73,7 +74,8 @@ def upload(  # pylint: disable=C0330,R0913
 
     Args:
         source (.fastq.gz, .fastq.bgz, .fq.gz, .fq.bgz):
-            folder that contains fastq files to be uploaded.
+            folder that contains fastq files to be uploaded
+            OR .fastq-map.csv file
         destination (str, optional): 'gncv://' notated folder
             on Gencove's system, where the files will be uploaded to.
         run_project_id (UUID, optional): ID of a project to which all files

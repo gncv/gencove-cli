@@ -38,6 +38,7 @@ if LOG_LEVEL == DEBUG:
     _echo_with_datetime("OS details: {}".format(platform()))
     _echo_with_datetime("boto3 version: {}".format(boto3.__version__))
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+    logging.getLogger("botocore.auth").setLevel(logging.CRITICAL)
 
 
 def output_warning(text):

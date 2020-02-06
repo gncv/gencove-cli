@@ -95,6 +95,7 @@ class APIClient:
         method="get",
         custom_headers=None,
         timeout=60,
+        sensitive=False,
     ):
         url = urljoin(text(self.host), text(endpoint))
         headers = {"content-type": "application/json", "date": None}
@@ -104,7 +105,11 @@ class APIClient:
         if not params:
             params = {}
 
-        echo_debug("Contacting url: {} with payload: {}".format(url, params))
+        echo_debug(
+            "Contacting url: {} with payload: {}".format(
+                url, "[SENSITIVE CONTENT]" if sensitive else params
+            )
+        )
 
         try:
             if method == "get":
@@ -131,7 +136,8 @@ class APIClient:
 
         echo_debug(
             "API response is {} status is {}".format(
-                response.content, response.status_code
+                "[SENSITIVE CONTENT]" if sensitive else response.content,
+                response.status_code,
             )
         )
 
@@ -172,7 +178,14 @@ class APIClient:
 
         return {"Authorization": "Bearer {}".format(self._jwt_token)}
 
-    def _post(self, endpoint, payload=None, timeout=120, authorized=False):
+    def _post(
+        self,
+        endpoint,
+        payload=None,
+        timeout=120,
+        authorized=False,
+        sensitive=False,
+    ):
         headers = {} if not authorized else self._get_authorization()
         return self._request(
             endpoint,
@@ -180,10 +193,16 @@ class APIClient:
             method="post",
             timeout=timeout,
             custom_headers=headers,
+            sensitive=sensitive,
         )
 
     def _get(
-        self, endpoint, query_params=None, timeout=120, authorized=False
+        self,
+        endpoint,
+        query_params=None,
+        timeout=120,
+        authorized=False,
+        sensitive=False,
     ):
         headers = {} if not authorized else self._get_authorization()
         return self._request(
@@ -192,6 +211,7 @@ class APIClient:
             method="get",
             timeout=timeout,
             custom_headers=headers,
+            sensitive=sensitive,
         )
 
     @staticmethod
@@ -212,17 +232,23 @@ class APIClient:
     def refresh_token(self, refresh_token):
         """Refresh jwt token."""
         return self._post(
-            self.endpoints.refresh_jwt, {"refresh": refresh_token}
+            self.endpoints.refresh_jwt,
+            {"refresh": refresh_token},
+            sensitive=True,
         )
 
     def validate_token(self, token):
         """Validate jwt token."""
-        return self._post(self.endpoints.verify_jwt, {"token": token})
+        return self._post(
+            self.endpoints.verify_jwt, {"token": token}, sensitive=True
+        )
 
     def get_jwt(self, email, password):
         """Get jwt token."""
         return self._post(
-            self.endpoints.get_jwt, dict(email=email, password=password)
+            self.endpoints.get_jwt,
+            dict(email=email, password=password),
+            sensitive=True,
         )
 
     def login(self, email, password):
@@ -254,7 +280,9 @@ class APIClient:
     def get_upload_credentials(self):
         """Get aws credentials for user."""
         return self._post(
-            self.endpoints.get_upload_credentials, authorized=True
+            self.endpoints.get_upload_credentials,
+            authorized=True,
+            sensitive=True,
         )
 
     def get_project_samples(self, project_id, next_link=None):

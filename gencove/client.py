@@ -256,25 +256,18 @@ class APIClient:
         jwt = self.get_jwt(email, password)
         self._set_jwt(jwt["access"], jwt["refresh"])
 
-    def get_upload_details(self, gncv_file_path, extra_params=None):
+    def get_upload_details(self, gncv_file_path):
         """Get file upload details.
         Args:
             gncv_file_path (str): gncv notated path
-            extra_params (dict): fastq sample mapping
-                {
-                    'batch'<str>: <batch id>,
-                    'client_id'<str>: <sample client id>,
-                    'r_notation'<str>: <one of r1 or r2>
-                }
 
         Returns:
             dict: Upload details from the backend
         """
-        payload = dict(destination_path=gncv_file_path)
-        if extra_params:
-            payload.update(extra_params)
         return self._post(
-            self.endpoints.upload_details, payload, authorized=True
+            self.endpoints.upload_details,
+            dict(destination_path=gncv_file_path),
+            authorized=True,
         )
 
     def get_upload_credentials(self):

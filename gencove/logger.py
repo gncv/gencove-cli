@@ -65,6 +65,6 @@ def echo_debug(msg, **kwargs):
 def echo_warning(msg, **kwargs):
     """Output click echo msg with background."""
     if LOG_LEVEL == DEBUG:
-        _echo_with_datetime(msg, **kwargs)
+        _echo_with_datetime(output_warning(msg), **kwargs)
     else:
-        _echo(msg, **kwargs)
+        _echo(output_warning(msg), **kwargs)

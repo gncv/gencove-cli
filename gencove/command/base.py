@@ -43,8 +43,8 @@ class Command(object):  # pylint: disable=R0205
         """
         try:
             self.initialize()
-            self.validate_login_success()
             self.validate()
+            self.validate_login_success()
             self.execute()
         except ValidationError as err:
             self.echo_debug(repr(err))

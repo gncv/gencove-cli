@@ -232,7 +232,7 @@ class Upload(Command):
 
         try:
             samples = self.build_samples(self.upload_ids)
-        except (UploadError, SampleSheetError):
+        except (UploadError, SampleSheetError, UploadNotFound):
             self.echo_warning(
                 ASSIGN_ERROR.format(self.project_id, self.destination)
             )

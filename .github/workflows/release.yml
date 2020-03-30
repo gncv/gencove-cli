@@ -96,7 +96,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./gencove-Linux.zip
-          asset_name: gencove-Linux
+          asset_name: gencove-Linux.zip
           asset_content_type: application/zip
       - name: Upload Release Asset macOS
         uses: actions/upload-release-asset@v1
@@ -105,7 +105,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./gencove-macOS.zip
-          asset_name: gencove-macOS
+          asset_name: gencove-macOS.zip
           asset_content_type: application/zip
       - name: Upload Release Asset Windows
         uses: actions/upload-release-asset@v1
@@ -114,5 +114,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./gencove-Windows.zip
-          asset_name: gencove-Windows
+          asset_name: gencove-Windows.zip
           asset_content_type: application/zip

@@ -32,3 +32,4 @@ venv*
 .DS_Store
 /.tox
 .idea
+.vscode

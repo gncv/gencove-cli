@@ -2,3 +2,4 @@ tox
 sphinx
 sphinx-click
 pre-commit
+pyinstaller

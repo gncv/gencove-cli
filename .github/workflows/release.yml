@@ -84,7 +84,9 @@ jobs:
           prerelease: true
 
       - name: Zip release
+        # Uploading artifact changes file permissions
         run: |
+          chmod -R +x .
           zip --junk-paths gencove-Linux gencove-Linux/gencove
           zip --junk-paths gencove-macOS gencove-macOS/gencove
           zip --junk-paths gencove-Windows gencove-Windows/gencove.exe

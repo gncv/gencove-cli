@@ -78,8 +78,8 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
-          draft: true
-          prerelease: true
+          draft: false
+          prerelease: false
 
       - name: Zip release
         # Uploading artifact changes file permissions

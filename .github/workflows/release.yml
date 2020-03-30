@@ -51,7 +51,7 @@ jobs:
       - name: Package app
         run: |
           pip install .
-          pyinstaller gencove${{ matrix.slash }}cli.py --name gencove --onefile --add-data="gencove/version${{ matrix.path_separator }}gencove/version" --hidden-import="pkg_resources.py2_warn"
+          pyinstaller gencove${{ matrix.slash }}cli.py --name gencove --onefile --add-data="gencove/version${{ matrix.path_separator }}gencove/version" --hidden-import="pkg_resources.py2_warn" --hidden-import="configparser"
       - name: Upload artifact
         uses: actions/upload-artifact@v1.0.0
         with:

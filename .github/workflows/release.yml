@@ -89,7 +89,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./gencove-cli/gencove-Linux
+          asset_path: ./gencove-Linux/gencove-Linux
           asset_name: gencove-Linux.zip
           asset_content_type: application/zip
       - name: Upload Release Asset macOS
@@ -98,7 +98,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./gencove-cli/gencove-macOS
+          asset_path: ./gencove-macOS/gencove-macOS
           asset_name: gencove-macOS.zip
           asset_content_type: application/zip
       - name: Upload Release Asset Windows
@@ -107,6 +107,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./gencove-cli/gencove-Windows
+          asset_path: ./gencove-Windows/gencove-Windows
           asset_name: gencove-Windows.zip
           asset_content_type: application/zip

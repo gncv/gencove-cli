@@ -83,30 +83,36 @@ jobs:
           draft: true
           prerelease: true
 
+      - name: Zip release
+        run: |
+          zip --junk-paths gencove-Linux gencove-Linux/gencove
+          zip --junk-paths gencove-macOS gencove-macOS/gencove
+          zip --junk-paths gencove-Windows gencove-Windows/gencove.exe
+
       - name: Upload Release Asset Linux
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./gencove-Linux/gencove
+          asset_path: ./gencove-Linux.zip
           asset_name: gencove-Linux
-          asset_content_type: application/octet-stream
+          asset_content_type: application/zip
       - name: Upload Release Asset macOS
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./gencove-macOS/gencove
+          asset_path: ./gencove-macOS.zip
           asset_name: gencove-macOS
-          asset_content_type: application/octet-stream
+          asset_content_type: application/zip
       - name: Upload Release Asset Windows
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./gencove-Windows/gencove.exe
-          asset_name: gencove-Windows.exe
-          asset_content_type: application/octet-stream
+          asset_path: ./gencove-Windows.zip
+          asset_name: gencove-Windows
+          asset_content_type: application/zip

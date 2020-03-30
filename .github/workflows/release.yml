@@ -1,0 +1,57 @@
+name: Release Gencove CLI
+
+on:
+  push:
+    tags:
+      - "*.*.*"
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-16.04, macos-latest, windows-latest]
+        python: [3.7]
+        include:
+          - os: ubuntu-16.04
+            artifact_name: gencove
+            slash: "/"
+            path_separator: ":"
+            cache_location: ~/.cache/pip
+          - os: macos-latest
+            artifact_name: gencove
+            slash: "/"
+            path_separator: ":"
+            cache_location: ~/Library/Caches/pip
+          - os: windows-latest
+            artifact_name: gencove.exe
+            slash: "\\"
+            path_separator: ";"
+            cache_location: ~\AppData\Local\pip\Cache
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Cache pip modules
+        uses: actions/cache@v1
+        with:
+          path: ${{ matrix.cache_location }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Package app
+        run: |
+          pip install .
+          pyinstaller gencove${{ matrix.slash }}cli.py --name gencove --onefile --add-data="gencove/version${{ matrix.path_separator }}gencove/version" --hidden-import="pkg_resources.py2_warn"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: gencove-${{ runner.os }}
+          path: dist${{ matrix.slash }}${{ matrix.artifact_name }}

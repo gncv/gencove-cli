@@ -168,9 +168,7 @@ class Upload(Command):
         gncv_path = self.destination + get_gncv_path(client_id, r_notation)
         self.echo_debug("Calculated gncv path: {}".format(gncv_path))
 
-        upload_details = self.get_upload_details(
-            gncv_path, dict(client_id=client_id, r_notation=r_notation)
-        )
+        upload_details = self.get_upload_details(gncv_path)
 
         if upload_details["last_status"]["status"] == UPLOAD_STATUSES.done:
             self.echo("File was already uploaded: {}".format(gncv_path))
@@ -224,9 +222,9 @@ class Upload(Command):
     @backoff.on_predicate(
         backoff.expo, get_get_upload_details_retry_predicate, max_tries=10
     )
-    def get_upload_details(self, gncv_path, extra_params=None):
+    def get_upload_details(self, gncv_path):
         """Get upload details with retry for last status update."""
-        return self.api_client.get_upload_details(gncv_path, extra_params)
+        return self.api_client.get_upload_details(gncv_path)
 
     def assign_uploads_to_project(self):
         """Assign uploads to a project and trigger a run."""
@@ -234,7 +232,7 @@ class Upload(Command):
 
         try:
             samples = self.build_samples(self.upload_ids)
-        except (UploadError, SampleSheetError):
+        except (UploadError, SampleSheetError, UploadNotFound):
             self.echo_warning(
                 ASSIGN_ERROR.format(self.project_id, self.destination)
             )

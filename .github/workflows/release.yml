@@ -107,6 +107,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./gencove-Windows/gencove
+          asset_path: ./gencove-Windows/gencove.exe
           asset_name: gencove-Windows.zip
           asset_content_type: application/zip

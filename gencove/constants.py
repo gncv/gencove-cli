@@ -14,6 +14,8 @@ _APIEndpoint = namedtuple(
         "project_samples",
         "sample_details",
         "sample_sheet",
+        "projects",
+        "pipeline_capabilities",
     ],
 )
 API_ENDPOINTS = _APIEndpoint(
@@ -25,6 +27,8 @@ API_ENDPOINTS = _APIEndpoint(
     "/api/v2/project-samples/{id}",
     "/api/v2/samples/{id}",
     "/api/v2/sample-sheet/",
+    "/api/v2/projects/",
+    "/api/v2/pipeline-capabilities/{id}",
 )
 
 _SampleAssignmentStatus = namedtuple(

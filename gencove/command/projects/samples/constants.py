@@ -4,9 +4,9 @@ from collections import namedtuple
 
 from gencove.constants import (
     Optionals,
-    SORT_ORDER,
-    SAMPLE_STATUS,
     SAMPLE_SORT_BY,
+    SAMPLE_STATUS,
+    SORT_ORDER,
 )
 
 SamplesOptions = namedtuple(  # pylint: disable=invalid-name

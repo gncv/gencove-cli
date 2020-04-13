@@ -28,11 +28,11 @@ from requests import (  # pylint: disable=W0622
 
 from gencove import constants  # noqa: I100
 from gencove.constants import (
+    SAMPLES_SHEET_SORT_BY,
     SAMPLE_ASSIGNMENT_STATUS,
-    SORT_ORDER,
     SAMPLE_SORT_BY,
     SAMPLE_STATUS,
-    SAMPLES_SHEET_SORT_BY,
+    SORT_ORDER,
 )
 from gencove.logger import echo_debug
 

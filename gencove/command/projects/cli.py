@@ -1,12 +1,13 @@
 """Commands to be executed from command line."""
+# pylint: disable=C0330,R0913
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
 from gencove.constants import (
     Credentials,
     Optionals,
-    SAMPLE_STATUS,
     SAMPLE_SORT_BY,
+    SAMPLE_STATUS,
     SORT_ORDER,
 )
 

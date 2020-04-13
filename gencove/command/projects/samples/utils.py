@@ -1,6 +1,5 @@
 """Utilities for processing and validating samples."""
 from gencove.command.base import ValidationError
-from gencove.command.utils import sanitize_string
 from gencove.logger import echo_warning
 
 

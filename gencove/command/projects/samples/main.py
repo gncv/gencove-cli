@@ -8,15 +8,15 @@ from tabulate import tabulate
 # pylint: disable=wrong-import-order
 from gencove.client import APIClientError  # noqa: I100
 from gencove.command.base import Command
-from gencove.constants import SAMPLE_STATUS, SAMPLE_SORT_BY, SORT_ORDER
+from gencove.constants import SAMPLE_SORT_BY, SAMPLE_STATUS, SORT_ORDER
 
-from .exceptions import SamplesError
-from .utils import get_line, validate_input
 from .constants import (
-    ALLOWED_STATUSES_RE,
     ALLOWED_SORT_FIELDS_RE,
     ALLOWED_SORT_ORDER_RE,
+    ALLOWED_STATUSES_RE,
 )
+from .exceptions import SamplesError
+from .utils import get_line, validate_input
 
 
 class ListSamples(Command):
@@ -52,7 +52,8 @@ class ListSamples(Command):
 
     def execute(self):
         self.echo_debug(
-            "Retrieving sample sheet: status={} sort_by={} sort_order={} search_term={}".format(
+            "Retrieving sample sheet: "
+            "status={} sort_by={} sort_order={} search_term={}".format(
                 self.sample_status,
                 self.sort_by,
                 self.sort_order,
@@ -65,8 +66,8 @@ class ListSamples(Command):
                 lines.append(get_line(sample))
 
         if not lines:
-            self.echo(
-                "Sorry, but it looks like this project doesn't have any samples."
+            self.echo_debug(
+                "Looks like this project doesn't have any samples."
             )
         else:
             self.echo(tabulate(lines, tablefmt="plain"))

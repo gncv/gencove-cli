@@ -11,8 +11,7 @@ from gencove.constants import (
 
 SamplesOptions = namedtuple(  # pylint: disable=invalid-name
     "SamplesOptions",
-    Optionals._fields
-    + ("status", "search", "sort_by", "sort_order", "limit"),
+    Optionals._fields + ("status", "search", "sort_by", "sort_order"),
 )
 
 ALLOWED_STATUSES_RE = re.compile(

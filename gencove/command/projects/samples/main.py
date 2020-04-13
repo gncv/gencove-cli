@@ -29,7 +29,6 @@ class ListSamples(Command):
         self.search_term = options.search
         self.sort_by = options.sort_by
         self.sort_order = options.sort_order
-        self.limit = options.limit
 
     def initialize(self):
         """Initialize list subcommand."""
@@ -80,7 +79,6 @@ class ListSamples(Command):
         """
         more = True
         next_link = None
-        count = 0
         while more:
             self.echo_debug("Get sample sheet page")
             try:
@@ -88,9 +86,6 @@ class ListSamples(Command):
                 yield resp["results"]
                 next_link = resp["meta"]["next"]
                 more = next_link is not None
-                count += len(resp["results"])
-                if self.limit and more:
-                    more = count < self.limit
             except APIClientError as err:
                 self.echo_debug(err)
                 raise SamplesError

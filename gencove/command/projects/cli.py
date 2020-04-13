@@ -49,11 +49,6 @@ def list_projects(host, email, password, api_key):
     type=click.Choice(SORT_ORDER._asdict().values()),
     default=SORT_ORDER.desc,
 )
-@click.option(
-    "--limit",
-    help="Limit number of returned samples. "
-    "If not provided, all samples will be returned.",
-)
 @add_options(common_options)
 def list_project_samples(
     project_id,
@@ -61,7 +56,6 @@ def list_project_samples(
     status,
     sort_by,
     sort_order,
-    limit,
     host,
     email,
     password,
@@ -71,5 +65,5 @@ def list_project_samples(
     ListSamples(
         project_id,
         Credentials(email, password, api_key),
-        SamplesOptions(host, status, search, sort_by, sort_order, limit),
+        SamplesOptions(host, status, search, sort_by, sort_order),
     ).run()

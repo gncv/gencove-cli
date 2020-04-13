@@ -1,9 +1,5 @@
 """Utilities for processing projects."""
-
-
-def sanitize_string(output):
-    """Removes unwanted characters from output string."""
-    return output.replace("\t", " ")
+from gencove.command.utils import sanitize_string
 
 
 def get_line(project):

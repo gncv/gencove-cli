@@ -12,7 +12,10 @@ from tabulate import tabulate
 
 from gencove.client import APIClient  # noqa: I100
 from gencove.command.projects.cli import list_projects
-from gencove.command.projects.constants import PipelineCapabilities, Project
+from gencove.command.projects.list.constants import (
+    PipelineCapabilities,
+    Project,
+)
 
 
 def test_list_empty(mocker):
@@ -66,7 +69,7 @@ def test_list_projects(mocker):
     mocked_get_projects = mocker.patch.object(
         APIClient, "list_projects", return_value=MOCKED_PROJECTS
     )
-    mocked_get_pipeline_capabilites = mocker.patch.object(
+    mocked_get_pipeline_capabilities = mocker.patch.object(
         APIClient,
         "get_pipeline_capabilities",
         return_value=MOCKED_PIPELINE_CAPABILITY,
@@ -74,10 +77,11 @@ def test_list_projects(mocker):
     res = runner.invoke(
         list_projects, ["--email", "foo@bar.com", "--password", "123"]
     )
+    print(res.output)
     assert res.exit_code == 0
     mocked_login.assert_called_once()
     mocked_get_projects.assert_called_once()
-    mocked_get_pipeline_capabilites.assert_called_once()
+    mocked_get_pipeline_capabilities.assert_called_once()
 
     project = Project(**MOCKED_PROJECTS["results"][0])
     pipeline = PipelineCapabilities(**MOCKED_PIPELINE_CAPABILITY)

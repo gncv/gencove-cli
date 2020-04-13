@@ -38,6 +38,26 @@ SAMPLE_ASSIGNMENT_STATUS = _SampleAssignmentStatus(
     "all", "unassigned", "assigned"
 )
 
+_SampleSheetSortBy = namedtuple("SampleSheetSortBy", ["created", "modified"])
+SAMPLES_SHEET_SORT_BY = _SampleSheetSortBy("created", "modified")
+
+_SampleStatus = namedtuple(
+    "SampleStatus", ["completed", "succeeded", "failed", "running", "all"]
+)
+SAMPLE_STATUS = _SampleStatus(
+    "completed", "succeeded", "failed", "running", "all"
+)
+
+_SampleSortBy = namedtuple(
+    "SampleSortFields", ["created", "modified", "status", "client_id", "id"]
+)
+SAMPLE_SORT_BY = _SampleSortBy(
+    "created", "modified", "status", "client_id", "id"
+)
+
+_SortOrder = namedtuple("SortOrder", ["asc", "desc"])
+SORT_ORDER = _SortOrder("asc", "desc")
+
 Credentials = namedtuple("Credentials", ["email", "password", "api_key"])
 Optionals = namedtuple("Optionals", ["host"])
 

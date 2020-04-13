@@ -27,7 +27,13 @@ from requests import (  # pylint: disable=W0622
 )
 
 from gencove import constants  # noqa: I100
-from gencove.constants import SAMPLE_ASSIGNMENT_STATUS
+from gencove.constants import (
+    SAMPLE_ASSIGNMENT_STATUS,
+    SORT_ORDER,
+    SAMPLE_SORT_BY,
+    SAMPLE_STATUS,
+    SAMPLES_SHEET_SORT_BY,
+)
 from gencove.logger import echo_debug
 
 
@@ -312,12 +318,28 @@ class APIClient:
             sensitive=True,
         )
 
-    def get_project_samples(self, project_id, next_link=None):
+    def get_project_samples(
+        self,
+        project_id,
+        next_link=None,
+        search="",
+        sample_status=SAMPLE_STATUS.all,
+        sort_by=SAMPLE_SORT_BY.modified,
+        sort_order=SORT_ORDER.desc,
+    ):
         """List single project's associated samples."""
         project_endpoint = self.endpoints.project_samples.format(
             id=project_id
         )
-        params = self._add_query_params(next_link)
+        params = self._add_query_params(
+            next_link,
+            {
+                "search": search,
+                "sort_by": sort_by,
+                "sort_order": sort_order,
+                "status": sample_status,
+            },
+        )
         return self._get(
             project_endpoint, query_params=params, authorized=True
         )
@@ -345,20 +367,30 @@ class APIClient:
     def get_sample_sheet(
         self,
         gncv_path=None,
-        is_assigned=SAMPLE_ASSIGNMENT_STATUS.all,
+        assigned_status=SAMPLE_ASSIGNMENT_STATUS.all,
         next_link=None,
+        sort_by=SAMPLES_SHEET_SORT_BY.created,
+        sort_order=SORT_ORDER.desc,
     ):
         """Fetch user samples.
 
         Args:
             gncv_path (str): filter samples by gncv notated path.
-            is_assigned (str, optional, default 'all'): filter samples by
+            assigned_status (str, optional, default 'all'): filter samples by
                 assignment status. One of SAMPLE_ASSIGNMENT_STATUS.
             next_link (str, optional): url from previous
                 response['meta']['next'].
+            sort_by(str): upload fastq field to sort by
+            sort_order(str): asc or desc sorting
         """
         params = self._add_query_params(
-            next_link, {"search": gncv_path, "status": is_assigned}
+            next_link,
+            {
+                "search": gncv_path,
+                "status": assigned_status,
+                "sort_by": sort_by,
+                "sort_order": sort_order,
+            },
         )
         return self._get(
             self.endpoints.sample_sheet, query_params=params, authorized=True

@@ -6,13 +6,9 @@ import requests
 # pylint: disable=wrong-import-order
 from gencove.client import APIClientError  # noqa: I100
 from gencove.command.base import Command
-from gencove.constants import SAMPLE_SORT_BY, SAMPLE_STATUS, SORT_ORDER
+from gencove.constants import SAMPLE_STATUS
 
-from .constants import (
-    ALLOWED_SORT_FIELDS_RE,
-    ALLOWED_SORT_ORDER_RE,
-    ALLOWED_STATUSES_RE,
-)
+from .constants import ALLOWED_STATUSES_RE
 from .exceptions import SamplesError
 from .utils import get_line, validate_input
 
@@ -25,8 +21,6 @@ class ListSamples(Command):
         self.project_id = project_id
         self.sample_status = options.status
         self.search_term = options.search
-        self.sort_by = options.sort_by
-        self.sort_order = options.sort_order
 
     def initialize(self):
         """Initialize list subcommand."""
@@ -40,21 +34,12 @@ class ListSamples(Command):
             ALLOWED_STATUSES_RE,
             SAMPLE_STATUS,
         )
-        validate_input(
-            "sort by", self.sort_by, ALLOWED_SORT_FIELDS_RE, SAMPLE_SORT_BY
-        )
-        validate_input(
-            "sort order", self.sort_order, ALLOWED_SORT_ORDER_RE, SORT_ORDER
-        )
 
     def execute(self):
         self.echo_debug(
             "Retrieving sample sheet: "
-            "status={} sort_by={} sort_order={} search_term={}".format(
-                self.sample_status,
-                self.sort_by,
-                self.sort_order,
-                self.search_term,
+            "status={} search_term={}".format(
+                self.sample_status, self.search_term
             )
         )
         for samples in self.get_paginated_samples():
@@ -97,6 +82,4 @@ class ListSamples(Command):
             next_link=next_link,
             search=self.search_term,
             sample_status=self.sample_status,
-            sort_by=self.sort_by,
-            sort_order=self.sort_order,
         )

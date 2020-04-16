@@ -11,9 +11,11 @@ def get_line(project):
     Returns:
         list(str): list of relevant data to be printed
     """
-    return [
-        project.created,
-        project.id,
-        sanitize_string(project.name),
-        sanitize_string(project.pipeline_capabilities.name),
-    ]
+    return "\t".join(
+        [
+            project.created,
+            project.id,
+            sanitize_string(project.name),
+            sanitize_string(project.pipeline_capabilities.name),
+        ]
+    )

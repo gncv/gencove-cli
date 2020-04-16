@@ -3,8 +3,6 @@ import backoff
 
 import requests
 
-from tabulate import tabulate
-
 # pylint: disable=wrong-import-order
 from gencove.client import APIClientError  # noqa: I100
 from gencove.command.base import Command
@@ -26,19 +24,18 @@ class List(Command):
 
     def execute(self):
         self.echo_debug("Retrieving projects")
-        lines = []
+
         for projects in self.get_paginated_projects():
+            if not projects:
+                self.echo_debug("No projects were found.")
+                return
+
             augmented_projects = self.augment_projects_with_pipeline_capabilities(  # noqa: E501
                 projects
             )
 
             for project in augmented_projects:
-                lines.append(get_line(project))
-
-        if not lines:
-            self.echo("Sorry, but it looks like you don't have any projects.")
-        else:
-            self.echo(tabulate(lines, tablefmt="plain"))
+                self.echo(get_line(project))
 
     def get_paginated_projects(self):
         """Paginate over all projects.

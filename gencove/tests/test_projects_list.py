@@ -8,8 +8,6 @@ from uuid import uuid4
 from click import echo
 from click.testing import CliRunner
 
-from tabulate import tabulate
-
 from gencove.client import APIClient  # noqa: I100
 from gencove.command.projects.cli import list_projects
 from gencove.command.projects.list.constants import (
@@ -33,9 +31,7 @@ def test_list_empty(mocker):
     assert res.exit_code == 0
     mocked_login.assert_called_once()
     mocked_get_projects.assert_called_once()
-    assert (
-        "Sorry, but it looks like you don't have any projects." in res.output
-    )
+    assert "" in res.output
 
 
 MOCKED_PROJECTS = dict(
@@ -89,16 +85,13 @@ def test_list_projects(mocker):
     output_line = io.BytesIO()
     sys.stdout = output_line
     echo(
-        tabulate(
+        "\t".join(
             [
-                [
-                    project.created,
-                    project.id,
-                    project.name.replace("\t", " "),
-                    pipeline.name,
-                ]
-            ],
-            tablefmt="plain",
+                project.created,
+                project.id,
+                project.name.replace("\t", " "),
+                pipeline.name,
+            ]
         )
     )
     assert output_line.getvalue() == res.output.encode()

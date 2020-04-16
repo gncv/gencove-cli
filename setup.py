@@ -38,7 +38,6 @@ setup(
         "future==0.18.2",
         "progressbar2==3.50.1",
         "backoff==1.10.0",
-        "tabulate==0.8.7",
     ],
     setup_requires=["pytest-runner"],
     tests_require=["pytest", "pytest-mock"],

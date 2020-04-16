@@ -123,9 +123,9 @@ def login(api_client, credentials):
 
     if not credentials.email or not credentials.password:
         echo("Login required")
-        email = email or click.prompt("Email", type=str)
+        email = email or click.prompt("Email", type=str, err=True)
         password = password or click.prompt(
-            "Password", type=str, hide_input=True
+            "Password", type=str, hide_input=True, err=True
         )
 
     try:

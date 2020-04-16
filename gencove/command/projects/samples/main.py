@@ -14,7 +14,7 @@ from .utils import get_line, validate_input
 
 
 class ListSamples(Command):
-    """List sample sheet command executor."""
+    """List samples command executor."""
 
     def __init__(self, project_id, credentials, options):
         super(ListSamples, self).__init__(credentials, options)

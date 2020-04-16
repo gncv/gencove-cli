@@ -3,8 +3,6 @@ import backoff
 
 import requests
 
-from tabulate import tabulate
-
 # pylint: disable=wrong-import-order
 from gencove.client import APIClientError  # noqa: I100
 from gencove.command.base import Command
@@ -59,17 +57,13 @@ class ListSamples(Command):
                 self.search_term,
             )
         )
-        lines = []
         for samples in self.get_paginated_samples():
-            for sample in samples:
-                lines.append(get_line(sample))
+            if not samples:
+                self.echo_debug("No matching samples were found.")
+                return
 
-        if not lines:
-            self.echo_debug(
-                "Looks like this project doesn't have any samples."
-            )
-        else:
-            self.echo(tabulate(lines, tablefmt="plain"))
+            for sample in samples:
+                self.echo(get_line(sample))
 
     def get_paginated_samples(self):
         """Paginate over all sample sheets for the destination.

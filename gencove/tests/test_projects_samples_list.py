@@ -6,8 +6,6 @@ from uuid import uuid4
 
 from click.testing import CliRunner
 
-from tabulate import tabulate
-
 from gencove.client import APIClient  # noqa: I100
 from gencove.command.projects.cli import list_project_samples
 from gencove.logger import echo
@@ -68,16 +66,13 @@ def test_list_projects(mocker):
     output_line = io.BytesIO()
     sys.stdout = output_line
     echo(
-        tabulate(
+        "\t".join(
             [
-                [
-                    MOCKED_SAMPLES["results"][0]["last_status"]["created"],
-                    MOCKED_SAMPLES["results"][0]["id"],
-                    MOCKED_SAMPLES["results"][0]["client_id"],
-                    MOCKED_SAMPLES["results"][0]["last_status"]["status"],
-                ]
-            ],
-            tablefmt="plain",
+                MOCKED_SAMPLES["results"][0]["last_status"]["created"],
+                MOCKED_SAMPLES["results"][0]["id"],
+                MOCKED_SAMPLES["results"][0]["client_id"],
+                MOCKED_SAMPLES["results"][0]["last_status"]["status"],
+            ]
         )
     )
     assert output_line.getvalue() == res.output.encode()

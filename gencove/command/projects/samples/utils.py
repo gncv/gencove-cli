@@ -42,9 +42,11 @@ def get_line(sample):
     Returns:
         list(str): list of relevant data to be printed
     """
-    return [
-        sample["last_status"]["created"],
-        sample["id"],
-        sample["client_id"],
-        sample["last_status"]["status"],
-    ]
+    return "\t".join(
+        [
+            sample["last_status"]["created"],
+            sample["id"],
+            sample["client_id"],
+            sample["last_status"]["status"],
+        ]
+    )

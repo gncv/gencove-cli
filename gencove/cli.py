@@ -5,6 +5,7 @@ from gencove import version
 from gencove.command.download import download
 from gencove.command.projects import projects
 from gencove.command.upload import upload
+from gencove.command.uploads import uploads
 
 
 @click.group()
@@ -15,6 +16,7 @@ def cli():
 
 cli.add_command(download)
 cli.add_command(upload)
+cli.add_command(uploads)
 cli.add_command(projects)
 
 

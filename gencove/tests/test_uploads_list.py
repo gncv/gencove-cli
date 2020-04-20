@@ -2,7 +2,6 @@
 # pylint: disable=wrong-import-order
 import io
 import sys
-from datetime import datetime, timedelta
 from uuid import uuid4
 
 from click import echo

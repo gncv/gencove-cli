@@ -10,7 +10,8 @@ from gencove.constants import SAMPLE_STATUS
 
 from .constants import ALLOWED_STATUSES_RE
 from .exceptions import SamplesError
-from .utils import get_line, validate_input
+from .utils import get_line
+from ...utils import validate_input
 
 
 class ListSamples(Command):

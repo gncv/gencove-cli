@@ -5,6 +5,7 @@ Exclude imports from linters due to install aliases breaking the rules.
 
 # noqa Python 2 and 3 compatibility
 # pylint: disable=wrong-import-order,wrong-import-position
+import time
 from builtins import str as text  # noqa
 import datetime  # noqa
 import json  # noqa
@@ -16,10 +17,23 @@ except ImportError:  # noqa
     # python 2.7
     from urlparse import urljoin, urlparse, parse_qs  # noqa
 
-from requests import get, post, ConnectTimeout, ReadTimeout, codes  # noqa
+from requests import (  # pylint: disable=W0622
+    ConnectTimeout,
+    ConnectionError,
+    ReadTimeout,
+    codes,
+    get,
+    post,
+)
 
 from gencove import constants  # noqa: I100
-from gencove.constants import SAMPLE_ASSIGNMENT_STATUS
+from gencove.constants import (
+    SAMPLES_SHEET_SORT_BY,
+    SAMPLE_ASSIGNMENT_STATUS,
+    SAMPLE_SORT_BY,
+    SAMPLE_STATUS,
+    SORT_ORDER,
+)
 from gencove.logger import echo_debug
 
 
@@ -37,9 +51,10 @@ class DateTimeEncoder(json.JSONEncoder):
 class APIError(Exception):
     """Base API Error."""
 
-    def __init__(self, message):
+    def __init__(self, message, status_code=None):
         super(APIError, self).__init__(message)
         self.message = message
+        self.status_code = status_code
 
 
 class APIClientError(APIError):
@@ -110,6 +125,7 @@ class APIClient:
                 url, "[SENSITIVE CONTENT]" if sensitive else params
             )
         )
+        start = time.time()
 
         try:
             if method == "get":
@@ -124,9 +140,9 @@ class APIClient:
                     headers=headers,
                     timeout=timeout,
                 )
-        except ConnectTimeout:
+        except (ConnectTimeout, ConnectionError):
             # If request timed out,
-            # let upper level handle it they way it sees fit.
+            # let upper level handle it the way it sees fit.
             # one place might want to retry another might not.
             raise APIClientTimeout("Could not connect to the api server")
         except ReadTimeout:
@@ -135,9 +151,10 @@ class APIClient:
             )
 
         echo_debug(
-            "API response is {} status is {}".format(
+            "API response is {} status is {} in {}ms".format(
                 "[SENSITIVE CONTENT]" if sensitive else response.content,
                 response.status_code,
+                (time.time() - start) * 1000,
             )
         )
 
@@ -159,23 +176,21 @@ class APIClient:
         elif 500 <= response.status_code < 600:
             http_error_msg = "Server Error: {}".format(response.reason)
 
-        raise APIClientError(http_error_msg)
+        raise APIClientError(http_error_msg, response.status_code)
 
     def _set_jwt(self, access_token, refresh_token=None):
         self._jwt_token = access_token
         if refresh_token is not None:
             self._jwt_refresh_token = refresh_token
 
+    def _refresh_authentication(self):
+        echo_debug("Refreshing authentication")
+        jwt = self.refresh_token(self._jwt_refresh_token)
+        self._set_jwt(jwt["access"])
+
     def _get_authorization(self):
         if self._api_key:
             return {"Authorization": "Api-Key {}".format(self._api_key)}
-
-        try:
-            self.validate_token(self._jwt_token)
-        except APIClientError:
-            jwt = self.refresh_token(self._jwt_refresh_token)
-            self._set_jwt(jwt["access"])
-
         return {"Authorization": "Bearer {}".format(self._jwt_token)}
 
     def _post(
@@ -185,16 +200,26 @@ class APIClient:
         timeout=120,
         authorized=False,
         sensitive=False,
+        refreshed=False,
     ):
         headers = {} if not authorized else self._get_authorization()
-        return self._request(
-            endpoint,
-            params=payload,
-            method="post",
-            timeout=timeout,
-            custom_headers=headers,
-            sensitive=sensitive,
-        )
+        try:
+            return self._request(
+                endpoint,
+                params=payload,
+                method="post",
+                timeout=timeout,
+                custom_headers=headers,
+                sensitive=sensitive,
+            )
+        except APIClientError as err:
+            if not refreshed and err.status_code and err.status_code == 401:
+                self._refresh_authentication()
+                return self._post(
+                    endpoint, payload, timeout, authorized, sensitive, True
+                )
+
+            raise err
 
     def _get(
         self,
@@ -203,22 +228,37 @@ class APIClient:
         timeout=120,
         authorized=False,
         sensitive=False,
+        refreshed=False,
     ):
         headers = {} if not authorized else self._get_authorization()
-        return self._request(
-            endpoint,
-            params=query_params,
-            method="get",
-            timeout=timeout,
-            custom_headers=headers,
-            sensitive=sensitive,
-        )
+        try:
+            return self._request(
+                endpoint,
+                params=query_params,
+                method="get",
+                timeout=timeout,
+                custom_headers=headers,
+                sensitive=sensitive,
+            )
+        except APIClientError as err:
+            if not refreshed and err.status_code and err.status_code == 401:
+                self._refresh_authentication()
+                return self._get(
+                    endpoint,
+                    query_params,
+                    timeout,
+                    authorized,
+                    sensitive,
+                    True,
+                )
+
+            raise err
 
     @staticmethod
-    def _add_query_params(next_link, query_params=None):
+    def _add_query_params(next_link, query_params=None, limit=200):
         if not query_params:
             query_params = {}
-        query_params.update({"offset": 0, "limit": 200})
+        query_params.update({"offset": 0, "limit": limit})
         if next_link:
             query_params["offset"] = parse_qs(urlparse(next_link).query)[
                 "offset"
@@ -278,12 +318,28 @@ class APIClient:
             sensitive=True,
         )
 
-    def get_project_samples(self, project_id, next_link=None):
+    def get_project_samples(
+        self,
+        project_id,
+        next_link=None,
+        search="",
+        sample_status=SAMPLE_STATUS.all,
+        sort_by=SAMPLE_SORT_BY.modified,
+        sort_order=SORT_ORDER.desc,
+    ):
         """List single project's associated samples."""
         project_endpoint = self.endpoints.project_samples.format(
             id=project_id
         )
-        params = self._add_query_params(next_link)
+        params = self._add_query_params(
+            next_link,
+            {
+                "search": search,
+                "sort_by": sort_by,
+                "sort_order": sort_order,
+                "status": sample_status,
+            },
+        )
         return self._get(
             project_endpoint, query_params=params, authorized=True
         )
@@ -311,21 +367,69 @@ class APIClient:
     def get_sample_sheet(
         self,
         gncv_path=None,
-        is_assigned=SAMPLE_ASSIGNMENT_STATUS.all,
+        assigned_status=SAMPLE_ASSIGNMENT_STATUS.all,
         next_link=None,
+        sort_by=SAMPLES_SHEET_SORT_BY.created,
+        sort_order=SORT_ORDER.desc,
     ):
         """Fetch user samples.
 
         Args:
             gncv_path (str): filter samples by gncv notated path.
-            is_assigned (str, optional, default 'all'): filter samples by
+            assigned_status (str, optional, default 'all'): filter samples by
                 assignment status. One of SAMPLE_ASSIGNMENT_STATUS.
             next_link (str, optional): url from previous
                 response['meta']['next'].
+            sort_by(str): upload fastq field to sort by
+            sort_order(str): asc or desc sorting
         """
         params = self._add_query_params(
-            next_link, {"search": gncv_path, "status": is_assigned}
+            next_link,
+            {
+                "search": gncv_path,
+                "status": assigned_status,
+                "sort_by": sort_by,
+                "sort_order": sort_order,
+            },
         )
         return self._get(
             self.endpoints.sample_sheet, query_params=params, authorized=True
         )
+
+    def list_projects(self, next_link=None):
+        """Fetch projects.
+
+        Args:
+            next_link (str, optional): url from previous
+                response['meta']['next'].
+
+        Returns:
+            api response (dict):
+                {
+                    "meta": {
+                        "count": int,
+                        "next": str,
+                        "previous": optional[str],
+                    },
+                    "results": [...]
+                }
+        """
+        params = self._add_query_params(next_link)
+        return self._get(
+            self.endpoints.projects, query_params=params, authorized=True
+        )
+
+    def get_pipeline_capabilities(self, pipeline_id):
+        """Get pipeline capabilities details.
+
+        Args:
+            pipeline_id (str:uuid): pipeline id
+
+        Returns:
+            dict: pipeline details
+        """
+        resp = self._get(
+            self.endpoints.pipeline_capabilities.replace("{id}", pipeline_id),
+            authorized=True,
+        )
+        return resp

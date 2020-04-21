@@ -1,4 +1,5 @@
 """Download command utilities."""
+import json
 import os
 import re
 
@@ -130,6 +131,28 @@ def build_file_path(deliverable, file_with_prefix, download_to):
     return _create_filepath(download_to, prefix.dirs, destination_filename)
 
 
+def build_qc_metrics_file_path(file_with_prefix, download_to):
+    """Create qc metrics file system path.
+
+    Args:
+        file_with_prefix(str): file path based on download template defined by
+            user
+        download_to(str): general location where to download the file to
+
+    Returns:
+        str : file path on current file system
+    """
+    prefix = _get_prefix_parts(file_with_prefix)
+    filled_filename = prefix.filename.format(
+        **{DownloadTemplateParts.file_type: "qc"}
+    )
+    destination_filename = "{}.json".format(filled_filename)
+    echo_debug(
+        "Calculated qc destination filename: {}".format(destination_filename)
+    )
+    return _create_filepath(download_to, prefix.dirs, destination_filename)
+
+
 def fatal_request_error(err=None):
     """Give up retrying if the error code is in fatal range.
 
@@ -219,6 +242,21 @@ def download_file(file_path, download_url, skip_existing=True):
         os.rename(file_path_tmp, file_path)
         echo("Finished downloading a file: {}".format(file_path))
         return file_path
+
+
+def save_qc_file(path, content):
+    """Helper function to save qc metrics to json file.
+
+    Args:
+        path(str): full file path where qc metrics will be saved
+        content(list of dict): list of qc metrics to be saved
+
+    Returns:
+        None
+    """
+    echo("Downloading file to: {}".format(path))
+    with open(path, "w") as qc_file:
+        json.dump(content, qc_file)
 
 
 def fatal_process_sample_error(err):

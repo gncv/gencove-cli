@@ -364,6 +364,20 @@ class APIClient:
             authorized=True,
         )
 
+    def get_sample_qc_metrics(self, sample_id):
+        """Fetch sample qc metrics.
+
+        Args:
+            sample_id(str of uuid): gencove sample id
+
+        Returns:
+            list of qc params objects.
+        """
+        return self._get(
+            self.endpoints.sample_qc_metrics.format(id=sample_id),
+            authorized=True,
+        )
+
     def get_sample_sheet(
         self,
         gncv_path=None,

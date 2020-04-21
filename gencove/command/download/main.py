@@ -12,9 +12,11 @@ from gencove.command.download.exceptions import DownloadTemplateError
 from .constants import ALLOWED_STATUSES_RE
 from .utils import (
     build_file_path,
+    build_qc_metrics_file_path,
     download_file,
     fatal_process_sample_error,
     get_download_template_format_params,
+    save_qc_file,
 )
 
 
@@ -138,6 +140,14 @@ class Download(Command):
             "|".join(self.filters.file_types), re.IGNORECASE
         )
 
+        file_with_prefix = self.options.download_template.format(
+            **get_download_template_format_params(
+                sample["client_id"], sample["id"]
+            )
+        )
+        self.echo("file path with prefix is: {}".format(file_with_prefix))
+        self.download_sample_qc_metrics(file_with_prefix, sample_id)
+
         for sample_file in sample["files"]:
             # pylint: disable=C0330
             if self.filters.file_types and not file_types_re.match(
@@ -148,31 +158,68 @@ class Download(Command):
                 )
                 continue
 
-            file_with_prefix = self.options.download_template.format(
-                **get_download_template_format_params(
-                    sample["client_id"], sample["id"]
-                )
-            )
             file_path = build_file_path(
                 sample_file, file_with_prefix, self.download_to
             )
 
-            if file_path in self.downloaded_files:
-                self.echo_warning(
-                    "Bad template! Multiple files have the same name. "
-                    "Please fix the template and try again."
-                )
-
-                raise DownloadTemplateError
-
-            download_file(
+            self.validate_and_download(
+                file_path,
+                download_file,
                 file_path,
                 sample_file["download_url"],
                 self.options.skip_existing,
             )
 
-            self.echo_debug("Adding file path: {}".format(file_path))
-            self.downloaded_files.add(file_path)
+    def validate_and_download(
+        self, download_to_path, download_func, *args, **kwargs
+    ):
+        """Check if this file was already downloaded, if yes - exit.
+
+        Args:
+            download_to_path(str): system file path to donwload to
+            download_func(function): function that will do the download logic
+            *args: arguments that will be passed to download function
+            **kwargs: keyword arguments that will be passed to download func
+
+        Returns:
+            None
+
+        Raises:
+            DownloadTemplateError: if the file was found in already downloaded
+             list
+        """
+        if download_to_path in self.downloaded_files:
+            self.echo_warning(
+                "Bad template! Multiple files have the same name. "
+                "Please fix the template and try again."
+            )
+
+            raise DownloadTemplateError
+
+        download_func(*args, **kwargs)
+
+        self.echo_debug("Adding file path: {}".format(download_to_path))
+        self.downloaded_files.add(download_to_path)
+
+    def download_sample_qc_metrics(self, file_with_prefix, sample_id):
+        """Download and save to file on user file system.
+
+        Args:
+            file_with_prefix(str): file path based on download template,
+                prefilled with sample data
+            sample_id(str of uuid): sample gencove id
+
+        Returns:
+            None
+        """
+        qc_metrics = self.get_sample_qc_metrics(sample_id)
+        file_path = build_qc_metrics_file_path(
+            file_with_prefix, self.download_to
+        )
+
+        self.validate_and_download(
+            file_path, save_qc_file, file_path, qc_metrics
+        )
 
     def _get_paginated_samples(self):
         """Generate for project samples that traverses all pages."""
@@ -187,3 +234,18 @@ class Download(Command):
                 yield sample
             next_page = req["meta"]["next"]
             get_samples = next_page is not None
+
+    def get_sample_qc_metrics(self, sample_id):
+        """Retrieve sample quality control metrics.
+
+        Args:
+            sample_id(str of uuid): sample gencove id
+
+        Returns:
+            list of qc metrics.
+        """
+        try:
+            return self.api_client.get_sample_qc_metrics(sample_id)["results"]
+        except client.APIClientError:
+            self.echo_warning("Error getting sample quality control metrics.")
+            raise

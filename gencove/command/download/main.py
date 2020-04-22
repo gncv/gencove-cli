@@ -145,7 +145,9 @@ class Download(Command):
                 sample["client_id"], sample["id"]
             )
         )
-        self.echo("file path with prefix is: {}".format(file_with_prefix))
+        self.echo_debug(
+            "file path with prefix is: {}".format(file_with_prefix)
+        )
         self.download_sample_qc_metrics(file_with_prefix, sample_id)
 
         for sample_file in sample["files"]:

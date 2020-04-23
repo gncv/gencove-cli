@@ -28,3 +28,6 @@ FilePrefix = namedtuple("FilePrefix", ["dirs", "filename", "file_extension"])
 FILENAME_RE = re.compile("filename=(.+)")
 
 FILE_TYPES_MAPPER = {"fastq-r1": "fastq-r1_R1", "fastq-r2": "fastq-r2_R2"}
+
+
+QC_FILE_TYPE = "qc"

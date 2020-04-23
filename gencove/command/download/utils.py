@@ -89,7 +89,9 @@ def _create_filepath(download_to, prefix_dirs, filename):
     return file_path
 
 
-def build_file_path(deliverable, file_with_prefix, download_to):
+def build_file_path(
+    deliverable, file_with_prefix, download_to, filename=None
+):
     """Create and return file system path where the file will be downloaded to.
 
     Args:
@@ -101,9 +103,11 @@ def build_file_path(deliverable, file_with_prefix, download_to):
          str : file path on current file system
     """
     prefix = _get_prefix_parts(file_with_prefix)
-    source_filename = get_filename_from_download_url(
-        deliverable["download_url"]
-    )
+    source_filename = (
+        filename
+        if filename
+        else get_filename_from_download_url(deliverable["download_url"])
+    )  # fmt: off
 
     if prefix.file_extension:
         destination_filename = "{}.{}".format(
@@ -114,41 +118,18 @@ def build_file_path(deliverable, file_with_prefix, download_to):
             prefix.filename, DownloadTemplateParts.file_extension
         )
 
+    # turning off formatting for improved code readability
+    # fmt: off
     destination_filename = destination_filename.format(
         **{
-            DownloadTemplateParts.file_type: FILE_TYPES_MAPPER.get(
-                deliverable["file_type"]
-            )
-            or deliverable["file_type"],  # pylint: disable=C0330
-            DownloadTemplateParts.file_extension: deliverable_type_from_filename(  # noqa: E501
-                source_filename
-            ),
+            DownloadTemplateParts.file_type: FILE_TYPES_MAPPER.get(deliverable["file_type"]) or deliverable["file_type"],  # noqa: E501  # pylint: disable=line-too-long
+            DownloadTemplateParts.file_extension: deliverable_type_from_filename(source_filename),  # noqa: E501  # pylint: disable=line-too-long
         }
     )
+    # fmt: on
+
     echo_debug(
         "Calculated destination filename: {}".format(destination_filename)
-    )
-    return _create_filepath(download_to, prefix.dirs, destination_filename)
-
-
-def build_qc_metrics_file_path(file_with_prefix, download_to):
-    """Create qc metrics file system path.
-
-    Args:
-        file_with_prefix(str): file path based on download template defined by
-            user
-        download_to(str): general location where to download the file to
-
-    Returns:
-        str : file path on current file system
-    """
-    prefix = _get_prefix_parts(file_with_prefix)
-    filled_filename = prefix.filename.format(
-        **{DownloadTemplateParts.file_type: "qc"}
-    )
-    destination_filename = "{}.json".format(filled_filename)
-    echo_debug(
-        "Calculated qc destination filename: {}".format(destination_filename)
     )
     return _create_filepath(download_to, prefix.dirs, destination_filename)
 

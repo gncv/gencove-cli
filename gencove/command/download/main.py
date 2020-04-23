@@ -9,10 +9,9 @@ from gencove import client  # noqa: I100
 from gencove.command.base import Command, ValidationError
 from gencove.command.download.exceptions import DownloadTemplateError
 
-from .constants import ALLOWED_STATUSES_RE
+from .constants import ALLOWED_STATUSES_RE, QC_FILE_TYPE
 from .utils import (
     build_file_path,
-    build_qc_metrics_file_path,
     download_file,
     fatal_process_sample_error,
     get_download_template_format_params,
@@ -148,7 +147,8 @@ class Download(Command):
         self.echo_debug(
             "file path with prefix is: {}".format(file_with_prefix)
         )
-        self.download_sample_qc_metrics(file_with_prefix, sample_id)
+        if file_types_re.match(QC_FILE_TYPE):
+            self.download_sample_qc_metrics(file_with_prefix, sample_id)
 
         for sample_file in sample["files"]:
             # pylint: disable=C0330
@@ -215,8 +215,11 @@ class Download(Command):
             None
         """
         qc_metrics = self.get_sample_qc_metrics(sample_id)
-        file_path = build_qc_metrics_file_path(
-            file_with_prefix, self.download_to
+        file_path = build_file_path(
+            dict(file_type=QC_FILE_TYPE),
+            file_with_prefix,
+            self.download_to,
+            "qc.json",
         )
 
         self.validate_and_download(

@@ -40,12 +40,10 @@ def test___get_filename_dirs_prefix():
     resp = _get_prefix_parts(template)
 
     assert resp.dirs == "{}/{}".format(client_id, gencove_id)
-    assert resp.filename == "{}_{{{}}}".format(
-        gencove_id, DownloadTemplateParts.file_type
+    assert resp.filename == "{{{}}}".format(
+        DownloadTemplateParts.default_filename
     )
-    assert resp.file_extension == "{{{}}}".format(
-        DownloadTemplateParts.file_extension
-    )
+    assert resp.file_extension == ""
 
     template2 = "{client_id}-{gencove_id}_{file_type}".format(
         **get_download_template_format_params(client_id, gencove_id)

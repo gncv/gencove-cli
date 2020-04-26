@@ -65,18 +65,26 @@ Optionals = namedtuple("Optionals", ["host"])
 
 _DownloadTemplateParts = namedtuple(
     "DownloadTemplateParts",
-    ["client_id", "gencove_id", "file_type", "file_extension"],
+    [
+        "client_id",
+        "gencove_id",
+        "file_type",
+        "file_extension",
+        "default_filename",
+    ],
 )
 # pylint: disable=C0103
 DownloadTemplateParts = _DownloadTemplateParts(
-    "client_id", "gencove_id", "file_type", "file_extension"
+    "client_id",
+    "gencove_id",
+    "file_type",
+    "file_extension",
+    "default_filename",
 )
-DOWNLOAD_TEMPLATE = "{{{}}}/{{{}}}/{{{}}}_{{{}}}.{{{}}}".format(
+DOWNLOAD_TEMPLATE = "{{{}}}/{{{}}}/{{{}}}".format(
     DownloadTemplateParts.client_id,
     DownloadTemplateParts.gencove_id,
-    DownloadTemplateParts.gencove_id,
-    DownloadTemplateParts.file_type,
-    DownloadTemplateParts.file_extension,
+    DownloadTemplateParts.default_filename,
 )
 
 MAX_RETRY_TIME_SECONDS = 300  # 5 minutes

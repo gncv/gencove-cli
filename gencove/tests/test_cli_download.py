@@ -76,8 +76,16 @@ def test_project_id_provided(mocker):
                 ],
             },
         )
+        mocked_qc_metrics = mocker.patch.object(
+            APIClient,
+            "get_sample_qc_metrics",
+            return_value={"results": [{"foo": 12}]},
+        )
         mocked_download_file = mocker.patch(
             "gencove.command.download.main.download_file"
+        )
+        mocked_save_qc_metrics = mocker.patch(
+            "gencove.command.download.main.save_qc_file"
         )
         res = runner.invoke(
             download,
@@ -94,7 +102,9 @@ def test_project_id_provided(mocker):
         assert res.exit_code == 0
         mocked_login.assert_called_once()
         mocked_project_samples.assert_called_once()
+        mocked_qc_metrics.assert_called_once()
         mocked_download_file.assert_called_once()
+        mocked_save_qc_metrics.assert_called_once()
         mocked_sample_details.assert_called_once()
 
 
@@ -120,8 +130,16 @@ def test_sample_ids_provided(mocker):
                 ],
             },
         )
+        mocked_qc_metrics = mocker.patch.object(
+            APIClient,
+            "get_sample_qc_metrics",
+            return_value={"results": [{"foo": 12}]},
+        )
         mocked_download_file = mocker.patch(
             "gencove.command.download.main.download_file"
+        )
+        mocked_save_qc_metrics = mocker.patch(
+            "gencove.command.download.main.save_qc_file"
         )
         res = runner.invoke(
             download,
@@ -139,6 +157,8 @@ def test_sample_ids_provided(mocker):
         mocked_login.assert_called_once()
         mocked_download_file.assert_called_once()
         mocked_sample_details.assert_called_once()
+        mocked_qc_metrics.assert_called_once()
+        mocked_save_qc_metrics.assert_called_once()
 
 
 def test_multiple_credentials_not_allowed():

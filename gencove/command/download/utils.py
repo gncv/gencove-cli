@@ -1,4 +1,5 @@
 """Download command utilities."""
+import json
 import os
 import re
 
@@ -20,14 +21,25 @@ from gencove.constants import (  # noqa: I100
 from gencove.logger import echo, echo_debug
 from gencove.utils import get_progress_bar
 
-from .constants import CHUNK_SIZE, FILENAME_RE, FILE_TYPES_MAPPER, FilePrefix
+from .constants import (
+    CHUNK_SIZE,
+    DEFAULT_FILENAME_TOKEN,
+    FILENAME_RE,
+    FILE_TYPES_MAPPER,
+    FilePrefix,
+)
 
 
 def _get_prefix_parts(full_prefix):
     """Extract directories prefix parts from."""
     prefix_parts = full_prefix.split("/")
     file_name, _, file_ext = prefix_parts[-1].partition(".")
-    return FilePrefix("/".join(prefix_parts[:-1]), file_name, file_ext)
+    return FilePrefix(
+        "/".join(prefix_parts[:-1]),
+        file_name,
+        file_ext,
+        DEFAULT_FILENAME_TOKEN in full_prefix,
+    )
 
 
 def get_filename_from_download_url(url):
@@ -88,7 +100,9 @@ def _create_filepath(download_to, prefix_dirs, filename):
     return file_path
 
 
-def build_file_path(deliverable, file_with_prefix, download_to):
+def build_file_path(
+    deliverable, file_with_prefix, download_to, filename=None
+):
     """Create and return file system path where the file will be downloaded to.
 
     Args:
@@ -100,11 +114,13 @@ def build_file_path(deliverable, file_with_prefix, download_to):
          str : file path on current file system
     """
     prefix = _get_prefix_parts(file_with_prefix)
-    source_filename = get_filename_from_download_url(
-        deliverable["download_url"]
-    )
+    # fmt: off
+    source_filename = filename if filename else get_filename_from_download_url(deliverable["download_url"])  # noqa: E501  # pylint: disable=line-too-long
+    # fmt: on
 
-    if prefix.file_extension:
+    if prefix.use_default_filename:
+        destination_filename = prefix.filename
+    elif prefix.file_extension:
         destination_filename = "{}.{}".format(
             prefix.filename, prefix.file_extension
         )
@@ -113,17 +129,17 @@ def build_file_path(deliverable, file_with_prefix, download_to):
             prefix.filename, DownloadTemplateParts.file_extension
         )
 
+    # turning off formatting for improved code readability
+    # fmt: off
     destination_filename = destination_filename.format(
         **{
-            DownloadTemplateParts.file_type: FILE_TYPES_MAPPER.get(
-                deliverable["file_type"]
-            )
-            or deliverable["file_type"],  # pylint: disable=C0330
-            DownloadTemplateParts.file_extension: deliverable_type_from_filename(  # noqa: E501
-                source_filename
-            ),
+            DownloadTemplateParts.file_type: FILE_TYPES_MAPPER.get(deliverable["file_type"]) or deliverable["file_type"],  # noqa: E501  # pylint: disable=line-too-long
+            DownloadTemplateParts.file_extension: deliverable_type_from_filename(source_filename),  # noqa: E501  # pylint: disable=line-too-long
+            DownloadTemplateParts.default_filename: source_filename,
         }
     )
+    # fmt: on
+
     echo_debug(
         "Calculated destination filename: {}".format(destination_filename)
     )
@@ -221,6 +237,21 @@ def download_file(file_path, download_url, skip_existing=True):
         return file_path
 
 
+def save_qc_file(path, content):
+    """Helper function to save qc metrics to json file.
+
+    Args:
+        path(str): full file path where qc metrics will be saved
+        content(list of dict): list of qc metrics to be saved
+
+    Returns:
+        None
+    """
+    echo("Downloading file to: {}".format(path))
+    with open(path, "w") as qc_file:
+        json.dump(content, qc_file)
+
+
 def fatal_process_sample_error(err):
     """Give up retrying if the error code is different from 403.
 
@@ -251,5 +282,8 @@ def get_download_template_format_params(client_id, gencove_id):
         ),
         DownloadTemplateParts.file_extension: "{{{}}}".format(
             DownloadTemplateParts.file_extension
+        ),
+        DownloadTemplateParts.default_filename: "{{{}}}".format(
+            DownloadTemplateParts.default_filename
         ),
     }

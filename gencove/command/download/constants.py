@@ -2,7 +2,7 @@
 import re
 from collections import namedtuple
 
-from gencove.constants import Optionals
+from gencove.constants import DownloadTemplateParts, Optionals
 
 
 _SampleStatuses = namedtuple("SampleStatuses", ["succeeded", "failed"])
@@ -24,7 +24,18 @@ DownloadOptions = namedtuple(  # pylint: disable=invalid-name
     "DownloadOptions",
     Optionals._fields + ("skip_existing", "download_template"),
 )
-FilePrefix = namedtuple("FilePrefix", ["dirs", "filename", "file_extension"])
+DEFAULT_FILENAME_TOKEN = "{{{}}}".format(
+    DownloadTemplateParts.default_filename
+)
+FilePrefix = namedtuple(
+    "FilePrefix",
+    ["dirs", "filename", "file_extension", "use_default_filename"],
+)
 FILENAME_RE = re.compile("filename=(.+)")
 
-FILE_TYPES_MAPPER = {"fastq-r1": "fastq-r1_R1", "fastq-r2": "fastq-r2_R2"}
+# Leaving the line below since it is a great explaination of FILE_TYPES_MAPPER
+# usage:
+# FILE_TYPES_MAPPER = {"fastq-r1": "fastq-r1_R1", "fastq-r2": "fastq-r2_R2"}
+FILE_TYPES_MAPPER = {}
+
+QC_FILE_TYPE = "qc"

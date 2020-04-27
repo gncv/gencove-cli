@@ -33,7 +33,9 @@ FilePrefix = namedtuple(
 )
 FILENAME_RE = re.compile("filename=(.+)")
 
-FILE_TYPES_MAPPER = {"fastq-r1": "fastq-r1_R1", "fastq-r2": "fastq-r2_R2"}
-
+# Leaving the line below since it is a great explaination of FILE_TYPES_MAPPER
+# usage:
+# FILE_TYPES_MAPPER = {"fastq-r1": "fastq-r1_R1", "fastq-r2": "fastq-r2_R2"}
+FILE_TYPES_MAPPER = {}
 
 QC_FILE_TYPE = "qc"

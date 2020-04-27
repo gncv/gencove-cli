@@ -2,14 +2,18 @@
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
-from gencove.constants import Credentials, DOWNLOAD_TEMPLATE
+from gencove.constants import (
+    Credentials,
+    DOWNLOAD_TEMPLATE,
+    DownloadTemplateParts,
+)
 from gencove.logger import echo_debug
 
 from .constants import DownloadFilters, DownloadOptions
 from .main import Download
 
 
-@click.command()
+@click.command(context_settings=dict(max_content_width=150))
 @click.argument("destination")
 @click.option("--project-id", help="Gencove project ID")
 @click.option(
@@ -30,8 +34,16 @@ from .main import Download
     "--download-template",
     default=DOWNLOAD_TEMPLATE,
     help=(
-        "Change downloads structure. "
-        "Defaults to: {}".format(DOWNLOAD_TEMPLATE)
+        "Change downloads structure. Defaults to: {}."
+        "\nAvailable tokens: \n{}".format(
+            DOWNLOAD_TEMPLATE,
+            "\n".join(
+                [
+                    "{{{}}}".format(v)
+                    for v in DownloadTemplateParts._asdict().values()
+                ]
+            ),
+        )
     ),
 )
 @add_options(common_options)

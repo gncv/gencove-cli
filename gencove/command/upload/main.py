@@ -123,11 +123,13 @@ class Upload(Command):
         s3_client = get_s3_client_refreshable(
             self.api_client.get_upload_credentials
         )
-
-        if self.fastqs:
-            self.upload_from_source(s3_client)
-        elif self.fastqs_map:
-            self.upload_from_map_file(s3_client)
+        try:
+            if self.fastqs:
+                self.upload_from_source(s3_client)
+            elif self.fastqs_map:
+                self.upload_from_map_file(s3_client)
+        except UploadError:
+            return
 
         self.echo_debug("Upload ids are now: {}".format(self.upload_ids))
         if self.project_id:
@@ -205,7 +207,19 @@ class Upload(Command):
             )
         )
 
-        upload_details = self.get_upload_details(gncv_notated_path)
+        try:
+            upload_details = self.get_upload_details(gncv_notated_path)
+        except APIClientError as err:
+            if err.status_code == 400:
+                self.echo_warning(
+                    "Destination {} is taken by deleted upload. "
+                    "Please choose a different destination".format(
+                        gncv_notated_path
+                    )
+                )
+                raise UploadError
+            raise err
+
         if upload_details["last_status"]["status"] == UPLOAD_STATUSES.done:
             self.echo("File was already uploaded: {}".format(clean_file_path))
             return upload_details

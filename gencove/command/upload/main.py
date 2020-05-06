@@ -211,8 +211,8 @@ class Upload(Command):
             upload_details = self.get_upload_details(gncv_notated_path)
         except APIClientError as err:
             if err.status_code == 400:
-                self.echo_warning(
-                    "Destination {} is taken by deleted upload. "
+                self.echo(
+                    "ERROR: Destination {} is taken by deleted upload. "
                     "Please choose a different destination".format(
                         gncv_notated_path
                     )

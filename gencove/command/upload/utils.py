@@ -197,7 +197,7 @@ def _validate_header(header):
         if column not in header_columns:
             echo(
                 "Unexpected CSV header. Expected: {}".format(
-                    " ,".join(FastQ._fields)
+                    ", ".join(FastQ._fields)
                 )
             )
             raise ValidationError("Unexpected CSV header: {}".format(column))

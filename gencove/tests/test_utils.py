@@ -9,7 +9,11 @@ from gencove.command.download.utils import (
     _get_prefix_parts,
     get_download_template_format_params,
 )
-from gencove.command.upload.utils import parse_fastqs_map_file, upload_file
+from gencove.command.upload.utils import (
+    _validate_header,
+    parse_fastqs_map_file,
+    upload_file,
+)
 from gencove.constants import DOWNLOAD_TEMPLATE, DownloadTemplateParts
 
 
@@ -84,7 +88,7 @@ def test_parse_fastqs_map_file():
             writer = csv.writer(map_file)
             writer.writerows(
                 [
-                    ["client_id", "r1_notation", "path"],
+                    ["client_id", "r_notation", "path"],
                     ["barid", "r1", "test_dir/test.fastq.gz"],
                     ["barid", "r2", "test_dir/test_2.fastq.gz"],
                     ["barid", "r1", "test_dir/test_3.fastq.gz"],
@@ -118,7 +122,7 @@ def test_invalid_fastqs_map_file():
             writer = csv.writer(map_file)
             writer.writerows(
                 [
-                    ["client_id", "r1_notation", "path"],
+                    ["client_id", "r_notation", "path"],
                     ["barid", "r1", "test_dir/test.fastq.gz"],
                     ["barid", "r2", "test_dir/test_2.fastq.zip"],
                     ["barid", "r1", "test_dir/test_3.fastq.gz"],
@@ -148,7 +152,7 @@ def test_fastqs_map_file_path_does_not_exist():
             writer = csv.writer(map_file)
             writer.writerows(
                 [
-                    ["client_id", "r1_notation", "path"],
+                    ["client_id", "r_notation", "path"],
                     ["barid", "r1", "test_dir/test.fastq.gz"],
                     ["barid", "r1", "test_dir/test_3.fastq.gz"],
                     ["barid", "r1", "test_dir/i_dont_exist.fastq.gz"],
@@ -158,3 +162,35 @@ def test_fastqs_map_file_path_does_not_exist():
             parse_fastqs_map_file("test_map.csv")
         except ValidationError as err:
             assert "Could not find" in err.args[0]
+
+
+def test_fastqs_map_file_has_wrong_header():
+    """Test that header is validated properly."""
+    with open("test_map.csv", "w") as map_file:
+        writer = csv.writer(map_file)
+        writer.writerows(
+            [
+                ["client_id", "r1_notation", "path"],
+                ["barid", "r1", "test_dir/test.fastq.gz"],
+                ["barid", "r1", "test_dir/test_3.fastq.gz"],
+                ["barid", "r1", "test_dir/i_dont_exist.fastq.gz"],
+            ]
+        )
+    try:
+        parse_fastqs_map_file("test_map.csv")
+    except ValidationError as err:
+        assert "Unexpected CSV header" in err.args[0]
+
+
+def test__validate_header():
+    """Test that header is validated properly."""
+    header_row = dict(foo="foo", bar="bar")
+    try:
+        _validate_header(header_row)
+    except ValidationError:
+        pass
+
+    header_row = dict(
+        client_id="client_id", r_notation="r_notation", path="path"
+    )
+    assert _validate_header(header_row) is None

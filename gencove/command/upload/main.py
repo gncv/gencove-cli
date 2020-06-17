@@ -85,7 +85,8 @@ class Upload(Command):
             self.destination = self.destination.rstrip("/")
             self.destination += "/"
 
-        self.login()
+        if self.is_credentials_valid:
+            self.login()
 
     def validate(self):
         """Validate command setup before execution.

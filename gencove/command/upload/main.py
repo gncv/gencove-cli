@@ -64,9 +64,8 @@ class Upload(Command):
         self.echo_debug("Host is {}".format(self.options.host))
         self.echo_warning(TMP_UPLOADS_WARNING, err=True)
 
-        if os.path.isfile(self.source) and self.source.endswith(
-            FASTQ_MAP_EXTENSION  # pylint: disable=C0330
-        ):
+        # fmt: off
+        if os.path.isfile(self.source) and self.source.endswith(FASTQ_MAP_EXTENSION):  # noqa: E501
             self.echo_debug("Scanning fastqs map file")
             self.fastqs_map = parse_fastqs_map_file(self.source)
         else:
@@ -78,6 +77,7 @@ class Upload(Command):
             self.echo(
                 "Files will be uploaded to: {}".format(self.destination)
             )
+        # fmt: on
 
         # Make sure there is just one trailing slash. Only exception is
         # UPLOAD_PREFIX itself, which can have two trailing slashes.
@@ -93,9 +93,8 @@ class Upload(Command):
         Raises:
             ValidationError - if something is wrong with command parameters.
         """
-        if self.destination and not self.destination.startswith(
-            UPLOAD_PREFIX  # pylint: disable=C0330
-        ):
+        # fmt: off
+        if self.destination and not self.destination.startswith(UPLOAD_PREFIX):
             self.echo(
                 "Invalid destination path. Must start with '{}'".format(
                     UPLOAD_PREFIX
@@ -103,6 +102,7 @@ class Upload(Command):
                 err=True,
             )
             raise ValidationError("Bad configuration. Exiting.")
+        # fmt: on
 
         if not self.fastqs and not self.fastqs_map:
             self.echo(

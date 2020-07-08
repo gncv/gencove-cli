@@ -191,6 +191,18 @@ def _validate_fastq(fastq):
         raise ValidationError("Wrong R notation: {}".format(fastq.r_notation))
 
 
+def _validate_header(header):
+    header_columns = header.values()
+    for column in FastQ._fields:
+        if column not in header_columns:
+            echo(
+                "Unexpected CSV header. Expected: {}".format(
+                    ", ".join(FastQ._fields)
+                )
+            )
+            raise ValidationError("Unexpected CSV header: {}".format(column))
+
+
 def parse_fastqs_map_file(fastqs_map_path):
     """Parse fastq map file.
 
@@ -216,7 +228,8 @@ def parse_fastqs_map_file(fastqs_map_path):
     with open(fastqs_map_path) as fastqs_file:
         reader = csv.DictReader(fastqs_file, fieldnames=FastQ._fields)
         # read headers row
-        _ = next(reader)
+        header = next(reader)
+        _validate_header(header)
         for row in reader:
             fastq = FastQ(**row)
             _validate_fastq(fastq)

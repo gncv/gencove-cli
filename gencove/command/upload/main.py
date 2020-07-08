@@ -64,11 +64,11 @@ class Upload(Command):
         self.echo_debug("Host is {}".format(self.options.host))
         self.echo_warning(TMP_UPLOADS_WARNING, err=True)
 
-        if os.path.isfile(self.source) and self.source.endswith(
-            FASTQ_MAP_EXTENSION  # pylint: disable=C0330
-        ):
+        # fmt: off
+        if os.path.isfile(self.source) and self.source.endswith(FASTQ_MAP_EXTENSION):  # noqa: E501
             self.echo_debug("Scanning fastqs map file")
             self.fastqs_map = parse_fastqs_map_file(self.source)
+            self.echo_debug("got fastq pairs: {}".format(self.fastqs_map))
         else:
             self.echo_debug("Seeking files to upload")
             self.fastqs = list(seek_files_to_upload(self.source))
@@ -78,6 +78,7 @@ class Upload(Command):
             self.echo(
                 "Files will be uploaded to: {}".format(self.destination)
             )
+        # fmt: on
 
         # Make sure there is just one trailing slash. Only exception is
         # UPLOAD_PREFIX itself, which can have two trailing slashes.
@@ -85,7 +86,8 @@ class Upload(Command):
             self.destination = self.destination.rstrip("/")
             self.destination += "/"
 
-        self.login()
+        if self.is_credentials_valid:
+            self.login()
 
     def validate(self):
         """Validate command setup before execution.
@@ -93,9 +95,8 @@ class Upload(Command):
         Raises:
             ValidationError - if something is wrong with command parameters.
         """
-        if self.destination and not self.destination.startswith(
-            UPLOAD_PREFIX  # pylint: disable=C0330
-        ):
+        # fmt: off
+        if self.destination and not self.destination.startswith(UPLOAD_PREFIX):
             self.echo(
                 "Invalid destination path. Must start with '{}'".format(
                     UPLOAD_PREFIX
@@ -103,6 +104,7 @@ class Upload(Command):
                 err=True,
             )
             raise ValidationError("Bad configuration. Exiting.")
+        # fmt: on
 
         if not self.fastqs and not self.fastqs_map:
             self.echo(
@@ -123,11 +125,13 @@ class Upload(Command):
         s3_client = get_s3_client_refreshable(
             self.api_client.get_upload_credentials
         )
-
-        if self.fastqs:
-            self.upload_from_source(s3_client)
-        elif self.fastqs_map:
-            self.upload_from_map_file(s3_client)
+        try:
+            if self.fastqs:
+                self.upload_from_source(s3_client)
+            elif self.fastqs_map:
+                self.upload_from_map_file(s3_client)
+        except UploadError:
+            return
 
         self.echo_debug("Upload ids are now: {}".format(self.upload_ids))
         if self.project_id:
@@ -205,7 +209,14 @@ class Upload(Command):
             )
         )
 
-        upload_details = self.get_upload_details(gncv_notated_path)
+        try:
+            upload_details = self.get_upload_details(gncv_notated_path)
+        except APIClientError as err:
+            if err.status_code == 400:
+                self.echo(err.message)
+                raise UploadError
+            raise err
+
         if upload_details["last_status"]["status"] == UPLOAD_STATUSES.done:
             self.echo("File was already uploaded: {}".format(clean_file_path))
             return upload_details

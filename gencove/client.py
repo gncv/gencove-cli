@@ -177,7 +177,7 @@ class APIClient:
                 else:
                     error_msg = "\n".join(
                         [
-                            "{}: {}".format(key, value[0])
+                            "  {}: {}".format(key, value[0])
                             for key, value in iteritems(response_json)
                         ]
                     )

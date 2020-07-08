@@ -10,6 +10,8 @@ from builtins import str as text  # noqa
 import datetime  # noqa
 import json  # noqa
 
+from future.utils import iteritems
+
 try:
     # python 3
     from urllib.parse import urljoin, urlparse, parse_qs  # noqa
@@ -172,6 +174,14 @@ class APIClient:
                 response_json = response.json()
                 if "detail" in response_json:
                     http_error_msg += ": {}".format(response_json["detail"])
+                else:
+                    error_msg = "\n".join(
+                        [
+                            "{}: {}".format(key, value[0])
+                            for key, value in iteritems(response_json)
+                        ]
+                    )
+                    http_error_msg += ":\n{}".format(error_msg)
 
         elif 500 <= response.status_code < 600:
             http_error_msg = "Server Error: {}".format(response.reason)

@@ -1,5 +1,5 @@
 """Batches command exceptions"""
 
 
-class BatchesError(Exception):
+class BatchesListError(Exception):
     """Batches related error."""

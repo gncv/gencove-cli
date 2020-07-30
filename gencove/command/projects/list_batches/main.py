@@ -9,7 +9,7 @@ from gencove.client import APIClientError  # noqa: I100
 from gencove.command.base import Command, ValidationError
 from gencove.command.utils import is_valid_uuid
 
-from .exceptions import BatchesError
+from .exceptions import BatchesListError
 from .utils import get_line
 
 
@@ -65,7 +65,7 @@ class ListBatches(Command):
                 more = next_link is not None
             except APIClientError as err:
                 self.echo_debug(err)
-                raise BatchesError
+                raise BatchesListError
 
     @backoff.on_exception(
         backoff.expo,

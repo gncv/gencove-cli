@@ -14,8 +14,8 @@ from gencove.command.upload.utils import (
     parse_fastqs_map_file,
     upload_file,
 )
-from gencove.constants import DOWNLOAD_TEMPLATE, DownloadTemplateParts
 from gencove.command.utils import is_valid_uuid
+from gencove.constants import DOWNLOAD_TEMPLATE, DownloadTemplateParts
 
 
 def test_upload_file(mocker):

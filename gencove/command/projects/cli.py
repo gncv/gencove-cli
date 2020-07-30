@@ -4,6 +4,7 @@ import click
 
 from .list.cli import list_projects
 from .list_batch_types.cli import list_project_batch_types
+from .list_batches.cli import list_project_batches
 from .samples.cli import list_project_samples
 
 
@@ -15,3 +16,4 @@ def projects():
 projects.add_command(list_projects)
 projects.add_command(list_project_samples)
 projects.add_command(list_project_batch_types)
+projects.add_command(list_project_batches)

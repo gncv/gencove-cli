@@ -467,3 +467,13 @@ class APIClient:
         return self._get(
             project_endpoint, query_params=params, authorized=True
         )
+
+    def get_project_batches(self, project_id, next_link=None):
+        """List single project's batches."""
+        project_endpoint = self.endpoints.project_batches.format(
+            id=project_id
+        )
+        params = self._add_query_params(next_link,)
+        return self._get(
+            project_endpoint, query_params=params, authorized=True
+        )

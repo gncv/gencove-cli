@@ -15,6 +15,7 @@ from gencove.command.upload.utils import (
     upload_file,
 )
 from gencove.constants import DOWNLOAD_TEMPLATE, DownloadTemplateParts
+from gencove.command.utils import is_valid_uuid
 
 
 def test_upload_file(mocker):
@@ -194,3 +195,19 @@ def test__validate_header():
         client_id="client_id", r_notation="r_notation", path="path"
     )
     assert _validate_header(header_row) is None
+
+
+def test_is_valid_uuid__is_valid():
+    assert is_valid_uuid("11111111-1111-1111-1111-111111111111")
+
+
+def test_is_valid_uuid__is_not_valid__too_long():
+    assert is_valid_uuid("11111111-1111-1111-1111-11111111111122") is False
+
+
+def test_is_valid_uuid__is_not_valid__too_short():
+    assert is_valid_uuid("11111111-1111-1111-1111-1") is False
+
+
+def test_is_valid_uuid__is_not_valid__text():
+    assert is_valid_uuid("foo") is False

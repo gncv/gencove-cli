@@ -34,7 +34,7 @@ MOCKED_BATCH_TYPES = dict(
     meta=dict(count=2, next=None),
     results=[
         {"key": "hd777k", "description": "foo",},  # noqa
-        {"key": "illuminahd", "description": "bar",}, # noqa
+        {"key": "illuminahd", "description": "bar",},  # noqa
     ],
 )
 

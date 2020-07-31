@@ -33,8 +33,8 @@ def test_list_project_batch_types__empty(mocker):
 MOCKED_BATCH_TYPES = dict(
     meta=dict(count=2, next=None),
     results=[
-        {"key": "hd777k", "description": "foo",},
-        {"key": "illuminahd", "description": "bar",},
+        {"key": "hd777k", "description": "foo",},  # noqa
+        {"key": "illuminahd", "description": "bar",}, # noqa
     ],
 )
 

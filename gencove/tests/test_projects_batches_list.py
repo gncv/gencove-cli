@@ -43,7 +43,7 @@ MOCKED_BATCHES = dict(
                     "file_type": "report-zip",
                     "download_url": "https://foo.com/bar.zip",
                 }
-            ]
+            ],
         },
         {
             "id": str(uuid4()),
@@ -55,8 +55,8 @@ MOCKED_BATCHES = dict(
                     "file_type": "report-zip",
                     "download_url": "https://baz.com/bar.zip",
                 }
-            ]
-        }
+            ],
+        },
     ],
 )
 
@@ -80,22 +80,18 @@ def test_list_project_batches__not_empty(mocker):
     output_line = io.BytesIO()
     sys.stdout = output_line
     line_one = "\t".join(
-            [
-                MOCKED_BATCHES["results"][0]["id"],
-                MOCKED_BATCHES["results"][0]["batch_type"],
-                MOCKED_BATCHES["results"][0]["name"],
-            ]
-        )
-    line_two = "\t".join(
-            [
-                MOCKED_BATCHES["results"][1]["id"],
-                MOCKED_BATCHES["results"][1]["batch_type"],
-                MOCKED_BATCHES["results"][1]["name"],
-            ]
-        )
-    echo(
-        "\n".join(
-            [line_one, line_two]
-        )
+        [
+            MOCKED_BATCHES["results"][0]["id"],
+            MOCKED_BATCHES["results"][0]["batch_type"],
+            MOCKED_BATCHES["results"][0]["name"],
+        ]
     )
+    line_two = "\t".join(
+        [
+            MOCKED_BATCHES["results"][1]["id"],
+            MOCKED_BATCHES["results"][1]["batch_type"],
+            MOCKED_BATCHES["results"][1]["name"],
+        ]
+    )
+    echo("\n".join([line_one, line_two]))
     assert output_line.getvalue() == res.output.encode()

@@ -33,14 +33,8 @@ def test_list_project_batch_types__empty(mocker):
 MOCKED_BATCH_TYPES = dict(
     meta=dict(count=2, next=None),
     results=[
-        {
-            "key": "hd777k",
-            "description": "foo",
-        },
-        {
-            "key": "illuminahd",
-            "description": "bar",
-        }
+        {"key": "hd777k", "description": "foo",},
+        {"key": "illuminahd", "description": "bar",},
     ],
 )
 
@@ -64,20 +58,16 @@ def test_list_project_batch_types__not_empty(mocker):
     output_line = io.BytesIO()
     sys.stdout = output_line
     line_one = "\t".join(
-            [
-                MOCKED_BATCH_TYPES["results"][0]["key"],
-                MOCKED_BATCH_TYPES["results"][0]["description"],
-            ]
-        )
-    line_two = "\t".join(
-            [
-                MOCKED_BATCH_TYPES["results"][1]["key"],
-                MOCKED_BATCH_TYPES["results"][1]["description"],
-            ]
-        )
-    echo(
-        "\n".join(
-            [line_one, line_two]
-        )
+        [
+            MOCKED_BATCH_TYPES["results"][0]["key"],
+            MOCKED_BATCH_TYPES["results"][0]["description"],
+        ]
     )
+    line_two = "\t".join(
+        [
+            MOCKED_BATCH_TYPES["results"][1]["key"],
+            MOCKED_BATCH_TYPES["results"][1]["description"],
+        ]
+    )
+    echo("\n".join([line_one, line_two]))
     assert output_line.getvalue() == res.output.encode()

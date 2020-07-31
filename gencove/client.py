@@ -477,3 +477,22 @@ class APIClient:
         return self._get(
             project_endpoint, query_params=params, authorized=True
         )
+
+    def create_project_batch(self, project_id, batch_type, batch_name, sample_ids):
+        """Making a post request to create project batch.
+        """
+        project_endpoint = self.endpoints.project_batches.format(
+            id=project_id
+        )
+
+        payload = {
+            "name": batch_name,
+            "batch_type": batch_type,
+            "sample_ids": sample_ids,
+        }
+
+        return self._post(
+            project_endpoint,
+            payload,
+            authorized=True,
+        )

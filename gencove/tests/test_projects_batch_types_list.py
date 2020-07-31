@@ -2,7 +2,7 @@
 
 import io
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from uuid import uuid4
 
 from click import echo

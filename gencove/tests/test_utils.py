@@ -14,6 +14,7 @@ from gencove.command.upload.utils import (
     parse_fastqs_map_file,
     upload_file,
 )
+from gencove.command.utils import is_valid_uuid
 from gencove.constants import DOWNLOAD_TEMPLATE, DownloadTemplateParts
 
 
@@ -194,3 +195,23 @@ def test__validate_header():
         client_id="client_id", r_notation="r_notation", path="path"
     )
     assert _validate_header(header_row) is None
+
+
+def test_is_valid_uuid__is_valid():
+    """"Test that a UUID is a valid UUID"""
+    assert is_valid_uuid("11111111-1111-1111-1111-111111111111")
+
+
+def test_is_valid_uuid__is_not_valid__too_long():
+    """"Test that UUID with extra chars is not a valid UUID"""
+    assert is_valid_uuid("11111111-1111-1111-1111-11111111111122") is False
+
+
+def test_is_valid_uuid__is_not_valid__too_short():
+    """"Test that UUID with missing chars is not a valid UUID"""
+    assert is_valid_uuid("11111111-1111-1111-1111-1") is False
+
+
+def test_is_valid_uuid__is_not_valid__text():
+    """"Test that random word is not a valid UUID"""
+    assert is_valid_uuid("foo") is False

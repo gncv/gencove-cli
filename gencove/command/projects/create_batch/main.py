@@ -5,6 +5,7 @@ import requests
 
 from gencove import client  # noqa: I100
 from gencove.command.base import Command, ValidationError
+from gencove.command.projects.list_batches.utils import get_line
 from gencove.command.utils import is_valid_uuid
 
 from .exceptions import BatchCreateError
@@ -13,6 +14,7 @@ from .exceptions import BatchCreateError
 class CreateBatch(Command):
     """Create project's batch executor."""
 
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         project_id,
@@ -63,6 +65,12 @@ class CreateBatch(Command):
                 self.echo_warning(error_message, err=True)
                 raise ValidationError(error_message)
 
+    @backoff.on_exception(
+        backoff.expo,
+        (requests.exceptions.ConnectionError, requests.exceptions.Timeout),
+        max_tries=5,
+        max_time=30,
+    )
     def execute(self):
         """Make a request to create a batch for given project.
         """
@@ -79,10 +87,16 @@ class CreateBatch(Command):
                 batch_name=self.batch_name,
                 sample_ids=self.sample_ids,
             )
+            self.echo_debug(created_batches_details)
+            for batch in created_batches_details["results"]:
+                self.echo(get_line(batch))
         except client.APIClientError as err:
-            # TODO catching errors is not working as expected!
-            # parsing of error fails
             if err.status_code == 400:
+                self.echo_debug(err)
+                self.echo_warning(
+                    "There was an error creating project batches."
+                )
+                self.echo("The following error was returned:")
                 self.echo(err.message)
+            else:
                 raise BatchCreateError
-            raise err

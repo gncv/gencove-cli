@@ -24,7 +24,7 @@ from .main import CreateBatch
     "which to create a batch; if not specified use all samples in project",
 )
 @add_options(common_options)
-def create_project_batch(
+def create_project_batch(  # pylint: disable=too-many-arguments
     project_id,
     batch_type,
     batch_name,

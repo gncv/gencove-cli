@@ -12,6 +12,8 @@ from gencove.command.projects.cli import create_project_batch
 
 
 def test_create_project_batches__missing_batch_type(mocker):
+    """Test batch creation failure when batch type is not sent.
+    """
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_project_batch = mocker.patch.object(
@@ -36,6 +38,8 @@ def test_create_project_batches__missing_batch_type(mocker):
 
 
 def test_create_project_batches__missing_batch_name(mocker):
+    """Test batch creation failure when batch name is not sent.
+    """
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_project_batch = mocker.patch.object(
@@ -60,6 +64,8 @@ def test_create_project_batches__missing_batch_name(mocker):
 
 
 def test_create_project_batches__bad_project_id(mocker):
+    """Test batch creation failure when non-uuid string is used as project id.
+    """
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_project_batch = mocker.patch.object(
@@ -86,13 +92,14 @@ def test_create_project_batches__bad_project_id(mocker):
 
 
 def test_create_project_batches__not_owned_project(mocker):
-    """Test project batch types being outputed to the shell."""
-    MOCKED_RESPONSE = {"detail": "Not found."}
+    """Test batch creation failure when project is not owned.
+    """
+    mocked_response = {"detail": "Not found."}
 
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_project_batch = mocker.patch.object(
-        APIClient, "create_project_batch", return_value=MOCKED_RESPONSE
+        APIClient, "create_project_batch", return_value=mocked_response
     )
 
     mocked_create_project_batch = mocker.patch.object(
@@ -122,8 +129,10 @@ def test_create_project_batches__not_owned_project(mocker):
 
 
 def test_create_project_batches__duplicate_client_ids(mocker):
-    """Test project batch types being outputed to the shell."""
-    MOCKED_RESPONSE = {
+    """Test batch creation failure when there are samples that share same
+    client id.
+    """
+    mocked_response = {
         "sample_ids": ["All samples must have unique client_id attribute."],
         "duplicate_client_ids": {
             "cow1": [
@@ -136,7 +145,7 @@ def test_create_project_batches__duplicate_client_ids(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_project_batch = mocker.patch.object(
-        APIClient, "create_project_batch", return_value=MOCKED_RESPONSE
+        APIClient, "create_project_batch", return_value=mocked_response
     )
 
     mocked_create_project_batch = mocker.patch.object(
@@ -166,7 +175,9 @@ def test_create_project_batches__duplicate_client_ids(mocker):
 
 
 def test_create_project_batches__success__with_sample_ids(mocker):
-    MOCKED_RESPONSE = {
+    """Test batch creation success when when sample ids are explicitly sent.
+    """
+    mocked_response = {
         "meta": {"count": 1},
         "results": [
             {"id": str(uuid4()), "name": "foo bar", "batch_type": "hd777k"}
@@ -176,7 +187,7 @@ def test_create_project_batches__success__with_sample_ids(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_project_batch = mocker.patch.object(
-        APIClient, "create_project_batch", return_value=MOCKED_RESPONSE
+        APIClient, "create_project_batch", return_value=mocked_response
     )
 
     res = runner.invoke(
@@ -204,9 +215,9 @@ def test_create_project_batches__success__with_sample_ids(mocker):
     echo(
         "\t".join(
             [
-                MOCKED_RESPONSE["results"][0]["id"],
-                MOCKED_RESPONSE["results"][0]["batch_type"],
-                MOCKED_RESPONSE["results"][0]["name"],
+                mocked_response["results"][0]["id"],
+                mocked_response["results"][0]["batch_type"],
+                mocked_response["results"][0]["name"],
             ]
         )
     )
@@ -214,7 +225,10 @@ def test_create_project_batches__success__with_sample_ids(mocker):
 
 
 def test_create_project_batches__success__without_sample_ids(mocker):
-    MOCKED_RESPONSE = {
+    """Test batch creation success when when sample ids are not explicitly
+    sent.
+    """
+    mocked_response = {
         "meta": {"count": 1},
         "results": [
             {"id": str(uuid4()), "name": "foo bar", "batch_type": "hd777k"}
@@ -224,7 +238,7 @@ def test_create_project_batches__success__without_sample_ids(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_project_batch = mocker.patch.object(
-        APIClient, "create_project_batch", return_value=MOCKED_RESPONSE
+        APIClient, "create_project_batch", return_value=mocked_response
     )
 
     res = runner.invoke(
@@ -250,9 +264,9 @@ def test_create_project_batches__success__without_sample_ids(mocker):
     echo(
         "\t".join(
             [
-                MOCKED_RESPONSE["results"][0]["id"],
-                MOCKED_RESPONSE["results"][0]["batch_type"],
-                MOCKED_RESPONSE["results"][0]["name"],
+                mocked_response["results"][0]["id"],
+                mocked_response["results"][0]["batch_type"],
+                mocked_response["results"][0]["name"],
             ]
         )
     )

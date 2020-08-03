@@ -68,16 +68,24 @@ def test_get_batch__not_empty(mocker):
                 files=[
                     dict(
                         id="file-id-1",
-                        s3_path="output/simple_vcf2finalreport/job-id-1/simple_vcf2finalreport/report.zip",
+                        s3_path=(
+                            "output/simple_vcf2finalreport/job-id-1/"
+                            "simple_vcf2finalreport/report.zip"
+                        ),
                         size=None,
-                        download_url="https://bucket.s3.amazonaws.com/output/simple_vcf2finalreport/job-id-1/simple_vcf2finalreport/report.zip",
+                        download_url=(
+                            "https://bucket.s3.amazonaws.com/output/"
+                            "simple_vcf2finalreport/job-id-1/"
+                            "simple_vcf2finalreport/report.zip"
+                        ),
                         file_type="report-zip",
                     )
                 ],
             ),
         )
         mocked_download_file = mocker.patch(
-            "gencove.command.projects.get_batch.main.download.utils.download_file"
+            "gencove.command.projects.get_batch.main.download.utils."
+            "download_file"
         )
         res = runner.invoke(
             get_batch,

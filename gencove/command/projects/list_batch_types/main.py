@@ -5,7 +5,7 @@ import backoff
 import requests
 
 # pylint: disable=wrong-import-order
-from gencove.client import APIClientError  # noqa: I100
+from gencove import client  # noqa: I100
 from gencove.command.base import Command, ValidationError
 from gencove.command.utils import is_valid_uuid
 
@@ -40,13 +40,32 @@ class ListBatchTypes(Command):
     def execute(self):
         self.echo_debug("Retrieving project's batch types:")
 
-        for batch_types in self.get_paginated_batch_types():
-            if not batch_types:
-                self.echo_debug("No matching batch types were found.")
-                return
+        try:
+            for batch_types in self.get_paginated_batch_types():
+                if not batch_types:
+                    self.echo_debug("No matching batch types were found.")
+                    return
 
-            for batch_type in batch_types:
-                self.echo(get_line(batch_type))
+                for batch_type in batch_types:
+                    self.echo(get_line(batch_type))
+
+        except client.APIClientError as err:
+            self.echo_debug(err)
+            if err.status_code == 400:
+                self.echo_warning(
+                    "There was an error listing project batch types."
+                )
+                self.echo("The following error was returned:")
+                self.echo(err.message)
+            elif err.status_code == 404:
+                self.echo_warning(
+                    "Project {} does not exist or you do not have "
+                    "permission required to access it.".format(
+                        self.project_id
+                    )
+                )
+            else:
+                raise BatchTypesError
 
     def get_paginated_batch_types(self):
         """Paginate over all batch types for the destination.
@@ -58,14 +77,10 @@ class ListBatchTypes(Command):
         next_link = None
         while more:
             self.echo_debug("Get batch types page")
-            try:
-                resp = self.get_batch_types(next_link)
-                yield resp["results"]
-                next_link = resp["meta"]["next"]
-                more = next_link is not None
-            except APIClientError as err:
-                self.echo_debug(err)
-                raise BatchTypesError
+            resp = self.get_batch_types(next_link)
+            yield resp["results"]
+            next_link = resp["meta"]["next"]
+            more = next_link is not None
 
     @backoff.on_exception(
         backoff.expo,

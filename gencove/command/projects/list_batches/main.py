@@ -1,4 +1,4 @@
-"""List project's batch types subcommand."""
+"""List project's batches subcommand."""
 
 import backoff
 

@@ -91,5 +91,5 @@ class ListBatchTypes(Command):
     def get_batch_types(self, next_link=None):
         """Get batch types page."""
         return self.api_client.get_project_batch_types(
-            project_id=self.project_id, next_link=next_link,
+            project_id=self.project_id, next_link=next_link
         )

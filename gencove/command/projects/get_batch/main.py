@@ -54,9 +54,8 @@ class GetBatch(Command):
                 sys.exit(1)
             if len(batch["files"]) > 1:
                 self.echo_warning(
-                    "There is more than one deliverable available for batch {}.".format(
-                        self.batch_id
-                    )
+                    "There is more than one deliverable available for "
+                    "batch {}.".format(self.batch_id)
                 )
             deliverable = batch["files"][0]
             download_path = (

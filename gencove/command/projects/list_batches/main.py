@@ -90,5 +90,5 @@ class ListBatches(Command):
     def get_batches(self, next_link=None):
         """Get batches page."""
         return self.api_client.get_project_batches(
-            project_id=self.project_id, next_link=next_link,
+            project_id=self.project_id, next_link=next_link
         )

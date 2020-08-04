@@ -1,4 +1,6 @@
 """Common utils used in multiple commands."""
+import uuid
+
 from gencove.command.base import ValidationError
 from gencove.logger import echo_warning
 
@@ -36,3 +38,18 @@ def validate_input(key, provided_value, allowed_values_re, allowed_values):
         raise ValidationError(
             "Unknown {} value: {}.".format(key, provided_value)
         )
+
+
+def is_valid_uuid(candidate):
+    """Test if provided string is a valid uuid version 4 string.
+
+    candidate (str): uuid to check
+
+    Returns:
+        bool: True if is a valid uuid v4, False if not
+    """
+    try:
+        uuid.UUID(candidate, version=4)
+        return True
+    except ValueError:
+        return False

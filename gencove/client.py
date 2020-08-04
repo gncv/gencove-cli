@@ -177,7 +177,14 @@ class APIClient:
                 else:
                     error_msg = "\n".join(
                         [
-                            "  {}: {}".format(key, value[0])
+                            # create-batch can return error details that is
+                            # a dict, not a list
+                            "  {}: {}".format(
+                                key,
+                                value[0]
+                                if isinstance(value, list)
+                                else str(value),
+                            )
                             for key, value in iteritems(response_json)
                         ]
                     )
@@ -457,3 +464,45 @@ class APIClient:
             authorized=True,
         )
         return resp
+
+    def get_project_batch_types(self, project_id, next_link=None):
+        """List single project's available batch types."""
+        project_endpoint = self.endpoints.project_batch_types.format(
+            id=project_id
+        )
+        params = self._add_query_params(next_link)
+        return self._get(
+            project_endpoint, query_params=params, authorized=True
+        )
+
+    def get_project_batches(self, project_id, next_link=None):
+        """List single project's batches."""
+        project_endpoint = self.endpoints.project_batches.format(
+            id=project_id
+        )
+        params = self._add_query_params(next_link)
+        return self._get(
+            project_endpoint, query_params=params, authorized=True
+        )
+
+    def create_project_batch(
+        self, project_id, batch_type, batch_name, sample_ids
+    ):
+        """Making a post request to create project batch.
+        """
+        project_endpoint = self.endpoints.project_batches.format(
+            id=project_id
+        )
+
+        payload = {
+            "name": batch_name,
+            "batch_type": batch_type,
+            "sample_ids": sample_ids,
+        }
+
+        return self._post(project_endpoint, payload, authorized=True)
+
+    def get_batch(self, batch_id):
+        """Get single batch."""
+        batches_endpoint = self.endpoints.batches.format(id=batch_id)
+        return self._get(batches_endpoint, authorized=True)

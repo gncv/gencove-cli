@@ -19,6 +19,7 @@ _APIEndpoint = namedtuple(
         "pipeline_capabilities",
         "project_batch_types",
         "project_batches",
+        "batches",
     ],
 )
 API_ENDPOINTS = _APIEndpoint(
@@ -35,6 +36,7 @@ API_ENDPOINTS = _APIEndpoint(
     "/api/v2/pipeline-capabilities/{id}",
     "/api/v2/project-batch-types/{id}",
     "/api/v2/project-batches/{id}",
+    "/api/v2/batches/{id}",
 )
 
 _SampleAssignmentStatus = namedtuple(

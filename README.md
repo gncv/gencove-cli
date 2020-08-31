@@ -17,6 +17,18 @@ Install local requirements:
 pip install -r requirements.txt
 ```
 
+Use with local api service (need to have [back_api2](http://gitlab.com/gencove/v2/back_api2/) running)
+
+```
+gencove <command> --host http://localhost:8200
+```
+
+or use with development version of deployed API service
+
+```
+gencove <command> --host https://api-dev.gencove-dev.com
+```
+
 Before pushing run:
 
 ```bash

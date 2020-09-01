@@ -67,7 +67,10 @@ def upload_file(s3_client, file_name, bucket, object_name=None):  # noqa: D413
 
 
 def upload_multi_file(
-    s3_client, file_obj, bucket, object_name=None  # pylint: disable=C0330
+    s3_client,
+    file_obj,
+    bucket,
+    object_name=None,  # pylint: disable=E0012,C0330
 ):  # noqa: D413
     """Upload a file to an S3 bucket.
 

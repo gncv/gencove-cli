@@ -17,7 +17,9 @@ class ListBatchTypes(Command):
     """List batch types command executor."""
 
     def __init__(self, project_id, credentials, options):
-        super(ListBatchTypes, self).__init__(credentials, options)
+        super(ListBatchTypes, self).__init__(  # pylint: disable=R1725
+            credentials, options
+        )
 
         self.project_id = project_id
 
@@ -65,7 +67,7 @@ class ListBatchTypes(Command):
                     )
                 )
             else:
-                raise BatchTypesError
+                raise BatchTypesError  # pylint: disable=W0707
 
     def get_paginated_batch_types(self):
         """Paginate over all batch types for the destination.

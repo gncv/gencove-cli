@@ -24,7 +24,9 @@ class CreateBatch(Command):
         credentials,
         options,
     ):
-        super(CreateBatch, self).__init__(credentials, options)
+        super(CreateBatch, self).__init__(  # pylint: disable=R1725
+            credentials, options
+        )
         self.project_id = project_id
         self.batch_type = batch_type
         self.batch_name = batch_name
@@ -105,4 +107,4 @@ class CreateBatch(Command):
                     )
                 )
             else:
-                raise BatchCreateError
+                raise BatchCreateError  # pylint: disable=W0707

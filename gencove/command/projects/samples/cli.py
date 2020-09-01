@@ -18,7 +18,7 @@ from .main import ListSamples
     default=SAMPLE_STATUS.all,
 )
 @add_options(common_options)
-def list_project_samples(  # pylint: disable=C0330,R0913
+def list_project_samples(  # pylint: disable=E0012,C0330,R0913
     project_id, search, status, host, email, password, api_key
 ):
     """List samples in a project."""

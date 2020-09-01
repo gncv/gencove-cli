@@ -1,5 +1,5 @@
 """Commands to be executed from command line."""
-# pylint: disable=C0330,R0913
+# pylint: disable=E0012,C0330,R0913
 import click
 
 from .create_batch.cli import create_project_batch

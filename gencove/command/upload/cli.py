@@ -17,7 +17,7 @@ from .main import Upload
     default=None,
     help="Immediately assign all uploaded files to this project and run them",
 )
-def upload(  # pylint: disable=C0330,R0913
+def upload(  # pylint: disable=E0012,C0330,R0913
     source, destination, host, email, password, api_key, run_project_id
 ):  # noqa: D301
     """Upload FASTQ files to Gencove's system.

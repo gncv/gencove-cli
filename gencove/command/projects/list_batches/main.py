@@ -17,7 +17,9 @@ class ListBatches(Command):
     """List batches command executor."""
 
     def __init__(self, project_id, credentials, options):
-        super(ListBatches, self).__init__(credentials, options)
+        super(ListBatches, self).__init__(  # pylint: disable=R1725
+            credentials, options
+        )
 
         self.project_id = project_id
 
@@ -64,7 +66,7 @@ class ListBatches(Command):
                     )
                 )
             else:
-                raise BatchesListError
+                raise BatchesListError  # pylint: disable=W0707
 
     def get_paginated_batches(self):
         """Paginate over all batches for the destination.

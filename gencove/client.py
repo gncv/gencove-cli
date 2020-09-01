@@ -54,7 +54,7 @@ class APIError(Exception):
     """Base API Error."""
 
     def __init__(self, message, status_code=None):
-        super(APIError, self).__init__(message)
+        super(APIError, self).__init__(message)  # pylint: disable=R1725
         self.message = message
         self.status_code = status_code
 
@@ -104,7 +104,7 @@ class APIClient:
     def _serialize_post_payload(payload):
         return json.dumps(payload, cls=DateTimeEncoder)
 
-    # pylint: disable=too-many-arguments,bad-continuation
+    # pylint: disable=bad-option-value,bad-continuation,too-many-arguments
     def _request(
         self,
         endpoint="",
@@ -146,9 +146,11 @@ class APIClient:
             # If request timed out,
             # let upper level handle it the way it sees fit.
             # one place might want to retry another might not.
-            raise APIClientTimeout("Could not connect to the api server")
+            raise APIClientTimeout(  # pylint: disable=W0707
+                "Could not connect to the api server"
+            )
         except ReadTimeout:
-            raise APIClientTimeout(
+            raise APIClientTimeout(  # pylint: disable=W0707
                 "API server did not respond in timely manner"
             )
 

@@ -42,7 +42,9 @@ class Upload(Command):
     """Upload command executor."""
 
     def __init__(self, source, destination, credentials, options):
-        super(Upload, self).__init__(credentials, options)
+        super(Upload, self).__init__(  # pylint: disable=R1725
+            credentials, options
+        )
         self.source = source
         self.destination = destination
         self.project_id = options.project_id
@@ -214,7 +216,7 @@ class Upload(Command):
         except APIClientError as err:
             if err.status_code == 400:
                 self.echo(err.message)
-                raise UploadError
+                raise UploadError  # pylint: disable=W0707
             raise err
 
         if upload_details["last_status"]["status"] == UPLOAD_STATUSES.done:
@@ -379,7 +381,7 @@ class Upload(Command):
                 more = next_link is not None
             except APIClientError as err:
                 self.echo_debug(err)
-                raise UploadError
+                raise UploadError  # pylint: disable=W0707
 
     @backoff.on_exception(
         backoff.expo,

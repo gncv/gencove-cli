@@ -54,7 +54,7 @@ class List(Command):
                 more = next_link is not None
             except APIClientError as err:
                 self.echo_debug(err)
-                raise ProjectsError
+                raise ProjectsError  # pylint: disable=W0707
 
     @backoff.on_exception(
         backoff.expo,

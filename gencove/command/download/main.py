@@ -23,7 +23,9 @@ class Download(Command):
     """Download command executor."""
 
     def __init__(self, download_to, filters, credentials, options):
-        super(Download, self).__init__(credentials, options)
+        super(Download, self).__init__(  # pylint: disable=R1725
+            credentials, options
+        )
         self.download_to = download_to
         self.filters = filters
         self.options = options
@@ -151,7 +153,7 @@ class Download(Command):
             self.download_sample_qc_metrics(file_with_prefix, sample_id)
 
         for sample_file in sample["files"]:
-            # pylint: disable=C0330
+            # pylint: disable=E0012,C0330
             if self.filters.file_types and not file_types_re.match(
                 sample_file["file_type"]
             ):

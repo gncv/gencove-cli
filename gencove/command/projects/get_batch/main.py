@@ -19,7 +19,9 @@ class GetBatch(Command):
     """Get batch command executor."""
 
     def __init__(self, batch_id, output_filename, credentials, options):
-        super(GetBatch, self).__init__(credentials, options)
+        super(GetBatch, self).__init__(  # pylint: disable=R1725
+            credentials, options
+        )
 
         self.batch_id = batch_id
         self.output_filename = output_filename
@@ -81,7 +83,7 @@ class GetBatch(Command):
                     "permission required to access it.".format(self.batch_id)
                 )
             else:
-                raise BatchGetError
+                raise BatchGetError  # pylint: disable=W0707
 
     @backoff.on_exception(
         backoff.expo,

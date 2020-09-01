@@ -488,8 +488,7 @@ class APIClient:
     def create_project_batch(
         self, project_id, batch_type, batch_name, sample_ids
     ):
-        """Making a post request to create project batch.
-        """
+        """Making a post request to create project batch."""
         project_endpoint = self.endpoints.project_batches.format(
             id=project_id
         )

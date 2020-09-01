@@ -72,8 +72,7 @@ class CreateBatch(Command):
         max_time=30,
     )
     def execute(self):
-        """Make a request to create a batch for given project.
-        """
+        """Make a request to create a batch for given project."""
         self.echo_debug(
             "Creating batch for project {} and batch key {}".format(
                 self.project_id, self.batch_name

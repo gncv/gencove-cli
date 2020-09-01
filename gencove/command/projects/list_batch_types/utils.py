@@ -10,4 +10,9 @@ def get_line(batch_type):
     Returns:
         str: tab delimited list of relevant data to be printed
     """
-    return "\t".join([batch_type["key"], batch_type["description"],])  # noqa
+    return "\t".join(
+        [
+            batch_type["key"],
+            batch_type["description"],
+        ]
+    )  # noqa

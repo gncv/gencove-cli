@@ -19,8 +19,7 @@ from .main import GetBatch
 @add_options(common_options)
 # pylint: disable=too-many-arguments
 def get_batch(batch_id, output_filename, host, email, password, api_key):
-    """Get batch that is available for a project.
-    """
+    """Get batch that is available for a project."""
     GetBatch(
         batch_id,
         output_filename,

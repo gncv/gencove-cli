@@ -8,6 +8,9 @@ Main documentation can be found here: [http://docs.gencove.com](http://docs.genc
 
 ## Local Development
 
+Have some form of virtualization, for instance pyenv for 3.7.x and a virtualenv.
+
+Install in editing mode:
 ```bash
 pip install -e .
 ```
@@ -15,6 +18,11 @@ pip install -e .
 Install local requirements:
 ```bash
 pip install -r requirements.txt
+```
+
+Install pre-commit hook:
+```bash
+pre-commit install
 ```
 
 Use with local api service (need to have [back_api2](http://gitlab.com/gencove/v2/back_api2/) running)
@@ -30,6 +38,12 @@ gencove <command> --host https://api-dev.gencove-dev.com
 ```
 
 Before pushing run:
+
+```bash
+pre-commit run
+```
+
+and then:
 
 ```bash
 tox

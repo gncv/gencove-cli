@@ -64,7 +64,9 @@ def test_create_project_batches__missing_batch_name(mocker):
 
 
 def test_create_project_batches__bad_project_id(mocker):
-    """Test batch creation failure when non-uuid string is used as project id."""
+    """Test batch creation failure when non-uuid string is used as project
+    id.
+    """
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_project_batch = mocker.patch.object(

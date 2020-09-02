@@ -11,8 +11,7 @@ from .main import ListBatchTypes
 @click.argument("project_id")
 @add_options(common_options)
 def list_project_batch_types(project_id, host, email, password, api_key):
-    """List batch types that are available for a project.
-    """
+    """List batch types that are available for a project."""
     ListBatchTypes(
         project_id, Credentials(email, password, api_key), Optionals(host)
     ).run()

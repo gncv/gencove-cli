@@ -35,7 +35,6 @@ setup(
         "Click>=7.0",
         "requests>=2.19.1",
         "boto3>=1.9.188",
-        "future==0.18.2",
         "progressbar2==3.50.1",
         "backoff==1.10.0",
     ],

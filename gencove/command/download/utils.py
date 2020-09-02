@@ -2,13 +2,7 @@
 import json
 import os
 import re
-
-try:
-    # python 3.7
-    from urllib.parse import urlparse, parse_qs  # noqa
-except ImportError:
-    # python 2.7
-    from urlparse import urlparse, parse_qs  # noqa
+from urllib.parse import parse_qs, urlparse
 
 import backoff
 
@@ -204,7 +198,7 @@ def download_file(file_path, download_url, skip_existing=True):
     with requests.get(download_url, **stream_params) as req:
         req.raise_for_status()
         total = int(req.headers["content-length"])
-        # pylint: disable=C0330
+        # pylint: disable=E0012,C0330
         if (
             skip_existing
             and os.path.isfile(file_path)

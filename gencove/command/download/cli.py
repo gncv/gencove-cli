@@ -47,7 +47,7 @@ from .main import Download
     ),
 )
 @add_options(common_options)
-def download(  # pylint: disable=C0330,R0913
+def download(  # pylint: disable=E0012,C0330,R0913
     destination,
     project_id,
     sample_ids,

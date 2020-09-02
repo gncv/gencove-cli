@@ -3,21 +3,11 @@
 Exclude imports from linters due to install aliases breaking the rules.
 """
 
-# noqa Python 2 and 3 compatibility
-# pylint: disable=wrong-import-order,wrong-import-position
+import datetime
+import json
 import time
 from builtins import str as text  # noqa
-import datetime  # noqa
-import json  # noqa
-
-from future.utils import iteritems
-
-try:
-    # python 3
-    from urllib.parse import urljoin, urlparse, parse_qs  # noqa
-except ImportError:  # noqa
-    # python 2.7
-    from urlparse import urljoin, urlparse, parse_qs  # noqa
+from urllib.parse import parse_qs, urljoin, urlparse
 
 from requests import (  # pylint: disable=W0622
     ConnectTimeout,
@@ -54,7 +44,7 @@ class APIError(Exception):
     """Base API Error."""
 
     def __init__(self, message, status_code=None):
-        super(APIError, self).__init__(message)
+        super().__init__(message)
         self.message = message
         self.status_code = status_code
 
@@ -104,7 +94,7 @@ class APIClient:
     def _serialize_post_payload(payload):
         return json.dumps(payload, cls=DateTimeEncoder)
 
-    # pylint: disable=too-many-arguments,bad-continuation
+    # pylint: disable=bad-option-value,bad-continuation,too-many-arguments
     def _request(
         self,
         endpoint="",
@@ -146,9 +136,11 @@ class APIClient:
             # If request timed out,
             # let upper level handle it the way it sees fit.
             # one place might want to retry another might not.
-            raise APIClientTimeout("Could not connect to the api server")
+            raise APIClientTimeout(  # pylint: disable=W0707
+                "Could not connect to the api server"
+            )
         except ReadTimeout:
-            raise APIClientTimeout(
+            raise APIClientTimeout(  # pylint: disable=W0707
                 "API server did not respond in timely manner"
             )
 
@@ -185,7 +177,7 @@ class APIClient:
                                 if isinstance(value, list)
                                 else str(value),
                             )
-                            for key, value in iteritems(response_json)
+                            for key, value in response_json.items()
                         ]
                     )
                     http_error_msg += ":\n{}".format(error_msg)
@@ -488,8 +480,7 @@ class APIClient:
     def create_project_batch(
         self, project_id, batch_type, batch_name, sample_ids
     ):
-        """Making a post request to create project batch.
-        """
+        """Making a post request to create project batch."""
         project_endpoint = self.endpoints.project_batches.format(
             id=project_id
         )

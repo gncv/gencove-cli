@@ -12,12 +12,12 @@ from gencove.command.projects.cli import create_project_batch
 
 
 def test_create_project_batches__missing_batch_type(mocker):
-    """Test batch creation failure when batch type is not sent.
-    """
+    """Test batch creation failure when batch type is not sent."""
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_project_batch = mocker.patch.object(
-        APIClient, "create_project_batch",
+        APIClient,
+        "create_project_batch",
     )
     res = runner.invoke(
         create_project_batch,
@@ -38,12 +38,12 @@ def test_create_project_batches__missing_batch_type(mocker):
 
 
 def test_create_project_batches__missing_batch_name(mocker):
-    """Test batch creation failure when batch name is not sent.
-    """
+    """Test batch creation failure when batch name is not sent."""
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_project_batch = mocker.patch.object(
-        APIClient, "create_project_batch",
+        APIClient,
+        "create_project_batch",
     )
     res = runner.invoke(
         create_project_batch,
@@ -64,12 +64,14 @@ def test_create_project_batches__missing_batch_name(mocker):
 
 
 def test_create_project_batches__bad_project_id(mocker):
-    """Test batch creation failure when non-uuid string is used as project id.
+    """Test batch creation failure when non-uuid string is used as project
+    id.
     """
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_project_batch = mocker.patch.object(
-        APIClient, "create_project_batch",
+        APIClient,
+        "create_project_batch",
     )
     res = runner.invoke(
         create_project_batch,
@@ -92,8 +94,7 @@ def test_create_project_batches__bad_project_id(mocker):
 
 
 def test_create_project_batches__not_owned_project(mocker):
-    """Test batch creation failure when project is not owned.
-    """
+    """Test batch creation failure when project is not owned."""
     mocked_response = {"detail": "Not found."}
 
     runner = CliRunner()
@@ -175,8 +176,7 @@ def test_create_project_batches__duplicate_client_ids(mocker):
 
 
 def test_create_project_batches__success__with_sample_ids(mocker):
-    """Test batch creation success when when sample ids are explicitly sent.
-    """
+    """Test batch creation success when when sample ids are explicitly sent."""
     mocked_response = {
         "meta": {"count": 1},
         "results": [

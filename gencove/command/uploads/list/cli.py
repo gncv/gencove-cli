@@ -17,7 +17,7 @@ from .main import ListSampleSheet
     default=SAMPLE_ASSIGNMENT_STATUS.all,
 )
 @add_options(common_options)
-def list_uploads(  # pylint: disable=C0330,R0913
+def list_uploads(  # pylint: disable=E0012,C0330,R0913
     search, status, host, email, password, api_key
 ):
     """List user uploads."""

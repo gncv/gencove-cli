@@ -36,11 +36,11 @@ MOCKED_BATCH_TYPES = dict(
         {
             "key": "hd777k",
             "description": "foo",
-        },  # noqa
+        },
         {
             "key": "illuminahd",
             "description": "bar",
-        },  # noqa
+        },
     ],
 )
 

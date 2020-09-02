@@ -15,4 +15,4 @@ def get_line(batch_type):
             batch_type["key"],
             batch_type["description"],
         ]
-    )  # noqa
+    )

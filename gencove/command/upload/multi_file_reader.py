@@ -88,7 +88,7 @@ class MultiFileReader(object):
             if not self._file and self._file_idx == len(self._files):
                 break
 
-            # pylint: disable=bad-option-value,C0330
+            # pylint: disable=E0012,C0330
             if (
                 not self._file
                 or self._read_files_offset[self._file.name]

@@ -3,8 +3,6 @@
 Exclude imports from linters due to install aliases breaking the rules.
 """
 
-# noqa Python 2 and 3 compatibility
-# pylint: disable=wrong-import-order,wrong-import-position
 import datetime
 import json
 import time

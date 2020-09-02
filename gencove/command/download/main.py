@@ -23,9 +23,7 @@ class Download(Command):
     """Download command executor."""
 
     def __init__(self, download_to, filters, credentials, options):
-        super(Download, self).__init__(  # pylint: disable=R1725
-            credentials, options
-        )
+        super().__init__(credentials, options)
         self.download_to = download_to
         self.filters = filters
         self.options = options

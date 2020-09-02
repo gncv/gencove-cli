@@ -17,10 +17,7 @@ class ListBatchTypes(Command):
     """List batch types command executor."""
 
     def __init__(self, project_id, credentials, options):
-        super(ListBatchTypes, self).__init__(  # pylint: disable=R1725
-            credentials, options
-        )
-
+        super().__init__(credentials, options)
         self.project_id = project_id
 
     def initialize(self):

@@ -42,9 +42,7 @@ class Upload(Command):
     """Upload command executor."""
 
     def __init__(self, source, destination, credentials, options):
-        super(Upload, self).__init__(  # pylint: disable=R1725
-            credentials, options
-        )
+        super().__init__(credentials, options)
         self.source = source
         self.destination = destination
         self.project_id = options.project_id

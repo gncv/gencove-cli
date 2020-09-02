@@ -2,13 +2,7 @@
 import json
 import os
 import re
-
-try:
-    # python 3.7
-    from urllib.parse import urlparse, parse_qs  # noqa
-except ImportError:
-    # python 2.7
-    from urlparse import urlparse, parse_qs  # noqa
+from urllib.parse import parse_qs, urlparse
 
 import backoff
 

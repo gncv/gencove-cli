@@ -18,9 +18,7 @@ class ListSamples(Command):
     """List samples command executor."""
 
     def __init__(self, project_id, credentials, options):
-        super(ListSamples, self).__init__(  # pylint: disable=R1725
-            credentials, options
-        )
+        super().__init__(credentials, options)
         self.project_id = project_id
         self.sample_status = options.status
         self.search_term = options.search

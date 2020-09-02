@@ -18,9 +18,7 @@ class ListSampleSheet(Command):
     """List sample sheet command executor."""
 
     def __init__(self, credentials, options):
-        super(ListSampleSheet, self).__init__(  # pylint: disable=R1725
-            credentials, options
-        )
+        super().__init__(credentials, options)
         self.status = options.status
         self.gncv_path = options.search
 

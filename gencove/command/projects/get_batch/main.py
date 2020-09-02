@@ -19,10 +19,7 @@ class GetBatch(Command):
     """Get batch command executor."""
 
     def __init__(self, batch_id, output_filename, credentials, options):
-        super(GetBatch, self).__init__(  # pylint: disable=R1725
-            credentials, options
-        )
-
+        super().__init__(credentials, options)
         self.batch_id = batch_id
         self.output_filename = output_filename
 

@@ -17,10 +17,7 @@ class ListBatches(Command):
     """List batches command executor."""
 
     def __init__(self, project_id, credentials, options):
-        super(ListBatches, self).__init__(  # pylint: disable=R1725
-            credentials, options
-        )
-
+        super().__init__(credentials, options)
         self.project_id = project_id
 
     def initialize(self):

@@ -20,7 +20,7 @@ Install local requirements:
 pip install -r requirements.txt
 ```
 
-Install pre-commit hook:
+Install pre-commit hooks:
 ```bash
 pre-commit install
 ```

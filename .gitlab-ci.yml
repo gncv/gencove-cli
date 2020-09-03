@@ -1,4 +1,4 @@
-image: ruby:2.5
+image: python:3.7
 
 stages:
   - test
@@ -18,42 +18,36 @@ before_script:
   - pip install awscli
 
 python37:
-  image: python:3.7
   stage: test
   script: tox -e py37
   except:
     - tags
 
 black:
-  image: python:3.7
   stage: test
   script: tox -e black_checker
   except:
     - tags
 
 flake8:
-  image: python:3.7
   stage: test
   script: tox -e flake8
   except:
     - tags
 
 pylint:
-  image: python:3.7
   stage: test
   script: tox -e pylint
   except:
     - tags
 
 bandit:
-  image: python:3.7
   stage: test
   script: tox -e bandit
   except:
     - tags
 
 staging:
-  image: python:3.7
   stage: deploy
   script:
     # # Install twine for uploading to pypi
@@ -70,21 +64,6 @@ staging:
     # - twine upload dist/*
   only:
     - master
-
-temp:
-  image: python:3.7
-  stage: test
-  script:
-    # # Install twine for uploading to pypi
-    # - pip install twine
-    # test git version
-    - git --version
-    # try to build
-    - python setup.py sdist
-    - python setup.py bdist_wheel --universal
-    # - twine upload dist/*
-  except:
-    - tags
 
 production:
   stage: deploy

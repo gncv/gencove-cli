@@ -53,6 +53,7 @@ bandit:
     - tags
 
 staging:
+  image: python:3.7
   stage: deploy
   script:
     # # Install twine for uploading to pypi
@@ -69,7 +70,22 @@ staging:
     # - twine upload dist/*
   only:
     - master
-  
+
+temp:
+  image: python:3.7
+  stage: test
+  script:
+    # # Install twine for uploading to pypi
+    # - pip install twine
+    # test git version
+    - git --version
+    # try to build
+    - python setup.py sdist
+    - python setup.py bdist_wheel --universal
+    # - twine upload dist/*
+  except:
+    - tags
+
 production:
   stage: deploy
   script:

@@ -20,7 +20,7 @@ Indices and tables
 .. automodule:: gencove.cli
    :members:
 
-Supported Python versions are 3.7 and above.
+Supported Python versions are 3.6 and above.
 
 Quickstart
 ==========

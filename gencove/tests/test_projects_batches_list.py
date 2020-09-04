@@ -44,6 +44,11 @@ MOCKED_BATCHES = dict(
                     "download_url": "https://foo.com/bar.zip",
                 }
             ],
+            "last_status": {
+                "created": "2020-07-27T12:46:22.719862Z",
+                "id": str(uuid4()),
+                "status": "succeeded",
+            },
         },
         {
             "id": str(uuid4()),
@@ -56,6 +61,11 @@ MOCKED_BATCHES = dict(
                     "download_url": "https://baz.com/bar.zip",
                 }
             ],
+            "last_status": {
+                "created": "2020-07-28T12:46:22.719862Z",
+                "id": str(uuid4()),
+                "status": "running",
+            },
         },
     ],
 )
@@ -82,6 +92,8 @@ def test_list_project_batches__not_empty(mocker):
     line_one = "\t".join(
         [
             MOCKED_BATCHES["results"][0]["id"],
+            MOCKED_BATCHES["results"][0]["last_status"]["created"],
+            MOCKED_BATCHES["results"][0]["last_status"]["status"],
             MOCKED_BATCHES["results"][0]["batch_type"],
             MOCKED_BATCHES["results"][0]["name"],
         ]
@@ -89,6 +101,8 @@ def test_list_project_batches__not_empty(mocker):
     line_two = "\t".join(
         [
             MOCKED_BATCHES["results"][1]["id"],
+            MOCKED_BATCHES["results"][1]["last_status"]["created"],
+            MOCKED_BATCHES["results"][1]["last_status"]["status"],
             MOCKED_BATCHES["results"][1]["batch_type"],
             MOCKED_BATCHES["results"][1]["name"],
         ]

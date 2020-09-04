@@ -180,7 +180,16 @@ def test_create_project_batches__success__with_sample_ids(mocker):
     mocked_response = {
         "meta": {"count": 1},
         "results": [
-            {"id": str(uuid4()), "name": "foo bar", "batch_type": "hd777k"}
+            {
+                "id": str(uuid4()),
+                "name": "foo bar",
+                "batch_type": "hd777k",
+                "last_status": {
+                    "created": "2020-07-28T12:46:22.719862Z",
+                    "id": str(uuid4()),
+                    "status": "running",
+                },
+            }
         ],
     }
 
@@ -216,6 +225,8 @@ def test_create_project_batches__success__with_sample_ids(mocker):
         "\t".join(
             [
                 mocked_response["results"][0]["id"],
+                mocked_response["results"][0]["last_status"]["created"],
+                mocked_response["results"][0]["last_status"]["status"],
                 mocked_response["results"][0]["batch_type"],
                 mocked_response["results"][0]["name"],
             ]
@@ -231,7 +242,16 @@ def test_create_project_batches__success__without_sample_ids(mocker):
     mocked_response = {
         "meta": {"count": 1},
         "results": [
-            {"id": str(uuid4()), "name": "foo bar", "batch_type": "hd777k"}
+            {
+                "id": str(uuid4()),
+                "name": "foo bar",
+                "batch_type": "hd777k",
+                "last_status": {
+                    "created": "2020-07-28T12:46:22.719862Z",
+                    "id": str(uuid4()),
+                    "status": "running",
+                },
+            }
         ],
     }
 
@@ -265,6 +285,8 @@ def test_create_project_batches__success__without_sample_ids(mocker):
         "\t".join(
             [
                 mocked_response["results"][0]["id"],
+                mocked_response["results"][0]["last_status"]["created"],
+                mocked_response["results"][0]["last_status"]["status"],
                 mocked_response["results"][0]["batch_type"],
                 mocked_response["results"][0]["name"],
             ]

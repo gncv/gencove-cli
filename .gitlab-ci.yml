@@ -1,4 +1,4 @@
-image: ruby:2.5
+image: python:3.7
 
 stages:
   - test
@@ -18,35 +18,30 @@ before_script:
   - pip install awscli
 
 python37:
-  image: python:3.7
   stage: test
   script: tox -e py37
   except:
     - tags
 
 black:
-  image: python:3.7
   stage: test
   script: tox -e black_checker
   except:
     - tags
 
 flake8:
-  image: python:3.7
   stage: test
   script: tox -e flake8
   except:
     - tags
 
 pylint:
-  image: python:3.7
   stage: test
   script: tox -e pylint
   except:
     - tags
 
 bandit:
-  image: python:3.7
   stage: test
   script: tox -e bandit
   except:
@@ -69,7 +64,7 @@ staging:
     # - twine upload dist/*
   only:
     - master
-  
+
 production:
   stage: deploy
   script:

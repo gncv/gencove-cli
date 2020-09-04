@@ -21,6 +21,7 @@ setup(
     author="Tomaz Berisa",
     license="Apache 2.0",
     version=version(),
+    python_requires=">=3.6",
     packages=find_packages(exclude=["tests"]),
     install_requires=[
         # For the python-dateutil requirement, see:

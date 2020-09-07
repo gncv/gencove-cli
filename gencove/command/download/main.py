@@ -219,7 +219,7 @@ class Download(Command):
             dict(file_type=QC_FILE_TYPE),
             file_with_prefix,
             self.download_to,
-            "qc.json",
+            "{}.qc.json".format(sample_id),
         )
 
         self.validate_and_download(

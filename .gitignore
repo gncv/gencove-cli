@@ -33,3 +33,4 @@ venv*
 /.tox
 .idea
 .vscode
+.coverage

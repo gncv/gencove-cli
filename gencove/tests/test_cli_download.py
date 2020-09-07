@@ -161,6 +161,56 @@ def test_sample_ids_provided(mocker):
         mocked_save_qc_metrics.assert_called_once()
 
 
+def test_sample_ids_provided_no_qc_file(mocker):
+    """Check flow with sample ids and no file present."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        mocked_login = mocker.patch.object(
+            APIClient, "login", return_value=None
+        )
+        mocked_sample_details = mocker.patch.object(
+            APIClient,
+            "get_sample_details",
+            return_value={
+                "id": 0,
+                "client_id": 1,
+                "last_status": {"status": "succeeded"},
+                "files": [],
+            },
+        )
+        mocked_qc_metrics = mocker.patch.object(
+            APIClient,
+            "get_sample_qc_metrics",
+            return_value={"results": [{"foo": 12}]},
+        )
+        mocked_save_qc_metrics = mocker.patch(
+            "gencove.command.download.main.save_qc_file"
+        )
+        mocked_validate_and_download = mocker.patch(
+            "gencove.command.download.main.Download.validate_and_download"
+        )
+        res = runner.invoke(
+            download,
+            [
+                "cli_test_data",
+                "--sample-ids",
+                "0",
+                "--email",
+                "foo@bar.com",
+                "--password",
+                "123",
+            ],
+        )
+        assert res.exit_code == 0
+        file_path = "cli_test_data/1/0/0.qc.json"
+        mocked_validate_and_download.assert_called_with(
+            file_path, mocked_save_qc_metrics, file_path, [{"foo": 12}]
+        )
+        mocked_login.assert_called_once()
+        mocked_sample_details.assert_called_once()
+        mocked_qc_metrics.assert_called_once()
+
+
 def test_multiple_credentials_not_allowed():
     """Test that in providing multiple credentials is not allowed."""
     runner = CliRunner()

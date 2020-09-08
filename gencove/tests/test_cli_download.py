@@ -202,7 +202,7 @@ def test_sample_ids_provided_no_qc_file(mocker):
             ],
         )
         assert res.exit_code == 0
-        file_path = "cli_test_data/1/0/0.qc.json"
+        file_path = "cli_test_data/1/0/0_qc.json"
         mocked_validate_and_download.assert_called_with(
             file_path, mocked_save_qc_metrics, file_path, [{"foo": 12}]
         )

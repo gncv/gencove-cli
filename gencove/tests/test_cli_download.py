@@ -24,7 +24,7 @@ def test_no_required_options():
                 "12345",
             ],
         )
-        assert res.exit_code == 0
+        assert res.exit_code == 1
 
 
 def test_both_project_id_and_sample_ids_provided():
@@ -46,7 +46,7 @@ def test_both_project_id_and_sample_ids_provided():
                 "12345",
             ],
         )
-    assert res.exit_code == 0
+    assert res.exit_code == 1
 
 
 def test_project_id_provided(mocker):
@@ -228,5 +228,5 @@ def test_multiple_credentials_not_allowed():
             "foobar",
         ],
     )
-    assert res.exit_code == 0
+    assert res.exit_code == 1
     assert "Please provide either username/password or API key." in res.output

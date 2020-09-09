@@ -31,7 +31,7 @@ def test_create_project_batches__missing_batch_type(mocker):
             "foo bar",
         ],
     )
-    assert res.exit_code == 0
+    assert res.exit_code == 1
     mocked_login.assert_called_once()
     mocked_create_project_batch.assert_not_called()
     assert "You must provide value for --batch-type" in res.output
@@ -57,7 +57,7 @@ def test_create_project_batches__missing_batch_name(mocker):
             "hd777k",
         ],
     )
-    assert res.exit_code == 0
+    assert res.exit_code == 1
     mocked_login.assert_called_once()
     mocked_create_project_batch.assert_not_called()
     assert "You must provide value for --batch-name" in res.output
@@ -87,7 +87,7 @@ def test_create_project_batches__bad_project_id(mocker):
             "foo bar",
         ],
     )
-    assert res.exit_code == 0
+    assert res.exit_code == 1
     mocked_login.assert_called_once()
     mocked_create_project_batch.assert_not_called()
     assert "Project ID is not valid" in res.output

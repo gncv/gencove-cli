@@ -12,7 +12,7 @@ import click
 import progressbar
 
 from gencove.client import APIClientError  # noqa: I100
-from gencove.logger import echo, echo_debug, echo_warning
+from gencove.logger import echo, echo_debug, echo_warning, echo_error
 
 KB = 1024
 MB = KB * 1024
@@ -134,7 +134,7 @@ def login(api_client, credentials):
         return True
     except APIClientError as err:
         echo_debug("Failed to login: {}".format(err))
-        echo_warning(
+        echo_error(
             "Failed to login. Please verify your credentials and try again"
         )
         return False

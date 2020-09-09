@@ -5,7 +5,14 @@ All commands must implement this interface.
 import click
 from gencove.client import APIClient, APIClientError
 from gencove.exceptions import ValidationError
-from gencove.logger import DEBUG, LOG_LEVEL, echo, echo_debug, echo_warning
+from gencove.logger import (
+    DEBUG,
+    LOG_LEVEL,
+    echo,
+    echo_debug,
+    echo_warning,
+    echo_error,
+)
 from gencove.utils import login, validate_credentials
 
 
@@ -73,6 +80,11 @@ class Command(object):  # pylint: disable=R0205
     def echo_warning(msg, **kwargs):
         """Output warning message."""
         echo_warning(msg, **kwargs)
+
+    @staticmethod
+    def echo_error(msg, **kwargs):
+        """Output error message."""
+        echo_error(msg, **kwargs)
 
     @staticmethod
     def echo_debug(msg, **kwargs):

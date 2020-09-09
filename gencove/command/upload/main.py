@@ -9,7 +9,8 @@ import backoff
 import requests
 
 from gencove.client import APIClientError  # noqa: I100
-from gencove.command.base import Command, ValidationError
+from gencove.command.base import Command
+from gencove.exceptions import ValidationError
 from gencove.constants import FASTQ_MAP_EXTENSION, SAMPLE_ASSIGNMENT_STATUS
 from gencove.utils import (
     batchify,

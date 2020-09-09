@@ -4,7 +4,8 @@ import backoff
 import requests
 
 from gencove import client  # noqa: I100
-from gencove.command.base import Command, ValidationError
+from gencove.command.base import Command
+from gencove.exceptions import ValidationError
 from gencove.command.projects.list_batches.utils import get_line
 from gencove.command.utils import is_valid_uuid
 

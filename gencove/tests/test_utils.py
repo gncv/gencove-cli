@@ -4,7 +4,7 @@ import os
 
 from click.testing import CliRunner
 
-from gencove.command.base import ValidationError
+from gencove.exceptions import ValidationError
 from gencove.command.download.utils import (
     _get_prefix_parts,
     get_download_template_format_params,

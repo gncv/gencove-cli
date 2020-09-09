@@ -44,7 +44,7 @@ if LOG_LEVEL == DEBUG:
 def output_warning(text):
     """Click echo warning."""
     return click.style(
-        "WARNING: {}".format(text), bg="red", fg="white", bold=True
+        "WARNING: {}".format(text), bg="yellow", fg="black", bold=True
     )
 
 

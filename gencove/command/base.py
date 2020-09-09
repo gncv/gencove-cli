@@ -3,6 +3,7 @@
 All commands must implement this interface.
 """
 import click
+
 from gencove.client import APIClient, APIClientError
 from gencove.exceptions import ValidationError
 from gencove.logger import (
@@ -10,8 +11,8 @@ from gencove.logger import (
     LOG_LEVEL,
     echo,
     echo_debug,
-    echo_warning,
     echo_error,
+    echo_warning,
 )
 from gencove.utils import login, validate_credentials
 

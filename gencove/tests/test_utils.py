@@ -4,7 +4,6 @@ import os
 
 from click.testing import CliRunner
 
-from gencove.exceptions import ValidationError
 from gencove.command.download.utils import (
     _get_prefix_parts,
     get_download_template_format_params,
@@ -16,6 +15,7 @@ from gencove.command.upload.utils import (
 )
 from gencove.command.utils import is_valid_uuid
 from gencove.constants import DOWNLOAD_TEMPLATE, DownloadTemplateParts
+from gencove.exceptions import ValidationError
 
 
 def test_upload_file(mocker):

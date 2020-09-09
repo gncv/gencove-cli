@@ -12,7 +12,7 @@ import click
 import progressbar
 
 from gencove.client import APIClientError  # noqa: I100
-from gencove.logger import echo, echo_debug, echo_warning, echo_error
+from gencove.logger import echo, echo_debug, echo_error, echo_warning
 
 KB = 1024
 MB = KB * 1024

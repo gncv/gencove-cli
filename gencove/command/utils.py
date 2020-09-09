@@ -1,7 +1,7 @@
 """Common utils used in multiple commands."""
 import uuid
 
-from gencove.command.base import ValidationError
+from gencove.exceptions import ValidationError
 from gencove.logger import echo_warning
 
 

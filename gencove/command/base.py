@@ -2,8 +2,18 @@
 
 All commands must implement this interface.
 """
+import click
+
 from gencove.client import APIClient, APIClientError
-from gencove.logger import DEBUG, LOG_LEVEL, echo, echo_debug, echo_warning
+from gencove.exceptions import ValidationError
+from gencove.logger import (
+    DEBUG,
+    LOG_LEVEL,
+    echo,
+    echo_debug,
+    echo_error,
+    echo_warning,
+)
 from gencove.utils import login, validate_credentials
 
 
@@ -48,10 +58,12 @@ class Command(object):  # pylint: disable=R0205
             self.execute()
         except ValidationError as err:
             self.echo_debug(repr(err))
+            raise click.Abort()
         except APIClientError as err:
             echo(err.message, err=True)
             if LOG_LEVEL == DEBUG:
                 raise err
+            raise click.Abort()
 
     def login(self):
         """Login current user."""
@@ -71,14 +83,11 @@ class Command(object):  # pylint: disable=R0205
         echo_warning(msg, **kwargs)
 
     @staticmethod
+    def echo_error(msg, **kwargs):
+        """Output error message."""
+        echo_error(msg, **kwargs)
+
+    @staticmethod
     def echo_debug(msg, **kwargs):
         """Output debug message."""
         echo_debug(msg, **kwargs)
-
-
-class CriticalFailure(Exception):
-    """CLI critical error - indicating command exit."""
-
-
-class ValidationError(Exception):
-    """CLI validation error - indicating command input is not valid."""

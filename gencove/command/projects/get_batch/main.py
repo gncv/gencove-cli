@@ -8,8 +8,9 @@ import requests
 
 # pylint: disable=wrong-import-order
 from gencove import client  # noqa: I100
-from gencove.command.base import Command, ValidationError
+from gencove.command.base import Command
 from gencove.command.utils import is_valid_uuid
+from gencove.exceptions import ValidationError
 
 from .exceptions import BatchGetError
 from ... import download

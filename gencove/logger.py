@@ -44,7 +44,14 @@ if LOG_LEVEL == DEBUG:
 def output_warning(text):
     """Click echo warning."""
     return click.style(
-        "WARNING: {}".format(text), bg="red", fg="white", bold=True
+        "WARNING: {}".format(text), bg="yellow", fg="black", bold=True
+    )
+
+
+def output_error(text):
+    """Click echo error."""
+    return click.style(
+        "ERROR: {}".format(text), bg="red", fg="white", bold=True
     )
 
 
@@ -68,3 +75,11 @@ def echo_warning(msg, **kwargs):
         _echo_with_datetime(output_warning(msg), **kwargs)
     else:
         _echo(output_warning(msg), **kwargs)
+
+
+def echo_error(msg, **kwargs):
+    """Output click echo msg with background."""
+    if LOG_LEVEL == DEBUG:
+        _echo_with_datetime(output_error(msg), err=True, **kwargs)
+    else:
+        _echo(output_error(msg), err=True, **kwargs)

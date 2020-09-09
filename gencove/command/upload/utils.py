@@ -8,7 +8,7 @@ from boto3.s3.transfer import TransferConfig
 
 from botocore.exceptions import ClientError
 
-from gencove.command.base import ValidationError
+from gencove.exceptions import ValidationError
 from gencove.logger import echo, echo_debug
 from gencove.utils import CHUNK_SIZE, get_progress_bar
 

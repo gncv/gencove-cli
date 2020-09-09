@@ -65,7 +65,7 @@ def test_upload_no_files_found(mocker):
         # for debugging, if needed
         print("output is", res.output)
 
-        assert res.exit_code == 0
+        assert res.exit_code == 1
         assert "No FASTQ files found in the path" in res.output
         mocked_login.assert_called_once()
 
@@ -89,7 +89,7 @@ def test_upload_invalid_destination(mocker):
         # for debugging, if needed
         print("output is", res.output)
 
-        assert res.exit_code == 0
+        assert res.exit_code == 1
         assert (
             "Invalid destination path. Must start with '{}'".format(
                 UPLOAD_PREFIX

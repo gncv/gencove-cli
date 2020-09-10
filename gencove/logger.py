@@ -44,15 +44,13 @@ if LOG_LEVEL == DEBUG:
 def output_warning(text):
     """Click echo warning."""
     return click.style(
-        "WARNING: {}".format(text), bg="yellow", fg="black", bold=True
+        "WARNING: {}".format(text), fg="bright_yellow", bold=True
     )
 
 
 def output_error(text):
     """Click echo error."""
-    return click.style(
-        "ERROR: {}".format(text), bg="red", fg="white", bold=True
-    )
+    return click.style("ERROR: {}".format(text), fg="bright_red", bold=True)
 
 
 def echo(msg, **kwargs):

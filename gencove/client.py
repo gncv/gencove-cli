@@ -497,3 +497,8 @@ class APIClient:
         """Get single batch."""
         batches_endpoint = self.endpoints.batches.format(id=batch_id)
         return self._get(batches_endpoint, authorized=True)
+
+    def get_project(self, project_id):
+        """Get single project."""
+        project_endpoint = "{}{}".format(self.endpoints.projects, project_id)
+        return self._get(project_endpoint, authorized=True)

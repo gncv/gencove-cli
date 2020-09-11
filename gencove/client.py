@@ -78,6 +78,7 @@ class APIClientTimeout(APIClientError):
     """
 
 
+# pylint: disable=too-many-public-methods
 class APIClient:
     """Gencove API client."""
 
@@ -95,6 +96,7 @@ class APIClient:
         return json.dumps(payload, cls=DateTimeEncoder)
 
     # pylint: disable=bad-option-value,bad-continuation,too-many-arguments
+    # pylint: disable=too-many-branches
     def _request(
         self,
         endpoint="",

@@ -60,7 +60,7 @@ class Command(object):  # pylint: disable=R0205
             self.echo_debug(repr(err))
             raise click.Abort()
         except APIClientError as err:
-            echo(err.message, err=True)
+            self.echo_error(err.message)
             if LOG_LEVEL == DEBUG:
                 raise err
             raise click.Abort()

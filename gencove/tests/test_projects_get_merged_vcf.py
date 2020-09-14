@@ -1,4 +1,4 @@
-"""Test project's get merged vcf command."""
+"""Test project's get merged VCF command."""
 
 from uuid import uuid4
 
@@ -69,7 +69,7 @@ def test_get_merged_vcf__not_owned_project(mocker):
 
 
 def test_get_merged_vcf__empty(mocker):
-    """Test project doesn't have a merged vcf file."""
+    """Test project doesn't have a merged VCF file."""
     project_id = str(uuid4())
 
     runner = CliRunner()
@@ -110,7 +110,7 @@ def test_get_merged_vcf__empty(mocker):
 
 
 def test_get_merged_vcf__success(mocker):
-    """Test project download merged vcf success."""
+    """Test project download merged VCF success."""
     project_id = str(uuid4())
     file_id = str(uuid4())
 

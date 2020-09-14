@@ -1,4 +1,4 @@
-"""Test create merged project's vcf file command."""
+"""Test create merged project's VCF file command."""
 
 import io
 import sys

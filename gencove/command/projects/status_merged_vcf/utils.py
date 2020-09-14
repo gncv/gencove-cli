@@ -5,7 +5,7 @@ def get_line(merged_vcf):
     """Build a list of relevant data to be printed.
 
     Args:
-        merged_vcf (dict): an object from project merge vcf response
+        merged_vcf (dict): an object from project merge VCF response
 
     Returns:
         str: tab delimited list of relevant data to be printed

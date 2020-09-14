@@ -1,4 +1,4 @@
-"""Project create merged vcf shell command definition."""
+"""Project create merged VCF shell command definition."""
 import click
 
 from gencove.command.common_cli_options import add_options, common_options

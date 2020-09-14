@@ -1,4 +1,4 @@
-"""Test project's status merged vcf command."""
+"""Test project's status merged VCF command."""
 
 import io
 import sys
@@ -119,7 +119,7 @@ def test_status_merged_vcf__not_able(mocker):
 
 
 def test_status_merged_vcf__success_but_job_failed(mocker):
-    """Test status merged vcf success, but the job is in the failed state."""
+    """Test status merged VCF success, but the job is in the failed state."""
     project_id = str(uuid4())
     mocked_response = {
         "id": project_id,
@@ -159,7 +159,7 @@ def test_status_merged_vcf__success_but_job_failed(mocker):
 
 
 def test_status_merged_vcf__success(mocker):
-    """Test status merged vcf success."""
+    """Test status merged VCF success."""
     project_id = str(uuid4())
     mocked_response = {
         "id": project_id,

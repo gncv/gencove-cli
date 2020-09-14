@@ -56,6 +56,8 @@ class StatusMergedVCF(Command):
                 self.project_id
             )
             self.echo_debug(merge_details_status)
+            if merge_details_status["last_status"]["status"] == "failed":
+                self.echo_warning("The job failed merging.")
             self.echo(get_line(merge_details_status))
         except client.APIClientError as err:
             self.echo_debug(err)

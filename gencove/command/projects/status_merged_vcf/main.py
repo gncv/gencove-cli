@@ -67,8 +67,7 @@ class StatusMergedVCF(Command):
             elif err.status_code == 404:
                 self.echo_error(
                     "Project {} does not exist or you do not have "
-                    "permission required to access it.".format(
-                        self.project_id
-                    )
+                    "permission required to access it or there are no "
+                    "running jobs associated with it.".format(self.project_id)
                 )
             raise

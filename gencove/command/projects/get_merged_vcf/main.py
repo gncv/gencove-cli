@@ -81,9 +81,7 @@ class GetMergedVCF(Command):
             )
         except client.APIClientError as err:
             self.echo_debug(err)
-            if err.status_code == 400:
-                self.echo_error("There was an error getting the merged file.")
-            elif err.status_code == 404:
+            if err.status_code == 404:
                 self.echo_error(
                     "Project {} does not exist or you do not have "
                     "permission required to access it.".format(

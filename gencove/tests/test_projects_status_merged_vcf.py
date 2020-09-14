@@ -11,6 +11,35 @@ from gencove.client import APIClient, APIClientError
 from gencove.command.projects.cli import status_merged_vcf
 
 
+def test_status_merged_vcf__bad_project_id(mocker):
+    """Test status merged file failure when non-uuid string is used as
+    project id.
+    """
+    runner = CliRunner()
+
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_retrieve_merged_vcf = mocker.patch.object(
+        APIClient,
+        "retrieve_merged_vcf",
+    )
+
+    res = runner.invoke(
+        status_merged_vcf,
+        [
+            "1111111",
+            "--email",
+            "foo@bar.com",
+            "--password",
+            "123",
+        ],
+    )
+
+    assert res.exit_code == 1
+    mocked_login.assert_called_once()
+    mocked_retrieve_merged_vcf.assert_not_called()
+    assert "Project ID is not valid" in res.output
+
+
 def test_status_merged_vcf__empty(mocker):
     """Test create merged file failure when project is responding empty.
     This can be due to no merged files or no permission required for the

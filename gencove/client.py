@@ -78,6 +78,7 @@ class APIClientTimeout(APIClientError):
     """
 
 
+# pylint: disable=too-many-public-methods
 class APIClient:
     """Gencove API client."""
 
@@ -95,6 +96,7 @@ class APIClient:
         return json.dumps(payload, cls=DateTimeEncoder)
 
     # pylint: disable=bad-option-value,bad-continuation,too-many-arguments
+    # pylint: disable=too-many-branches
     def _request(
         self,
         endpoint="",
@@ -167,19 +169,22 @@ class APIClient:
                 if "detail" in response_json:
                     http_error_msg += ": {}".format(response_json["detail"])
                 else:
-                    error_msg = "\n".join(
-                        [
-                            # create-batch can return error details that is
-                            # a dict, not a list
-                            "  {}: {}".format(
-                                key,
-                                value[0]
-                                if isinstance(value, list)
-                                else str(value),
-                            )
-                            for key, value in response_json.items()
-                        ]
-                    )
+                    try:
+                        error_msg = "\n".join(
+                            [
+                                # create-batch can return error details that
+                                # is a dict, not a list
+                                "  {}: {}".format(
+                                    key,
+                                    value[0]
+                                    if isinstance(value, list)
+                                    else str(value),
+                                )
+                                for key, value in response_json.items()
+                            ]
+                        )
+                    except AttributeError:
+                        error_msg = "\n".join(response_json)
                     http_error_msg += ":\n{}".format(error_msg)
 
         elif 500 <= response.status_code < 600:
@@ -497,3 +502,22 @@ class APIClient:
         """Get single batch."""
         batches_endpoint = self.endpoints.batches.format(id=batch_id)
         return self._get(batches_endpoint, authorized=True)
+
+    def get_project(self, project_id):
+        """Get single project."""
+        project_endpoint = "{}{}".format(self.endpoints.projects, project_id)
+        return self._get(project_endpoint, authorized=True)
+
+    def create_merged_vcf(self, project_id):
+        """Merge VCF files for a project."""
+        merge_vcf_endpoint = self.endpoints.project_merge_vcfs.format(
+            id=project_id
+        )
+        return self._post(merge_vcf_endpoint, authorized=True)
+
+    def retrieve_merged_vcf(self, project_id):
+        """Retrieve the status of the merge command for a project."""
+        merge_vcf_endpoint = self.endpoints.project_merge_vcfs.format(
+            id=project_id
+        )
+        return self._get(merge_vcf_endpoint, authorized=True)

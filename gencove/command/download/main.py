@@ -303,9 +303,13 @@ class Download(Command):
 
     def output_list(self):
         """Output reformatted JSON of each individual sample."""
-        self.echo_debug("Outputting {}.".format(self.download_urls))
+        self.echo_debug("Outputting JSON.")
         if self.download_to == "-":
             self.echo(json.dumps(self.download_files, indent=4))
         else:
             with open(self.download_to, "w") as json_file:
                 json_file.write(json.dumps(self.download_files, indent=4))
+            self.echo(
+                "Samples and their deliverables download URLs outputted to "
+                "{}".format(self.download_to)
+            )

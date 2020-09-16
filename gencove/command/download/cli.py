@@ -31,6 +31,11 @@ from .main import Download
     help="Skip downloading files that already exist in DESTINATION",
 )
 @click.option(
+    "--download-urls",
+    help="Output a list of urls in a JSON format.",
+    is_flag=True,
+)
+@click.option(
     "--download-template",
     default=DOWNLOAD_TEMPLATE,
     help=(
@@ -53,6 +58,7 @@ def download(  # pylint: disable=E0012,C0330,R0913
     sample_ids,
     file_types,
     skip_existing,
+    download_urls,
     download_template,
     host,
     email,
@@ -77,6 +83,10 @@ def download(  # pylint: disable=E0012,C0330,R0913
 
             gencove download ./results --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db --file-types alignment-bam,impute-vcf,fastq-r1,fastq-r2
 
+        Skip download entirely and print out the deliverables as a JSON:
+
+            gencove download - --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db --download-urls
+
     \f
 
     Args:
@@ -89,6 +99,10 @@ def download(  # pylint: disable=E0012,C0330,R0913
             results for. if not specified, all file types will be downloaded.
         skip_existing (bool, optional, default True): skip downloading existing
             files.
+        download_urls (bool, optional): output the files available for a
+            download. if the destination parameter is "-", it goes to the
+            stdout.
+
     """  # noqa: E501
     s_ids = tuple()
     if sample_ids:
@@ -105,4 +119,5 @@ def download(  # pylint: disable=E0012,C0330,R0913
         DownloadFilters(project_id, s_ids, f_types),
         Credentials(email, password, api_key),
         DownloadOptions(host, skip_existing, download_template),
+        download_urls,
     ).run()

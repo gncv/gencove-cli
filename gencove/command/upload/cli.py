@@ -58,8 +58,9 @@ def upload(  # pylint: disable=E0012,C0330,R0913
             on Gencove's system, where the files will be uploaded to.
         run_project_id (UUID, optional): ID of a project to which all files
             in this upload will be assigned to and then immediately analyzed.
-        output (str, optional): must be used with run_project_id. - redirects
-            the JSON to STDOUT, and a name redirects the output to a file.
+        output (str, optional): must be used with run_project_id. "-"
+            redirects the JSON to STDOUT, and a name redirects the output to
+            a file.
     """
     Upload(
         source,

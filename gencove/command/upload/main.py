@@ -45,7 +45,9 @@ class Upload(Command):
     """Upload command executor."""
 
     # pylint: disable=too-many-arguments
-    def __init__(self, source, destination, credentials, options, output):
+    def __init__(
+        self, source, destination, credentials, options, output, no_progress
+    ):
         super().__init__(credentials, options)
         self.source = source
         self.destination = destination
@@ -55,6 +57,7 @@ class Upload(Command):
         self.upload_ids = set()
         self.output = output
         self.assigned_samples = []
+        self.no_progress = no_progress
 
     @staticmethod
     def generate_gncv_destination():
@@ -195,6 +198,7 @@ class Upload(Command):
             MultiFileReader(fastqs),
             upload_details["s3"]["bucket"],
             upload_details["s3"]["object_name"],
+            self.no_progress,
         )
         return upload_details
 
@@ -238,6 +242,7 @@ class Upload(Command):
             file_name=file_path,
             bucket=upload_details["s3"]["bucket"],
             object_name=upload_details["s3"]["object_name"],
+            no_progress=self.no_progress,
         )
         return upload_details
 
@@ -274,8 +279,11 @@ class Upload(Command):
         )
 
         assigned_count = 0
-        progress_bar = get_regular_progress_bar(len(samples), "Assigning: ")
-        progress_bar.start()
+        if not self.no_progress:
+            progress_bar = get_regular_progress_bar(
+                len(samples), "Assigning: "
+            )
+            progress_bar.start()
         for samples_batch in batchify(samples, batch_size=ASSIGN_BATCH_SIZE):
             try:
                 samples_batch_len = len(samples_batch)
@@ -287,7 +295,8 @@ class Upload(Command):
                 )
                 self.assigned_samples.extend(assigned_batch)
                 assigned_count += samples_batch_len
-                progress_bar.update(samples_batch_len)
+                if not self.no_progress:
+                    progress_bar.update(samples_batch_len)
                 self.echo_debug("Total assigned: {}".format(assigned_count))
             except APIClientError as err:
                 self.echo_debug(err)
@@ -304,10 +313,11 @@ class Upload(Command):
                     self.echo_warning(
                         ASSIGN_ERROR.format(self.project_id, self.destination)
                     )
-                progress_bar.finish()
+                if not self.no_progress:
+                    progress_bar.finish()
                 return
-
-        progress_bar.finish()
+        if not self.no_progress:
+            progress_bar.finish()
         self.echo("Assigned all samples to a project")
 
     @backoff.on_exception(

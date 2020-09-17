@@ -1,4 +1,5 @@
 """Entry point into upload command."""
+import json
 import os
 import uuid
 from datetime import datetime
@@ -39,10 +40,12 @@ from .utils import (
 )
 
 
+# pylint: disable=too-many-instance-attributes
 class Upload(Command):
     """Upload command executor."""
 
-    def __init__(self, source, destination, credentials, options):
+    # pylint: disable=too-many-arguments
+    def __init__(self, source, destination, credentials, options, output):
         super().__init__(credentials, options)
         self.source = source
         self.destination = destination
@@ -50,6 +53,8 @@ class Upload(Command):
         self.fastqs = []
         self.fastqs_map = {}
         self.upload_ids = set()
+        self.output = output
+        self.assigned_samples = []
 
     @staticmethod
     def generate_gncv_destination():
@@ -98,24 +103,27 @@ class Upload(Command):
         """
         # fmt: off
         if self.destination and not self.destination.startswith(UPLOAD_PREFIX):
-            self.echo(
+            self.echo_error(
                 "Invalid destination path. Must start with '{}'".format(
                     UPLOAD_PREFIX
-                ),
-                err=True,
+                )
             )
             raise ValidationError("Bad configuration. Exiting.")
         # fmt: on
 
         if not self.fastqs and not self.fastqs_map:
-            self.echo(
+            self.echo_error(
                 "No FASTQ files found in the path. "
                 "Only following files are accepted: {}".format(
                     FASTQ_EXTENSIONS
-                ),
-                err=True,
+                )
             )
             raise ValidationError("Bad configuration. Exiting.")
+
+        if self.output and not self.project_id:
+            message = "--output cannot be used without --run-project-id"
+            self.echo_error(message)
+            raise ValidationError(message)
 
     def execute(self):
         """Upload fastq files from host system to Gencove cloud.
@@ -139,6 +147,8 @@ class Upload(Command):
             self.echo_debug("Cooling down period.")
             sleep(10)
             self.assign_uploads_to_project()
+            if self.output:
+                self.output_list()
 
     def upload_from_source(self, s3_client):
         """Upload command with <source> argument provided."""
@@ -272,9 +282,10 @@ class Upload(Command):
                 self.echo_debug(
                     "Assigning batch: {}".format(samples_batch_len)
                 )
-                self.api_client.add_samples_to_project(
+                assigned_batch = self.api_client.add_samples_to_project(
                     samples_batch, self.project_id
                 )
+                self.assigned_samples.extend(assigned_batch)
                 assigned_count += samples_batch_len
                 progress_bar.update(samples_batch_len)
                 self.echo_debug("Total assigned: {}".format(assigned_count))
@@ -393,3 +404,17 @@ class Upload(Command):
         return self.api_client.get_sample_sheet(
             self.destination, SAMPLE_ASSIGNMENT_STATUS.unassigned, next_link
         )
+
+    def output_list(self):
+        """Output JSON of assigning samples to a project."""
+        self.echo_debug("Outputting JSON.")
+        if self.output == "-":
+            self.echo(json.dumps(self.assigned_samples, indent=4))
+        else:
+            with open(self.output, "w") as json_file:
+                json_file.write(json.dumps(self.assigned_samples, indent=4))
+            self.echo(
+                "Assigned samples response outputted to {}".format(
+                    self.output
+                )
+            )

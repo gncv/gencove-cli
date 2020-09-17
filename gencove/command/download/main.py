@@ -1,4 +1,5 @@
 """Download command executor."""
+import json
 import re
 
 import backoff
@@ -23,19 +24,25 @@ from .utils import (
 class Download(Command):
     """Download command executor."""
 
-    def __init__(self, download_to, filters, credentials, options):
+    # pylint: disable=too-many-arguments
+    def __init__(
+        self, download_to, filters, credentials, options, download_urls
+    ):
         super().__init__(credentials, options)
         self.download_to = download_to
         self.filters = filters
         self.options = options
         self.sample_ids = set()
         self.downloaded_files = set()
+        self.download_urls = download_urls
+        self.download_files = []
 
     def initialize(self):
         """Initialize download command."""
         if self.filters.project_id and self.filters.sample_ids:
-            self.echo_debug("Bad configuration. Exiting")
-            return
+            message = "Bad configuration. Exiting"
+            self.echo_error(message)
+            raise ValidationError(message)
 
         self.login()
 
@@ -50,11 +57,12 @@ class Download(Command):
                 samples_generator = self._get_paginated_samples()
                 for sample in samples_generator:
                     self.sample_ids.add(sample["id"])
-            except client.APIClientError:
-                self.echo_warning(
-                    "Project id {} not found.".format(self.filters.project_id)
+            except client.APIClientError as err:
+                message = "Project id {} not found.".format(
+                    self.filters.project_id
                 )
-                return
+                self.echo_error(message)
+                raise ValidationError(message) from err
         else:
             self.sample_ids = self.filters.sample_ids
 
@@ -65,37 +73,51 @@ class Download(Command):
             ValidationError : something is wrong with configuration
         """
         if not self.filters.project_id and not self.filters.sample_ids:
-            self.echo_warning(
-                "Must specify one of: project id or sample ids", err=True
-            )
-            raise ValidationError(
-                "Must specify one of: project id or sample ids"
-            )
+            message = "Must specify one of: project id or sample ids"
+            self.echo_error(message)
+            raise ValidationError(message)
 
         if self.filters.project_id and self.filters.sample_ids:
-            self.echo_warning(
-                "Must specify only one of: project id or sample ids", err=True
-            )
-            raise ValidationError(
-                "Must specify only one of: project id or sample ids"
-            )
+            message = "Must specify only one of: project id or sample ids"
+            self.echo_error(message)
+            raise ValidationError(message)
 
         if not self.sample_ids:
-            raise ValidationError("No samples to process. Exiting.")
+            message = "No samples to process. Exiting."
+            self.echo_error(message)
+            raise ValidationError(message)
 
-        self.echo_debug(
-            "Host is {} downloading to {}".format(
-                self.options.host, self.download_to
+        if all(
+            [
+                self.download_to == "-",
+                not self.download_urls,
+            ]
+        ):
+            message = "Cannot have - as a destination without download-urls."
+            self.echo_error(message)
+            raise ValidationError(message)
+
+        if self.download_urls:
+            self.echo_debug("Requesting download list in JSON format.")
+        if self.download_to == "-":
+            self.echo_debug("Will not download. Redirecting to STDOUT.")
+        else:
+            self.echo_debug(
+                "Host is {} saving to {}".format(
+                    self.options.host, self.download_to
+                )
             )
-        )
 
     def execute(self):
-        self.echo("Processing samples")
+        if self.download_to != "-":
+            self.echo("Processing samples")
         for sample_id in self.sample_ids:
             try:
                 self.process_sample(sample_id)
             except DownloadTemplateError:
                 return
+        if self.download_urls:
+            self.output_list()
 
     @backoff.on_exception(
         backoff.expo,
@@ -107,10 +129,10 @@ class Download(Command):
         """Process sample.
 
         Check if a sample is in appropriate state and if it is,
-        download its files one by one.
+        get its files one by one.
 
-        If a download failed with error 403, reprocess the sample
-        in order to get fresh download url.
+        If downloading and a download failed with error 403, reprocess the
+        sample in order to get fresh download url.
         """
         try:
             sample = self.api_client.get_sample_details(sample_id)
@@ -148,8 +170,27 @@ class Download(Command):
         self.echo_debug(
             "file path with prefix is: {}".format(file_with_prefix)
         )
-        if file_types_re.match(QC_FILE_TYPE):
+        if all(
+            [
+                self.download_to != "-",
+                not self.download_urls,
+                file_types_re.match(QC_FILE_TYPE),
+            ]
+        ):
             self.download_sample_qc_metrics(file_with_prefix, sample_id)
+
+        self.download_files.append(
+            {
+                "gencove_id": sample["id"],
+                "client_id": sample["client_id"],
+                "last_status": {
+                    "id": sample["last_status"]["id"],
+                    "status": sample["last_status"]["status"],
+                    "created": sample["last_status"]["created"],
+                },
+                "files": {},
+            }
+        )
 
         for sample_file in sample["files"]:
             # pylint: disable=E0012,C0330
@@ -161,17 +202,21 @@ class Download(Command):
                 )
                 continue
 
-            file_path = build_file_path(
-                sample_file, file_with_prefix, self.download_to
-            )
-
-            self.validate_and_download(
-                file_path,
-                download_file,
-                file_path,
-                sample_file["download_url"],
-                self.options.skip_existing,
-            )
+            if not self.download_urls:
+                file_path = build_file_path(
+                    sample_file, file_with_prefix, self.download_to
+                )
+                self.validate_and_download(
+                    file_path,
+                    download_file,
+                    file_path,
+                    sample_file["download_url"],
+                    self.options.skip_existing,
+                )
+            self.download_files[-1]["files"][sample_file["file_type"]] = {
+                "id": sample_file["id"],
+                "download_url": sample_file["download_url"],
+            }
 
     def validate_and_download(
         self, download_to_path, download_func, *args, **kwargs
@@ -255,3 +300,16 @@ class Download(Command):
         except client.APIClientError:
             self.echo_warning("Error getting sample quality control metrics.")
             raise
+
+    def output_list(self):
+        """Output reformatted JSON of each individual sample."""
+        self.echo_debug("Outputting JSON.")
+        if self.download_to == "-":
+            self.echo(json.dumps(self.download_files, indent=4))
+        else:
+            with open(self.download_to, "w") as json_file:
+                json_file.write(json.dumps(self.download_files, indent=4))
+            self.echo(
+                "Samples and their deliverables download URLs outputted to "
+                "{}".format(self.download_to)
+            )

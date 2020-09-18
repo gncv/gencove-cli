@@ -168,8 +168,9 @@ def test_get_merged_vcf_custom_filename(mocker):
     assert res.exit_code == 0
     mocked_login.assert_called_once()
     mocked_get_project.assert_called_once()
-    mocked_download_file.assert_called_once()
-    mocked_download_file.assert_called_with("superman.vcf.gz", download_url)
+    mocked_download_file.assert_called_once_with(
+        "superman.vcf.gz", download_url
+    )
 
 
 def test_get_merged_vcf__success(mocker):

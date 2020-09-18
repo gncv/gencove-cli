@@ -170,8 +170,7 @@ def test_sample_ids_provided(mocker):
         )
         assert res.exit_code == 0
         mocked_login.assert_called_once()
-        mocked_download_file.assert_called_once()
-        mocked_download_file.assert_called_with(
+        mocked_download_file.assert_called_once_with(
             "cli_test_data/1/0/bar.txt",
             "https://foo.com/bar.txt",
             True,
@@ -469,8 +468,7 @@ def test_download_no_progress(mocker):
         )
         assert res.exit_code == 0
         mocked_login.assert_called_once()
-        mocked_download_file.assert_called_once()
-        mocked_download_file.assert_called_with(
+        mocked_download_file.assert_called_once_with(
             "cli_test_data/1/0/bar.txt", "https://foo.com/bar.txt", True, True
         )
         mocked_sample_details.assert_called_once()

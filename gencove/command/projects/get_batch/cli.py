@@ -17,12 +17,20 @@ from .main import GetBatch
     default=None,
 )
 @add_options(common_options)
+@click.option(
+    "--no-progress",
+    is_flag=True,
+    help="If specified, no progress bar is shown.",
+)
 # pylint: disable=too-many-arguments
-def get_batch(batch_id, output_filename, host, email, password, api_key):
+def get_batch(
+    batch_id, output_filename, host, email, password, api_key, no_progress
+):
     """Get batch that is available for a project."""
     GetBatch(
         batch_id,
         output_filename,
         Credentials(email, password, api_key),
         Optionals(host),
+        no_progress,
     ).run()

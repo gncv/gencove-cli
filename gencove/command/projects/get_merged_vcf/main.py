@@ -13,16 +13,19 @@ from ....exceptions import ValidationError
 class GetMergedVCF(Command):
     """Download project's merged VCF file executor."""
 
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         project_id,
         output_filename,
         credentials,
         options,
+        no_progress,
     ):
         super().__init__(credentials, options)
         self.project_id = project_id
         self.output_filename = output_filename
+        self.no_progress = no_progress
 
     def initialize(self):
         """Initialize subcommand."""
@@ -77,7 +80,9 @@ class GetMergedVCF(Command):
                 )
             )
             download.utils.download_file(
-                download_path, merged_vcf["download_url"]
+                download_path,
+                merged_vcf["download_url"],
+                no_progress=self.no_progress,
             )
         except client.APIClientError as err:
             self.echo_debug(err)

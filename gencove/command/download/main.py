@@ -21,12 +21,19 @@ from .utils import (
 )
 
 
+# pylint: disable=too-many-instance-attributes
 class Download(Command):
     """Download command executor."""
 
     # pylint: disable=too-many-arguments
     def __init__(
-        self, download_to, filters, credentials, options, download_urls
+        self,
+        download_to,
+        filters,
+        credentials,
+        options,
+        download_urls,
+        no_progress,
     ):
         super().__init__(credentials, options)
         self.download_to = download_to
@@ -36,6 +43,7 @@ class Download(Command):
         self.downloaded_files = set()
         self.download_urls = download_urls
         self.download_files = []
+        self.no_progress = no_progress
 
     def initialize(self):
         """Initialize download command."""
@@ -212,6 +220,7 @@ class Download(Command):
                     file_path,
                     sample_file["download_url"],
                     self.options.skip_existing,
+                    self.no_progress,
                 )
             self.download_files[-1]["files"][sample_file["file_type"]] = {
                 "id": sample_file["id"],

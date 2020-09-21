@@ -23,6 +23,11 @@ from .main import Upload
     default=None,
     help="A destination where to store the resulting assignments.",
 )
+@click.option(
+    "--no-progress",
+    is_flag=True,
+    help="If specified, no progress bar is shown.",
+)
 def upload(  # pylint: disable=E0012,C0330,R0913
     source,
     destination,
@@ -32,6 +37,7 @@ def upload(  # pylint: disable=E0012,C0330,R0913
     api_key,
     run_project_id,
     output,
+    no_progress,
 ):  # noqa: D301
     """Upload FASTQ files to Gencove's system.
 
@@ -61,6 +67,8 @@ def upload(  # pylint: disable=E0012,C0330,R0913
         output (str, optional): must be used with run_project_id. "-"
             redirects the JSON to STDOUT, and a name redirects the output to
             a file.
+        no_progress (bool, optional, default False): do not show progress
+            bar.
     """
     Upload(
         source,
@@ -68,4 +76,5 @@ def upload(  # pylint: disable=E0012,C0330,R0913
         Credentials(email, password, api_key),
         UploadOptions(host, run_project_id),
         output,
+        no_progress,
     ).run()

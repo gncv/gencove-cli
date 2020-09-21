@@ -17,6 +17,11 @@ from .main import GetMergedVCF
     default=None,
 )
 @add_options(common_options)
+@click.option(
+    "--no-progress",
+    is_flag=True,
+    help="If specified, no progress bar is shown.",
+)
 # pylint: disable=too-many-arguments
 def get_merged_vcf(
     project_id,
@@ -25,6 +30,7 @@ def get_merged_vcf(
     email,
     password,
     api_key,
+    no_progress,
 ):
     """Download merged VCF file in a project."""
     GetMergedVCF(
@@ -32,4 +38,5 @@ def get_merged_vcf(
         output_filename,
         Credentials(email, password, api_key),
         Optionals(host),
+        no_progress,
     ).run()

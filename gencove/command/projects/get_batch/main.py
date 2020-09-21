@@ -19,10 +19,14 @@ from ... import download
 class GetBatch(Command):
     """Get batch command executor."""
 
-    def __init__(self, batch_id, output_filename, credentials, options):
+    # pylint: disable=too-many-arguments
+    def __init__(
+        self, batch_id, output_filename, credentials, options, no_progress
+    ):
         super().__init__(credentials, options)
         self.batch_id = batch_id
         self.output_filename = output_filename
+        self.no_progress = no_progress
 
     def initialize(self):
         """Initialize list subcommand."""
@@ -66,7 +70,9 @@ class GetBatch(Command):
                 )
             )
             download.utils.download_file(
-                download_path, deliverable["download_url"]
+                download_path,
+                deliverable["download_url"],
+                no_progress=self.no_progress,
             )
 
         except client.APIClientError as err:

@@ -165,7 +165,9 @@ def fatal_request_error(err=None):
     max_time=MAX_RETRY_TIME_SECONDS,
     giveup=fatal_request_error,
 )
-def download_file(file_path, download_url, skip_existing=True):
+def download_file(
+    file_path, download_url, skip_existing=True, no_progress=False
+):
     """Download a file to file system.
 
     Args:
@@ -173,6 +175,7 @@ def download_file(file_path, download_url, skip_existing=True):
             and download template
         download_url (str): url of the file to download
         skip_existing (bool): skip already downloaded files
+        no_progress (bool): don't show progress bar
 
     Returns:
         str : file path
@@ -210,14 +213,17 @@ def download_file(file_path, download_url, skip_existing=True):
         echo_debug("Starting to download file to: {}".format(file_path))
 
         with open(file_path_tmp, file_mode) as downloaded_file:
-            pbar = get_progress_bar(
-                int(req.headers["content-length"]), "Downloading: "
-            )
-            pbar.start()
+            if not no_progress:
+                pbar = get_progress_bar(
+                    int(req.headers["content-length"]), "Downloading: "
+                )
+                pbar.start()
             for chunk in req.iter_content(chunk_size=CHUNK_SIZE):
                 downloaded_file.write(chunk)
-                pbar.update(pbar.value + len(chunk))
-            pbar.finish()
+                if not no_progress:
+                    pbar.update(pbar.value + len(chunk))
+            if not no_progress:
+                pbar.finish()
 
         # Cross-platform cross-python-version file overwriting
         if os.path.exists(file_path):
@@ -244,6 +250,7 @@ def save_qc_file(path, content):
     echo("Downloading file to: {}".format(path))
     with open(path, "w") as qc_file:
         json.dump(content, qc_file)
+    echo("Finished downloading a file: {}".format(path))
 
 
 def fatal_process_sample_error(err):

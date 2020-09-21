@@ -52,6 +52,11 @@ from .main import Download
     ),
 )
 @add_options(common_options)
+@click.option(
+    "--no-progress",
+    is_flag=True,
+    help="If specified, no progress bar is shown.",
+)
 def download(  # pylint: disable=E0012,C0330,R0913
     destination,
     project_id,
@@ -64,6 +69,7 @@ def download(  # pylint: disable=E0012,C0330,R0913
     email,
     password,
     api_key,
+    no_progress,
 ):  # noqa: D413,D301,D412 # pylint: disable=C0301
     """Download deliverables of a project.
 
@@ -102,7 +108,8 @@ def download(  # pylint: disable=E0012,C0330,R0913
         download_urls (bool, optional): output the files available for a
             download. if the destination parameter is "-", it goes to the
             stdout.
-
+        no_progress (bool, optional, default False): do not show progress
+            bar.
     """  # noqa: E501
     s_ids = tuple()
     if sample_ids:
@@ -120,4 +127,5 @@ def download(  # pylint: disable=E0012,C0330,R0913
         Credentials(email, password, api_key),
         DownloadOptions(host, skip_existing, download_template),
         download_urls,
+        no_progress,
     ).run()

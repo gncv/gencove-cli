@@ -250,6 +250,7 @@ def save_qc_file(path, content):
     echo("Downloading file to: {}".format(path))
     with open(path, "w") as qc_file:
         json.dump(content, qc_file)
+    echo("Finished downloading a file: {}".format(path))
 
 
 def fatal_process_sample_error(err):

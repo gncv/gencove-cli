@@ -20,7 +20,7 @@ Indices and tables
 .. automodule:: gencove.cli
    :members:
 
-Supported Python versions are 2.7+ and 3.7+.
+Supported Python versions are 3.6 and above.
 
 Quickstart
 ==========
@@ -69,5 +69,5 @@ This will output all available commands.
 .. click:: gencove.cli:cli
    :prog: gencove
    :show-nested:
-   :commands: upload,download
+   :commands: upload,download,projects,uploads
 

@@ -11,5 +11,11 @@ def get_line(batch):
         str: tab delimited list of relevant data to be printed
     """
     return "\t".join(
-        [batch["id"], batch["batch_type"], batch["name"],]  # noqa
+        [
+            batch["id"],
+            batch["last_status"]["created"],
+            batch["last_status"]["status"],
+            batch["batch_type"],
+            batch["name"],
+        ]  # noqa
     )

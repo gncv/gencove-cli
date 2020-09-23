@@ -8,8 +8,9 @@ import requests
 
 # pylint: disable=wrong-import-order
 from gencove import client  # noqa: I100
-from gencove.command.base import Command, ValidationError
+from gencove.command.base import Command
 from gencove.command.utils import is_valid_uuid
+from gencove.exceptions import ValidationError
 
 from .exceptions import BatchGetError
 from ... import download
@@ -18,11 +19,14 @@ from ... import download
 class GetBatch(Command):
     """Get batch command executor."""
 
-    def __init__(self, batch_id, output_filename, credentials, options):
-        super(GetBatch, self).__init__(credentials, options)
-
+    # pylint: disable=too-many-arguments
+    def __init__(
+        self, batch_id, output_filename, credentials, options, no_progress
+    ):
+        super().__init__(credentials, options)
         self.batch_id = batch_id
         self.output_filename = output_filename
+        self.no_progress = no_progress
 
     def initialize(self):
         """Initialize list subcommand."""
@@ -66,7 +70,9 @@ class GetBatch(Command):
                 )
             )
             download.utils.download_file(
-                download_path, deliverable["download_url"]
+                download_path,
+                deliverable["download_url"],
+                no_progress=self.no_progress,
             )
 
         except client.APIClientError as err:
@@ -81,7 +87,7 @@ class GetBatch(Command):
                     "permission required to access it.".format(self.batch_id)
                 )
             else:
-                raise BatchGetError
+                raise BatchGetError  # pylint: disable=W0707
 
     @backoff.on_exception(
         backoff.expo,

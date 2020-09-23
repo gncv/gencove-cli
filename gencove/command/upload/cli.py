@@ -17,8 +17,27 @@ from .main import Upload
     default=None,
     help="Immediately assign all uploaded files to this project and run them",
 )
-def upload(  # pylint: disable=C0330,R0913
-    source, destination, host, email, password, api_key, run_project_id
+@click.option(
+    "--output",
+    required=False,
+    default=None,
+    help="A destination where to store the resulting assignments.",
+)
+@click.option(
+    "--no-progress",
+    is_flag=True,
+    help="If specified, no progress bar is shown.",
+)
+def upload(  # pylint: disable=E0012,C0330,R0913
+    source,
+    destination,
+    host,
+    email,
+    password,
+    api_key,
+    run_project_id,
+    output,
+    no_progress,
 ):  # noqa: D301
     """Upload FASTQ files to Gencove's system.
 
@@ -45,10 +64,17 @@ def upload(  # pylint: disable=C0330,R0913
             on Gencove's system, where the files will be uploaded to.
         run_project_id (UUID, optional): ID of a project to which all files
             in this upload will be assigned to and then immediately analyzed.
+        output (str, optional): must be used with run_project_id. "-"
+            redirects the JSON to STDOUT, and a name redirects the output to
+            a file.
+        no_progress (bool, optional, default False): do not show progress
+            bar.
     """
     Upload(
         source,
         destination,
         Credentials(email, password, api_key),
         UploadOptions(host, run_project_id),
+        output,
+        no_progress,
     ).run()

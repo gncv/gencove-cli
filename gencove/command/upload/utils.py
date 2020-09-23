@@ -8,7 +8,7 @@ from boto3.s3.transfer import TransferConfig
 
 from botocore.exceptions import ClientError
 
-from gencove.command.base import ValidationError
+from gencove.exceptions import ValidationError
 from gencove.logger import echo, echo_debug
 from gencove.utils import CHUNK_SIZE, get_progress_bar
 
@@ -21,7 +21,9 @@ from .constants import (
 )
 
 
-def upload_file(s3_client, file_name, bucket, object_name=None):  # noqa: D413
+def upload_file(
+    s3_client, file_name, bucket, object_name=None, no_progress=False
+):  # noqa: D413
     """Upload a file to an S3 bucket.
 
     Args:
@@ -47,19 +49,22 @@ def upload_file(s3_client, file_name, bucket, object_name=None):  # noqa: D413
             use_threads=True,
             max_concurrency=10,
         )
-
-        progress_bar = get_progress_bar(
-            os.path.getsize(file_name), "Uploading: "
-        )
-        progress_bar.start()
+        if not no_progress:
+            progress_bar = get_progress_bar(
+                os.path.getsize(file_name), "Uploading: "
+            )
+            progress_bar.start()
         s3_client.upload_file(
             file_name,
             bucket,
             object_name,
             Config=config,
-            Callback=_progress_bar_update(progress_bar),
+            Callback=_progress_bar_update(progress_bar)
+            if not no_progress
+            else None,
         )
-        progress_bar.finish()
+        if not no_progress:
+            progress_bar.finish()
     except ClientError as err:
         echo("Failed to upload file {}: {}".format(file_name, err), err=True)
         return False
@@ -67,7 +72,11 @@ def upload_file(s3_client, file_name, bucket, object_name=None):  # noqa: D413
 
 
 def upload_multi_file(
-    s3_client, file_obj, bucket, object_name=None  # pylint: disable=C0330
+    s3_client,
+    file_obj,
+    bucket,
+    object_name=None,  # pylint: disable=E0012,C0330
+    no_progress=False,
 ):  # noqa: D413
     """Upload a file to an S3 bucket.
 
@@ -96,16 +105,22 @@ def upload_multi_file(
             max_concurrency=10,
         )
 
-        progress_bar = get_progress_bar(file_obj.get_size(), "Uploading: ")
-        progress_bar.start()
+        if not no_progress:
+            progress_bar = get_progress_bar(
+                file_obj.get_size(), "Uploading: "
+            )
+            progress_bar.start()
         s3_client.upload_fileobj(
             file_obj,
             bucket,
             object_name,
             Config=config,
-            Callback=_progress_bar_update(progress_bar),
+            Callback=_progress_bar_update(progress_bar)
+            if not no_progress
+            else None,
         )
-        progress_bar.finish()
+        if not no_progress:
+            progress_bar.finish()
     except ClientError as err:
         echo(
             "Failed to upload file {}: {}".format(file_obj.name, err),

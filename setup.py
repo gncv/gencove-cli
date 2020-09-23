@@ -21,6 +21,7 @@ setup(
     author="Tomaz Berisa",
     license="Apache 2.0",
     version=version(),
+    python_requires=">=3.6",
     packages=find_packages(exclude=["tests"]),
     install_requires=[
         # For the python-dateutil requirement, see:
@@ -35,7 +36,6 @@ setup(
         "Click>=7.0",
         "requests>=2.19.1",
         "boto3>=1.9.188",
-        "future==0.18.2",
         "progressbar2==3.50.1",
         "backoff==1.10.0",
     ],

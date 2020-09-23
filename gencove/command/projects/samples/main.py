@@ -18,7 +18,7 @@ class ListSamples(Command):
     """List samples command executor."""
 
     def __init__(self, project_id, credentials, options):
-        super(ListSamples, self).__init__(credentials, options)
+        super().__init__(credentials, options)
         self.project_id = project_id
         self.sample_status = options.status
         self.search_term = options.search
@@ -68,7 +68,7 @@ class ListSamples(Command):
                 more = next_link is not None
             except APIClientError as err:
                 self.echo_debug(err)
-                raise SamplesError
+                raise SamplesError  # pylint: disable=W0707
 
     @backoff.on_exception(
         backoff.expo,

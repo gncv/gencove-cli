@@ -6,8 +6,9 @@ import requests
 
 # pylint: disable=wrong-import-order
 from gencove import client  # noqa: I100
-from gencove.command.base import Command, ValidationError
+from gencove.command.base import Command
 from gencove.command.utils import is_valid_uuid
+from gencove.exceptions import ValidationError
 
 from .exceptions import BatchesListError
 from .utils import get_line
@@ -17,8 +18,7 @@ class ListBatches(Command):
     """List batches command executor."""
 
     def __init__(self, project_id, credentials, options):
-        super(ListBatches, self).__init__(credentials, options)
-
+        super().__init__(credentials, options)
         self.project_id = project_id
 
     def initialize(self):
@@ -64,7 +64,7 @@ class ListBatches(Command):
                     )
                 )
             else:
-                raise BatchesListError
+                raise BatchesListError  # pylint: disable=W0707
 
     def get_paginated_batches(self):
         """Paginate over all batches for the destination.

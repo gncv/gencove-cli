@@ -1,4 +1,5 @@
 """Entry point into upload command."""
+import json
 import os
 import uuid
 from datetime import datetime
@@ -9,8 +10,9 @@ import backoff
 import requests
 
 from gencove.client import APIClientError  # noqa: I100
-from gencove.command.base import Command, ValidationError
+from gencove.command.base import Command
 from gencove.constants import FASTQ_MAP_EXTENSION, SAMPLE_ASSIGNMENT_STATUS
+from gencove.exceptions import ValidationError
 from gencove.utils import (
     batchify,
     get_regular_progress_bar,
@@ -38,17 +40,24 @@ from .utils import (
 )
 
 
+# pylint: disable=too-many-instance-attributes
 class Upload(Command):
     """Upload command executor."""
 
-    def __init__(self, source, destination, credentials, options):
-        super(Upload, self).__init__(credentials, options)
+    # pylint: disable=too-many-arguments
+    def __init__(
+        self, source, destination, credentials, options, output, no_progress
+    ):
+        super().__init__(credentials, options)
         self.source = source
         self.destination = destination
         self.project_id = options.project_id
         self.fastqs = []
         self.fastqs_map = {}
         self.upload_ids = set()
+        self.output = output
+        self.assigned_samples = []
+        self.no_progress = no_progress
 
     @staticmethod
     def generate_gncv_destination():
@@ -97,24 +106,27 @@ class Upload(Command):
         """
         # fmt: off
         if self.destination and not self.destination.startswith(UPLOAD_PREFIX):
-            self.echo(
+            self.echo_error(
                 "Invalid destination path. Must start with '{}'".format(
                     UPLOAD_PREFIX
-                ),
-                err=True,
+                )
             )
             raise ValidationError("Bad configuration. Exiting.")
         # fmt: on
 
         if not self.fastqs and not self.fastqs_map:
-            self.echo(
+            self.echo_error(
                 "No FASTQ files found in the path. "
                 "Only following files are accepted: {}".format(
                     FASTQ_EXTENSIONS
-                ),
-                err=True,
+                )
             )
             raise ValidationError("Bad configuration. Exiting.")
+
+        if self.output and not self.project_id:
+            message = "--output cannot be used without --run-project-id"
+            self.echo_error(message)
+            raise ValidationError(message)
 
     def execute(self):
         """Upload fastq files from host system to Gencove cloud.
@@ -138,6 +150,8 @@ class Upload(Command):
             self.echo_debug("Cooling down period.")
             sleep(10)
             self.assign_uploads_to_project()
+            if self.output:
+                self.output_list()
 
     def upload_from_source(self, s3_client):
         """Upload command with <source> argument provided."""
@@ -184,6 +198,7 @@ class Upload(Command):
             MultiFileReader(fastqs),
             upload_details["s3"]["bucket"],
             upload_details["s3"]["object_name"],
+            self.no_progress,
         )
         return upload_details
 
@@ -214,7 +229,7 @@ class Upload(Command):
         except APIClientError as err:
             if err.status_code == 400:
                 self.echo(err.message)
-                raise UploadError
+                raise UploadError  # pylint: disable=W0707
             raise err
 
         if upload_details["last_status"]["status"] == UPLOAD_STATUSES.done:
@@ -227,6 +242,7 @@ class Upload(Command):
             file_name=file_path,
             bucket=upload_details["s3"]["bucket"],
             object_name=upload_details["s3"]["object_name"],
+            no_progress=self.no_progress,
         )
         return upload_details
 
@@ -263,19 +279,24 @@ class Upload(Command):
         )
 
         assigned_count = 0
-        progress_bar = get_regular_progress_bar(len(samples), "Assigning: ")
-        progress_bar.start()
+        if not self.no_progress:
+            progress_bar = get_regular_progress_bar(
+                len(samples), "Assigning: "
+            )
+            progress_bar.start()
         for samples_batch in batchify(samples, batch_size=ASSIGN_BATCH_SIZE):
             try:
                 samples_batch_len = len(samples_batch)
                 self.echo_debug(
                     "Assigning batch: {}".format(samples_batch_len)
                 )
-                self.api_client.add_samples_to_project(
+                assigned_batch = self.api_client.add_samples_to_project(
                     samples_batch, self.project_id
                 )
+                self.assigned_samples.extend(assigned_batch)
                 assigned_count += samples_batch_len
-                progress_bar.update(samples_batch_len)
+                if not self.no_progress:
+                    progress_bar.update(samples_batch_len)
                 self.echo_debug("Total assigned: {}".format(assigned_count))
             except APIClientError as err:
                 self.echo_debug(err)
@@ -292,10 +313,11 @@ class Upload(Command):
                     self.echo_warning(
                         ASSIGN_ERROR.format(self.project_id, self.destination)
                     )
-                progress_bar.finish()
+                if not self.no_progress:
+                    progress_bar.finish()
                 return
-
-        progress_bar.finish()
+        if not self.no_progress:
+            progress_bar.finish()
         self.echo("Assigned all samples to a project")
 
     @backoff.on_exception(
@@ -379,7 +401,7 @@ class Upload(Command):
                 more = next_link is not None
             except APIClientError as err:
                 self.echo_debug(err)
-                raise UploadError
+                raise UploadError  # pylint: disable=W0707
 
     @backoff.on_exception(
         backoff.expo,
@@ -392,3 +414,17 @@ class Upload(Command):
         return self.api_client.get_sample_sheet(
             self.destination, SAMPLE_ASSIGNMENT_STATUS.unassigned, next_link
         )
+
+    def output_list(self):
+        """Output JSON of assigning samples to a project."""
+        self.echo_debug("Outputting JSON.")
+        if self.output == "-":
+            self.echo(json.dumps(self.assigned_samples, indent=4))
+        else:
+            with open(self.output, "w") as json_file:
+                json_file.write(json.dumps(self.assigned_samples, indent=4))
+            self.echo(
+                "Assigned samples response outputted to {}".format(
+                    self.output
+                )
+            )

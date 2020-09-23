@@ -4,9 +4,10 @@ import backoff
 import requests
 
 from gencove import client  # noqa: I100
-from gencove.command.base import Command, ValidationError
+from gencove.command.base import Command
 from gencove.command.projects.list_batches.utils import get_line
 from gencove.command.utils import is_valid_uuid
+from gencove.exceptions import ValidationError
 
 from .exceptions import BatchCreateError
 
@@ -24,7 +25,7 @@ class CreateBatch(Command):
         credentials,
         options,
     ):
-        super(CreateBatch, self).__init__(credentials, options)
+        super().__init__(credentials, options)
         self.project_id = project_id
         self.batch_type = batch_type
         self.batch_name = batch_name
@@ -72,8 +73,7 @@ class CreateBatch(Command):
         max_time=30,
     )
     def execute(self):
-        """Make a request to create a batch for given project.
-        """
+        """Make a request to create a batch for given project."""
         self.echo_debug(
             "Creating batch for project {} and batch key {}".format(
                 self.project_id, self.batch_name
@@ -106,4 +106,4 @@ class CreateBatch(Command):
                     )
                 )
             else:
-                raise BatchCreateError
+                raise BatchCreateError  # pylint: disable=W0707

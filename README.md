@@ -6,7 +6,7 @@
 ## Documentation ##
 Main documentation can be found here: [http://docs.gencove.com](http://docs.gencove.com)
 
-## Local Development
+## Local Development ##
 
 Have some form of virtualization, for instance pyenv for 3.7.x and a virtualenv.
 
@@ -63,7 +63,7 @@ To create docs:
 cd docs && make html
 ```
 
-## Release process
+## Release process ##
 
 1. Check for the current version by running `version-01-upgrade.sh print`
 2. Make a new branch titled version/X.Y.Z

@@ -63,7 +63,7 @@ To create docs:
 cd docs && make html
 ```
 
-## Release process ##
+## Release process ##
 
 1. Check for the current version by running `version-01-upgrade.sh print`
 2. Make a new branch titled version/X.Y.Z

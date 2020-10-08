@@ -6,6 +6,7 @@ from gencove.command.download import download
 from gencove.command.projects import projects
 from gencove.command.upload import upload
 from gencove.command.uploads import uploads
+from gencove.command.samples import samples
 
 
 @click.group()
@@ -18,6 +19,7 @@ cli.add_command(download)
 cli.add_command(upload)
 cli.add_command(uploads)
 cli.add_command(projects)
+cli.add_command(samples)
 
 
 if __name__ == "__main__":

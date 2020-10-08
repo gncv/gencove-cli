@@ -13,8 +13,8 @@ from .main import GetMetadata
     "--output-filename",
     help="Output filename for the metadata.",
     type=click.Path(),
+    default="-",
     required=False,
-    default=None,
 )
 @add_options(common_options)
 def get_metadata(

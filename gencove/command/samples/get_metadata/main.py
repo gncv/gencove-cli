@@ -62,8 +62,7 @@ class GetMetadata(Command):
                     "Sample metadata {} does not exist or you do not have "
                     "permission required to access it.".format(self.sample_id)
                 )
-            else:
-                raise
+            raise
 
     @backoff.on_exception(
         backoff.expo,

@@ -81,8 +81,9 @@ class GetMetadata(Command):
         if self.output_filename == "-":
             self.echo(json.dumps(metadata, indent=4))
         else:
-            if not os.path.exists(os.path.dirname(self.output_filename)):
-                os.makedirs(os.path.dirname(self.output_filename))
+            dirname = os.path.dirname(self.output_filename)
+            if dirname and not os.path.exists(dirname):
+                os.makedirs(dirname)
             with open(self.output_filename, "w") as json_file:
                 json_file.write(json.dumps(metadata, indent=4))
             self.echo(

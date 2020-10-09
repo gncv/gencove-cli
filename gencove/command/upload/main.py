@@ -421,6 +421,9 @@ class Upload(Command):
         if self.output == "-":
             self.echo(json.dumps(self.assigned_samples, indent=4))
         else:
+            dirname = os.path.dirname(self.output)
+            if dirname and not os.path.exists(dirname):
+                os.makedirs(dirname)
             with open(self.output, "w") as json_file:
                 json_file.write(json.dumps(self.assigned_samples, indent=4))
             self.echo(

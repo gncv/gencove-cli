@@ -378,7 +378,6 @@ def test_upload_and_run_immediately_with_output_to_nested_file(mocker):
         mocked_upload_file.assert_called_once()
         mocked_get_sample_sheet.assert_called()
         mocked_assign_sample.assert_called_once()
-        output_content = None
         with open("somefolder/samples.json", "r") as output_file:
             output_content = output_file.read()
         assert json.dumps(mocked_response, indent=4) == output_content

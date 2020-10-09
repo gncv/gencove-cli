@@ -17,6 +17,7 @@ from .main import GetMetadata
     required=False,
 )
 @add_options(common_options)
+# pylint: disable=too-many-arguments
 def get_metadata(
     sample_id,
     output_filename,

@@ -1,7 +1,6 @@
 """Test samples set metadata command."""
 
 import json
-
 from uuid import uuid4
 
 from click.testing import CliRunner

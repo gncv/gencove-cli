@@ -1,16 +1,18 @@
 """Get sample metadata subcommand."""
 
-import click
-import backoff
 import json
 import os
 
+import backoff
+
+import click
+
 import requests
 
-from gencove import client
-from gencove.command.base import Command
-from gencove.command.utils import is_valid_uuid
-from gencove.exceptions import ValidationError
+from ...base import Command
+from ...utils import is_valid_uuid
+from .... import client
+from ....exceptions import ValidationError
 
 
 class GetMetadata(Command):
@@ -53,11 +55,7 @@ class GetMetadata(Command):
 
         except client.APIClientError as err:
             self.echo_debug(err)
-            if err.status_code == 400:
-                self.echo_warning("There was an error getting the metadata.")
-                self.echo("The following error was returned:")
-                self.echo(err.message)
-            elif err.status_code == 404:
+            if err.status_code == 404:
                 self.echo_warning(
                     "Sample metadata {} does not exist or you do not have "
                     "permission required to access it.".format(self.sample_id)

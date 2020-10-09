@@ -15,6 +15,7 @@ from .main import SetMetadata
     required=True,
 )
 @add_options(common_options)
+# pylint: disable=too-many-arguments
 def set_metadata(
     sample_id,
     json,

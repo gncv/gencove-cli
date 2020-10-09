@@ -3,7 +3,6 @@
 import io
 import json
 import sys
-
 from uuid import uuid4
 
 from click import echo

@@ -4,9 +4,9 @@ import click
 from gencove import version
 from gencove.command.download import download
 from gencove.command.projects import projects
+from gencove.command.samples import samples
 from gencove.command.upload import upload
 from gencove.command.uploads import uploads
-from gencove.command.samples import samples
 
 
 @click.group()

@@ -1,14 +1,15 @@
 """Set sample metadata subcommand."""
 
 import json
+
 import backoff
 
 import requests
 
-from gencove import client
-from gencove.command.base import Command
-from gencove.command.utils import is_valid_uuid
-from gencove.exceptions import ValidationError
+from ...base import Command
+from ...utils import is_valid_uuid
+from .... import client
+from ....exceptions import ValidationError
 
 
 class SetMetadata(Command):

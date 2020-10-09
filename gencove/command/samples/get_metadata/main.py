@@ -22,7 +22,7 @@ class GetMetadata(Command):
         self.output_filename = output_filename
 
     def initialize(self):
-        """Initialize list subcommand."""
+        """Initialize get-metadata subcommand."""
         self.login()
 
     def validate(self):

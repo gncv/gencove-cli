@@ -528,3 +528,13 @@ class APIClient:
             id=sample_id
         )
         return self._get(sample_metadata_endpoint, authorized=True)
+
+    def set_metadata(self, sample_id, metadata):
+        """Assign the metadata to a sample."""
+        sample_metadata_endpoint = self.endpoints.sample_metadata.format(
+            id=sample_id
+        )
+        payload = {
+            "metadata": metadata,
+        }
+        return self._post(sample_metadata_endpoint, payload, authorized=True)

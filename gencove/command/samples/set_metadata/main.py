@@ -36,7 +36,7 @@ class SetMetadata(Command):
             raise ValidationError(error_message)
 
         if not self._valid_json(self.json_metadata):
-            error_message = "Metadatata JSON is not valid. Exiting."
+            error_message = "Metadata JSON is not valid. Exiting."
             self.echo_warning(error_message, err=True)
             raise ValidationError(error_message)
 

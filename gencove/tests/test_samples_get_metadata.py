@@ -70,7 +70,7 @@ def test_get_metadata__not_owned_sample(mocker):
     assert res.exit_code == 0
     mocked_login.assert_called_once()
     mocked_get_metadata.assert_called_once()
-    assert "\n" in res.output
+    assert "does not exist" in res.output
 
 
 def test_get_metadata__empty(mocker):

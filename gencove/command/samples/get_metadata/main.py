@@ -60,7 +60,6 @@ class GetMetadata(Command):
                     "Sample metadata {} does not exist or you do not have "
                     "permission required to access it.".format(self.sample_id)
                 )
-                self.echo("")
             else:
                 raise
 

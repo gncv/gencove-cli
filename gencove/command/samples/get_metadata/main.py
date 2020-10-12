@@ -5,8 +5,6 @@ import os
 
 import backoff
 
-import click
-
 import requests
 
 from ...base import Command

@@ -42,7 +42,9 @@ def test_get_metadata__bad_sample_id(mocker):
 
 
 def test_get_metadata__not_owned_sample(mocker):
-    """Test get metadata failure when sample is not owned."""
+    """Test get metadata failure when sample is not owned.
+    This will return empty response to handle cases when using the CLI tool.
+    """
     mocked_response = {"detail": "Not found."}
 
     runner = CliRunner()
@@ -65,10 +67,10 @@ def test_get_metadata__not_owned_sample(mocker):
             "123",
         ],
     )
-    assert res.exit_code == 1
+    assert res.exit_code == 0
     mocked_login.assert_called_once()
     mocked_get_metadata.assert_called_once()
-    assert "you do not have permission required" in res.output
+    assert "\n" in res.output
 
 
 def test_get_metadata__empty(mocker):

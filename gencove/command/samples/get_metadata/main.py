@@ -56,11 +56,13 @@ class GetMetadata(Command):
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 404:
-                self.echo_warning(
+                self.echo_error(
                     "Sample metadata {} does not exist or you do not have "
                     "permission required to access it.".format(self.sample_id)
                 )
-            raise
+                self.echo("")
+            else:
+                raise
 
     @backoff.on_exception(
         backoff.expo,

@@ -67,10 +67,10 @@ def test_get_metadata__not_owned_sample(mocker):
             "123",
         ],
     )
-    assert res.exit_code == 0
+    assert res.exit_code == 1
     mocked_login.assert_called_once()
     mocked_get_metadata.assert_called_once()
-    assert "does not exist" in res.output
+    assert "you do not have permission required" in res.output
 
 
 def test_get_metadata__empty(mocker):
@@ -98,7 +98,7 @@ def test_get_metadata__empty(mocker):
             "123",
         ],
     )
-    assert res.exit_code == 1
+    assert res.exit_code == 0
     mocked_login.assert_called_once()
     mocked_get_metadata.assert_called_once()
     assert (

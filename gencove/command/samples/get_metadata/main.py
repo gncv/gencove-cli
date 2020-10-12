@@ -45,23 +45,22 @@ class GetMetadata(Command):
         try:
             metadata = self.get_metadata()
             if not metadata["metadata"]:
-                self.echo(
+                self.echo_error(
                     "There is no metadata associated with sample {}.".format(
                         self.sample_id
                     )
                 )
-                raise click.Abort()
-            self.output_metadata(metadata)
+            else:
+                self.output_metadata(metadata)
 
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 404:
-                self.echo_error(
+                self.echo_warning(
                     "Sample metadata {} does not exist or you do not have "
                     "permission required to access it.".format(self.sample_id)
                 )
-            else:
-                raise
+            raise
 
     @backoff.on_exception(
         backoff.expo,

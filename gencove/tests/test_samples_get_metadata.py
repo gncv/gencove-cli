@@ -101,10 +101,7 @@ def test_get_metadata__empty(mocker):
     assert res.exit_code == 0
     mocked_login.assert_called_once()
     mocked_get_metadata.assert_called_once()
-    assert (
-        "There is no metadata associated with sample {}".format(sample_id)
-        in res.output
-    )
+    assert json.dumps({"metadata": None}, indent=4) in res.output
 
 
 def test_get_metadata__success_custom_filename(mocker):

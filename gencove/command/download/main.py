@@ -11,12 +11,13 @@ from gencove.command.base import Command
 from gencove.command.download.exceptions import DownloadTemplateError
 from gencove.exceptions import ValidationError
 
-from .constants import ALLOWED_STATUSES_RE, QC_FILE_TYPE
+from .constants import ALLOWED_STATUSES_RE, METADATA_FILE_TYPE, QC_FILE_TYPE
 from .utils import (
     build_file_path,
     download_file,
     fatal_process_sample_error,
     get_download_template_format_params,
+    save_metadata_file,
     save_qc_file,
 )
 
@@ -187,6 +188,15 @@ class Download(Command):
         ):
             self.download_sample_qc_metrics(file_with_prefix, sample_id)
 
+        if all(
+            [
+                self.download_to != "-",
+                not self.download_urls,
+                file_types_re.match(METADATA_FILE_TYPE),
+            ]
+        ):
+            self.download_sample_metadata(file_with_prefix, sample_id)
+
         self.download_files.append(
             {
                 "gencove_id": sample["id"],
@@ -281,6 +291,29 @@ class Download(Command):
             file_path, save_qc_file, file_path, qc_metrics
         )
 
+    def download_sample_metadata(self, file_with_prefix, sample_id):
+        """Get metadata and save to file on user file system.
+
+        Args:
+            file_with_prefix(str): file path based on download template,
+                prefilled with sample data
+            sample_id(str of uuid): sample gencove id
+
+        Returns:
+            None
+        """
+        metadata = self.get_sample_metadata(sample_id)
+        file_path = build_file_path(
+            dict(file_type=METADATA_FILE_TYPE),
+            file_with_prefix,
+            self.download_to,
+            "{}_{}.json".format(sample_id, METADATA_FILE_TYPE),
+        )
+
+        self.validate_and_download(
+            file_path, save_metadata_file, file_path, metadata
+        )
+
     def _get_paginated_samples(self):
         """Generate for project samples that traverses all pages."""
         get_samples = True
@@ -308,6 +341,21 @@ class Download(Command):
             return self.api_client.get_sample_qc_metrics(sample_id)["results"]
         except client.APIClientError:
             self.echo_warning("Error getting sample quality control metrics.")
+            raise
+
+    def get_sample_metadata(self, sample_id):
+        """Retrieve sample metadata.
+
+        Args:
+            sample_id(str of uuid): sample gencove id
+
+        Returns:
+            any associated metadata as a JSON.
+        """
+        try:
+            return self.api_client.get_metadata(sample_id)
+        except client.APIClientError:
+            self.echo_warning("Error getting sample metadata.")
             raise
 
     def output_list(self):

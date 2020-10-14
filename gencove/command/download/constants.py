@@ -39,3 +39,4 @@ FILENAME_RE = re.compile("filename=(.+)")
 FILE_TYPES_MAPPER = {}
 
 QC_FILE_TYPE = "qc"
+METADATA_FILE_TYPE = "metadata"

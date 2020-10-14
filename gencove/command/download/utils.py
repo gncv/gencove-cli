@@ -237,6 +237,22 @@ def download_file(
         return file_path
 
 
+def save_metadata_file(path, content):
+    """Helper function to save metadata to json file.
+
+    Args:
+        path(str): full file path where metadata will be saved
+        content(any): depending on the metadata, any json serializable
+
+    Returns:
+        None
+    """
+    echo("Downloading file to: {}".format(path))
+    with open(path, "w") as metadata_file:
+        json.dump(content, metadata_file)
+    echo("Finished downloading a file: {}".format(path))
+
+
 def save_qc_file(path, content):
     """Helper function to save qc metrics to json file.
 

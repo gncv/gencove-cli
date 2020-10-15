@@ -60,7 +60,8 @@ class SetMetadata(Command):
             )
             self.echo_debug(assigned_metadata)
             self.echo(
-                "Assigned metadata to a sample {}".format(self.sample_id)
+                "Assigned metadata to a sample {}".format(self.sample_id),
+                err=True,
             )
         except client.APIClientError as err:
             self.echo_debug(err)

@@ -94,16 +94,17 @@ class CreateBatch(Command):
             self.echo_debug(err)
             if err.status_code == 400:
                 self.echo_warning(
-                    "There was an error creating project batches."
+                    "There was an error creating project batches.", err=True
                 )
-                self.echo("The following error was returned:")
-                self.echo(err.message)
+                self.echo("The following error was returned:", err=True)
+                self.echo(err.message, err=True)
             elif err.status_code == 404:
                 self.echo_warning(
                     "Project {} does not exist or you do not have "
                     "permission required to access it.".format(
                         self.project_id
-                    )
+                    ),
+                    err=True,
                 )
             else:
                 raise BatchCreateError  # pylint: disable=W0707

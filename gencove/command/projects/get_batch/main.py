@@ -45,7 +45,7 @@ class GetBatch(Command):
             raise ValidationError(error_message)
 
     def execute(self):
-        self.echo_debug("Retrieving batch:")
+        self.echo_debug("Retrieving batch:", err=True)
 
         try:
             batch = self.get_batch()
@@ -53,7 +53,8 @@ class GetBatch(Command):
                 self.echo(
                     "There are no deliverables available for batch {}.".format(
                         self.batch_id
-                    )
+                    ),
+                    err=True,
                 )
                 sys.exit(1)
             if len(batch["files"]) > 1:
@@ -78,13 +79,16 @@ class GetBatch(Command):
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 400:
-                self.echo_warning("There was an error getting the batch.")
-                self.echo("The following error was returned:")
-                self.echo(err.message)
+                self.echo_warning(
+                    "There was an error getting the batch.", err=True
+                )
+                self.echo("The following error was returned:", err=True)
+                self.echo(err.message, err=True)
             elif err.status_code == 404:
                 self.echo_warning(
                     "Batch {} does not exist or you do not have "
-                    "permission required to access it.".format(self.batch_id)
+                    "permission required to access it.".format(self.batch_id),
+                    err=True,
                 )
             else:
                 raise BatchGetError  # pylint: disable=W0707

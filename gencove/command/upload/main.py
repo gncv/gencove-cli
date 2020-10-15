@@ -9,7 +9,10 @@ import backoff
 
 import requests
 
-from gencove.client import APIClientError  # noqa: I100
+from gencove.client import (  # noqa: I100
+    APIClientError,
+    APIClientTooManyRequestsError,
+)
 from gencove.command.base import Command
 from gencove.constants import FASTQ_MAP_EXTENSION, SAMPLE_ASSIGNMENT_STATUS
 from gencove.exceptions import ValidationError
@@ -248,6 +251,9 @@ class Upload(Command):
 
     @backoff.on_predicate(
         backoff.expo, get_get_upload_details_retry_predicate, max_tries=10
+    )
+    @backoff.on_exception(
+        backoff.expo, APIClientTooManyRequestsError, max_tries=20
     )
     def get_upload_details(self, gncv_path):
         """Get upload details with retry for last status update."""

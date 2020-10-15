@@ -53,6 +53,12 @@ class APIClientError(APIError):
     """Base HTTP error."""
 
 
+class APIClientTooManyRequestsError(APIClientError):
+    """Too many requests (429) HTTP error."""
+
+    status_code = 429
+
+
 class APIClientTimeout(APIClientError):
     """API timeout exception.
 
@@ -134,6 +140,9 @@ class APIClient:
                     headers=headers,
                     timeout=timeout,
                 )
+
+            if response.status_code == 429:
+                raise APIClientTooManyRequestsError("Too Many Requests")
         except (ConnectTimeout, ConnectionError):
             # If request timed out,
             # let upper level handle it the way it sees fit.

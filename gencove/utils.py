@@ -104,7 +104,8 @@ def validate_credentials(credentials):
         echo_debug("User provided 2 sets of credentials.")
         echo_warning(
             "Multiple sets of credentials provided."
-            "Please provide either username/password or API key."
+            "Please provide either username/password or API key.",
+            err=True,
         )
         return False
 
@@ -122,7 +123,7 @@ def login(api_client, credentials):
     password = credentials.password
 
     if not credentials.email or not credentials.password:
-        echo("Login required")
+        echo("Login required", err=True)
         email = email or click.prompt("Email", type=str, err=True)
         password = password or click.prompt(
             "Password", type=str, hide_input=True, err=True
@@ -135,7 +136,8 @@ def login(api_client, credentials):
     except APIClientError as err:
         echo_debug("Failed to login: {}".format(err))
         echo_error(
-            "Failed to login. Please verify your credentials and try again"
+            "Failed to login. Please verify your credentials and try again",
+            err=True,
         )
         return False
 

@@ -54,7 +54,8 @@ class CreateMergedVCF(Command):
             )
             self.echo_debug(created_merge_details)
             self.echo(
-                "Issued merge request for project {}".format(self.project_id)
+                "Issued merge request for project {}".format(self.project_id),
+                err=True,
             )
             self.echo(get_line(created_merge_details))
         except client.APIClientError as err:

@@ -119,7 +119,7 @@ class Download(Command):
 
     def execute(self):
         if self.download_to != "-":
-            self.echo("Processing samples")
+            self.echo("Processing samples", err=True)
         for sample_id in self.sample_ids:
             try:
                 self.process_sample(sample_id)
@@ -150,7 +150,8 @@ class Download(Command):
                 "Sample with id {} not found. "
                 "Are you using client id instead of sample id?".format(
                     sample_id
-                )
+                ),
+                err=True,
             )
             return
 
@@ -258,7 +259,8 @@ class Download(Command):
         if download_to_path in self.downloaded_files:
             self.echo_warning(
                 "Bad template! Multiple files have the same name. "
-                "Please fix the template and try again."
+                "Please fix the template and try again.",
+                err=True,
             )
 
             raise DownloadTemplateError
@@ -340,7 +342,9 @@ class Download(Command):
         try:
             return self.api_client.get_sample_qc_metrics(sample_id)["results"]
         except client.APIClientError:
-            self.echo_warning("Error getting sample quality control metrics.")
+            self.echo_warning(
+                "Error getting sample quality control metrics.", err=True
+            )
             raise
 
     def get_sample_metadata(self, sample_id):
@@ -355,7 +359,7 @@ class Download(Command):
         try:
             return self.api_client.get_metadata(sample_id)
         except client.APIClientError:
-            self.echo_warning("Error getting sample metadata.")
+            self.echo_warning("Error getting sample metadata.", err=True)
             raise
 
     def output_list(self):
@@ -368,5 +372,6 @@ class Download(Command):
                 json_file.write(json.dumps(self.download_files, indent=4))
             self.echo(
                 "Samples and their deliverables download URLs outputted to "
-                "{}".format(self.download_to)
+                "{}".format(self.download_to),
+                err=True,
             )

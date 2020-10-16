@@ -75,5 +75,6 @@ class GetMetadata(Command):
             with open(self.output_filename, "w") as json_file:
                 json_file.write(json.dumps(metadata, indent=4))
             self.echo(
-                "Sample metadata saved to {}".format(self.output_filename)
+                "Sample metadata saved to {}".format(self.output_filename),
+                err=True,
             )

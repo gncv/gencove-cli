@@ -53,6 +53,12 @@ class APIClientError(APIError):
     """Base HTTP error."""
 
 
+class APIClientTooManyRequestsError(APIClientError):
+    """Too many requests (429) HTTP error."""
+
+    status_code = 429
+
+
 class APIClientTimeout(APIClientError):
     """API timeout exception.
 
@@ -134,6 +140,9 @@ class APIClient:
                     headers=headers,
                     timeout=timeout,
                 )
+
+            if response.status_code == 429:
+                raise APIClientTooManyRequestsError("Too Many Requests")
         except (ConnectTimeout, ConnectionError):
             # If request timed out,
             # let upper level handle it the way it sees fit.
@@ -521,3 +530,20 @@ class APIClient:
             id=project_id
         )
         return self._get(merge_vcf_endpoint, authorized=True)
+
+    def get_metadata(self, sample_id):
+        """Retrieve the metadata for a sample."""
+        sample_metadata_endpoint = self.endpoints.sample_metadata.format(
+            id=sample_id
+        )
+        return self._get(sample_metadata_endpoint, authorized=True)
+
+    def set_metadata(self, sample_id, metadata):
+        """Assign the metadata to a sample."""
+        sample_metadata_endpoint = self.endpoints.sample_metadata.format(
+            id=sample_id
+        )
+        payload = {
+            "metadata": metadata,
+        }
+        return self._post(sample_metadata_endpoint, payload, authorized=True)

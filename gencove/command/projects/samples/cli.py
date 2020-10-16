@@ -10,7 +10,9 @@ from .main import ListSamples
 
 @click.command("list-samples")
 @click.argument("project_id")
-@click.option("--search", help="Gencove sample ID or client ID")
+@click.option(
+    "--search", help="Gencove sample ID, client ID or metadata substring"
+)
 @click.option(
     "--status",
     help="Get samples with specific status",

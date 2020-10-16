@@ -21,6 +21,7 @@ _APIEndpoint = namedtuple(
         "project_batches",
         "batches",
         "project_merge_vcfs",
+        "sample_metadata",
     ],
 )
 API_ENDPOINTS = _APIEndpoint(
@@ -39,6 +40,7 @@ API_ENDPOINTS = _APIEndpoint(
     "/api/v2/project-batches/{id}",
     "/api/v2/batches/{id}",
     "/api/v2/project-merge-vcfs/{id}",
+    "/api/v2/sample-metadata/{id}",
 )
 
 _SampleAssignmentStatus = namedtuple(

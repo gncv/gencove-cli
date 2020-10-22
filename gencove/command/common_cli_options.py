@@ -11,9 +11,10 @@ from gencove.constants import HOST
 common_options = [  # pylint: disable=invalid-name
     click.option(
         "--host",
-        default=HOST,
+        default=lambda: os.environ.get("GENCOVE_HOST", HOST),
         help="Optional Gencove API host, including http/s protocol. "
-        "Defaults to https://api.gencove.com",
+        "Can be passed as GENCOVE_HOST environment variable. "
+        f"Defaults to {HOST}",
     ),
     click.option(
         "--email",

@@ -101,7 +101,7 @@ def test_get_metadata__empty(mocker):
     assert res.exit_code == 0
     mocked_login.assert_called_once()
     mocked_get_metadata.assert_called_once()
-    assert json.dumps({"metadata": None}, indent=4) in res.output
+    assert json.dumps(None, indent=4) in res.output
 
 
 def test_get_metadata__success_custom_filename(mocker):
@@ -111,7 +111,8 @@ def test_get_metadata__success_custom_filename(mocker):
     runner = CliRunner()
 
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
-    mocked_response = {"metadata": {"somekey": "somevalue"}}
+    metadata = {"somekey": "somevalue"}
+    mocked_response = {"metadata": metadata}
     mocked_get_metadata = mocker.patch.object(
         APIClient,
         "get_metadata",
@@ -136,7 +137,7 @@ def test_get_metadata__success_custom_filename(mocker):
         mocked_get_metadata.assert_called_once()
         with open(custom_filename, "r") as output_file:
             output_content = output_file.read()
-        assert json.dumps(mocked_response, indent=4) == output_content
+        assert json.dumps(metadata, indent=4) == output_content
 
 
 def test_get_metadata__success_nested_custom_filename(mocker):
@@ -146,7 +147,8 @@ def test_get_metadata__success_nested_custom_filename(mocker):
     runner = CliRunner()
 
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
-    mocked_response = {"metadata": {"somekey": "somevalue"}}
+    metadata = {"somekey": "somevalue"}
+    mocked_response = {"metadata": metadata}
     mocked_get_metadata = mocker.patch.object(
         APIClient,
         "get_metadata",
@@ -171,7 +173,7 @@ def test_get_metadata__success_nested_custom_filename(mocker):
         mocked_get_metadata.assert_called_once()
         with open(custom_filename, "r") as output_file:
             output_content = output_file.read()
-        assert json.dumps(mocked_response, indent=4) == output_content
+        assert json.dumps(metadata, indent=4) == output_content
 
 
 def test_get_metadata__success_stdout(mocker):
@@ -181,7 +183,8 @@ def test_get_metadata__success_stdout(mocker):
     runner = CliRunner()
 
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
-    mocked_response = {"metadata": {"somekey": "somevalue"}}
+    metadata = {"somekey": "somevalue"}
+    mocked_response = {"metadata": metadata}
     mocked_get_metadata = mocker.patch.object(
         APIClient,
         "get_metadata",
@@ -205,5 +208,5 @@ def test_get_metadata__success_stdout(mocker):
     mocked_get_metadata.assert_called_once()
     output_line = io.BytesIO()
     sys.stdout = output_line
-    echo(json.dumps(mocked_response, indent=4))
+    echo(json.dumps(metadata, indent=4))
     assert output_line.getvalue() in res.output.encode()

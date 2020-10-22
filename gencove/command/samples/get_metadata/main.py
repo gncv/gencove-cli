@@ -61,7 +61,9 @@ class GetMetadata(Command):
     )
     def get_metadata(self):
         """Get metadata page."""
-        return self.api_client.get_metadata(sample_id=self.sample_id)
+        response = self.api_client.get_metadata(sample_id=self.sample_id)
+        # API always returns a dictionary with a "metadata" key
+        return response["metadata"]
 
     def output_metadata(self, metadata):
         """Output reformatted metadata JSON."""

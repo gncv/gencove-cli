@@ -1,7 +1,5 @@
 """Get project batch's deliverable subcommand."""
 
-import sys
-
 import backoff
 
 import requests
@@ -40,23 +38,19 @@ class GetBatch(Command):
         """
 
         if is_valid_uuid(self.batch_id) is False:
-            error_message = "Batch ID is not valid. Exiting."
-            self.echo_warning(error_message, err=True)
-            raise ValidationError(error_message)
+            raise ValidationError("Batch ID is not valid. Exiting.")
 
     def execute(self):
-        self.echo_debug("Retrieving batch:", err=True)
+        self.echo_debug("Retrieving batch:")
 
         try:
             batch = self.get_batch()
             if len(batch["files"]) == 0:
-                self.echo(
+                raise ValidationError(
                     "There are no deliverables available for batch {}.".format(
                         self.batch_id
-                    ),
-                    err=True,
+                    )
                 )
-                sys.exit(1)
             if len(batch["files"]) > 1:
                 self.echo_warning(
                     "There is more than one deliverable available for "
@@ -79,16 +73,13 @@ class GetBatch(Command):
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 400:
-                self.echo_warning(
-                    "There was an error getting the batch.", err=True
-                )
-                self.echo("The following error was returned:", err=True)
-                self.echo(err.message, err=True)
+                self.echo_warning("There was an error getting the batch.")
+                self.echo_info("The following error was returned:")
+                self.echo_info(err.message)
             elif err.status_code == 404:
                 self.echo_warning(
                     "Batch {} does not exist or you do not have "
                     "permission required to access it.".format(self.batch_id),
-                    err=True,
                 )
             else:
                 raise BatchGetError  # pylint: disable=W0707

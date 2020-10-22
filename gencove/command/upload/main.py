@@ -74,7 +74,7 @@ class Upload(Command):
     def initialize(self):
         """Initialize upload command parameters from provided arguments."""
         self.echo_debug("Host is {}".format(self.options.host))
-        self.echo_warning(TMP_UPLOADS_WARNING, err=True)
+        self.echo_warning(TMP_UPLOADS_WARNING)
 
         # fmt: off
         if os.path.isfile(self.source) and self.source.endswith(FASTQ_MAP_EXTENSION):  # noqa: E501
@@ -87,9 +87,8 @@ class Upload(Command):
 
         if not self.destination:
             self.destination = self.generate_gncv_destination()
-            self.echo(
-                "Files will be uploaded to: {}".format(self.destination),
-                err=True
+            self.echo_info(
+                "Files will be uploaded to: {}".format(self.destination)
             )
         # fmt: on
 
@@ -128,9 +127,9 @@ class Upload(Command):
             raise ValidationError("Bad configuration. Exiting.")
 
         if self.output and not self.project_id:
-            message = "--output cannot be used without --run-project-id"
-            self.echo_error(message)
-            raise ValidationError(message)
+            raise ValidationError(
+                "--output cannot be used without --run-project-id"
+            )
 
     def execute(self):
         """Upload fastq files from host system to Gencove cloud.
@@ -164,7 +163,7 @@ class Upload(Command):
             if self.project_id and upload:
                 self.upload_ids.add(upload["id"])
 
-        self.echo("All files were successfully uploaded.", err=True)
+        self.echo_info("All files were successfully uploaded.")
 
     def upload_from_map_file(self, s3_client):
         """Upload fastq files from a csv file."""
@@ -175,7 +174,7 @@ class Upload(Command):
             if self.project_id and upload:
                 self.upload_ids.add(upload["id"])
 
-        self.echo("All files were successfully uploaded.", err=True)
+        self.echo_info("All files were successfully uploaded.")
 
     def concatenate_and_upload_fastqs(self, key, fastqs, s3_client):
         """Upload fastqs parts as one file."""
@@ -193,12 +192,10 @@ class Upload(Command):
         upload_details = self.get_upload_details(gncv_path)
 
         if upload_details["last_status"]["status"] == UPLOAD_STATUSES.done:
-            self.echo(
-                "File was already uploaded: {}".format(gncv_path), err=True
-            )
+            self.echo_info("File was already uploaded: {}".format(gncv_path))
             return upload_details
 
-        self.echo("Uploading to {}".format(gncv_path), err=True)
+        self.echo_info("Uploading to {}".format(gncv_path))
         upload_multi_file(
             s3_client,
             MultiFileReader(fastqs),
@@ -224,31 +221,28 @@ class Upload(Command):
         )
         gncv_notated_path = self.destination + clean_file_path
 
-        self.echo(
+        self.echo_info(
             "Checking if file was already uploaded: {}".format(
                 clean_file_path
-            ),
-            err=True,
+            )
         )
 
         try:
             upload_details = self.get_upload_details(gncv_notated_path)
         except APIClientError as err:
             if err.status_code == 400:
-                self.echo(err.message, err=True)
+                self.echo_info(err.message)
                 raise UploadError  # pylint: disable=W0707
             raise err
 
         if upload_details["last_status"]["status"] == UPLOAD_STATUSES.done:
-            self.echo(
-                "File was already uploaded: {}".format(clean_file_path),
-                err=True,
+            self.echo_info(
+                "File was already uploaded: {}".format(clean_file_path)
             )
             return upload_details
 
-        self.echo(
-            "Uploading {} to {}".format(file_path, gncv_notated_path),
-            err=True,
+        self.echo_info(
+            "Uploading {} to {}".format(file_path, gncv_notated_path)
         )
         upload_file(
             s3_client=s3_client,
@@ -271,25 +265,22 @@ class Upload(Command):
 
     def assign_uploads_to_project(self):
         """Assign uploads to a project and trigger a run."""
-        self.echo(
-            "Assigning uploads to project {}".format(self.project_id),
-            err=True,
+        self.echo_info(
+            "Assigning uploads to project {}".format(self.project_id)
         )
 
         try:
             samples = self.build_samples(self.upload_ids)
         except (UploadError, SampleSheetError, UploadNotFound):
             self.echo_warning(
-                ASSIGN_ERROR.format(self.project_id, self.destination),
-                err=True,
+                ASSIGN_ERROR.format(self.project_id, self.destination)
             )
             return
 
         if not samples:
             self.echo_debug("No related samples were found")
             self.echo_warning(
-                ASSIGN_ERROR.format(self.project_id, self.destination),
-                err=True,
+                ASSIGN_ERROR.format(self.project_id, self.destination)
             )
             return
 
@@ -322,28 +313,24 @@ class Upload(Command):
             except APIClientError as err:
                 self.echo_debug(err)
                 self.echo_warning(
-                    "There was an error assigning/running samples.", err=True
+                    "There was an error assigning/running samples."
                 )
                 if assigned_count > 0:
                     self.echo_warning(
                         "Some of the samples were assigned. "
                         "Please use the Web UI to assign "
-                        "the rest of the samples",
-                        err=True,
+                        "the rest of the samples"
                     )
                 else:
                     self.echo_warning(
-                        ASSIGN_ERROR.format(
-                            self.project_id, self.destination
-                        ),
-                        err=True,
+                        ASSIGN_ERROR.format(self.project_id, self.destination)
                     )
                 if not self.no_progress:
                     progress_bar.finish()
                 return
         if not self.no_progress:
             progress_bar.finish()
-        self.echo("Assigned all samples to a project", err=True)
+        self.echo_info("Assigned all samples to a project")
 
     @backoff.on_exception(
         backoff.expo, (SampleSheetError, UploadNotFound), max_time=300
@@ -444,16 +431,15 @@ class Upload(Command):
         """Output JSON of assigning samples to a project."""
         self.echo_debug("Outputting JSON.")
         if self.output == "-":
-            self.echo(json.dumps(self.assigned_samples, indent=4))
+            self.echo_data(json.dumps(self.assigned_samples, indent=4))
         else:
             dirname = os.path.dirname(self.output)
             if dirname and not os.path.exists(dirname):
                 os.makedirs(dirname)
             with open(self.output, "w") as json_file:
                 json_file.write(json.dumps(self.assigned_samples, indent=4))
-            self.echo(
+            self.echo_info(
                 "Assigned samples response outputted to {}".format(
                     self.output
-                ),
-                err=True,
+                )
             )

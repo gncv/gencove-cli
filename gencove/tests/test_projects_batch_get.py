@@ -37,10 +37,8 @@ def test_get_batch__empty(mocker):
     mocked_login.assert_called_once()
     mocked_get_batch.assert_called_once()
     assert (
-        res.output
-        == "There are no deliverables available for batch {}.\n".format(
-            batch_id
-        )
+        res.output == "ERROR: There are no deliverables available for batch"
+        " {}.\nAborted!\n".format(batch_id)
     )
 
 

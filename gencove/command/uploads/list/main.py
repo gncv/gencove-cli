@@ -46,7 +46,7 @@ class ListSampleSheet(Command):
                 return
 
             for upload in uploads:
-                self.echo(get_line(upload))
+                self.echo_data(get_line(upload))
 
     def get_paginated_sample_sheet(self):
         """Paginate over all sample sheet pages.

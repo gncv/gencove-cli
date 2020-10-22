@@ -33,9 +33,7 @@ class GetMetadata(Command):
         """
 
         if is_valid_uuid(self.sample_id) is False:
-            error_message = "Sample ID is not valid. Exiting."
-            self.echo_warning(error_message, err=True)
-            raise ValidationError(error_message)
+            raise ValidationError("Sample ID is not valid. Exiting.")
 
     def execute(self):
         self.echo_debug("Retrieving sample metadata:")
@@ -69,14 +67,13 @@ class GetMetadata(Command):
         """Output reformatted metadata JSON."""
         self.echo_debug("Outputting JSON.")
         if self.output_filename == "-":
-            self.echo(json.dumps(metadata, indent=4))
+            self.echo_data(json.dumps(metadata, indent=4))
         else:
             dirname = os.path.dirname(self.output_filename)
             if dirname and not os.path.exists(dirname):
                 os.makedirs(dirname)
             with open(self.output_filename, "w") as json_file:
                 json_file.write(json.dumps(metadata, indent=4))
-            self.echo(
+            self.echo_info(
                 "Sample metadata saved to {}".format(self.output_filename),
-                err=True,
             )

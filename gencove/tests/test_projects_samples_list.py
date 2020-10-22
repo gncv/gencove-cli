@@ -8,7 +8,7 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient  # noqa: I100
 from gencove.command.projects.cli import list_project_samples
-from gencove.logger import echo
+from gencove.logger import echo_data
 
 
 def test_list_empty(mocker):
@@ -65,7 +65,7 @@ def test_list_projects(mocker):
 
     output_line = io.BytesIO()
     sys.stdout = output_line
-    echo(
+    echo_data(
         "\t".join(
             [
                 MOCKED_SAMPLES["results"][0]["last_status"]["created"],

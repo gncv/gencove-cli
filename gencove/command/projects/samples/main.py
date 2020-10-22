@@ -49,7 +49,7 @@ class ListSamples(Command):
                 return
 
             for sample in samples:
-                self.echo(get_line(sample))
+                self.echo_data(get_line(sample))
 
     def get_paginated_samples(self):
         """Paginate over all sample sheets for the destination.

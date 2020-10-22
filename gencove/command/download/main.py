@@ -49,9 +49,7 @@ class Download(Command):
     def initialize(self):
         """Initialize download command."""
         if self.filters.project_id and self.filters.sample_ids:
-            message = "Bad configuration. Exiting"
-            self.echo_error(message)
-            raise ValidationError(message)
+            raise ValidationError("Bad configuration. Exiting")
 
         self.login()
 
@@ -67,11 +65,9 @@ class Download(Command):
                 for sample in samples_generator:
                     self.sample_ids.add(sample["id"])
             except client.APIClientError as err:
-                message = "Project id {} not found.".format(
-                    self.filters.project_id
-                )
-                self.echo_error(message)
-                raise ValidationError(message) from err
+                raise ValidationError(
+                    "Project id {} not found.".format(self.filters.project_id)
+                ) from err
         else:
             self.sample_ids = self.filters.sample_ids
 
@@ -82,19 +78,17 @@ class Download(Command):
             ValidationError : something is wrong with configuration
         """
         if not self.filters.project_id and not self.filters.sample_ids:
-            message = "Must specify one of: project id or sample ids"
-            self.echo_error(message)
-            raise ValidationError(message)
+            raise ValidationError(
+                "Must specify one of: project id or sample ids"
+            )
 
         if self.filters.project_id and self.filters.sample_ids:
-            message = "Must specify only one of: project id or sample ids"
-            self.echo_error(message)
-            raise ValidationError(message)
+            raise ValidationError(
+                "Must specify only one of: project id or sample ids"
+            )
 
         if not self.sample_ids:
-            message = "No samples to process. Exiting."
-            self.echo_error(message)
-            raise ValidationError(message)
+            raise ValidationError("No samples to process. Exiting.")
 
         if all(
             [
@@ -102,9 +96,9 @@ class Download(Command):
                 not self.download_urls,
             ]
         ):
-            message = "Cannot have - as a destination without download-urls."
-            self.echo_error(message)
-            raise ValidationError(message)
+            raise ValidationError(
+                "Cannot have - as a destination without download-urls."
+            )
 
         if self.download_urls:
             self.echo_debug("Requesting download list in JSON format.")
@@ -119,7 +113,7 @@ class Download(Command):
 
     def execute(self):
         if self.download_to != "-":
-            self.echo("Processing samples", err=True)
+            self.echo_info("Processing samples")
         for sample_id in self.sample_ids:
             try:
                 self.process_sample(sample_id)
@@ -150,8 +144,7 @@ class Download(Command):
                 "Sample with id {} not found. "
                 "Are you using client id instead of sample id?".format(
                     sample_id
-                ),
-                err=True,
+                )
             )
             return
 
@@ -164,7 +157,6 @@ class Download(Command):
         if not ALLOWED_STATUSES_RE.match(sample["last_status"]["status"]):
             self.echo_warning(
                 "Sample #{} has no deliverable.".format(sample["id"]),
-                err=True,
             )
             return
 
@@ -259,8 +251,7 @@ class Download(Command):
         if download_to_path in self.downloaded_files:
             self.echo_warning(
                 "Bad template! Multiple files have the same name. "
-                "Please fix the template and try again.",
-                err=True,
+                "Please fix the template and try again."
             )
 
             raise DownloadTemplateError
@@ -342,9 +333,7 @@ class Download(Command):
         try:
             return self.api_client.get_sample_qc_metrics(sample_id)["results"]
         except client.APIClientError:
-            self.echo_warning(
-                "Error getting sample quality control metrics.", err=True
-            )
+            self.echo_warning("Error getting sample quality control metrics.")
             raise
 
     def get_sample_metadata(self, sample_id):
@@ -359,19 +348,18 @@ class Download(Command):
         try:
             return self.api_client.get_metadata(sample_id)
         except client.APIClientError:
-            self.echo_warning("Error getting sample metadata.", err=True)
+            self.echo_warning("Error getting sample metadata.")
             raise
 
     def output_list(self):
         """Output reformatted JSON of each individual sample."""
         self.echo_debug("Outputting JSON.")
         if self.download_to == "-":
-            self.echo(json.dumps(self.download_files, indent=4))
+            self.echo_data(json.dumps(self.download_files, indent=4))
         else:
             with open(self.download_to, "w") as json_file:
                 json_file.write(json.dumps(self.download_files, indent=4))
-            self.echo(
+            self.echo_info(
                 "Samples and their deliverables download URLs outputted to "
-                "{}".format(self.download_to),
-                err=True,
+                "{}".format(self.download_to)
             )

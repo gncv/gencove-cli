@@ -33,9 +33,7 @@ class ListBatchTypes(Command):
         """
 
         if is_valid_uuid(self.project_id) is False:
-            error_message = "Project ID is not valid. Exiting."
-            self.echo_warning(error_message, err=True)
-            raise ValidationError(error_message)
+            raise ValidationError("Project ID is not valid. Exiting.")
 
     def execute(self):
         self.echo_debug("Retrieving project's batch types:")
@@ -47,24 +45,22 @@ class ListBatchTypes(Command):
                     return
 
                 for batch_type in batch_types:
-                    self.echo(get_line(batch_type))
+                    self.echo_data(get_line(batch_type))
 
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 400:
                 self.echo_warning(
-                    "There was an error listing project batch types.",
-                    err=True,
+                    "There was an error listing project batch types."
                 )
-                self.echo("The following error was returned:", err=True)
-                self.echo(err.message, err=True)
+                self.echo_info("The following error was returned:")
+                self.echo_info(err.message)
             elif err.status_code == 404:
                 self.echo_warning(
                     "Project {} does not exist or you do not have "
                     "permission required to access it.".format(
                         self.project_id
-                    ),
-                    err=True,
+                    )
                 )
             else:
                 raise BatchTypesError  # pylint: disable=W0707

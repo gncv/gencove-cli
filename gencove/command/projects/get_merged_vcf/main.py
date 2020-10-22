@@ -38,9 +38,7 @@ class GetMergedVCF(Command):
             ValidationError - if something is wrong with command parameters.
         """
         if is_valid_uuid(self.project_id) is False:
-            error_message = "Project ID is not valid. Exiting."
-            self.echo_error(error_message)
-            raise ValidationError(error_message)
+            raise ValidationError("Project ID is not valid. Exiting.")
 
     @backoff.on_exception(
         backoff.expo,
@@ -67,11 +65,11 @@ class GetMergedVCF(Command):
                 None,
             )
             if merged_vcf is None:
-                error_message = "No files to process for project {}".format(
-                    self.project_id
+                raise ValidationError(
+                    "No files to process for project {}".format(
+                        self.project_id
+                    )
                 )
-                self.echo_error(error_message)
-                raise ValidationError(error_message)
             download_path = (
                 self.output_filename
                 if self.output_filename

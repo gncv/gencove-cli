@@ -9,9 +9,10 @@ from gencove.exceptions import ValidationError
 from gencove.logger import (
     DEBUG,
     LOG_LEVEL,
-    echo,
+    echo_data,
     echo_debug,
     echo_error,
+    echo_info,
     echo_warning,
 )
 from gencove.utils import login, validate_credentials
@@ -57,7 +58,7 @@ class Command(object):  # pylint: disable=R0205
             self.validate_login_success()
             self.execute()
         except ValidationError as err:
-            self.echo_debug(repr(err))
+            self.echo_error(str(err))
             raise click.Abort()
         except APIClientError as err:
             self.echo_error(err.message)
@@ -73,9 +74,14 @@ class Command(object):  # pylint: disable=R0205
         return self.is_logged_in
 
     @staticmethod
-    def echo(msg, **kwargs):
+    def echo_data(msg, **kwargs):
+        """Output data message."""
+        echo_data(msg, **kwargs)
+
+    @staticmethod
+    def echo_info(msg, **kwargs):
         """Output info message."""
-        echo(msg, **kwargs)
+        echo_info(msg, **kwargs)
 
     @staticmethod
     def echo_warning(msg, **kwargs):

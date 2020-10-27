@@ -58,7 +58,7 @@ class Command(object):  # pylint: disable=R0205
             self.validate_login_success()
             self.execute()
         except ValidationError as err:
-            self.echo_error(str(err))
+            self.echo_error(err.message)
             raise click.Abort()
         except APIClientError as err:
             self.echo_error(err.message)

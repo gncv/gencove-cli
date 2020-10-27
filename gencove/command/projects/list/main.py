@@ -35,7 +35,7 @@ class List(Command):
             )
 
             for project in augmented_projects:
-                self.echo(get_line(project))
+                self.echo_data(get_line(project))
 
     def get_paginated_projects(self):
         """Paginate over all projects.

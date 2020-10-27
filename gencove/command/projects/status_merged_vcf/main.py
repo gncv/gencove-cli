@@ -35,9 +35,7 @@ class StatusMergedVCF(Command):
             ValidationError - if something is wrong with command parameters.
         """
         if is_valid_uuid(self.project_id) is False:
-            error_message = "Project ID is not valid. Exiting."
-            self.echo_error(error_message)
-            raise ValidationError(error_message)
+            raise ValidationError("Project ID is not valid. Exiting.")
 
     @backoff.on_exception(
         backoff.expo,
@@ -57,8 +55,8 @@ class StatusMergedVCF(Command):
             )
             self.echo_debug(merge_details_status)
             if merge_details_status["last_status"]["status"] == "failed":
-                self.echo_warning("The job failed merging.", err=True)
-            self.echo(get_line(merge_details_status))
+                self.echo_warning("The job failed merging.")
+            self.echo_data(get_line(merge_details_status))
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 400:

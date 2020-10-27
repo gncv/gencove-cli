@@ -42,29 +42,23 @@ class CreateBatch(Command):
             ValidationError - if something is wrong with command parameters.
         """
         if not self.batch_type:
-            error_message = (
+            raise ValidationError(
                 "You must provide value for --batch-type. Exiting."
             )
-            self.echo_warning(error_message, err=True)
-            raise ValidationError(error_message)
 
         if not self.batch_name:
-            error_message = (
+            raise ValidationError(
                 "You must provide value for --batch-name. Exiting."
             )
-            self.echo_warning(error_message, err=True)
-            raise ValidationError(error_message)
 
         if is_valid_uuid(self.project_id) is False:
-            error_message = "Project ID is not valid. Exiting."
-            self.echo_warning(error_message, err=True)
-            raise ValidationError(error_message)
+            raise ValidationError("Project ID is not valid. Exiting.")
 
         if self.sample_ids:
             if not all([is_valid_uuid(s_id) for s_id in self.sample_ids]):
-                error_message = "Not all sample IDs are valid. Exiting."
-                self.echo_warning(error_message, err=True)
-                raise ValidationError(error_message)
+                raise ValidationError(
+                    "Not all sample IDs are valid. Exiting."
+                )
 
     @backoff.on_exception(
         backoff.expo,
@@ -89,22 +83,21 @@ class CreateBatch(Command):
             )
             self.echo_debug(created_batches_details)
             for batch in created_batches_details["results"]:
-                self.echo(get_line(batch))
+                self.echo_data(get_line(batch))
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 400:
                 self.echo_warning(
-                    "There was an error creating project batches.", err=True
+                    "There was an error creating project batches."
                 )
-                self.echo("The following error was returned:", err=True)
-                self.echo(err.message, err=True)
+                self.echo_info("The following error was returned:")
+                self.echo_info(err.message)
             elif err.status_code == 404:
                 self.echo_warning(
                     "Project {} does not exist or you do not have "
                     "permission required to access it.".format(
                         self.project_id
-                    ),
-                    err=True,
+                    )
                 )
             else:
                 raise BatchCreateError  # pylint: disable=W0707

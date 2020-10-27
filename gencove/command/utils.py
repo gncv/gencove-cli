@@ -2,7 +2,6 @@
 import uuid
 
 from gencove.exceptions import ValidationError
-from gencove.logger import echo_warning
 
 
 def sanitize_string(output):
@@ -27,16 +26,12 @@ def validate_input(key, provided_value, allowed_values_re, allowed_values):
          ValidationError: with validation error message
     """
     if not allowed_values_re.match(provided_value):
-        echo_warning(
+        raise ValidationError(
             "Unknown {} value: {}. Allowed values are: {}".format(
                 key,
                 provided_value,
                 ", ".join(allowed_values._asdict().values()),
-            ),
-            err=True,
-        )
-        raise ValidationError(
-            "Unknown {} value: {}.".format(key, provided_value)
+            )
         )
 
 

@@ -12,7 +12,7 @@ import click
 import progressbar
 
 from gencove.client import APIClientError  # noqa: I100
-from gencove.logger import echo, echo_debug, echo_error, echo_warning
+from gencove.logger import echo_debug, echo_error, echo_info, echo_warning
 
 KB = 1024
 MB = KB * 1024
@@ -104,8 +104,7 @@ def validate_credentials(credentials):
         echo_debug("User provided 2 sets of credentials.")
         echo_warning(
             "Multiple sets of credentials provided."
-            "Please provide either username/password or API key.",
-            err=True,
+            "Please provide either username/password or API key."
         )
         return False
 
@@ -123,7 +122,7 @@ def login(api_client, credentials):
     password = credentials.password
 
     if not credentials.email or not credentials.password:
-        echo("Login required", err=True)
+        echo_info("Login required")
         email = email or click.prompt("Email", type=str, err=True)
         password = password or click.prompt(
             "Password", type=str, hide_input=True, err=True
@@ -136,8 +135,7 @@ def login(api_client, credentials):
     except APIClientError as err:
         echo_debug("Failed to login: {}".format(err))
         echo_error(
-            "Failed to login. Please verify your credentials and try again",
-            err=True,
+            "Failed to login. Please verify your credentials and try again"
         )
         return False
 

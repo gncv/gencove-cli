@@ -9,7 +9,7 @@ from boto3.s3.transfer import TransferConfig
 from botocore.exceptions import ClientError
 
 from gencove.exceptions import ValidationError
-from gencove.logger import echo, echo_debug
+from gencove.logger import echo_debug, echo_info
 from gencove.utils import CHUNK_SIZE, get_progress_bar
 
 from .constants import (
@@ -66,7 +66,7 @@ def upload_file(
         if not no_progress:
             progress_bar.finish()
     except ClientError as err:
-        echo("Failed to upload file {}: {}".format(file_name, err), err=True)
+        echo_info("Failed to upload file {}: {}".format(file_name, err))
         return False
     return True
 
@@ -122,10 +122,7 @@ def upload_multi_file(
         if not no_progress:
             progress_bar.finish()
     except ClientError as err:
-        echo(
-            "Failed to upload file {}: {}".format(file_obj.name, err),
-            err=True,
-        )
+        echo_info("Failed to upload file {}: {}".format(file_obj.name, err))
         return False
     return True
 
@@ -190,22 +187,19 @@ def _validate_fastq(fastq):
         ValidationError if fastq is not valid
     """
     if not fastq.path.lower().endswith(FASTQ_EXTENSIONS):
-        echo("Unsupported file type found: {}".format(fastq.path), err=True)
+        echo_info("Unsupported file type found: {}".format(fastq.path))
         raise ValidationError(
             "Bad file extension in path: {}".format(fastq.path)
         )
     if "_" in fastq.client_id:
-        echo("Underscore is not allowed in client id", err=True)
+        echo_info("Underscore is not allowed in client id")
         raise ValidationError("Underscore is not allowed in client id")
     if not os.path.exists(fastq.path):
-        echo("Path does not exist: {}".format(fastq.path), err=True)
+        echo_info("Path does not exist: {}".format(fastq.path))
         raise ValidationError("Could not find: {}".format(fastq.path))
     if fastq.r_notation not in R_NOTATION_MAP:
-        echo("Wrong R notation: {}".format(fastq.r_notation), err=True)
-        echo(
-            "Valid R notations are: {}".format(R_NOTATION_MAP.keys()),
-            err=True,
-        )
+        echo_info("Wrong R notation: {}".format(fastq.r_notation))
+        echo_info("Valid R notations are: {}".format(R_NOTATION_MAP.keys()))
         raise ValidationError("Wrong R notation: {}".format(fastq.r_notation))
 
 
@@ -213,13 +207,11 @@ def _validate_header(header):
     header_columns = header.values()
     for column in FastQ._fields:
         if column not in header_columns:
-            echo(
+            raise ValidationError(
                 "Unexpected CSV header. Expected: {}".format(
                     ", ".join(FastQ._fields)
-                ),
-                err=True,
+                )
             )
-            raise ValidationError("Unexpected CSV header: {}".format(column))
 
 
 def parse_fastqs_map_file(fastqs_map_path):

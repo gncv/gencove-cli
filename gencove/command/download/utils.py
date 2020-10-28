@@ -112,15 +112,14 @@ def build_file_path(
     source_filename = filename if filename else get_filename_from_download_url(deliverable["download_url"])  # noqa: E501  # pylint: disable=line-too-long
     # fmt: on
 
+    destination_filename = "{}.{{{}}}".format(
+        prefix.filename, DownloadTemplateParts.file_extension
+    )
     if prefix.use_default_filename:
         destination_filename = prefix.filename
-    elif prefix.file_extension:
+    if prefix.file_extension:
         destination_filename = "{}.{}".format(
             prefix.filename, prefix.file_extension
-        )
-    else:
-        destination_filename = "{}.{{{}}}".format(
-            prefix.filename, DownloadTemplateParts.file_extension
         )
 
     # turning off formatting for improved code readability

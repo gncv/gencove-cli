@@ -8,7 +8,6 @@ from gencove.client import APIClientError  # noqa: I100
 from gencove.command.base import Command
 
 from .constants import PipelineCapabilities, Project
-from .exceptions import ProjectsError
 from .utils import get_line
 
 
@@ -25,17 +24,24 @@ class List(Command):
     def execute(self):
         self.echo_debug("Retrieving projects")
 
-        for projects in self.get_paginated_projects():
-            if not projects:
-                self.echo_debug("No projects were found.")
-                return
+        try:
+            for projects in self.get_paginated_projects():
+                if not projects:
+                    self.echo_debug("No projects were found.")
+                    return
 
-            augmented_projects = self.augment_projects_with_pipeline_capabilities(  # noqa: E501
-                projects
-            )
+                augmented_projects = self.augment_projects_with_pipeline_capabilities(  # noqa: E501
+                    projects
+                )
 
-            for project in augmented_projects:
-                self.echo_data(get_line(project))
+                for project in augmented_projects:
+                    self.echo_data(get_line(project))
+        except APIClientError as err:
+            if err.status_code == 404:
+                self.echo_error(
+                    "You do not have permission required to access the project list."
+                )
+            raise
 
     def get_paginated_projects(self):
         """Paginate over all projects.
@@ -47,14 +53,10 @@ class List(Command):
         next_link = None
         while more:
             self.echo_debug("Get projects page")
-            try:
-                resp = self.get_projects(next_link)
-                yield [Project(**result) for result in resp["results"]]
-                next_link = resp["meta"]["next"]
-                more = next_link is not None
-            except APIClientError as err:
-                self.echo_debug(err)
-                raise ProjectsError  # pylint: disable=W0707
+            resp = self.get_projects(next_link)
+            yield [Project(**result) for result in resp["results"]]
+            next_link = resp["meta"]["next"]
+            more = next_link is not None
 
     @backoff.on_exception(
         backoff.expo,

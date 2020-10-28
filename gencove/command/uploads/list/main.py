@@ -10,7 +10,6 @@ from gencove.command.utils import validate_input
 from gencove.constants import SAMPLE_ASSIGNMENT_STATUS
 
 from .constants import ALLOWED_STATUSES_RE
-from .exceptions import UploadsError
 from .utils import get_line
 
 
@@ -40,13 +39,21 @@ class ListSampleSheet(Command):
             "Retrieving sample sheet: "
             "status={} search_term={}".format(self.status, self.gncv_path)
         )
-        for uploads in self.get_paginated_sample_sheet():
-            if not uploads:
-                self.echo_debug("No matching uploads found.")
-                return
+        try:
+            for uploads in self.get_paginated_sample_sheet():
+                if not uploads:
+                    self.echo_debug("No matching uploads found.")
+                    return
 
-            for upload in uploads:
-                self.echo_data(get_line(upload))
+                for upload in uploads:
+                    self.echo_data(get_line(upload))
+        except APIClientError as err:
+            if err.status_code == 404:
+                self.echo_error(
+                    "Uploads do not exist or you do not have "
+                    "permission required to access them."
+                )
+            raise
 
     def get_paginated_sample_sheet(self):
         """Paginate over all sample sheet pages.
@@ -58,14 +65,10 @@ class ListSampleSheet(Command):
         next_link = None
         while more:
             self.echo_debug("Get sample sheet page")
-            try:
-                resp = self.get_sample_sheet(next_link)
-                yield resp["results"]
-                next_link = resp["meta"]["next"]
-                more = next_link is not None
-            except APIClientError as err:
-                self.echo_debug(err)
-                raise UploadsError  # pylint: disable=W0707
+            resp = self.get_sample_sheet(next_link)
+            yield resp["results"]
+            next_link = resp["meta"]["next"]
+            more = next_link is not None
 
     @backoff.on_exception(
         backoff.expo,

@@ -39,7 +39,8 @@ class List(Command):
         except APIClientError as err:
             if err.status_code == 404:
                 self.echo_error(
-                    "You do not have permission required to access the project list."
+                    "You do not have permission required "
+                    "to access the project list."
                 )
             raise
 

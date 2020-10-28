@@ -88,7 +88,8 @@ def test_list_projects_no_permission(mocker):
     echo(
         "\n".join(
             [
-                "ERROR: You do not have permission required to access the project list.",
+                "ERROR: You do not have permission required to access "
+                "the project list.",
                 "ERROR: API Client Error: Not Found: Not found.",
                 "Aborted!",
             ]

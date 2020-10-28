@@ -9,9 +9,9 @@ from gencove.command.base import Command
 from gencove.constants import SAMPLE_STATUS
 
 from .constants import ALLOWED_STATUSES_RE
-from .exceptions import SamplesError
 from .utils import get_line
-from ...utils import validate_input
+from ...utils import is_valid_uuid, validate_input
+from ....exceptions import ValidationError
 
 
 class ListSamples(Command):
@@ -29,6 +29,9 @@ class ListSamples(Command):
 
     def validate(self):
         """Validate command input."""
+        if is_valid_uuid(self.project_id) is False:
+            raise ValidationError("Project ID is not valid. Exiting.")
+
         validate_input(
             "sample status",
             self.sample_status,
@@ -43,13 +46,23 @@ class ListSamples(Command):
                 self.sample_status, self.search_term
             )
         )
-        for samples in self.get_paginated_samples():
-            if not samples:
-                self.echo_debug("No matching samples were found.")
-                return
+        try:
+            for samples in self.get_paginated_samples():
+                if not samples:
+                    self.echo_debug("No matching samples were found.")
+                    return
 
-            for sample in samples:
-                self.echo_data(get_line(sample))
+                for sample in samples:
+                    self.echo_data(get_line(sample))
+        except APIClientError as err:
+            if err.status_code == 404:
+                self.echo_error(
+                    "Project {} does not exist or you do not have "
+                    "permission required to access it.".format(
+                        self.project_id
+                    )
+                )
+            raise
 
     def get_paginated_samples(self):
         """Paginate over all sample sheets for the destination.
@@ -61,14 +74,10 @@ class ListSamples(Command):
         next_link = None
         while more:
             self.echo_debug("Get sample sheet page")
-            try:
-                resp = self.get_samples(next_link)
-                yield resp["results"]
-                next_link = resp["meta"]["next"]
-                more = next_link is not None
-            except APIClientError as err:
-                self.echo_debug(err)
-                raise SamplesError  # pylint: disable=W0707
+            resp = self.get_samples(next_link)
+            yield resp["results"]
+            next_link = resp["meta"]["next"]
+            more = next_link is not None
 
     @backoff.on_exception(
         backoff.expo,

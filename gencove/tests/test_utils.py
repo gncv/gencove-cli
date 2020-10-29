@@ -46,7 +46,9 @@ def test_download_template_tokens():
     ] == list(DownloadTemplateParts._asdict().values())
 
 
-def test_build_file_path(mocker):
+# pylint: disable=too-many-locals
+def test_build_file_path():
+    """Test token combinations when building a file path."""
     client_id = "12345"
     gencove_id = "1"
     deliverable = {

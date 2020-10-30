@@ -6,9 +6,9 @@ from uuid import uuid4
 
 from click.testing import CliRunner
 
-from gencove.client import APIClient  # noqa: I100
+from gencove.client import APIClient, APIClientError
 from gencove.command.projects.cli import list_project_samples
-from gencove.logger import echo
+from gencove.logger import echo_data
 
 
 def test_list_empty(mocker):
@@ -30,29 +30,91 @@ def test_list_empty(mocker):
     assert res.output == ""
 
 
-MOCKED_SAMPLES = dict(
-    meta=dict(count=1, next=None),
-    results=[
-        {
-            "id": str(uuid4()),
-            "client_id": "tester client id",
-            "last_status": {
-                "created": (
-                    datetime.utcnow() - timedelta(days=3)
-                ).isoformat(),
-                "status": "succeeded",
-            },
-        }
-    ],
-)
+def test_list_projects_bad_project_id(mocker):
+    """Test project samples throw an error if project id is not uuid."""
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+
+    project_id = "123456"
+
+    res = runner.invoke(
+        list_project_samples,
+        [project_id, "--email", "foo@bar.com", "--password", "123"],
+    )
+    assert res.exit_code == 1
+    mocked_login.assert_called_once()
+    output_line = io.BytesIO()
+    sys.stdout = output_line
+    echo_data(
+        "\n".join(
+            [
+                "ERROR: Project ID is not valid. Exiting.",
+                "Aborted!",
+            ]
+        )
+    )
+    assert output_line.getvalue() == res.output.encode()
+
+
+def test_list_projects_no_project(mocker):
+    """Test project samples throw an error if no project available."""
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_get_project_samples = mocker.patch.object(
+        APIClient,
+        "get_project_samples",
+        side_effect=APIClientError(
+            message="API Client Error: Not Found: Not found.", status_code=404
+        ),
+        return_value={"detail": "Not found"},
+    )
+
+    project_id = str(uuid4())
+
+    res = runner.invoke(
+        list_project_samples,
+        [project_id, "--email", "foo@bar.com", "--password", "123"],
+    )
+    assert res.exit_code == 1
+    mocked_login.assert_called_once()
+    mocked_get_project_samples.assert_called_once()
+
+    output_line = io.BytesIO()
+    sys.stdout = output_line
+    echo_data(
+        "\n".join(
+            [
+                "ERROR: Project {} does not exist or you do not have"
+                " permission required to access it.".format(project_id),
+                "ERROR: API Client Error: Not Found: Not found.",
+                "Aborted!",
+            ]
+        )
+    )
+    assert output_line.getvalue() == res.output.encode()
 
 
 def test_list_projects(mocker):
     """Test project samples being outputed to the shell."""
+    mocked_samples = dict(
+        meta=dict(count=1, next=None),
+        results=[
+            {
+                "id": str(uuid4()),
+                "client_id": "tester client id",
+                "last_status": {
+                    "created": (
+                        datetime.utcnow() - timedelta(days=3)
+                    ).isoformat(),
+                    "status": "succeeded",
+                },
+            }
+        ],
+    )
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_project_samples = mocker.patch.object(
-        APIClient, "get_project_samples", return_value=MOCKED_SAMPLES
+        APIClient, "get_project_samples", return_value=mocked_samples
     )
 
     res = runner.invoke(
@@ -65,13 +127,13 @@ def test_list_projects(mocker):
 
     output_line = io.BytesIO()
     sys.stdout = output_line
-    echo(
+    echo_data(
         "\t".join(
             [
-                MOCKED_SAMPLES["results"][0]["last_status"]["created"],
-                MOCKED_SAMPLES["results"][0]["id"],
-                MOCKED_SAMPLES["results"][0]["client_id"],
-                MOCKED_SAMPLES["results"][0]["last_status"]["status"],
+                mocked_samples["results"][0]["last_status"]["created"],
+                mocked_samples["results"][0]["id"],
+                mocked_samples["results"][0]["client_id"],
+                mocked_samples["results"][0]["last_status"]["status"],
             ]
         )
     )

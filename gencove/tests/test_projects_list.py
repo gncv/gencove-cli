@@ -8,7 +8,7 @@ from uuid import uuid4
 from click import echo
 from click.testing import CliRunner
 
-from gencove.client import APIClient  # noqa: I100
+from gencove.client import APIClient, APIClientError  # noqa: I100
 from gencove.command.projects.cli import list_projects
 from gencove.command.projects.list.constants import (
     PipelineCapabilities,
@@ -56,6 +56,46 @@ MOCKED_PIPELINE_CAPABILITY = {
     "private": False,
     "merge_vcfs_enabled": False,
 }
+
+
+def test_list_projects_no_permission(mocker):
+    """Test projects no permission available to show them."""
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_get_projects = mocker.patch.object(
+        APIClient,
+        "list_projects",
+        side_effect=APIClientError(
+            message="API Client Error: Not Found: Not found.", status_code=404
+        ),
+        return_value={"detail": "Not found"},
+    )
+    mocked_get_pipeline_capabilities = mocker.patch.object(
+        APIClient,
+        "get_pipeline_capabilities",
+        return_value=MOCKED_PIPELINE_CAPABILITY,
+    )
+    res = runner.invoke(
+        list_projects, ["--email", "foo@bar.com", "--password", "123"]
+    )
+    assert res.exit_code == 1
+    mocked_login.assert_called_once()
+    mocked_get_projects.assert_called_once()
+    mocked_get_pipeline_capabilities.assert_not_called()
+
+    output_line = io.BytesIO()
+    sys.stdout = output_line
+    echo(
+        "\n".join(
+            [
+                "ERROR: You do not have permission required to access "
+                "the project list.",
+                "ERROR: API Client Error: Not Found: Not found.",
+                "Aborted!",
+            ]
+        )
+    )
+    assert output_line.getvalue() == res.output.encode()
 
 
 def test_list_projects(mocker):

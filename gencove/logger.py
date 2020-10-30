@@ -53,7 +53,7 @@ def output_error(text):
     return click.style("ERROR: {}".format(text), fg="bright_red", bold=True)
 
 
-def echo(msg, **kwargs):
+def echo_data(msg, **kwargs):
     """Output click echo msg."""
     if LOG_LEVEL == DEBUG:
         _echo_with_datetime(msg, **kwargs)
@@ -61,18 +61,26 @@ def echo(msg, **kwargs):
         _echo(msg, **kwargs)
 
 
+def echo_info(msg, **kwargs):
+    """Output click echo msg."""
+    if LOG_LEVEL == DEBUG:
+        _echo_with_datetime(msg, err=True, **kwargs)
+    else:
+        _echo(msg, err=True, **kwargs)
+
+
 def echo_debug(msg, **kwargs):
     """Output click echo msg only if debug is on."""
     if LOG_LEVEL == DEBUG:
-        _echo_with_datetime(msg, **kwargs)
+        _echo_with_datetime(msg, err=True, **kwargs)
 
 
 def echo_warning(msg, **kwargs):
     """Output click echo msg with background."""
     if LOG_LEVEL == DEBUG:
-        _echo_with_datetime(output_warning(msg), **kwargs)
+        _echo_with_datetime(output_warning(msg), err=True, **kwargs)
     else:
-        _echo(output_warning(msg), **kwargs)
+        _echo(output_warning(msg), err=True, **kwargs)
 
 
 def echo_error(msg, **kwargs):

@@ -7,8 +7,39 @@ from uuid import uuid4
 from click import echo
 from click.testing import CliRunner
 
-from gencove.client import APIClient  # noqa: I100
+from gencove.client import APIClient, APIClientError
 from gencove.command.uploads.list.cli import list_uploads
+
+
+def test_list_does_not_exist(mocker):
+    """Test user cannot get to uploads."""
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_get_projects = mocker.patch.object(
+        APIClient,
+        "get_sample_sheet",
+        side_effect=APIClientError(
+            message="API Client Error: Not Found: Not found.", status_code=404
+        ),
+        return_value={"detail": "Not found"},
+    )
+    res = runner.invoke(
+        list_uploads, ["--email", "foo@bar.com", "--password", "123"]
+    )
+    assert res.exit_code == 1
+    mocked_login.assert_called_once()
+    mocked_get_projects.assert_called_once()
+    assert (
+        "\n".join(
+            [
+                "ERROR: Uploads do not exist or you do not have permission "
+                "required to access them.",
+                "ERROR: API Client Error: Not Found: Not found.",
+                "Aborted!\n",
+            ]
+        )
+        == res.output
+    )
 
 
 def test_list_empty(mocker):

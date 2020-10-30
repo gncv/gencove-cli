@@ -32,14 +32,10 @@ class SetMetadata(Command):
         """
 
         if is_valid_uuid(self.sample_id) is False:
-            error_message = "Sample ID is not valid. Exiting."
-            self.echo_warning(error_message, err=True)
-            raise ValidationError(error_message)
+            raise ValidationError("Sample ID is not valid. Exiting.")
 
         if not self._valid_json(self.json_metadata):
-            error_message = "Metadata JSON is not valid. Exiting."
-            self.echo_warning(error_message, err=True)
-            raise ValidationError(error_message)
+            raise ValidationError("Metadata JSON is not valid. Exiting.")
 
     @backoff.on_exception(
         backoff.expo,
@@ -59,9 +55,8 @@ class SetMetadata(Command):
                 self.sample_id, self.json_metadata
             )
             self.echo_debug(assigned_metadata)
-            self.echo(
-                "Assigned metadata to a sample {}".format(self.sample_id),
-                err=True,
+            self.echo_info(
+                "Assigned metadata to a sample {}".format(self.sample_id)
             )
         except client.APIClientError as err:
             self.echo_debug(err)

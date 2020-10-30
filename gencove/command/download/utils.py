@@ -12,7 +12,7 @@ from gencove.constants import (  # noqa: I100
     DownloadTemplateParts,
     MAX_RETRY_TIME_SECONDS,
 )
-from gencove.logger import echo, echo_debug
+from gencove.logger import echo_debug, echo_info
 from gencove.utils import get_progress_bar
 
 from .constants import (
@@ -109,18 +109,14 @@ def build_file_path(
     """
     prefix = _get_prefix_parts(file_with_prefix)
     # fmt: off
+    # the source filename includes extensions as well.
     source_filename = filename if filename else get_filename_from_download_url(deliverable["download_url"])  # noqa: E501  # pylint: disable=line-too-long
     # fmt: on
 
-    if prefix.use_default_filename:
-        destination_filename = prefix.filename
-    elif prefix.file_extension:
+    destination_filename = prefix.filename
+    if prefix.file_extension:
         destination_filename = "{}.{}".format(
             prefix.filename, prefix.file_extension
-        )
-    else:
-        destination_filename = "{}.{{{}}}".format(
-            prefix.filename, DownloadTemplateParts.file_extension
         )
 
     # turning off formatting for improved code readability
@@ -188,11 +184,11 @@ def download_file(
         headers = dict(
             Range="bytes={}-".format(os.path.getsize(file_path_tmp))
         )
-        echo("Resuming previous download: {}".format(file_path), err=True)
+        echo_info("Resuming previous download: {}".format(file_path))
     else:
         file_mode = "wb"
         headers = dict()
-        echo("Downloading file to {}".format(file_path), err=True)
+        echo_info("Downloading file to {}".format(file_path))
 
     stream_params = dict(
         stream=True, allow_redirects=False, headers=headers, timeout=30
@@ -207,7 +203,7 @@ def download_file(
             and os.path.isfile(file_path)
             and os.path.getsize(file_path) == total
         ):
-            echo("Skipping existing file: {}".format(file_path), err=True)
+            echo_info("Skipping existing file: {}".format(file_path))
             return file_path
 
         echo_debug("Starting to download file to: {}".format(file_path))
@@ -233,7 +229,7 @@ def download_file(
             )
             os.remove(file_path)
         os.rename(file_path_tmp, file_path)
-        echo("Finished downloading a file: {}".format(file_path), err=True)
+        echo_info("Finished downloading a file: {}".format(file_path))
         return file_path
 
 
@@ -247,10 +243,10 @@ def save_metadata_file(path, content):
     Returns:
         None
     """
-    echo("Downloading file to: {}".format(path), err=True)
+    echo_info("Downloading file to: {}".format(path))
     with open(path, "w") as metadata_file:
         json.dump(content, metadata_file)
-    echo("Finished downloading a file: {}".format(path), err=True)
+    echo_info("Finished downloading a file: {}".format(path))
 
 
 def save_qc_file(path, content):
@@ -263,10 +259,10 @@ def save_qc_file(path, content):
     Returns:
         None
     """
-    echo("Downloading file to: {}".format(path), err=True)
+    echo_info("Downloading file to: {}".format(path))
     with open(path, "w") as qc_file:
         json.dump(content, qc_file)
-    echo("Finished downloading a file: {}".format(path), err=True)
+    echo_info("Finished downloading a file: {}".format(path))
 
 
 def fatal_process_sample_error(err):

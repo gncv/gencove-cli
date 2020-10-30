@@ -109,18 +109,14 @@ def build_file_path(
     """
     prefix = _get_prefix_parts(file_with_prefix)
     # fmt: off
+    # the source filename includes extensions as well.
     source_filename = filename if filename else get_filename_from_download_url(deliverable["download_url"])  # noqa: E501  # pylint: disable=line-too-long
     # fmt: on
 
-    if prefix.use_default_filename:
-        destination_filename = prefix.filename
-    elif prefix.file_extension:
+    destination_filename = prefix.filename
+    if prefix.file_extension:
         destination_filename = "{}.{}".format(
             prefix.filename, prefix.file_extension
-        )
-    else:
-        destination_filename = "{}.{{{}}}".format(
-            prefix.filename, DownloadTemplateParts.file_extension
         )
 
     # turning off formatting for improved code readability

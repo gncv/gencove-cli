@@ -6,6 +6,7 @@ from click.testing import CliRunner
 
 from gencove.command.download.utils import (
     _get_prefix_parts,
+    build_file_path,
     get_download_template_format_params,
 )
 from gencove.command.upload.utils import (
@@ -32,6 +33,77 @@ def test_upload_file(mocker):
             object_name="foo-object.txt",
         )
         mocked_s3_client.upload_file.assert_called_once()
+
+
+def test_download_template_tokens():
+    """Ensure download tokens are only the ones defined."""
+    assert [
+        "client_id",
+        "gencove_id",
+        "file_type",
+        "file_extension",
+        "default_filename",
+    ] == list(DownloadTemplateParts._asdict().values())
+
+
+# pylint: disable=too-many-locals
+def test_build_file_path():
+    """Test token combinations when building a file path."""
+    client_id = "12345"
+    gencove_id = "1"
+    deliverable = {
+        "download_url": "https://example.com/file.txt",
+        "file_type": "txt",
+    }
+    # file with prefix will never have client_id and gencove_id. 0 is default
+    file_with_prefix0 = "{client_id}/{gencove_id}/{default_filename}".format(
+        **get_download_template_format_params(client_id, gencove_id)
+    )
+    file_with_prefix1 = "{client_id}".format(
+        **get_download_template_format_params(client_id, gencove_id)
+    )
+    file_with_prefix2 = "{gencove_id}".format(
+        **get_download_template_format_params(client_id, gencove_id)
+    )
+    file_with_prefix3 = "{file_type}"
+    file_with_prefix4 = "{file_extension}"
+    file_with_prefix5 = "{default_filename}"
+    file_with_prefix6 = "{default_filename}.{file_extension}"
+    file_with_prefix7 = "{default_filename}.{client_id}".format(
+        **get_download_template_format_params(client_id, gencove_id)
+    )
+    file_with_prefix8 = "{client_id}.{default_filename}".format(
+        **get_download_template_format_params(client_id, gencove_id)
+    )
+    file_with_prefix9 = "{file_extension}_{client_id}".format(
+        **get_download_template_format_params(client_id, gencove_id)
+    )
+    download_to = "."
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        result = build_file_path(deliverable, file_with_prefix0, download_to)
+        # default_filename is always a full filename with any extensions
+        assert result == "./{}/{}/{}".format(
+            client_id, gencove_id, "file.txt"
+        )
+        result = build_file_path(deliverable, file_with_prefix1, download_to)
+        assert result == "./{}".format(client_id)
+        result = build_file_path(deliverable, file_with_prefix2, download_to)
+        assert result == "./{}".format(gencove_id)
+        result = build_file_path(deliverable, file_with_prefix3, download_to)
+        assert result == "./{}".format("txt")
+        result = build_file_path(deliverable, file_with_prefix4, download_to)
+        assert result == "./{}".format("txt")
+        result = build_file_path(deliverable, file_with_prefix5, download_to)
+        assert result == "./{}".format("file.txt")
+        result = build_file_path(deliverable, file_with_prefix6, download_to)
+        assert result == "./{}.{}".format("file.txt", "txt")
+        result = build_file_path(deliverable, file_with_prefix7, download_to)
+        assert result == "./{}.{}".format("file.txt", client_id)
+        result = build_file_path(deliverable, file_with_prefix8, download_to)
+        assert result == "./{}.{}".format(client_id, "file.txt")
+        result = build_file_path(deliverable, file_with_prefix9, download_to)
+        assert result == "./{}_{}".format("txt", client_id)
 
 
 def test___get_filename_dirs_prefix():

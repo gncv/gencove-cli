@@ -281,7 +281,11 @@ class Download(Command):
         )
 
         self.validate_and_download(
-            file_path, save_qc_file, file_path, qc_metrics
+            file_path,
+            save_qc_file,
+            file_path,
+            qc_metrics,
+            self.options.skip_existing,
         )
 
     def download_sample_metadata(self, file_with_prefix, sample_id):
@@ -304,7 +308,11 @@ class Download(Command):
         )
 
         self.validate_and_download(
-            file_path, save_metadata_file, file_path, metadata
+            file_path,
+            save_metadata_file,
+            file_path,
+            metadata,
+            self.options.skip_existing,
         )
 
     def _get_paginated_samples(self):

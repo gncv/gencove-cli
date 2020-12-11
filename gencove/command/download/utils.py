@@ -233,7 +233,7 @@ def download_file(
         return file_path
 
 
-def save_metadata_file(path, content):
+def save_metadata_file(path, content, skip_existing=True):
     """Helper function to save metadata to json file.
 
     Args:
@@ -243,13 +243,18 @@ def save_metadata_file(path, content):
     Returns:
         None
     """
+    if skip_existing and os.path.isfile(path):
+        with open(path, "r") as metadata_file:
+            if json.dumps(content) == metadata_file.read():
+                echo_info("Skipping existing file: {}".format(path))
+                return
     echo_info("Downloading file to: {}".format(path))
     with open(path, "w") as metadata_file:
         json.dump(content, metadata_file)
     echo_info("Finished downloading a file: {}".format(path))
 
 
-def save_qc_file(path, content):
+def save_qc_file(path, content, skip_existing=True):
     """Helper function to save qc metrics to json file.
 
     Args:
@@ -259,6 +264,11 @@ def save_qc_file(path, content):
     Returns:
         None
     """
+    if skip_existing and os.path.isfile(path):
+        with open(path, "r") as qc_file:
+            if json.dumps(content) == qc_file.read():
+                echo_info("Skipping existing file: {}".format(path))
+                return
     echo_info("Downloading file to: {}".format(path))
     with open(path, "w") as qc_file:
         json.dump(content, qc_file)

@@ -8,11 +8,12 @@ import backoff
 
 import requests
 
+from gencove import client  # noqa: I100
 from gencove.constants import (  # noqa: I100
     DownloadTemplateParts,
     MAX_RETRY_TIME_SECONDS,
 )
-from gencove.logger import echo_debug, echo_info
+from gencove.logger import echo_debug, echo_info, echo_warning
 from gencove.utils import get_progress_bar
 
 from .constants import (
@@ -233,42 +234,52 @@ def download_file(
         return file_path
 
 
-def save_metadata_file(path, content, skip_existing=True):
+def save_metadata_file(path, api_client, sample_id, skip_existing=True):
     """Helper function to save metadata to json file.
 
     Args:
         path(str): full file path where metadata will be saved
-        content(any): depending on the metadata, any json serializable
+        api_client(APIClient): an instance of the client to make a call
+        sample_id(str of uuid): sample gencove id
+        skip_existing(bool): option of skipping the existing file
 
     Returns:
         None
     """
-    if skip_existing and os.path.isfile(path):
-        with open(path, "r") as metadata_file:
-            if json.dumps(content) == metadata_file.read():
-                echo_info("Skipping existing file: {}".format(path))
-                return
+    if skip_existing and os.path.isfile(path) and os.path.getsize(path):
+        echo_info("Skipping existing file: {}".format(path))
+        return
+    try:
+        content = api_client.get_metadata(sample_id)
+    except client.APIClientError:
+        echo_warning("Error getting sample metadata.")
+        raise
     echo_info("Downloading file to: {}".format(path))
     with open(path, "w") as metadata_file:
         json.dump(content, metadata_file)
     echo_info("Finished downloading a file: {}".format(path))
 
 
-def save_qc_file(path, content, skip_existing=True):
+def save_qc_file(path, api_client, sample_id, skip_existing=True):
     """Helper function to save qc metrics to json file.
 
     Args:
         path(str): full file path where qc metrics will be saved
-        content(list of dict): list of qc metrics to be saved
+        api_client(APIClient): an instance of the client to make a call
+        sample_id(str of uuid): sample gencove id
+        skip_existing(bool): option of skipping the existing file
 
     Returns:
         None
     """
-    if skip_existing and os.path.isfile(path):
-        with open(path, "r") as qc_file:
-            if json.dumps(content) == qc_file.read():
-                echo_info("Skipping existing file: {}".format(path))
-                return
+    if skip_existing and os.path.isfile(path) and os.path.getsize(path):
+        echo_info("Skipping existing file: {}".format(path))
+        return
+    try:
+        content = api_client.get_sample_qc_metrics(sample_id)["results"]
+    except client.APIClientError:
+        echo_warning("Error getting sample quality control metrics.")
+        raise
     echo_info("Downloading file to: {}".format(path))
     with open(path, "w") as qc_file:
         json.dump(content, qc_file)

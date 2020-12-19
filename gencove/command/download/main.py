@@ -272,7 +272,6 @@ class Download(Command):
         Returns:
             None
         """
-        qc_metrics = self.get_sample_qc_metrics(sample_id)
         file_path = build_file_path(
             dict(file_type=QC_FILE_TYPE),
             file_with_prefix,
@@ -281,7 +280,12 @@ class Download(Command):
         )
 
         self.validate_and_download(
-            file_path, save_qc_file, file_path, qc_metrics
+            file_path,
+            save_qc_file,
+            file_path,
+            self.api_client,
+            sample_id,
+            self.options.skip_existing,
         )
 
     def download_sample_metadata(self, file_with_prefix, sample_id):
@@ -295,7 +299,6 @@ class Download(Command):
         Returns:
             None
         """
-        metadata = self.get_sample_metadata(sample_id)
         file_path = build_file_path(
             dict(file_type=METADATA_FILE_TYPE),
             file_with_prefix,
@@ -304,7 +307,12 @@ class Download(Command):
         )
 
         self.validate_and_download(
-            file_path, save_metadata_file, file_path, metadata
+            file_path,
+            save_metadata_file,
+            file_path,
+            self.api_client,
+            sample_id,
+            self.options.skip_existing,
         )
 
     def _get_paginated_samples(self):
@@ -320,36 +328,6 @@ class Download(Command):
                 yield sample
             next_page = req["meta"]["next"]
             get_samples = next_page is not None
-
-    def get_sample_qc_metrics(self, sample_id):
-        """Retrieve sample quality control metrics.
-
-        Args:
-            sample_id(str of uuid): sample gencove id
-
-        Returns:
-            list of qc metrics.
-        """
-        try:
-            return self.api_client.get_sample_qc_metrics(sample_id)["results"]
-        except client.APIClientError:
-            self.echo_warning("Error getting sample quality control metrics.")
-            raise
-
-    def get_sample_metadata(self, sample_id):
-        """Retrieve sample metadata.
-
-        Args:
-            sample_id(str of uuid): sample gencove id
-
-        Returns:
-            any associated metadata as a JSON.
-        """
-        try:
-            return self.api_client.get_metadata(sample_id)
-        except client.APIClientError:
-            self.echo_warning("Error getting sample metadata.")
-            raise
 
     def output_list(self):
         """Output reformatted JSON of each individual sample."""

@@ -101,12 +101,6 @@ def test_project_id_provided(mocker):
         mocked_download_file = mocker.patch(
             "gencove.command.download.main.download_file"
         )
-        mocked_save_qc_metrics = mocker.patch(
-            "gencove.command.download.main.save_qc_file"
-        )
-        mocked_save_metadata = mocker.patch(
-            "gencove.command.download.main.save_metadata_file"
-        )
         res = runner.invoke(
             download,
             [
@@ -125,8 +119,6 @@ def test_project_id_provided(mocker):
         mocked_qc_metrics.assert_called_once()
         mocked_get_metadata.assert_called_once()
         mocked_download_file.assert_called_once()
-        mocked_save_qc_metrics.assert_called_once()
-        mocked_save_metadata.assert_called_once()
         mocked_sample_details.assert_called_once()
 
 
@@ -172,12 +164,6 @@ def test_sample_ids_provided(mocker):
         mocked_download_file = mocker.patch(
             "gencove.command.download.main.download_file"
         )
-        mocked_save_qc_metrics = mocker.patch(
-            "gencove.command.download.main.save_qc_file"
-        )
-        mocked_save_metadata = mocker.patch(
-            "gencove.command.download.main.save_metadata_file"
-        )
         res = runner.invoke(
             download,
             [
@@ -201,8 +187,6 @@ def test_sample_ids_provided(mocker):
         mocked_sample_details.assert_called_once()
         mocked_qc_metrics.assert_called_once()
         mocked_get_metadata.assert_called_once()
-        mocked_save_qc_metrics.assert_called_once()
-        mocked_save_metadata.assert_called_once()
 
 
 def test_sample_ids_provided_no_qc_file(mocker):
@@ -231,19 +215,10 @@ def test_sample_ids_provided_no_qc_file(mocker):
             "get_sample_qc_metrics",
             return_value={"results": [{"foo": 12}]},
         )
-        mocked_save_qc_metrics = mocker.patch(
-            "gencove.command.download.main.save_qc_file"
-        )
-        mocked_validate_and_download = mocker.patch(
-            "gencove.command.download.main.Download.validate_and_download"
-        )
         mocked_get_metadata = mocker.patch.object(
             APIClient,
             "get_metadata",
             return_value={"metadata": [{"foo": 12}]},
-        )
-        mocked_save_metadata = mocker.patch(
-            "gencove.command.download.main.save_metadata_file"
         )
         res = runner.invoke(
             download,
@@ -258,15 +233,10 @@ def test_sample_ids_provided_no_qc_file(mocker):
             ],
         )
         assert res.exit_code == 0
-        file_path = "cli_test_data/1/0/0_qc.json"
-        mocked_validate_and_download.assert_any_call(
-            file_path, mocked_save_qc_metrics, file_path, [{"foo": 12}]
-        )
         mocked_login.assert_called_once()
         mocked_sample_details.assert_called_once()
         mocked_qc_metrics.assert_called_once()
         mocked_get_metadata.assert_called_once()
-        mocked_save_metadata.assert_not_called()
 
 
 def test_sample_ids_provided_no_metadata_file(mocker):
@@ -295,19 +265,10 @@ def test_sample_ids_provided_no_metadata_file(mocker):
             "get_metadata",
             return_value={"metadata": [{"foo": 12}]},
         )
-        mocked_save_metadata = mocker.patch(
-            "gencove.command.download.main.save_metadata_file"
-        )
         mocked_qc_metrics = mocker.patch.object(
             APIClient,
             "get_sample_qc_metrics",
             return_value={"results": [{"foo": 12}]},
-        )
-        mocked_save_qc_metrics = mocker.patch(
-            "gencove.command.download.main.save_qc_file"
-        )
-        mocked_validate_and_download = mocker.patch(
-            "gencove.command.download.main.Download.validate_and_download"
         )
         res = runner.invoke(
             download,
@@ -322,18 +283,10 @@ def test_sample_ids_provided_no_metadata_file(mocker):
             ],
         )
         assert res.exit_code == 0
-        file_path = "cli_test_data/1/0/0_metadata.json"
-        mocked_validate_and_download.assert_called_with(
-            file_path,
-            mocked_save_metadata,
-            file_path,
-            {"metadata": [{"foo": 12}]},
-        )
         mocked_login.assert_called_once()
         mocked_sample_details.assert_called_once()
         mocked_get_metadata.assert_called_once()
         mocked_qc_metrics.assert_called_once()
-        mocked_save_qc_metrics.assert_not_called()
 
 
 def test_multiple_credentials_not_allowed():
@@ -558,12 +511,6 @@ def test_download_no_progress(mocker):
         mocked_download_file = mocker.patch(
             "gencove.command.download.main.download_file"
         )
-        mocked_save_qc_metrics = mocker.patch(
-            "gencove.command.download.main.save_qc_file"
-        )
-        mocked_save_metadata = mocker.patch(
-            "gencove.command.download.main.save_metadata_file"
-        )
         res = runner.invoke(
             download,
             [
@@ -585,5 +532,102 @@ def test_download_no_progress(mocker):
         mocked_sample_details.assert_called_once()
         mocked_qc_metrics.assert_called_once()
         mocked_get_metadata.assert_called_once()
-        mocked_save_qc_metrics.assert_called_once()
-        mocked_save_metadata.assert_called_once()
+
+
+def test_project_id_provided_skip_existing_qc_and_metadata(mocker):
+    """Check happy flow."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        mocked_login = mocker.patch.object(
+            APIClient, "login", return_value=None
+        )
+        mocked_project_samples = mocker.patch.object(
+            APIClient,
+            "get_project_samples",
+            return_value={"results": [{"id": 0}], "meta": {"next": None}},
+        )
+        mocked_sample_details = mocker.patch.object(
+            APIClient,
+            "get_sample_details",
+            return_value={
+                "id": 0,
+                "client_id": 1,
+                "last_status": {
+                    "id": str(uuid4()),
+                    "status": "succeeded",
+                    "created": "2020-07-28T12:46:22.719862Z",
+                },
+                "files": [
+                    {
+                        "id": str(uuid4()),
+                        "file_type": "txt",
+                        "download_url": "https://foo.com/bar.txt",
+                    }
+                ],
+            },
+        )
+        mocked_qc_metrics = mocker.patch.object(
+            APIClient,
+            "get_sample_qc_metrics",
+            return_value={"results": [{"foo": 12}]},
+        )
+        mocked_get_metadata = mocker.patch.object(
+            APIClient,
+            "get_metadata",
+            return_value=dict(
+                metadata=None,
+            ),
+        )
+        mocked_download_file = mocker.patch(
+            "gencove.command.download.main.download_file"
+        )
+        res = runner.invoke(
+            download,
+            [
+                "cli_test_data",
+                "--project-id",
+                "123",
+                "--email",
+                "foo@bar.com",
+                "--password",
+                "123",
+                "--no-skip-existing",
+            ],
+        )
+        assert res.exit_code == 0
+        mocked_login.assert_called_once()
+        mocked_project_samples.assert_called_once()
+        mocked_qc_metrics.assert_called_once()
+        mocked_get_metadata.assert_called_once()
+        mocked_download_file.assert_called_once()
+        mocked_sample_details.assert_called_once()
+
+        # call it the second time
+        mocked_qc_metrics = mocker.patch.object(
+            APIClient,
+            "get_sample_qc_metrics",
+            return_value={"results": [{"foo": 12}]},
+        )
+        mocked_get_metadata = mocker.patch.object(
+            APIClient,
+            "get_metadata",
+            return_value=dict(
+                metadata=None,
+            ),
+        )
+        res = runner.invoke(
+            download,
+            [
+                "cli_test_data",
+                "--project-id",
+                "123",
+                "--email",
+                "foo@bar.com",
+                "--password",
+                "123",
+                "--skip-existing",
+            ],
+        )
+        assert res.exit_code == 0
+        mocked_qc_metrics.assert_not_called()
+        mocked_get_metadata.assert_not_called()

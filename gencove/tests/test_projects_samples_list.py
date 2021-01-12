@@ -108,6 +108,15 @@ def test_list_projects(mocker):
                     ).isoformat(),
                     "status": "succeeded",
                 },
+                "archive_last_status": {
+                    "status": "available",
+                    "created": (
+                        datetime.utcnow() - timedelta(days=1)
+                    ).isoformat(),
+                    "transition_cutoff": (
+                        datetime.utcnow() + timedelta(days=6)
+                    ).isoformat(),
+                }
             }
         ],
     )
@@ -134,6 +143,7 @@ def test_list_projects(mocker):
                 mocked_samples["results"][0]["id"],
                 mocked_samples["results"][0]["client_id"],
                 mocked_samples["results"][0]["last_status"]["status"],
+                mocked_samples["results"][0]["archive_last_status"]["status"],
             ]
         )
     )

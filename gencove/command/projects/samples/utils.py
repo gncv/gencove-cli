@@ -16,5 +16,6 @@ def get_line(sample):
             sample["id"],
             sample["client_id"],
             sample["last_status"]["status"],
+            sample["archive_last_status"]["status"],
         ]
     )

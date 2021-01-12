@@ -94,7 +94,7 @@ def test_list_projects_no_project(mocker):
     assert output_line.getvalue() == res.output.encode()
 
 
-def test_list_projects(mocker):
+def test_list_project_samples(mocker):
     """Test project samples being outputed to the shell."""
     mocked_samples = dict(
         meta=dict(count=1, next=None),
@@ -116,7 +116,7 @@ def test_list_projects(mocker):
                     "transition_cutoff": (
                         datetime.utcnow() + timedelta(days=6)
                     ).isoformat(),
-                }
+                },
             }
         ],
     )

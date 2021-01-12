@@ -203,7 +203,9 @@ class Download(Command):
                     "id": sample["archive_last_status"]["id"],
                     "status": sample["archive_last_status"]["status"],
                     "created": sample["archive_last_status"]["created"],
-                    "transition_cutoff": sample["archive_last_status"]["transition_cutoff"],
+                    "transition_cutoff": (
+                        sample["archive_last_status"]["transition_cutoff"]
+                    ),
                 },
                 "files": {},
             }

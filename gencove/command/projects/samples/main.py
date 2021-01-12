@@ -6,9 +6,9 @@ import requests
 # pylint: disable=wrong-import-order
 from gencove.client import APIClientError  # noqa: I100
 from gencove.command.base import Command
-from gencove.constants import SAMPLE_STATUS, SAMPLE_ARCHIVE_STATUS
+from gencove.constants import SAMPLE_ARCHIVE_STATUS, SAMPLE_STATUS
 
-from .constants import ALLOWED_STATUSES_RE, ALLOWED_ARCHIVE_STATUSES_RE
+from .constants import ALLOWED_ARCHIVE_STATUSES_RE, ALLOWED_STATUSES_RE
 from .utils import get_line
 from ...utils import is_valid_uuid, validate_input
 from ....exceptions import ValidationError

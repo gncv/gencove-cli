@@ -2,7 +2,7 @@
 import re
 from collections import namedtuple
 
-from gencove.constants import Optionals, SAMPLE_STATUS, SAMPLE_ARCHIVE_STATUS
+from gencove.constants import Optionals, SAMPLE_ARCHIVE_STATUS, SAMPLE_STATUS
 
 SamplesOptions = namedtuple(  # pylint: disable=invalid-name
     "SamplesOptions",

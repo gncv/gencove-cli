@@ -4,8 +4,8 @@ import click
 from gencove.command.common_cli_options import add_options, common_options
 from gencove.constants import (
     Credentials,
-    SAMPLE_STATUS,
     SAMPLE_ARCHIVE_STATUS,
+    SAMPLE_STATUS,
 )
 
 from .constants import SamplesOptions

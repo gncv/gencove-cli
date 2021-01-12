@@ -24,6 +24,7 @@ from gencove.constants import (
     SAMPLE_ASSIGNMENT_STATUS,
     SAMPLE_SORT_BY,
     SAMPLE_STATUS,
+    SAMPLE_ARCHIVE_STATUS,
     SORT_ORDER,
 )
 from gencove.logger import echo_debug
@@ -347,6 +348,7 @@ class APIClient:
         next_link=None,
         search="",
         sample_status=SAMPLE_STATUS.all,
+        sample_archive_status=SAMPLE_ARCHIVE_STATUS.all,
         sort_by=SAMPLE_SORT_BY.modified,
         sort_order=SORT_ORDER.desc,
     ):
@@ -361,6 +363,7 @@ class APIClient:
                 "sort_by": sort_by,
                 "sort_order": sort_order,
                 "status": sample_status,
+                "archive_status": sample_archive_status,
             },
         )
         return self._get(

@@ -60,6 +60,23 @@ SAMPLE_STATUS = _SampleStatus(
     "completed", "succeeded", "failed", "running", "all"
 )
 
+_SampleArchiveStatus = namedtuple(
+    "SampleArchiveStatus",
+    [
+        "available",
+        "archived",
+        "restore_requested",
+        "all",
+    ],
+)
+
+SAMPLE_ARCHIVE_STATUS = _SampleArchiveStatus(
+    "available",
+    "archived",
+    "restore_requested",
+    "all",
+)
+
 _SampleSortBy = namedtuple(
     "SampleSortFields", ["created", "modified", "status", "client_id", "id"]
 )

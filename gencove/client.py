@@ -515,6 +515,18 @@ class APIClient:
         batches_endpoint = self.endpoints.batches.format(id=batch_id)
         return self._get(batches_endpoint, authorized=True)
 
+    def restore_project_samples(self, project_id, sample_ids):
+        """Requesting samples restored in given project."""
+        restore_project_samples_endpoint = (
+            self.endpoints.project_restore_samples.format(id=project_id)
+        )
+
+        payload = {"sample_ids": sample_ids}
+
+        return self._post(
+            restore_project_samples_endpoint, payload, authorized=True
+        )
+
     def get_project(self, project_id):
         """Get single project."""
         project_endpoint = "{}{}".format(self.endpoints.projects, project_id)

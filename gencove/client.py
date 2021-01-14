@@ -516,7 +516,7 @@ class APIClient:
         return self._get(batches_endpoint, authorized=True)
 
     def restore_project_samples(self, project_id, sample_ids):
-        """Requesting samples restored in given project."""
+        """Make a request to restore samples in given project."""
         restore_project_samples_endpoint = (
             self.endpoints.project_restore_samples.format(id=project_id)
         )

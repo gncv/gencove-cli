@@ -76,7 +76,7 @@ def upload(  # pylint: disable=E0012,C0330,R0913
             a file.
         no_progress (bool, optional, default False): do not show progress
             bar.
-        metadata (str, optional):
+        metadata (str, optional): JSON metadata to be applied to all samples
     """
     Upload(
         source,

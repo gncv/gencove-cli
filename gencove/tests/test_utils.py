@@ -14,7 +14,7 @@ from gencove.command.upload.utils import (
     parse_fastqs_map_file,
     upload_file,
 )
-from gencove.command.utils import is_valid_uuid
+from gencove.command.utils import is_valid_json, is_valid_uuid
 from gencove.constants import DOWNLOAD_TEMPLATE, DownloadTemplateParts
 from gencove.exceptions import ValidationError
 
@@ -287,3 +287,28 @@ def test_is_valid_uuid__is_not_valid__too_short():
 def test_is_valid_uuid__is_not_valid__text():
     """"Test that random word is not a valid UUID"""
     assert is_valid_uuid("foo") is False
+
+
+def test_is_valid_json__is_valid__dict():
+    """Test that dict as string is valid JSON."""
+    value = '{"a": "b", "1": 2}'
+    assert is_valid_json(value) is True
+
+
+def test_is_valid_json__is_valid__list():
+    """Test that list as string is valid JSON."""
+    value = "[1,2,3]"
+    assert is_valid_json(value) is True
+
+
+def test_is_valid_json__is_not_valid__broken_dict():
+    """Test that dict with missing value for one of its keys is not valid
+    JSON."""
+    value = '{"a":}'
+    assert is_valid_json(value) is False
+
+
+def test_is_valid_json__is_not_valid__open_list():
+    """Test that list without closing brackets is not valid JSON."""
+    value = "[1, 2, 3"
+    assert is_valid_json(value) is False

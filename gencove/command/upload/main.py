@@ -14,6 +14,7 @@ from gencove.client import (  # noqa: I100
     APIClientTooManyRequestsError,
 )
 from gencove.command.base import Command
+from gencove.command.utils import is_valid_json
 from gencove.constants import FASTQ_MAP_EXTENSION, SAMPLE_ASSIGNMENT_STATUS
 from gencove.exceptions import ValidationError
 from gencove.utils import (
@@ -133,16 +134,8 @@ class Upload(Command):
             )
 
         # validate metadata jsons
-        if self.metadata and self._valid_json(self.metadata) is False:
+        if self.metadata and is_valid_json(self.metadata) is False:
             raise ValidationError("--metadata is not valid JSON. Exiting.")
-
-    def _valid_json(self, metadata):
-        try:
-            json.loads(metadata)
-            return True
-        except ValueError as err:
-            self.echo_error(err)
-            return False
 
     def execute(self):
         """Upload fastq files from host system to Gencove cloud.

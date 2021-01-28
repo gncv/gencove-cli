@@ -99,7 +99,6 @@ def test_list_uploads(mocker):
     res = runner.invoke(
         list_uploads, ["--email", "foo@bar.com", "--password", "123"]
     )
-    print(res.output)
     assert res.exit_code == 0
     mocked_login.assert_called_once()
     mocked_get_sample_sheet.assert_called_once()

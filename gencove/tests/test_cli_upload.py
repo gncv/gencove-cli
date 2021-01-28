@@ -43,8 +43,6 @@ def test_upload(mocker):
             ["cli_test_data"],
             input="\n".join(["foo@bar.com", "123456"]),
         )
-        # for debugging, if needed
-        print("output is", res.output)
 
         assert res.exit_code == 0
         mocked_login.assert_called_once()
@@ -68,8 +66,6 @@ def test_upload_no_files_found(mocker):
             ["cli_test_data"],
             input="\n".join(["foo@bar.com", "123456"]),
         )
-        # for debugging, if needed
-        print("output is", res.output)
 
         assert res.exit_code == 1
         assert "No FASTQ files found in the path" in res.output
@@ -92,8 +88,6 @@ def test_upload_invalid_destination(mocker):
             ["cli_test_data", "foobar_dir"],
             input="\n".join(["foo@bar.com", "123456"]),
         )
-        # for debugging, if needed
-        print("output is", res.output)
 
         assert res.exit_code == 1
         assert (

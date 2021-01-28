@@ -105,6 +105,36 @@ def test_upload_invalid_destination(mocker):
         mocked_login.assert_called_once()
 
 
+def test_upload_project_id_not_uuid(mocker):
+    """Test that project id is valid UUID when uploading."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("cli_test_data")
+        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+            fastq_file.write("AAABBB")
+
+        mocked_login = mocker.patch.object(
+            APIClient, "login", return_value=None
+        )
+
+        res = runner.invoke(
+            upload,
+            [
+                "cli_test_data",
+                "--email",
+                "foo@bar.com",
+                "--password",
+                "123456",
+                "--run-project-id",
+                "1234",
+            ],
+        )
+
+        assert res.exit_code == 1
+        assert "--run-project-id is not valid" in res.output
+        mocked_login.assert_called_once()
+
+
 def test_upload_and_run_immediately(mocker):
     """Upload and assign right away."""
     runner = CliRunner()
@@ -157,7 +187,7 @@ def test_upload_and_run_immediately(mocker):
                 "--password",
                 "123456",
                 "--run-project-id",
-                "1234",
+                "11111111-1111-1111-1111-111111111111",
             ],
         )
 
@@ -223,7 +253,7 @@ def test_upload_and_run_immediately__with_metadata(mocker):
                 "--password",
                 "123456",
                 "--run-project-id",
-                "1234",
+                "11111111-1111-1111-1111-111111111111",
                 "--metadata",
                 "[1,2]",
             ],
@@ -288,7 +318,7 @@ def test_upload_and_run_immediately__invalid_metadata(mocker):
                 "--password",
                 "123456",
                 "--run-project-id",
-                "1234",
+                "11111111-1111-1111-1111-111111111111",
                 "--metadata",
                 "[1,2,3",
             ],
@@ -348,7 +378,7 @@ def test_upload_and_run_immediately_something_went_wrong(mocker):
                 "--password",
                 "123456",
                 "--run-project-id",
-                "1234",
+                "11111111-1111-1111-1111-111111111111",
             ],
         )
 
@@ -420,7 +450,7 @@ def test_upload_and_run_immediately_with_output_to_file(mocker):
                 "--password",
                 "123456",
                 "--run-project-id",
-                "1234",
+                "11111111-1111-1111-1111-111111111111",
                 "--output",
                 "samples.json",
             ],
@@ -498,7 +528,7 @@ def test_upload_and_run_immediately_with_output_to_nested_file(mocker):
                 "--password",
                 "123456",
                 "--run-project-id",
-                "1234",
+                "11111111-1111-1111-1111-111111111111",
                 "--output",
                 "somefolder/samples.json",
             ],
@@ -576,7 +606,7 @@ def test_upload_and_run_immediately_with_stdout(mocker):
                 "--password",
                 "123456",
                 "--run-project-id",
-                "1234",
+                "11111111-1111-1111-1111-111111111111",
                 "--output",
                 "-",
             ],
@@ -694,7 +724,7 @@ def test_upload_and_run_immediately_without_progressbar(mocker):
                 "--password",
                 "123456",
                 "--run-project-id",
-                "1234",
+                "11111111-1111-1111-1111-111111111111",
                 "--no-progress",
             ],
         )

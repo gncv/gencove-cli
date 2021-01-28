@@ -14,6 +14,7 @@ from gencove.client import (  # noqa: I100
     APIClientTooManyRequestsError,
 )
 from gencove.command.base import Command
+from gencove.command.utils import is_valid_uuid
 from gencove.constants import FASTQ_MAP_EXTENSION, SAMPLE_ASSIGNMENT_STATUS
 from gencove.exceptions import ValidationError
 from gencove.utils import (
@@ -131,6 +132,9 @@ class Upload(Command):
             raise ValidationError(
                 "--output cannot be used without --run-project-id"
             )
+
+        if self.project_id and is_valid_uuid(self.project_id) is False:
+            raise ValidationError("--run-project-id is not valid. Exiting.")
 
         # validate metadata jsons
         if self.metadata and self._valid_json(self.metadata) is False:

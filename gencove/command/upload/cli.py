@@ -32,7 +32,10 @@ from .main import Upload
     "--metadata",
     required=False,
     default=None,
-    help="Assign metadata to all samples created from uploads.",
+    help=(
+        "Assign metadata to all samples created from uploads. "
+        "Only compatible with --run-project-id."
+    ),
 )
 def upload(  # pylint: disable=E0012,C0330,R0913
     source,

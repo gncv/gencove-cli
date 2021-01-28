@@ -1,9 +1,7 @@
 """Common utils used in multiple commands."""
-import json
 import uuid
 
 from gencove.exceptions import ValidationError
-from gencove.logger import echo_error
 
 
 def sanitize_string(output):
@@ -49,20 +47,4 @@ def is_valid_uuid(candidate):
         uuid.UUID(candidate, version=4)
         return True
     except ValueError:
-        return False
-
-
-def is_valid_json(candidate):
-    """Test if provided string is valid JSON.
-
-    candidate (str): string to check
-
-    Returns:
-        bool: True if valid JSON, False if not
-    """
-    try:
-        json.loads(candidate)
-        return True
-    except ValueError as err:
-        echo_error(err)
         return False

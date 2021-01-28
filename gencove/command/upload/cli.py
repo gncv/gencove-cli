@@ -28,6 +28,12 @@ from .main import Upload
     is_flag=True,
     help="If specified, no progress bar is shown.",
 )
+@click.option(
+    "--metadata",
+    required=False,
+    default=None,
+    help="Assign metadata to all samples created from uploads.",
+)
 def upload(  # pylint: disable=E0012,C0330,R0913
     source,
     destination,
@@ -38,6 +44,7 @@ def upload(  # pylint: disable=E0012,C0330,R0913
     run_project_id,
     output,
     no_progress,
+    metadata,
 ):  # noqa: D301
     """Upload FASTQ files to Gencove's system.
 
@@ -69,12 +76,13 @@ def upload(  # pylint: disable=E0012,C0330,R0913
             a file.
         no_progress (bool, optional, default False): do not show progress
             bar.
+        metadata (str, optional):
     """
     Upload(
         source,
         destination,
         Credentials(email, password, api_key),
-        UploadOptions(host, run_project_id),
+        UploadOptions(host, run_project_id, metadata),
         output,
         no_progress,
     ).run()

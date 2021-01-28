@@ -61,6 +61,7 @@ class Upload(Command):
         self.output = output
         self.assigned_samples = []
         self.no_progress = no_progress
+        self.metadata = options.metadata
 
     @staticmethod
     def generate_gncv_destination():
@@ -130,6 +131,18 @@ class Upload(Command):
             raise ValidationError(
                 "--output cannot be used without --run-project-id"
             )
+
+        # validate metadata jsons
+        if self.metadata and self._valid_json(self.metadata) is False:
+            raise ValidationError("--metadata is not valid JSON. Exiting.")
+
+    def _valid_json(self, metadata):
+        try:
+            json.loads(metadata)
+            return True
+        except ValueError as err:
+            self.echo_error(err)
+            return False
 
     def execute(self):
         """Upload fastq files from host system to Gencove cloud.
@@ -303,7 +316,7 @@ class Upload(Command):
                     "Assigning batch: {}".format(samples_batch_len)
                 )
                 assigned_batch = self.api_client.add_samples_to_project(
-                    samples_batch, self.project_id
+                    samples_batch, self.project_id, self.metadata
                 )
                 self.assigned_samples.extend(assigned_batch)
                 assigned_count += samples_batch_len

@@ -367,16 +367,19 @@ class APIClient:
             project_endpoint, query_params=params, authorized=True
         )
 
-    def add_samples_to_project(self, samples, project_id):
+    def add_samples_to_project(self, samples, project_id, metadata=None):
         """Assign samples to a project.
 
         Args:
             samples (list of dicts): sample sheet results
             project_id (str): project to which to assign the samples
+            metadata (str): JSON metadata to be applied to all samples
         """
+        payload = {"uploads": samples, "metadata": metadata}
+
         return self._post(
             self.endpoints.project_samples.format(id=project_id),
-            samples,
+            payload,
             authorized=True,
         )
 

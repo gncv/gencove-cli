@@ -19,7 +19,7 @@ FASTQ_EXTENSIONS = (".fastq.gz", ".fastq.bgz", ".fq.gz", ".fq.bgz")
 UPLOAD_PREFIX = "gncv://"
 
 UploadOptions = namedtuple(
-    "UploadOptions", Optionals._fields + ("project_id",)
+    "UploadOptions", Optionals._fields + ("project_id", "metadata")
 )
 
 ASSIGN_ERROR = (

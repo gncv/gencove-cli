@@ -328,6 +328,39 @@ def test_upload_and_run_immediately__invalid_metadata(mocker):
         assert "--metadata is not valid JSON" in res.output
 
 
+def test_upload__with_metadata_without_project_id(mocker):
+    """Test that project id is present if attaching metadata when
+    uploading."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("cli_test_data")
+        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+            fastq_file.write("AAABBB")
+
+        mocked_login = mocker.patch.object(
+            APIClient, "login", return_value=None
+        )
+
+        res = runner.invoke(
+            upload,
+            [
+                "cli_test_data",
+                "--email",
+                "foo@bar.com",
+                "--password",
+                "123456",
+                "--metadata",
+                "[1,2]",
+            ],
+        )
+
+        assert res.exit_code == 1
+        assert (
+            "--metadata cannot be used without --run-project-id" in res.output
+        )
+        mocked_login.assert_called_once()
+
+
 def test_upload_and_run_immediately_something_went_wrong(mocker):
     """Upload and assign right away did't work."""
     runner = CliRunner()

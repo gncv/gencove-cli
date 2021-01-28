@@ -133,10 +133,15 @@ class Upload(Command):
                 "--output cannot be used without --run-project-id"
             )
 
+        if self.metadata and not self.project_id:
+            raise ValidationError(
+                "--metadata cannot be used without --run-project-id"
+            )
+
         if self.project_id and is_valid_uuid(self.project_id) is False:
             raise ValidationError("--run-project-id is not valid. Exiting.")
 
-        # validate metadata jsons
+        # validate metadata json
         if self.metadata and self._valid_json(self.metadata) is False:
             raise ValidationError("--metadata is not valid JSON. Exiting.")
 

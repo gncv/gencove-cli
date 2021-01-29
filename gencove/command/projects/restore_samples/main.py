@@ -44,6 +44,8 @@ class RestoreSamples(Command):
                 raise ValidationError(
                     "Not all sample IDs are valid. Exiting."
                 )
+        else:
+            raise ValidationError("Missing sample IDs. Exiting.")
 
     @backoff.on_exception(
         backoff.expo,

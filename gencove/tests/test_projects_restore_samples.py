@@ -101,6 +101,41 @@ def test_restore_project_samples__empty_sample_ids(mocker):
     assert res.exit_code == 1
     mocked_login.assert_called_once()
     mocked_restore_project_samples.assert_not_called()
+    assert "Missing sample IDs" in res.output
+
+
+def test_restore_project_samples__invalid_sample_ids(mocker):
+    """Test restore project samples failure when an empty list of sample ids
+    is sent."""
+    mocked_response = {"sample_ids": ["This list may not be empty."]}
+
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_restore_project_samples = mocker.patch.object(
+        APIClient, "restore_project_samples", return_value=mocked_response
+    )
+
+    mocked_restore_project_samples = mocker.patch.object(
+        APIClient,
+        "restore_project_samples",
+        side_effect=APIClientError(message="", status_code=400),
+    )
+
+    res = runner.invoke(
+        restore_project_samples,
+        [
+            str(uuid4()),
+            "--email",
+            "foo@bar.com",
+            "--password",
+            "123",
+            "--sample-ids",
+            "1111,222",
+        ],
+    )
+    assert res.exit_code == 1
+    mocked_login.assert_called_once()
+    mocked_restore_project_samples.assert_not_called()
     assert "Not all sample IDs are valid" in res.output
 
 

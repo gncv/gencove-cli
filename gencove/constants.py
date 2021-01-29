@@ -22,6 +22,7 @@ _APIEndpoint = namedtuple(
         "batches",
         "project_merge_vcfs",
         "sample_metadata",
+        "project_restore_samples",
     ],
 )
 API_ENDPOINTS = _APIEndpoint(
@@ -41,6 +42,7 @@ API_ENDPOINTS = _APIEndpoint(
     "/api/v2/batches/{id}",
     "/api/v2/project-merge-vcfs/{id}",
     "/api/v2/sample-metadata/{id}",
+    "/api/v2/project-restore-samples/{id}",
 )
 
 _SampleAssignmentStatus = namedtuple(
@@ -58,6 +60,23 @@ _SampleStatus = namedtuple(
 )
 SAMPLE_STATUS = _SampleStatus(
     "completed", "succeeded", "failed", "running", "all"
+)
+
+_SampleArchiveStatus = namedtuple(
+    "SampleArchiveStatus",
+    [
+        "available",
+        "archived",
+        "restore_requested",
+        "all",
+    ],
+)
+
+SAMPLE_ARCHIVE_STATUS = _SampleArchiveStatus(
+    "available",
+    "archived",
+    "restore_requested",
+    "all",
 )
 
 _SampleSortBy = namedtuple(

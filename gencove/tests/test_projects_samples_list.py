@@ -94,7 +94,7 @@ def test_list_projects_no_project(mocker):
     assert output_line.getvalue() == res.output.encode()
 
 
-def test_list_projects(mocker):
+def test_list_project_samples(mocker):
     """Test project samples being outputed to the shell."""
     mocked_samples = dict(
         meta=dict(count=1, next=None),
@@ -107,6 +107,15 @@ def test_list_projects(mocker):
                         datetime.utcnow() - timedelta(days=3)
                     ).isoformat(),
                     "status": "succeeded",
+                },
+                "archive_last_status": {
+                    "status": "available",
+                    "created": (
+                        datetime.utcnow() - timedelta(days=1)
+                    ).isoformat(),
+                    "transition_cutoff": (
+                        datetime.utcnow() + timedelta(days=6)
+                    ).isoformat(),
                 },
             }
         ],
@@ -134,6 +143,7 @@ def test_list_projects(mocker):
                 mocked_samples["results"][0]["id"],
                 mocked_samples["results"][0]["client_id"],
                 mocked_samples["results"][0]["last_status"]["status"],
+                mocked_samples["results"][0]["archive_last_status"]["status"],
             ]
         )
     )

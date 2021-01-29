@@ -77,6 +77,12 @@ def test_project_id_provided(mocker):
                     "status": "succeeded",
                     "created": "2020-07-28T12:46:22.719862Z",
                 },
+                "archive_last_status": {
+                    "id": str(uuid4()),
+                    "status": "available",
+                    "created": "2020-07-28T12:46:22.719862Z",
+                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
+                },
                 "files": [
                     {
                         "id": str(uuid4()),
@@ -139,6 +145,12 @@ def test_sample_ids_provided(mocker):
                     "id": str(uuid4()),
                     "status": "succeeded",
                     "created": "2020-07-28T12:46:22.719862Z",
+                },
+                "archive_last_status": {
+                    "id": str(uuid4()),
+                    "status": "available",
+                    "created": "2020-07-28T12:46:22.719862Z",
+                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
                 },
                 "files": [
                     {
@@ -207,6 +219,12 @@ def test_sample_ids_provided_no_qc_file(mocker):
                     "status": "succeeded",
                     "created": "2020-07-28T12:46:22.719862Z",
                 },
+                "archive_last_status": {
+                    "id": str(uuid4()),
+                    "status": "available",
+                    "created": "2020-07-28T12:46:22.719862Z",
+                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
+                },
                 "files": [],
             },
         )
@@ -256,6 +274,12 @@ def test_sample_ids_provided_no_metadata_file(mocker):
                     "id": str(uuid4()),
                     "status": "succeeded",
                     "created": "2020-07-28T12:46:22.719862Z",
+                },
+                "archive_last_status": {
+                    "id": str(uuid4()),
+                    "status": "available",
+                    "created": "2020-07-28T12:46:22.719862Z",
+                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
                 },
                 "files": [],
             },
@@ -350,6 +374,7 @@ def test_download_stdout_with_flag(mocker):
         return_value={"results": [{"id": 0}], "meta": {"next": None}},
     )
     last_status_id = str(uuid4())
+    archive_last_status_id = str(uuid4())
     file_id = str(uuid4())
     mocked_sample_details = mocker.patch.object(
         APIClient,
@@ -361,6 +386,12 @@ def test_download_stdout_with_flag(mocker):
                 "id": last_status_id,
                 "status": "succeeded",
                 "created": "2020-07-28T12:46:22.719862Z",
+            },
+            "archive_last_status": {
+                "id": archive_last_status_id,
+                "status": "available",
+                "created": "2020-07-28T12:46:22.719862Z",
+                "transition_cutoff": "2020-08-28T12:46:22.719862Z",
             },
             "files": [
                 {
@@ -400,6 +431,12 @@ def test_download_stdout_with_flag(mocker):
                     "status": "succeeded",
                     "created": "2020-07-28T12:46:22.719862Z",
                 },
+                "archive_last_status": {
+                    "id": archive_last_status_id,
+                    "status": "available",
+                    "created": "2020-07-28T12:46:22.719862Z",
+                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
+                },
                 "files": {
                     "txt": {
                         "id": file_id,
@@ -424,6 +461,7 @@ def test_download_urls_to_file(mocker):
         return_value={"results": [{"id": 0}], "meta": {"next": None}},
     )
     last_status_id = str(uuid4())
+    archive_last_status_id = str(uuid4())
     file_id = str(uuid4())
     mocked_sample_details = mocker.patch.object(
         APIClient,
@@ -435,6 +473,12 @@ def test_download_urls_to_file(mocker):
                 "id": last_status_id,
                 "status": "succeeded",
                 "created": "2020-07-28T12:46:22.719862Z",
+            },
+            "archive_last_status": {
+                "id": archive_last_status_id,
+                "status": "available",
+                "created": "2020-07-28T12:46:22.719862Z",
+                "transition_cutoff": "2020-08-28T12:46:22.719862Z",
             },
             "files": [
                 {
@@ -486,6 +530,12 @@ def test_download_no_progress(mocker):
                     "id": str(uuid4()),
                     "status": "succeeded",
                     "created": "2020-07-28T12:46:22.719862Z",
+                },
+                "archive_last_status": {
+                    "id": str(uuid4()),
+                    "status": "available",
+                    "created": "2020-07-28T12:46:22.719862Z",
+                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
                 },
                 "files": [
                     {
@@ -556,6 +606,12 @@ def test_project_id_provided_skip_existing_qc_and_metadata(mocker):
                     "id": str(uuid4()),
                     "status": "succeeded",
                     "created": "2020-07-28T12:46:22.719862Z",
+                },
+                "archive_last_status": {
+                    "id": str(uuid4()),
+                    "status": "available",
+                    "created": "2020-07-28T12:46:22.719862Z",
+                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
                 },
                 "files": [
                     {

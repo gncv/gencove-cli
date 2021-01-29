@@ -6,9 +6,9 @@ import requests
 # pylint: disable=wrong-import-order
 from gencove.client import APIClientError  # noqa: I100
 from gencove.command.base import Command
-from gencove.constants import SAMPLE_STATUS
+from gencove.constants import SAMPLE_ARCHIVE_STATUS, SAMPLE_STATUS
 
-from .constants import ALLOWED_STATUSES_RE
+from .constants import ALLOWED_ARCHIVE_STATUSES_RE, ALLOWED_STATUSES_RE
 from .utils import get_line
 from ...utils import is_valid_uuid, validate_input
 from ....exceptions import ValidationError
@@ -21,6 +21,7 @@ class ListSamples(Command):
         super().__init__(credentials, options)
         self.project_id = project_id
         self.sample_status = options.status
+        self.sample_archive_status = options.archive_status
         self.search_term = options.search
 
     def initialize(self):
@@ -39,11 +40,20 @@ class ListSamples(Command):
             SAMPLE_STATUS,
         )
 
+        validate_input(
+            "sample archive status",
+            self.sample_archive_status,
+            ALLOWED_ARCHIVE_STATUSES_RE,
+            SAMPLE_ARCHIVE_STATUS,
+        )
+
     def execute(self):
         self.echo_debug(
             "Retrieving sample sheet: "
-            "status={} search_term={}".format(
-                self.sample_status, self.search_term
+            "status={} archive_status={} search_term={}".format(
+                self.sample_status,
+                self.sample_archive_status,
+                self.search_term,
             )
         )
         try:
@@ -92,4 +102,5 @@ class ListSamples(Command):
             next_link=next_link,
             search=self.search_term,
             sample_status=self.sample_status,
+            sample_archive_status=self.sample_archive_status,
         )

@@ -9,6 +9,7 @@ from .get_merged_vcf.cli import get_merged_vcf
 from .list.cli import list_projects
 from .list_batch_types.cli import list_project_batch_types
 from .list_batches.cli import list_project_batches
+from .restore_samples.cli import restore_project_samples
 from .samples.cli import list_project_samples
 from .status_merged_vcf.cli import status_merged_vcf
 
@@ -24,6 +25,7 @@ projects.add_command(list_project_samples)
 projects.add_command(list_project_batch_types)
 projects.add_command(list_project_batches)
 projects.add_command(get_batch)
+projects.add_command(restore_project_samples)
 projects.add_command(create_merged_vcf)
 projects.add_command(status_merged_vcf)
 projects.add_command(get_merged_vcf)

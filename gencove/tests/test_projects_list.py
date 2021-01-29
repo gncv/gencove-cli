@@ -113,7 +113,6 @@ def test_list_projects(mocker):
     res = runner.invoke(
         list_projects, ["--email", "foo@bar.com", "--password", "123"]
     )
-    print(res.output)
     assert res.exit_code == 0
     mocked_login.assert_called_once()
     mocked_get_projects.assert_called_once()

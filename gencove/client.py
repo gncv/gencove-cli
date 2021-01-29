@@ -21,6 +21,7 @@ from requests import (  # pylint: disable=W0622
 from gencove import constants  # noqa: I100
 from gencove.constants import (
     SAMPLES_SHEET_SORT_BY,
+    SAMPLE_ARCHIVE_STATUS,
     SAMPLE_ASSIGNMENT_STATUS,
     SAMPLE_SORT_BY,
     SAMPLE_STATUS,
@@ -347,6 +348,7 @@ class APIClient:
         next_link=None,
         search="",
         sample_status=SAMPLE_STATUS.all,
+        sample_archive_status=SAMPLE_ARCHIVE_STATUS.all,
         sort_by=SAMPLE_SORT_BY.modified,
         sort_order=SORT_ORDER.desc,
     ):
@@ -361,22 +363,26 @@ class APIClient:
                 "sort_by": sort_by,
                 "sort_order": sort_order,
                 "status": sample_status,
+                "archive_status": sample_archive_status,
             },
         )
         return self._get(
             project_endpoint, query_params=params, authorized=True
         )
 
-    def add_samples_to_project(self, samples, project_id):
+    def add_samples_to_project(self, samples, project_id, metadata=None):
         """Assign samples to a project.
 
         Args:
             samples (list of dicts): sample sheet results
             project_id (str): project to which to assign the samples
+            metadata (str): JSON metadata to be applied to all samples
         """
+        payload = {"uploads": samples, "metadata": metadata}
+
         return self._post(
             self.endpoints.project_samples.format(id=project_id),
-            samples,
+            payload,
             authorized=True,
         )
 
@@ -511,6 +517,18 @@ class APIClient:
         """Get single batch."""
         batches_endpoint = self.endpoints.batches.format(id=batch_id)
         return self._get(batches_endpoint, authorized=True)
+
+    def restore_project_samples(self, project_id, sample_ids):
+        """Make a request to restore samples in given project."""
+        restore_project_samples_endpoint = (
+            self.endpoints.project_restore_samples.format(id=project_id)
+        )
+
+        payload = {"sample_ids": sample_ids}
+
+        return self._post(
+            restore_project_samples_endpoint, payload, authorized=True
+        )
 
     def get_project(self, project_id):
         """Get single project."""

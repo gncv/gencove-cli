@@ -162,12 +162,11 @@ class Download(Command):
         if not ALLOWED_ARCHIVE_STATUSES_RE.match(
             sample["archive_last_status"]["status"]
         ):
-            self.echo_warning(
+            raise ValidationError(
                 "Sample #{} is archived and cannot be downloaded.".format(
                     sample["id"]
-                ),
+                )
             )
-            return
 
         if not ALLOWED_STATUSES_RE.match(sample["last_status"]["status"]):
             self.echo_warning(

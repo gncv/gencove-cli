@@ -749,7 +749,7 @@ def test_download_not_working_because_archived(mocker):
                 "123",
             ],
         )
-        assert res.exit_code == 0
+        assert res.exit_code == 1
         mocked_login.assert_called_once()
         mocked_download_file.assert_not_called()
         mocked_sample_details.assert_called_once()

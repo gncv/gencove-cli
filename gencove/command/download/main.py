@@ -11,7 +11,12 @@ from gencove.command.base import Command
 from gencove.command.download.exceptions import DownloadTemplateError
 from gencove.exceptions import ValidationError
 
-from .constants import ALLOWED_STATUSES_RE, METADATA_FILE_TYPE, QC_FILE_TYPE
+from .constants import (
+    ALLOWED_ARCHIVE_STATUSES_RE,
+    ALLOWED_STATUSES_RE,
+    METADATA_FILE_TYPE,
+    QC_FILE_TYPE,
+)
 from .utils import (
     build_file_path,
     download_file,
@@ -153,6 +158,16 @@ class Download(Command):
                 sample["id"], sample["last_status"]["status"]
             )
         )
+
+        if not ALLOWED_ARCHIVE_STATUSES_RE.match(
+            sample["archive_last_status"]["status"]
+        ):
+            self.echo_warning(
+                "Sample #{} is archived and cannot be downloaded.".format(
+                    sample["id"]
+                ),
+            )
+            return
 
         if not ALLOWED_STATUSES_RE.match(sample["last_status"]["status"]):
             self.echo_warning(

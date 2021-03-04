@@ -687,3 +687,71 @@ def test_project_id_provided_skip_existing_qc_and_metadata(mocker):
         assert res.exit_code == 0
         mocked_qc_metrics.assert_not_called()
         mocked_get_metadata.assert_not_called()
+
+
+def test_download_not_working_because_archived(mocker):
+    """Test command doesn't download archived files."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        mocked_login = mocker.patch.object(
+            APIClient, "login", return_value=None
+        )
+        mocked_sample_details = mocker.patch.object(
+            APIClient,
+            "get_sample_details",
+            return_value={
+                "id": 0,
+                "client_id": 1,
+                "last_status": {
+                    "id": str(uuid4()),
+                    "status": "succeeded",
+                    "created": "2020-07-28T12:46:22.719862Z",
+                },
+                "archive_last_status": {
+                    "id": str(uuid4()),
+                    "status": "archived",
+                    "created": "2020-07-28T12:46:22.719862Z",
+                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
+                },
+                "files": [
+                    {
+                        "id": str(uuid4()),
+                        "file_type": "txt",
+                        "download_url": None,
+                    }
+                ],
+            },
+        )
+        mocked_qc_metrics = mocker.patch.object(
+            APIClient,
+            "get_sample_qc_metrics",
+            return_value={"results": [{"foo": 12}]},
+        )
+        mocked_get_metadata = mocker.patch.object(
+            APIClient,
+            "get_metadata",
+            return_value=dict(
+                metadata=None,
+            ),
+        )
+        mocked_download_file = mocker.patch(
+            "gencove.command.download.main.download_file"
+        )
+        res = runner.invoke(
+            download,
+            [
+                "cli_test_data",
+                "--sample-ids",
+                "0",
+                "--email",
+                "foo@bar.com",
+                "--password",
+                "123",
+            ],
+        )
+        assert res.exit_code == 0
+        mocked_login.assert_called_once()
+        mocked_download_file.assert_not_called()
+        mocked_sample_details.assert_called_once()
+        mocked_qc_metrics.assert_not_called()
+        mocked_get_metadata.assert_not_called()

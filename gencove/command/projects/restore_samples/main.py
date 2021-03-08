@@ -8,8 +8,6 @@ from gencove.command.base import Command
 from gencove.command.utils import is_valid_uuid
 from gencove.exceptions import ValidationError
 
-from .exceptions import SamplesRestoreError
-
 
 class RestoreSamples(Command):
     """Restore project's samples."""
@@ -86,4 +84,4 @@ class RestoreSamples(Command):
                     )
                 )
             else:
-                raise SamplesRestoreError  # pylint: disable=W0707
+                raise

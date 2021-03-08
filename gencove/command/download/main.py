@@ -164,7 +164,8 @@ class Download(Command):
             sample["archive_last_status"]["status"]
         ):
             raise ValidationError(
-                "Sample #{} is archived and cannot be downloaded.".format(
+                "Sample with id {} is archived and cannot be downloaded - "
+                "please restore the sample and try again.".format(
                     sample["id"]
                 )
             )

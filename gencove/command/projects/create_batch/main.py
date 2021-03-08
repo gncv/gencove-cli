@@ -9,8 +9,6 @@ from gencove.command.projects.list_batches.utils import get_line
 from gencove.command.utils import is_valid_uuid
 from gencove.exceptions import ValidationError
 
-from .exceptions import BatchCreateError
-
 
 class CreateBatch(Command):
     """Create project's batch executor."""
@@ -55,7 +53,7 @@ class CreateBatch(Command):
             raise ValidationError("Project ID is not valid. Exiting.")
 
         if self.sample_ids:
-            if not all([is_valid_uuid(s_id) for s_id in self.sample_ids]):
+            if not all(is_valid_uuid(s_id) for s_id in self.sample_ids):
                 raise ValidationError(
                     "Not all sample IDs are valid. Exiting."
                 )
@@ -100,4 +98,4 @@ class CreateBatch(Command):
                     )
                 )
             else:
-                raise BatchCreateError  # pylint: disable=W0707
+                raise

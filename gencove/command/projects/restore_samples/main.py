@@ -8,8 +8,6 @@ from gencove.command.base import Command
 from gencove.command.utils import is_valid_uuid
 from gencove.exceptions import ValidationError
 
-from .exceptions import SamplesRestoreError
-
 
 class RestoreSamples(Command):
     """Restore project's samples."""
@@ -40,7 +38,7 @@ class RestoreSamples(Command):
             raise ValidationError("Project ID is not valid. Exiting.")
 
         if self.sample_ids:
-            if not all([is_valid_uuid(s_id) for s_id in self.sample_ids]):
+            if not all(is_valid_uuid(s_id) for s_id in self.sample_ids):
                 raise ValidationError(
                     "Not all sample IDs are valid. Exiting."
                 )
@@ -86,4 +84,4 @@ class RestoreSamples(Command):
                     )
                 )
             else:
-                raise SamplesRestoreError  # pylint: disable=W0707
+                raise

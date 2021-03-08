@@ -6,10 +6,20 @@ from gencove.constants import DownloadTemplateParts, Optionals
 
 
 _SampleStatuses = namedtuple("SampleStatuses", ["succeeded", "failed"])
+_SampleArchiveStatuses = namedtuple(
+    "SampleStatuses", ["available", "restored"]
+)
 SAMPLE_STATUSES = _SampleStatuses("succeeded", "failed")
+SAMPLE_ARCHIVE_STATUSES = _SampleArchiveStatuses("available", "restored")
 
 ALLOWED_STATUSES_RE = re.compile(
     "{}|{}".format(SAMPLE_STATUSES.succeeded, SAMPLE_STATUSES.failed),
+    re.IGNORECASE,
+)
+ALLOWED_ARCHIVE_STATUSES_RE = re.compile(
+    "{}|{}".format(
+        SAMPLE_ARCHIVE_STATUSES.available, SAMPLE_ARCHIVE_STATUSES.restored
+    ),
     re.IGNORECASE,
 )
 KILOBYTE = 1024

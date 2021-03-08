@@ -9,9 +9,15 @@ import requests
 from gencove import client  # noqa: I100
 from gencove.command.base import Command
 from gencove.command.download.exceptions import DownloadTemplateError
+from gencove.constants import SAMPLE_ARCHIVE_STATUS
 from gencove.exceptions import ValidationError
 
-from .constants import ALLOWED_STATUSES_RE, METADATA_FILE_TYPE, QC_FILE_TYPE
+from .constants import (
+    ALLOWED_ARCHIVE_STATUSES_RE,
+    ALLOWED_STATUSES_RE,
+    METADATA_FILE_TYPE,
+    QC_FILE_TYPE,
+)
 from .utils import (
     build_file_path,
     download_file,
@@ -153,6 +159,16 @@ class Download(Command):
                 sample["id"], sample["last_status"]["status"]
             )
         )
+
+        if not ALLOWED_ARCHIVE_STATUSES_RE.match(
+            sample["archive_last_status"]["status"]
+        ):
+            raise ValidationError(
+                "Sample with id {} is archived and cannot be downloaded - "
+                "please restore the sample and try again.".format(
+                    sample["id"]
+                )
+            )
 
         if not ALLOWED_STATUSES_RE.match(sample["last_status"]["status"]):
             self.echo_warning(
@@ -330,7 +346,9 @@ class Download(Command):
         while get_samples:
             self.echo_debug("Getting page: {}".format(next_page or 1))
             req = self.api_client.get_project_samples(
-                self.filters.project_id, next_page
+                self.filters.project_id,
+                next_page,
+                sample_archive_status=SAMPLE_ARCHIVE_STATUS.available,
             )
             for sample in req["results"]:
                 yield sample

@@ -10,7 +10,6 @@ from gencove.command.base import Command
 from gencove.command.utils import is_valid_uuid
 from gencove.exceptions import ValidationError
 
-from .exceptions import BatchGetError
 from ... import download
 
 
@@ -82,7 +81,7 @@ class GetBatch(Command):
                     "permission required to access it.".format(self.batch_id),
                 )
             else:
-                raise BatchGetError  # pylint: disable=W0707
+                raise
 
     @backoff.on_exception(
         backoff.expo,

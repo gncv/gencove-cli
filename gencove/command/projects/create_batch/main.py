@@ -9,8 +9,6 @@ from gencove.command.projects.list_batches.utils import get_line
 from gencove.command.utils import is_valid_uuid
 from gencove.exceptions import ValidationError
 
-from .exceptions import BatchCreateError
-
 
 class CreateBatch(Command):
     """Create project's batch executor."""
@@ -100,4 +98,4 @@ class CreateBatch(Command):
                     )
                 )
             else:
-                raise BatchCreateError  # pylint: disable=W0707
+                raise

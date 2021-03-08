@@ -10,7 +10,6 @@ from gencove.command.base import Command
 from gencove.command.utils import is_valid_uuid
 from gencove.exceptions import ValidationError
 
-from .exceptions import BatchTypesError
 from .utils import get_line
 
 
@@ -63,7 +62,7 @@ class ListBatchTypes(Command):
                     )
                 )
             else:
-                raise BatchTypesError  # pylint: disable=W0707
+                raise
 
     def get_paginated_batch_types(self):
         """Paginate over all batch types for the destination.

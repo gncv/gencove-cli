@@ -13,7 +13,6 @@ from requests import (  # pylint: disable=W0622
     ConnectTimeout,
     ConnectionError,
     ReadTimeout,
-    codes,
     get,
     post,
 )
@@ -165,11 +164,7 @@ class APIClient:
         )
 
         # pylint: disable=no-member
-        if (
-            response.status_code == codes.ok
-            or response.status_code == codes.created
-            or response.status_code == codes.accepted
-        ):
+        if response.status_code >= 200 and response.status_code < 300:
             return response.json() if response.text else {}
 
         http_error_msg = ""

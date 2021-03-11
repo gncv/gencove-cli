@@ -168,6 +168,7 @@ class APIClient:
         if (
             response.status_code == codes.ok
             or response.status_code == codes.created
+            or response.status_code == codes.accepted
         ):
             return response.json() if response.text else {}
 

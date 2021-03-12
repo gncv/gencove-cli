@@ -72,12 +72,10 @@ def test_restore_project_samples__not_owned_project(mocker):
 def test_restore_project_samples__success__empty_sample_ids(mocker):
     """Test restore project samples success when an empty list of sample ids
     is sent."""
-    mocked_response = {"sample_ids": ["This list may be empty."]}
-
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_restore_project_samples = mocker.patch.object(
-        APIClient, "restore_project_samples", return_value=mocked_response
+        APIClient, "restore_project_samples", return_value=""
     )
 
     mocked_restore_project_samples = mocker.patch.object(

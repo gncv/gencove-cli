@@ -69,15 +69,13 @@ def test_restore_project_samples__not_owned_project(mocker):
     assert "you do not have permission required" in res.output
 
 
-def test_restore_project_samples__empty_sample_ids(mocker):
-    """Test restore project samples failure when an empty list of sample ids
+def test_restore_project_samples__success__empty_sample_ids(mocker):
+    """Test restore project samples success when an empty list of sample ids
     is sent."""
-    mocked_response = {"sample_ids": ["This list may not be empty."]}
-
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_restore_project_samples = mocker.patch.object(
-        APIClient, "restore_project_samples", return_value=mocked_response
+        APIClient, "restore_project_samples", return_value=""
     )
 
     mocked_restore_project_samples = mocker.patch.object(
@@ -98,10 +96,9 @@ def test_restore_project_samples__empty_sample_ids(mocker):
             "",
         ],
     )
-    assert res.exit_code == 1
+    assert res.exit_code == 0
     mocked_login.assert_called_once()
-    mocked_restore_project_samples.assert_not_called()
-    assert "Missing sample IDs" in res.output
+    mocked_restore_project_samples.assert_called_once()
 
 
 def test_restore_project_samples__invalid_sample_ids(mocker):

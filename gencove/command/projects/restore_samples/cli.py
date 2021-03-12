@@ -13,7 +13,10 @@ from .main import RestoreSamples
 @click.option(
     "--sample-ids",
     default="",
-    help="A comma separated list of sample ids which will be restored.",
+    help=(
+        "A comma separated list of sample ids which will be restored. If "
+        "omitted, restores all archived samples in project."
+    ),
 )
 @add_options(common_options)
 def restore_project_samples(  # pylint: disable=too-many-arguments

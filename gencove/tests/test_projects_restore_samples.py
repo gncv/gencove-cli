@@ -69,7 +69,7 @@ def test_restore_project_samples__not_owned_project(mocker):
     assert "you do not have permission required" in res.output
 
 
-def test_restore_project_samples__empty_sample_ids(mocker):
+def test_restore_project_samples__success__empty_sample_ids(mocker):
     """Test restore project samples success when an empty list of sample ids
     is sent."""
     mocked_response = {"sample_ids": ["This list may be empty."]}

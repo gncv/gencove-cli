@@ -7,7 +7,7 @@ from uuid import uuid4
 from click import echo
 from click.testing import CliRunner
 
-from gencove.client import APIClient, APIClientError
+from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.projects.cli import status_merged_vcf
 
 
@@ -156,6 +156,35 @@ def test_status_merged_vcf__success_but_job_failed(mocker):
     mocked_login.assert_called_once()
     mocked_retrieve_merged_vcf.assert_called_once()
     assert "WARNING: The job failed merging." in res.output
+
+
+def test_status_merged_vcf__slow_response_retry(mocker):
+    """Test status merged VCF slow response retry."""
+    project_id = str(uuid4())
+
+    runner = CliRunner()
+
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_retrieve_merged_vcf = mocker.patch.object(
+        APIClient,
+        "retrieve_merged_vcf",
+        side_effect=APIClientTimeout("Could not connect to the api server"),
+    )
+
+    res = runner.invoke(
+        status_merged_vcf,
+        [
+            project_id,
+            "--email",
+            "foo@bar.com",
+            "--password",
+            "123",
+        ],
+    )
+
+    assert res.exit_code == 1
+    mocked_login.assert_called_once()
+    assert mocked_retrieve_merged_vcf.call_count == 5
 
 
 def test_status_merged_vcf__success(mocker):

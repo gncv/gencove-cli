@@ -7,7 +7,7 @@ from uuid import uuid4
 from click import echo
 from click.testing import CliRunner
 
-from gencove.client import APIClient  # noqa: I100
+from gencove.client import APIClient, APIClientTimeout  # noqa: I100
 from gencove.command.projects.cli import list_project_batches
 
 
@@ -109,3 +109,22 @@ def test_list_project_batches__not_empty(mocker):
     )
     echo("\n".join([line_one, line_two]))
     assert output_line.getvalue() == res.output.encode()
+
+
+def test_list_project_batches__not_empty_slow_response_retry(mocker):
+    """Test project batches slow response retry."""
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_get_project_batches = mocker.patch.object(
+        APIClient,
+        "get_project_batches",
+        side_effect=APIClientTimeout("Could not connect to the api server"),
+    )
+
+    res = runner.invoke(
+        list_project_batches,
+        [str(uuid4()), "--email", "foo@bar.com", "--password", "123"],
+    )
+    assert res.exit_code == 1
+    mocked_login.assert_called_once()
+    assert mocked_get_project_batches.call_count == 2

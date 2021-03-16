@@ -7,7 +7,6 @@ from click.testing import CliRunner
 from gencove.client import (
     APIClient,
     APIClientError,
-    APIClientTimeout,
 )  # noqa: I100
 from gencove.command.projects.cli import restore_project_samples
 
@@ -181,33 +180,6 @@ def test_restore_project_samples__sample_not_in_project(mocker):
     assert (
         "There was an error requesting project samples restore" in res.output
     )
-
-
-def test_restore_project_samples_slow_response_retry(mocker):
-    """Test restore project samples slow response."""
-    runner = CliRunner()
-    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
-    mocked_restore_project_samples = mocker.patch.object(
-        APIClient,
-        "restore_project_samples",
-        side_effect=APIClientTimeout("Could not connect to the api server"),
-    )
-
-    res = runner.invoke(
-        restore_project_samples,
-        [
-            str(uuid4()),
-            "--email",
-            "foo@bar.com",
-            "--password",
-            "123",
-            "--sample-ids",
-            "11111111-1111-1111-1111-111111111111,22222222-2222-2222-2222-222222222222",  # noqa
-        ],
-    )
-    assert res.exit_code == 1
-    mocked_login.assert_called_once()
-    assert mocked_restore_project_samples.call_count == 5
 
 
 def test_restore_project_samples__success(mocker):

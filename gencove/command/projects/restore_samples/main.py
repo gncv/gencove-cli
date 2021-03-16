@@ -1,8 +1,4 @@
 """Request project's samples restore."""
-import backoff
-
-import requests
-
 from gencove import client  # noqa: I100
 from gencove.command.base import Command
 from gencove.command.utils import is_valid_uuid
@@ -45,16 +41,6 @@ class RestoreSamples(Command):
         else:
             raise ValidationError("Missing sample IDs. Exiting.")
 
-    @backoff.on_exception(
-        backoff.expo,
-        (
-            requests.exceptions.ConnectionError,
-            requests.exceptions.Timeout,
-            client.APIClientTimeout,
-        ),
-        max_tries=5,
-        max_time=30,
-    )
     def execute(self):
         """Make a request to request samples restore for given project."""
         self.echo_debug(

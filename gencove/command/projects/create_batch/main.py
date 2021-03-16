@@ -1,8 +1,4 @@
 """Create project's batch executor."""
-import backoff
-
-import requests
-
 from gencove import client  # noqa: I100
 from gencove.command.base import Command
 from gencove.command.projects.list_batches.utils import get_line
@@ -58,12 +54,6 @@ class CreateBatch(Command):
                     "Not all sample IDs are valid. Exiting."
                 )
 
-    @backoff.on_exception(
-        backoff.expo,
-        (requests.exceptions.ConnectionError, requests.exceptions.Timeout),
-        max_tries=5,
-        max_time=30,
-    )
     def execute(self):
         """Make a request to create a batch for given project."""
         self.echo_debug(

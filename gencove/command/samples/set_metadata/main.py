@@ -2,10 +2,6 @@
 
 import json
 
-import backoff
-
-import requests
-
 from ...base import Command
 from ...utils import is_valid_uuid
 from .... import client
@@ -37,12 +33,6 @@ class SetMetadata(Command):
         if not self._valid_json(self.json_metadata):
             raise ValidationError("Metadata JSON is not valid. Exiting.")
 
-    @backoff.on_exception(
-        backoff.expo,
-        (requests.exceptions.ConnectionError, requests.exceptions.Timeout),
-        max_tries=5,
-        max_time=30,
-    )
     def execute(self):
         """Make a request to assign given metadata to a specified sample."""
 

@@ -1,10 +1,8 @@
 """List uploads subcommand."""
 import backoff
 
-import requests
-
 # pylint: disable=wrong-import-order
-from gencove.client import APIClientError  # noqa: I100
+from gencove.client import APIClientError, APIClientTimeout  # noqa: I100
 from gencove.command.base import Command
 from gencove.command.utils import validate_input
 from gencove.constants import SAMPLE_ASSIGNMENT_STATUS
@@ -72,7 +70,7 @@ class ListSampleSheet(Command):
 
     @backoff.on_exception(
         backoff.expo,
-        (requests.exceptions.ConnectionError, requests.exceptions.Timeout),
+        (APIClientTimeout),
         max_tries=5,
         max_time=30,
     )

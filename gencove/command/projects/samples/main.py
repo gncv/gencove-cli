@@ -1,10 +1,8 @@
 """List projects subcommand."""
 import backoff
 
-import requests
-
 # pylint: disable=wrong-import-order
-from gencove.client import APIClientError  # noqa: I100
+from gencove.client import APIClientError, APIClientTimeout  # noqa: I100
 from gencove.command.base import Command
 from gencove.constants import SAMPLE_ARCHIVE_STATUS, SAMPLE_STATUS
 
@@ -91,7 +89,7 @@ class ListSamples(Command):
 
     @backoff.on_exception(
         backoff.expo,
-        (requests.exceptions.ConnectionError, requests.exceptions.Timeout),
+        (APIClientTimeout),
         max_tries=2,
         max_time=30,
     )

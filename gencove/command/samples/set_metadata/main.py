@@ -33,6 +33,8 @@ class SetMetadata(Command):
         if not self._valid_json(self.json_metadata):
             raise ValidationError("Metadata JSON is not valid. Exiting.")
 
+    # no retry for timeouts in order to avoid duplicate heavy operations on
+    # the backend
     def execute(self):
         """Make a request to assign given metadata to a specified sample."""
 

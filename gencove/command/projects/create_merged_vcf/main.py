@@ -31,6 +31,8 @@ class CreateMergedVCF(Command):
         if is_valid_uuid(self.project_id) is False:
             raise ValidationError("Project ID is not valid. Exiting.")
 
+    # no retry for timeouts in order to avoid duplicate heavy operations on
+    # the backend
     def execute(self):
         """Make a request to merge VCF files for a given project."""
         self.echo_debug(

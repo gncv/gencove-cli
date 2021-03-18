@@ -41,6 +41,8 @@ class RestoreSamples(Command):
         else:
             raise ValidationError("Missing sample IDs. Exiting.")
 
+    # no retry for timeouts in order to avoid duplicate heavy operations on
+    # the backend
     def execute(self):
         """Make a request to request samples restore for given project."""
         self.echo_debug(

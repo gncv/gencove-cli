@@ -54,6 +54,8 @@ class CreateBatch(Command):
                     "Not all sample IDs are valid. Exiting."
                 )
 
+    # no retry for timeouts in order to avoid duplicate heavy operations on
+    # the backend
     def execute(self):
         """Make a request to create a batch for given project."""
         self.echo_debug(

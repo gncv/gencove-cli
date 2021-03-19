@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from click.testing import CliRunner
 
-from gencove.client import APIClient, APIClientError
+from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.projects.cli import get_merged_vcf
 
 
@@ -238,6 +238,40 @@ def test_get_merged_vcf__no_progress_success(mocker):
         "merge_vcfs/{file_id}/{file_id}.vcf.bgz".format(file_id=file_id),
         no_progress=True,
     )
+
+
+def test_get_merged_vcf__slow_response_retry(mocker):
+    """Test project download merged VCF slow response retry."""
+    project_id = str(uuid4())
+
+    runner = CliRunner()
+
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_get_project = mocker.patch.object(
+        APIClient,
+        "get_project",
+        side_effect=APIClientTimeout("Could not connect to the api server"),
+    )
+
+    with runner.isolated_filesystem():
+        mocked_download_file = mocker.patch(
+            "gencove.command.projects.get_merged_vcf.main.download.utils."
+            "download_file"
+        )
+        res = runner.invoke(
+            get_merged_vcf,
+            [
+                project_id,
+                "--email",
+                "foo@bar.com",
+                "--password",
+                "123",
+            ],
+        )
+    assert res.exit_code == 1
+    mocked_login.assert_called_once()
+    assert mocked_get_project.call_count == 5
+    mocked_download_file.assert_not_called()
 
 
 def test_get_merged_vcf__success(mocker):

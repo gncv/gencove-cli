@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from click.testing import CliRunner
 
-from gencove.client import APIClient  # noqa: I100
+from gencove.client import APIClient, APIClientTimeout  # noqa: I100
 from gencove.command.projects.cli import get_batch
 
 
@@ -173,3 +173,40 @@ def test_get_batch__no_progress_not_empty(mocker):
         "job-id-1/simple_vcf2finalreport/report.zip",
         no_progress=True,
     )
+
+
+def test_get_batch__not_empty__slow_response_retry(mocker):
+    """Test project batches slow response retry."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        mocked_login = mocker.patch.object(
+            APIClient, "login", return_value=None
+        )
+        batch_id = str(uuid4())
+        mocked_get_batch = mocker.patch.object(
+            APIClient,
+            "get_batch",
+            side_effect=APIClientTimeout(
+                "Could not connect to the api server"
+            ),
+        )
+        mocked_download_file = mocker.patch(
+            "gencove.command.projects.get_batch.main.download.utils."
+            "download_file"
+        )
+        res = runner.invoke(
+            get_batch,
+            [
+                batch_id,
+                "--email",
+                "foo@bar.com",
+                "--password",
+                "123",
+                "--output-filename",
+                "test.zip",
+            ],
+        )
+    assert res.exit_code == 1
+    mocked_login.assert_called_once()
+    assert mocked_get_batch.call_count == 2
+    mocked_download_file.assert_not_called()

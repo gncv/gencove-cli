@@ -8,7 +8,7 @@ from uuid import uuid4
 from click import echo
 from click.testing import CliRunner
 
-from gencove.client import APIClient, APIClientError
+from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.samples.cli import get_metadata
 
 
@@ -210,3 +210,38 @@ def test_get_metadata__success_stdout(mocker):
     sys.stdout = output_line
     echo(json.dumps(metadata, indent=4))
     assert output_line.getvalue() in res.output.encode()
+
+
+def test_get_metadata__slow_response_retry(mocker):
+    """Test sample get metadata slow response retry."""
+    sample_id = str(uuid4())
+
+    runner = CliRunner()
+
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    metadata = {"somekey": "somevalue"}
+    mocked_get_metadata = mocker.patch.object(
+        APIClient,
+        "get_metadata",
+        side_effect=APIClientTimeout("Could not connect to the api server"),
+    )
+
+    res = runner.invoke(
+        get_metadata,
+        [
+            sample_id,
+            "--email",
+            "foo@bar.com",
+            "--password",
+            "123",
+            "--output-filename",
+            "-",
+        ],
+    )
+    assert res.exit_code == 1
+    mocked_login.assert_called_once()
+    assert mocked_get_metadata.call_count == 2
+    output_line = io.BytesIO()
+    sys.stdout = output_line
+    echo(json.dumps(metadata, indent=4))
+    assert output_line.getvalue() not in res.output.encode()

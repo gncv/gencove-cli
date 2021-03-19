@@ -7,10 +7,9 @@ from time import sleep
 
 import backoff
 
-import requests
-
 from gencove.client import (  # noqa: I100
     APIClientError,
+    APIClientTimeout,
     APIClientTooManyRequestsError,
 )
 from gencove.command.base import Command
@@ -439,7 +438,7 @@ class Upload(Command):
 
     @backoff.on_exception(
         backoff.expo,
-        (requests.exceptions.ConnectionError, requests.exceptions.Timeout),
+        (APIClientTimeout),
         max_tries=5,
         max_time=30,
     )

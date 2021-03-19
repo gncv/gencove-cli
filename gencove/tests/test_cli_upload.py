@@ -9,7 +9,7 @@ from click import echo
 from click.testing import CliRunner
 
 from gencove.cli import upload
-from gencove.client import APIClient
+from gencove.client import APIClient, APIClientTimeout
 from gencove.command.upload.constants import UPLOAD_PREFIX
 
 
@@ -764,3 +764,60 @@ def test_upload_and_run_immediately_without_progressbar(mocker):
         mocked_get_sample_sheet.assert_called()
         mocked_assign_sample.assert_called_once()
         mocked_regular_progress_bar.assert_not_called()
+
+
+def test_upload_and_run_immediately_slow_response_retry(mocker):
+    """Upload and assign right away and retry on slow response."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("cli_test_data")
+        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+            fastq_file.write("AAABBB")
+
+        mocked_login = mocker.patch.object(
+            APIClient, "login", return_value=None
+        )
+        mocked_get_credentials = mocker.patch(
+            "gencove.command.upload.main.get_s3_client_refreshable"
+        )
+        mocked_get_upload_details = mocker.patch.object(
+            APIClient,
+            "get_upload_details",
+            return_value={
+                "id": "test",
+                "last_status": {"status": ""},
+                "s3": {"bucket": "test", "object_name": "test"},
+            },
+        )
+        mocked_upload_file = mocker.patch(
+            "gencove.command.upload.main.upload_file"
+        )
+        mocked_get_sample_sheet = mocker.patch.object(
+            APIClient,
+            "get_sample_sheet",
+            side_effect=APIClientTimeout(
+                "Could not connect to the api server"
+            ),
+        )
+
+        res = runner.invoke(
+            upload,
+            [
+                "cli_test_data",
+                "--email",
+                "foo@bar.com",
+                "--password",
+                "123456",
+                "--run-project-id",
+                "11111111-1111-1111-1111-111111111111",
+                "--no-progress",
+            ],
+        )
+
+        assert res.exit_code == 0
+        mocked_login.assert_called_once()
+        mocked_get_credentials.assert_called_once()
+        mocked_get_upload_details.assert_called_once()
+        mocked_upload_file.assert_called_once()
+        assert mocked_get_sample_sheet.call_count == 5
+        assert "there was an error automatically running them" in res.output

@@ -8,7 +8,11 @@ from uuid import uuid4
 from click import echo
 from click.testing import CliRunner
 
-from gencove.client import APIClient, APIClientError  # noqa: I100
+from gencove.client import (
+    APIClient,
+    APIClientError,
+    APIClientTimeout,
+)  # noqa: I100
 from gencove.command.projects.cli import list_projects
 from gencove.command.projects.list.constants import (
     PipelineCapabilities,
@@ -96,6 +100,50 @@ def test_list_projects_no_permission(mocker):
         )
     )
     assert output_line.getvalue() == res.output.encode()
+
+
+def test_list_projects_slow_response_retry_list(mocker):
+    """Test projects slow response retry on the list."""
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_get_projects = mocker.patch.object(
+        APIClient,
+        "list_projects",
+        side_effect=APIClientTimeout("Could not connect to the api server"),
+    )
+    mocked_get_pipeline_capabilities = mocker.patch.object(
+        APIClient,
+        "get_pipeline_capabilities",
+        side_effect=APIClientTimeout("Could not connect to the api server"),
+    )
+    res = runner.invoke(
+        list_projects, ["--email", "foo@bar.com", "--password", "123"]
+    )
+    assert res.exit_code == 1
+    mocked_login.assert_called_once()
+    assert mocked_get_projects.call_count == 2
+    mocked_get_pipeline_capabilities.assert_not_called()
+
+
+def test_list_projects_slow_response_retry_pipeline(mocker):
+    """Test projects slow repsonse retry on the pipeline capabilities."""
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_get_projects = mocker.patch.object(
+        APIClient, "list_projects", return_value=MOCKED_PROJECTS
+    )
+    mocked_get_pipeline_capabilities = mocker.patch.object(
+        APIClient,
+        "get_pipeline_capabilities",
+        side_effect=APIClientTimeout("Could not connect to the api server"),
+    )
+    res = runner.invoke(
+        list_projects, ["--email", "foo@bar.com", "--password", "123"]
+    )
+    assert res.exit_code == 1
+    mocked_login.assert_called_once()
+    mocked_get_projects.assert_called_once()
+    assert mocked_get_pipeline_capabilities.call_count == 3
 
 
 def test_list_projects(mocker):

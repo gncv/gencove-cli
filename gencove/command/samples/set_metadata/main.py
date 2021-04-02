@@ -43,8 +43,11 @@ class SetMetadata(Command):
         )
 
         try:
+            metadata_api = None
+            if self.json_metadata is not None:
+                metadata_api = json.loads(self.json_metadata)
             assigned_metadata = self.api_client.set_metadata(
-                self.sample_id, json.loads(self.json_metadata)
+                self.sample_id, metadata_api
             )
             self.echo_debug(assigned_metadata)
             self.echo_info(

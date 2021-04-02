@@ -30,7 +30,7 @@ class SetMetadata(Command):
         if is_valid_uuid(self.sample_id) is False:
             raise ValidationError("Sample ID is not valid. Exiting.")
 
-        if not self._valid_json(self.json_metadata):
+        if self._valid_json(self.json_metadata) is False:
             raise ValidationError("Metadata JSON is not valid. Exiting.")
 
     # no retry for timeouts in order to avoid duplicate heavy operations on

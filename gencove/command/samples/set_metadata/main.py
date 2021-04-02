@@ -44,7 +44,7 @@ class SetMetadata(Command):
 
         try:
             assigned_metadata = self.api_client.set_metadata(
-                self.sample_id, self.json_metadata
+                self.sample_id, json.loads(self.json_metadata)
             )
             self.echo_debug(assigned_metadata)
             self.echo_info(
@@ -63,7 +63,7 @@ class SetMetadata(Command):
 
     def _valid_json(self, metadata):
         try:
-            self.json_metadata = json.loads(metadata)
+            json.loads(metadata)
             return True
         except ValueError as err:
             self.echo_error(err)

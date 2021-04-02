@@ -324,7 +324,7 @@ class Upload(Command):
                     "Assigning batch: {}".format(samples_batch_len)
                 )
                 assigned_batch = self.api_client.add_samples_to_project(
-                    samples_batch, self.project_id, self.metadata
+                    samples_batch, self.project_id, json.loads(self.metadata)
                 )
                 self.assigned_samples.extend(assigned_batch)
                 assigned_count += samples_batch_len

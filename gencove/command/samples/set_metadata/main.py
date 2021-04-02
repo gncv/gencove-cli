@@ -30,7 +30,7 @@ class SetMetadata(Command):
         if is_valid_uuid(self.sample_id) is False:
             raise ValidationError("Sample ID is not valid. Exiting.")
 
-        if not self._valid_json(self.json_metadata):
+        if self._valid_json(self.json_metadata) is False:
             raise ValidationError("Metadata JSON is not valid. Exiting.")
 
     # no retry for timeouts in order to avoid duplicate heavy operations on
@@ -43,8 +43,11 @@ class SetMetadata(Command):
         )
 
         try:
+            metadata_api = None
+            if self.json_metadata is not None:
+                metadata_api = json.loads(self.json_metadata)
             assigned_metadata = self.api_client.set_metadata(
-                self.sample_id, self.json_metadata
+                self.sample_id, metadata_api
             )
             self.echo_debug(assigned_metadata)
             self.echo_info(
@@ -63,7 +66,7 @@ class SetMetadata(Command):
 
     def _valid_json(self, metadata):
         try:
-            self.json_metadata = json.loads(metadata)
+            json.loads(metadata)
             return True
         except ValueError as err:
             self.echo_error(err)

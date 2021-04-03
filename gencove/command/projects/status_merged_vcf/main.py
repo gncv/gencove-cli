@@ -1,8 +1,6 @@
 """Merge project's VCF files executor."""
 import backoff
 
-import requests
-
 from .utils import get_line
 from ...base import Command
 from ...utils import is_valid_uuid
@@ -39,7 +37,7 @@ class StatusMergedVCF(Command):
 
     @backoff.on_exception(
         backoff.expo,
-        (requests.exceptions.ConnectionError, requests.exceptions.Timeout),
+        (client.APIClientTimeout),
         max_tries=5,
         max_time=30,
     )

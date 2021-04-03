@@ -7,10 +7,9 @@ from time import sleep
 
 import backoff
 
-import requests
-
 from gencove.client import (  # noqa: I100
     APIClientError,
+    APIClientTimeout,
     APIClientTooManyRequestsError,
 )
 from gencove.command.base import Command
@@ -324,8 +323,11 @@ class Upload(Command):
                 self.echo_debug(
                     "Assigning batch: {}".format(samples_batch_len)
                 )
+                metadata_api = None
+                if self.metadata is not None:
+                    metadata_api = json.loads(self.metadata)
                 assigned_batch = self.api_client.add_samples_to_project(
-                    samples_batch, self.project_id, self.metadata
+                    samples_batch, self.project_id, metadata_api
                 )
                 self.assigned_samples.extend(assigned_batch)
                 assigned_count += samples_batch_len
@@ -439,7 +441,7 @@ class Upload(Command):
 
     @backoff.on_exception(
         backoff.expo,
-        (requests.exceptions.ConnectionError, requests.exceptions.Timeout),
+        (APIClientTimeout),
         max_tries=5,
         max_time=30,
     )

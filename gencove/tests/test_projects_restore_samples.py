@@ -4,7 +4,10 @@ from uuid import uuid4
 
 from click.testing import CliRunner
 
-from gencove.client import APIClient, APIClientError  # noqa: I100
+from gencove.client import (
+    APIClient,
+    APIClientError,
+)  # noqa: I100
 from gencove.command.projects.cli import restore_project_samples
 
 

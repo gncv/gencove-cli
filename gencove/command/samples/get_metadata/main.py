@@ -5,8 +5,6 @@ import os
 
 import backoff
 
-import requests
-
 from ...base import Command
 from ...utils import is_valid_uuid
 from .... import client
@@ -53,7 +51,7 @@ class GetMetadata(Command):
 
     @backoff.on_exception(
         backoff.expo,
-        (requests.exceptions.ConnectionError, requests.exceptions.Timeout),
+        (client.APIClientTimeout),
         max_tries=2,
         max_time=30,
     )

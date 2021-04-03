@@ -2,8 +2,6 @@
 
 import backoff
 
-import requests
-
 # pylint: disable=wrong-import-order
 from gencove import client  # noqa: I100
 from gencove.command.base import Command
@@ -80,7 +78,7 @@ class ListBatches(Command):
 
     @backoff.on_exception(
         backoff.expo,
-        (requests.exceptions.ConnectionError, requests.exceptions.Timeout),
+        (client.APIClientTimeout),
         max_tries=2,
         max_time=30,
     )

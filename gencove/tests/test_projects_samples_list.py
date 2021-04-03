@@ -6,7 +6,7 @@ from uuid import uuid4
 
 from click.testing import CliRunner
 
-from gencove.client import APIClient, APIClientError
+from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.projects.cli import list_project_samples
 from gencove.logger import echo_data
 
@@ -92,6 +92,25 @@ def test_list_projects_no_project(mocker):
         )
     )
     assert output_line.getvalue() == res.output.encode()
+
+
+def test_list_project_samples_slow_response_retry(mocker):
+    """Test project samples slow response retry."""
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_get_project_samples = mocker.patch.object(
+        APIClient,
+        "get_project_samples",
+        side_effect=APIClientTimeout("Could not connect to the api server"),
+    )
+
+    res = runner.invoke(
+        list_project_samples,
+        [str(uuid4()), "--email", "foo@bar.com", "--password", "123"],
+    )
+    assert res.exit_code == 1
+    mocked_login.assert_called_once()
+    assert mocked_get_project_samples.call_count == 2
 
 
 def test_list_project_samples(mocker):

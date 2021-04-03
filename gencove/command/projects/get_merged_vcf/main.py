@@ -1,8 +1,6 @@
 """Download project's merged VCF file executor."""
 import backoff
 
-import requests
-
 from ... import download
 from ...base import Command
 from ...utils import is_valid_uuid
@@ -42,7 +40,7 @@ class GetMergedVCF(Command):
 
     @backoff.on_exception(
         backoff.expo,
-        (requests.exceptions.ConnectionError, requests.exceptions.Timeout),
+        (client.APIClientTimeout),
         max_tries=5,
         max_time=30,
     )

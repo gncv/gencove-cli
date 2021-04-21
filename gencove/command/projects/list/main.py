@@ -52,7 +52,8 @@ class List(Command):
         def _clean_project_response(project):
             """Clean-up legacy values.
 
-            webhook_url is not used anymore, but still returned by the API for now.
+            webhook_url is not used anymore, but still returned by the API for
+            now.
             """
             project.pop("webhook_url", None)
             return project

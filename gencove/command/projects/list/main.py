@@ -48,12 +48,26 @@ class List(Command):
         Yields:
             paginated lists of projects
         """
+
+        def _clean_project_response(project):
+            """Clean-up legacy values.
+
+            webhook_url is not used anymore, but still returned by the API for
+            now.
+            """
+            project.pop("webhook_url", None)
+            return project
+
         more = True
         next_link = None
         while more:
             self.echo_debug("Get projects page")
             resp = self.get_projects(next_link)
-            yield [Project(**result) for result in resp["results"]]
+
+            yield [
+                Project(**_clean_project_response(result))
+                for result in resp["results"]
+            ]
             next_link = resp["meta"]["next"]
             more = next_link is not None
 

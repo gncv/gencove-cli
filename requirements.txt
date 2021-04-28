@@ -1,5 +1,5 @@
 tox==3.14.6
 sphinx==1.8.5
 sphinx-click==2.3.1
-pre-commit==1.21.0
+pre-commit==2.12.1
 pyinstaller==3.6

@@ -1,6 +1,6 @@
 """Webhook validation related utilites."""
-import hmac
 import hashlib
+import hmac
 
 
 def is_valid_signature(secret, header, payload):

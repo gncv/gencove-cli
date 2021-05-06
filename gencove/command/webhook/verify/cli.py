@@ -1,9 +1,7 @@
 """Webhook signature verification shell command definition."""
 import click
 
-from gencove.logger import (
-    echo_info,
-)
+from gencove.logger import echo_error, echo_info
 
 from .utils import is_valid_signature
 
@@ -34,6 +32,7 @@ def verify(
         header (str): Gencove-Signature header content.
         payload (str): JSON payload (i.e., the request’s body).
     """
-    echo_info(
-        "OK" if is_valid_signature(secret, header, payload) else "INVALID"
-    )
+    if is_valid_signature(secret, header, payload):
+        echo_info("OK")
+    else:
+        echo_error("INVALID")

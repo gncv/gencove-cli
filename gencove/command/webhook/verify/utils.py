@@ -2,6 +2,8 @@
 import hashlib
 import hmac
 
+import requests
+
 
 # Copied from https://docs.gencove.com/main/?python#webhook-signatures
 def calculate_signature(secret, timestamp, payload):
@@ -22,16 +24,9 @@ def is_valid_signature(secret, header, payload):
     Returns:
         bool: True if is a valid signature, False if not
     """
-    header_content = header.split(",")
-    if len(header_content) != 2:
+    header = requests.utils.parse_dict_header(header)
+
+    if "v1" not in header or "t" not in header:
         return False
 
-    timestamp = header_content[0].split("=")
-    signature = header_content[1].split("=")
-    if len(timestamp) != 2 or len(signature) != 2:
-        return False
-
-    if signature[0] != "v1":
-        return False
-
-    return calculate_signature(secret, timestamp[1], payload) == signature[1]
+    return calculate_signature(secret, header["t"], payload) == header["v1"]

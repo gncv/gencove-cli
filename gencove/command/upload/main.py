@@ -41,6 +41,7 @@ from .utils import (
     upload_file,
     upload_multi_file,
 )
+from ..utils import is_valid_json
 
 
 # pylint: disable=too-many-instance-attributes
@@ -141,16 +142,8 @@ class Upload(Command):
             raise ValidationError("--run-project-id is not valid. Exiting.")
 
         # validate metadata json
-        if self.metadata and self._valid_json(self.metadata) is False:
+        if self.metadata and is_valid_json(self.metadata) is False:
             raise ValidationError("--metadata is not valid JSON. Exiting.")
-
-    def _valid_json(self, metadata):
-        try:
-            json.loads(metadata)
-            return True
-        except ValueError as err:
-            self.echo_error(err)
-            return False
 
     def execute(self):
         """Upload fastq files from host system to Gencove cloud.

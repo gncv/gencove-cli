@@ -1,4 +1,6 @@
 """Sample download file shell command definition."""
+import sys
+
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
@@ -52,14 +54,22 @@ def download_file(
         no_progress (bool, optional, default False): do not show progress
             bar.
     """  # noqa: E501
-    if destination == "-":
-        destination = "/dev/stdout"
-    with open(destination, "wb") as destination_file:
+    if destination in ("-", "/dev/stdout"):
         DownloadFile(
             sample_id,
             file_type,
-            destination_file,
+            sys.stdout.buffer,
             Credentials(email, password, api_key),
             Optionals(host),
             no_progress,
         ).run()
+    else:
+        with open(destination, "wb") as destination_file:
+            DownloadFile(
+                sample_id,
+                file_type,
+                destination_file,
+                Credentials(email, password, api_key),
+                Optionals(host),
+                no_progress,
+            ).run()

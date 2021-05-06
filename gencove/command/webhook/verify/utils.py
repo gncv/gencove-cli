@@ -3,6 +3,15 @@ import hashlib
 import hmac
 
 
+# Copied from https://docs.gencove.com/main/?python#webhook-signatures
+def calculate_signature(secret, timestamp, payload):
+    """Calculates hmac signature with the given secret"""
+    signature_message = "{}.{}".format(timestamp, payload).encode("utf-8")
+    return hmac.new(
+        secret.encode("utf-8"), signature_message, hashlib.sha512
+    ).hexdigest()
+
+
 def is_valid_signature(secret, header, payload):
     """Test if provided signature is a valid.
 
@@ -25,11 +34,4 @@ def is_valid_signature(secret, header, payload):
     if signature[0] != "v1":
         return False
 
-    return (
-        hmac.new(
-            secret.encode("utf-8"),
-            "{}.{}".format(timestamp[1], payload).encode("utf-8"),
-            hashlib.sha512,
-        ).hexdigest()
-        == signature[1]
-    )
+    return calculate_signature(secret, timestamp[1], payload) == signature[1]

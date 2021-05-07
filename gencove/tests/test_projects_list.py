@@ -71,6 +71,25 @@ MOCKED_PROJECTS_WITH_WEBHOOK_URL = dict(
     ],
 )
 
+# API responses may return new keys and values eventually
+MOCKED_PROJECTS_WITH_UNEXPECTED_KEYS = dict(
+    meta=dict(next=None),
+    results=[
+        {
+            "id": str(uuid4()),
+            "name": "test\tproject",
+            "description": "",
+            "created": (datetime.utcnow() - timedelta(days=7)).isoformat(),
+            "organization": str(uuid4()),
+            "webhook_url": None,
+            "sample_count": 1,
+            "pipeline_capabilities": str(uuid4()),
+            "roles": [],
+            **{"unexpected_key" + str(uuid4()): i for i in range(10)},
+        }
+    ],
+)
+
 MOCKED_PIPELINE_CAPABILITY = {
     "id": MOCKED_PROJECTS["results"][0]["pipeline_capabilities"],
     "name": "test capability",
@@ -230,6 +249,49 @@ def test_list_projects__with_webhook_url(mocker):
     mocked_get_pipeline_capabilities.assert_called_once()
 
     project = Project(**MOCKED_PROJECTS_WITH_WEBHOOK_URL["results"][0])
+    pipeline = PipelineCapabilities(**MOCKED_PIPELINE_CAPABILITY)
+
+    output_line = io.BytesIO()
+    sys.stdout = output_line
+    echo(
+        "\t".join(
+            [
+                project.created,
+                project.id,
+                project.name.replace("\t", " "),
+                pipeline.name,
+            ]
+        )
+    )
+    assert output_line.getvalue() == res.output.encode()
+
+
+def test_list_projects__with_unexpected_keys(mocker):
+    """Test projects being outputed to the shell where webhook_url, roles and
+    some randomly generated values are part of the response.
+    """
+
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_get_projects = mocker.patch.object(
+        APIClient,
+        "list_projects",
+        return_value=MOCKED_PROJECTS_WITH_UNEXPECTED_KEYS,
+    )
+    mocked_get_pipeline_capabilities = mocker.patch.object(
+        APIClient,
+        "get_pipeline_capabilities",
+        return_value=MOCKED_PIPELINE_CAPABILITY,
+    )
+    res = runner.invoke(
+        list_projects, ["--email", "foo@bar.com", "--password", "123"]
+    )
+    assert res.exit_code == 0
+    mocked_login.assert_called_once()
+    mocked_get_projects.assert_called_once()
+    mocked_get_pipeline_capabilities.assert_called_once()
+
+    project = Project(**MOCKED_PROJECTS_WITH_UNEXPECTED_KEYS["results"][0])
     pipeline = PipelineCapabilities(**MOCKED_PIPELINE_CAPABILITY)
 
     output_line = io.BytesIO()

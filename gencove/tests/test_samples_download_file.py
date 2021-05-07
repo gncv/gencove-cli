@@ -170,3 +170,23 @@ def test_samples_download_file_stdout(mocker):
     mocked_sample_details.assert_called_once()
     mocked_request.assert_called_once()
     assert file_content == res.output.encode()
+
+
+def test_samples_download_file_directory():
+    """Test command fails when writing to directory."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        res = runner.invoke(
+            download_file,
+            [
+                str(uuid4()),
+                "file_type",
+                ".",
+                "--email",
+                "foo@bar.com",
+                "--password",
+                "12345",
+            ],
+        )
+        assert res.exit_code == 1
+        assert "ERROR" in res.output

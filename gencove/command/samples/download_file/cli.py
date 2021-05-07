@@ -5,6 +5,7 @@ import click
 
 from gencove.command.common_cli_options import add_options, common_options
 from gencove.constants import Credentials, Optionals
+from gencove.logger import echo_error
 
 from .main import DownloadFile
 
@@ -17,7 +18,14 @@ from .main import DownloadFile
 @click.option(
     "--no-progress",
     is_flag=True,
-    help="If specified, no progress bar is shown.",
+    help="Hides progress bar when writing to a file.",
+    default=False,
+)
+@click.option(
+    "--show-progress",
+    is_flag=True,
+    help="Shows progress bar when writing to stdout.",
+    default=False,
 )
 # pylint: disable=too-many-arguments
 def download_file(
@@ -29,10 +37,15 @@ def download_file(
     password,
     api_key,
     no_progress,
+    show_progress,
 ):  # noqa: D413,D301,D412 # pylint: disable=C0301
     """Download sample file metadata.
 
-    Must specify SAMPLE_ID, FILE_TYPE and DESTINATION.
+    SAMPLE_ID   specific sample for which to download the results
+
+    FILE_TYPE   specific deliverable to download results for
+
+    DESTINATION path/to/file
 
     Examples:
 
@@ -46,13 +59,15 @@ def download_file(
     \f
 
     Args:
-        sample_id (str): specific samples for which
+        sample_id (str): specific sample for which
             to download the results.
         file_type (str): specific deliverable to download
             results for.
         destination (str): path/to/file.
         no_progress (bool, optional, default False): do not show progress
-            bar.
+            bar when writing to file.
+        show_progress (bool, optional, default False): show progress
+            bar when writing to stdout.
     """  # noqa: E501
     if destination in ("-", "/dev/stdout"):
         DownloadFile(
@@ -61,15 +76,22 @@ def download_file(
             sys.stdout.buffer,
             Credentials(email, password, api_key),
             Optionals(host),
-            no_progress,
+            not show_progress,
         ).run()
     else:
-        with open(destination, "wb") as destination_file:
-            DownloadFile(
-                sample_id,
-                file_type,
-                destination_file,
-                Credentials(email, password, api_key),
-                Optionals(host),
-                no_progress,
-            ).run()
+        try:
+            with open(destination, "wb") as destination_file:
+                DownloadFile(
+                    sample_id,
+                    file_type,
+                    destination_file,
+                    Credentials(email, password, api_key),
+                    Optionals(host),
+                    no_progress,
+                ).run()
+        except IsADirectoryError:
+            echo_error(
+                "Please specify a file path (not directory path)"
+                " for DESTINATION"
+            )
+            raise click.Abort()  # pylint: disable=raise-missing-from

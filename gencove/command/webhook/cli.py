@@ -5,8 +5,8 @@ from .verify.cli import verify
 
 
 @click.group()
-def webhook():
+def webhooks():
     """Webhook managements commands."""
 
 
-webhook.add_command(verify)
+webhooks.add_command(verify)

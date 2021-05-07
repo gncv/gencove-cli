@@ -1,2 +1,2 @@
 """Webhook related commands."""
-from .cli import webhook  # noqa: F401
+from .cli import webhooks  # noqa: F401

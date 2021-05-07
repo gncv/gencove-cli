@@ -18,8 +18,6 @@ def verify(
 ):
     """Verify webhook signature.
 
-    Prints OK if the signature is valid INVALID otherwise.
-
     SECRET  key to be used as a secret for hmac algorithm.
 
     HEADER  Gencove-Signature header content.
@@ -33,6 +31,7 @@ def verify(
         payload (str): JSON payload (i.e., the request’s body).
     """
     if is_valid_signature(secret, header, payload):
-        echo_info("OK")
+        echo_info("Webhook payload successfully verified.")
     else:
-        echo_error("INVALID")
+        echo_error("Could not verify webhook payload.")
+        raise click.Abort()

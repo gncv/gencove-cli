@@ -7,7 +7,7 @@ from gencove.command.projects import projects
 from gencove.command.samples import samples
 from gencove.command.upload import upload
 from gencove.command.uploads import uploads
-from gencove.command.webhook import webhook
+from gencove.command.webhook import webhooks
 
 
 @click.group()
@@ -21,7 +21,7 @@ cli.add_command(upload)
 cli.add_command(uploads)
 cli.add_command(projects)
 cli.add_command(samples)
-cli.add_command(webhook)
+cli.add_command(webhooks)
 
 
 if __name__ == "__main__":

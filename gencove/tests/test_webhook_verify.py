@@ -119,8 +119,8 @@ def test_verify__invalid_signature():
             args,
         )
 
-        assert res.exit_code == 0
-        assert "INVALID" in res.output
+        assert res.exit_code == 1
+        assert "ERROR" in res.output
 
 
 def test_verify__valid_signature():
@@ -138,4 +138,3 @@ def test_verify__valid_signature():
     )
 
     assert res.exit_code == 0
-    assert "OK" in res.output

@@ -18,14 +18,7 @@ from .main import DownloadFile
 @click.option(
     "--no-progress",
     is_flag=True,
-    help="Hides progress bar when writing to a file.",
-    default=False,
-)
-@click.option(
-    "--show-progress",
-    is_flag=True,
-    help="Shows progress bar when writing to stdout.",
-    default=False,
+    help="If specified, no progress bar is shown.",
 )
 # pylint: disable=too-many-arguments
 def download_file(
@@ -37,7 +30,6 @@ def download_file(
     password,
     api_key,
     no_progress,
-    show_progress,
 ):  # noqa: D413,D301,D412 # pylint: disable=C0301
     """Download sample file metadata.
 
@@ -65,9 +57,7 @@ def download_file(
             results for.
         destination (str): path/to/file.
         no_progress (bool, optional, default False): do not show progress
-            bar when writing to file.
-        show_progress (bool, optional, default False): show progress
-            bar when writing to stdout.
+            bar.
     """  # noqa: E501
     if destination in ("-", "/dev/stdout"):
         DownloadFile(
@@ -76,7 +66,7 @@ def download_file(
             sys.stdout.buffer,
             Credentials(email, password, api_key),
             Optionals(host),
-            not show_progress,
+            no_progress,
         ).run()
     else:
         try:

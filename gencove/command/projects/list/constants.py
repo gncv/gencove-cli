@@ -9,7 +9,6 @@ Project = namedtuple(
         "description",
         "created",
         "organization",
-        "webhook_url",
         "sample_count",
         "pipeline_capabilities",
     ],

@@ -47,6 +47,23 @@ MOCKED_PROJECTS = dict(
             "description": "",
             "created": (datetime.utcnow() - timedelta(days=7)).isoformat(),
             "organization": str(uuid4()),
+            "sample_count": 1,
+            "pipeline_capabilities": str(uuid4()),
+        }
+    ],
+)
+
+# API responses for the sake of backwards compatibility with old clients still
+# return webhook_url
+MOCKED_PROJECTS_WITH_WEBHOOK_URL = dict(
+    meta=dict(next=None),
+    results=[
+        {
+            "id": str(uuid4()),
+            "name": "test\tproject",
+            "description": "",
+            "created": (datetime.utcnow() - timedelta(days=7)).isoformat(),
+            "organization": str(uuid4()),
             "webhook_url": None,
             "sample_count": 1,
             "pipeline_capabilities": str(uuid4()),
@@ -167,6 +184,52 @@ def test_list_projects(mocker):
     mocked_get_pipeline_capabilities.assert_called_once()
 
     project = Project(**MOCKED_PROJECTS["results"][0])
+    pipeline = PipelineCapabilities(**MOCKED_PIPELINE_CAPABILITY)
+
+    output_line = io.BytesIO()
+    sys.stdout = output_line
+    echo(
+        "\t".join(
+            [
+                project.created,
+                project.id,
+                project.name.replace("\t", " "),
+                pipeline.name,
+            ]
+        )
+    )
+    assert output_line.getvalue() == res.output.encode()
+
+
+def test_list_projects__with_webhook_url(mocker):
+    """Test projects being outputed to the shell where webhook_url is part of
+    the response.
+
+    `webhook_url` is still being sent for the sake of backwards compatibility
+    with old clients.
+    """
+
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_get_projects = mocker.patch.object(
+        APIClient,
+        "list_projects",
+        return_value=MOCKED_PROJECTS_WITH_WEBHOOK_URL,
+    )
+    mocked_get_pipeline_capabilities = mocker.patch.object(
+        APIClient,
+        "get_pipeline_capabilities",
+        return_value=MOCKED_PIPELINE_CAPABILITY,
+    )
+    res = runner.invoke(
+        list_projects, ["--email", "foo@bar.com", "--password", "123"]
+    )
+    assert res.exit_code == 0
+    mocked_login.assert_called_once()
+    mocked_get_projects.assert_called_once()
+    mocked_get_pipeline_capabilities.assert_called_once()
+
+    project = Project(**MOCKED_PROJECTS_WITH_WEBHOOK_URL["results"][0])
     pipeline = PipelineCapabilities(**MOCKED_PIPELINE_CAPABILITY)
 
     output_line = io.BytesIO()

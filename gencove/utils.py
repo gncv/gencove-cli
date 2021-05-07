@@ -156,8 +156,8 @@ def batchify(items_list, batch_size=500):
     start = 0
     while left_to_process >= 0:
         end = start + batch_size
-        if end > total:
-            end = total
+        end = min(end, total)
+
         yield items_list[start:end]
         start += batch_size
         left_to_process -= batch_size

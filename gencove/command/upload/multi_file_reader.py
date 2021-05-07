@@ -47,7 +47,9 @@ class MultiFileReader(object):
             self._file_idx += 1
 
         try:
-            self._file = open(self._files[self._file_idx], "rb")
+            self._file = open(  # pylint: disable=consider-using-with
+                self._files[self._file_idx], "rb"
+            )
         except IndexError:
             pass
 

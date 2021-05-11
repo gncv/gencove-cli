@@ -16,8 +16,6 @@ UPLOAD_STATUSES = _UploadStatuses("succeeded", "started", "failed")
 
 FASTQ_EXTENSIONS = (".fastq.gz", ".fastq.bgz", ".fq.gz", ".fq.bgz")
 
-UPLOAD_PREFIX = "gncv://"
-
 UploadOptions = namedtuple(
     "UploadOptions", Optionals._fields + ("project_id", "metadata")
 )

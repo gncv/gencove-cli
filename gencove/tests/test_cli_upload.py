@@ -10,7 +10,7 @@ from click.testing import CliRunner
 
 from gencove.cli import upload
 from gencove.client import APIClient, APIClientTimeout
-from gencove.command.upload.constants import UPLOAD_PREFIX
+from gencove.constants import UPLOAD_PREFIX
 
 
 def test_upload(mocker):

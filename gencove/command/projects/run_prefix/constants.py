@@ -6,5 +6,3 @@ from gencove.constants import Optionals
 RunPrefixOptionals = namedtuple(
     "RunPrefixOptionals", Optionals._fields + ("metadata_json",)
 )
-
-UPLOAD_PREFIX = "gncv://"

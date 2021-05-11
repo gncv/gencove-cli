@@ -14,7 +14,11 @@ from gencove.client import (  # noqa: I100
 )
 from gencove.command.base import Command
 from gencove.command.utils import is_valid_uuid
-from gencove.constants import FASTQ_MAP_EXTENSION, SAMPLE_ASSIGNMENT_STATUS
+from gencove.constants import (
+    FASTQ_MAP_EXTENSION,
+    SAMPLE_ASSIGNMENT_STATUS,
+    UPLOAD_PREFIX,
+)
 from gencove.exceptions import ValidationError
 from gencove.utils import (
     batchify,
@@ -27,7 +31,6 @@ from .constants import (
     ASSIGN_ERROR,
     FASTQ_EXTENSIONS,
     TMP_UPLOADS_WARNING,
-    UPLOAD_PREFIX,
     UPLOAD_STATUSES,
 )
 from .exceptions import SampleSheetError, UploadError, UploadNotFound

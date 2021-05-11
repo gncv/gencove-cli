@@ -4,10 +4,10 @@ import json
 
 import backoff
 
-from .constants import UPLOAD_PREFIX
 from ...base import Command
 from ...utils import is_valid_json, is_valid_uuid
 from .... import client
+from ....constants import UPLOAD_PREFIX
 from ....exceptions import ValidationError
 
 

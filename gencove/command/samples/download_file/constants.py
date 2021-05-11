@@ -1,0 +1,6 @@
+"""Sample download file constants"""
+
+KILOBYTE = 1024
+MEGABYTE = 1024 * KILOBYTE
+NUM_MB_IN_CHUNK = 3
+CHUNK_SIZE = NUM_MB_IN_CHUNK * MEGABYTE

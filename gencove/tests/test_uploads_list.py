@@ -32,8 +32,7 @@ def test_list_does_not_exist(mocker):
     assert (
         "\n".join(
             [
-                "ERROR: Uploads do not exist or you do not have permission "
-                "required to access them.",
+                "ERROR: Uploads do not exist.",
                 "ERROR: API Client Error: Not Found: Not found.",
                 "Aborted!\n",
             ]

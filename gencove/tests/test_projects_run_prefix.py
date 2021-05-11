@@ -147,7 +147,7 @@ def test_run_prefix__not_owned_project(mocker):
     mocked_login.assert_called_once()
     mocked_get_sample_sheet.assert_called_once()
     mocked_add_samples_to_project.assert_not_called()
-    assert "You do not have the permission required" in res.output
+    assert "You do not have the sufficient permission" in res.output
 
 
 def test_run_prefix__no_paths(mocker):
@@ -212,7 +212,7 @@ def test_run_prefix__assigning_samples_no_permission(mocker):
     mocked_login.assert_called_once()
     mocked_get_sample_sheet.assert_called_once()
     mocked_add_samples_to_project.assert_called_once()
-    assert "You do not have the permission required to assign" in res.output
+    assert "You do not have the sufficient permission" in res.output
 
 
 def test_run_prefix__assigning_samples_failed(mocker):
@@ -243,9 +243,7 @@ def test_run_prefix__assigning_samples_failed(mocker):
     mocked_login.assert_called_once()
     mocked_get_sample_sheet.assert_called_once()
     mocked_add_samples_to_project.assert_called_once()
-    assert (
-        "You do not have the permission required to assign" not in res.output
-    )
+    assert "You do not have the sufficient permission" not in res.output
     assert "There was an error assigning" in res.output
 
 

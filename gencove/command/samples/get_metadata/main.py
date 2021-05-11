@@ -44,8 +44,9 @@ class GetMetadata(Command):
             self.echo_debug(err)
             if err.status_code == 404:
                 self.echo_error(
-                    "Sample metadata {} does not exist or you do not have "
-                    "permission required to access it.".format(self.sample_id)
+                    "Sample metadata {} does not exist.".format(
+                        self.sample_id
+                    )
                 )
             raise
 

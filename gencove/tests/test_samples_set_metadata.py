@@ -51,7 +51,7 @@ def test_set_metadata__not_owned_sample(mocker):
         APIClient,
         "set_metadata",
         return_value=mocked_response,
-        side_effect=APIClientError(message="", status_code=404),
+        side_effect=APIClientError(message="", status_code=403),
     )
 
     res = runner.invoke(
@@ -69,7 +69,7 @@ def test_set_metadata__not_owned_sample(mocker):
     assert res.exit_code == 1
     mocked_login.assert_called_once()
     mocked_set_metadata.assert_called_once()
-    assert "you do not have permission required" in res.output
+    assert "You do not have the sufficient permission" in res.output
 
 
 def test_set_metadata__bad_json(mocker):

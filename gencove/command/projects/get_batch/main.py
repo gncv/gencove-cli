@@ -75,8 +75,7 @@ class GetBatch(Command):
                 self.echo_info(err.message)
             elif err.status_code == 404:
                 self.echo_warning(
-                    "Batch {} does not exist or you do not have "
-                    "permission required to access it.".format(self.batch_id),
+                    "Batch {} does not exist.".format(self.batch_id),
                 )
             else:
                 raise

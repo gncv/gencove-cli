@@ -59,7 +59,6 @@ class SetMetadata(Command):
                 self.echo_error("There was an error assigning metadata.")
             elif err.status_code == 404:
                 self.echo_error(
-                    "Sample {} does not exist or you do not have "
-                    "permission required to access it.".format(self.sample_id)
+                    "Sample {} does not exist.".format(self.sample_id)
                 )
             raise

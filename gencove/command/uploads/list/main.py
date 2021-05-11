@@ -47,10 +47,7 @@ class ListSampleSheet(Command):
                     self.echo_data(get_line(upload))
         except APIClientError as err:
             if err.status_code == 404:
-                self.echo_error(
-                    "Uploads do not exist or you do not have "
-                    "permission required to access them."
-                )
+                self.echo_error("Uploads do not exist.")
             raise
 
     def get_paginated_sample_sheet(self):

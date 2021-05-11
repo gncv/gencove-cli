@@ -84,8 +84,7 @@ def test_list_projects_no_project(mocker):
     echo_data(
         "\n".join(
             [
-                "ERROR: Project {} does not exist or you do not have"
-                " permission required to access it.".format(project_id),
+                "ERROR: Project {} does not exist.".format(project_id),
                 "ERROR: API Client Error: Not Found: Not found.",
                 "Aborted!",
             ]

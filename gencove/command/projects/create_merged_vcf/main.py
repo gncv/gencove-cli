@@ -53,9 +53,6 @@ class CreateMergedVCF(Command):
                 self.echo_error("There was an error creating merged VCF.")
             elif err.status_code == 404:
                 self.echo_error(
-                    "Project {} does not exist or you do not have "
-                    "permission required to access it.".format(
-                        self.project_id
-                    )
+                    "Project {} does not exist.".format(self.project_id)
                 )
             raise

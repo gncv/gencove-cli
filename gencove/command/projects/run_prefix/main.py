@@ -54,12 +54,7 @@ class RunPrefix(Command):
                     self.project_id, len(samples)
                 )
             )
-        except client.APIClientError as err:
-            if err.status_code == 403:
-                self.echo_error(
-                    "You do not have the permission "
-                    "required to access the paths."
-                )
+        except client.APIClientError:  # pylint: disable=try-except-raise
             raise
 
     def _valid_prefix(self):
@@ -114,11 +109,6 @@ class RunPrefix(Command):
                 samples, self.project_id, metadata
             )
         except client.APIClientError as err:
-            self.echo_debug(err)
-            if err.status_code == 403:
-                self.echo_error(
-                    "You do not have the permission "
-                    "required to assign the samples."
-                )
+            self.echo_debug(err.message)
             self.echo_error("There was an error assigning samples.")
             raise

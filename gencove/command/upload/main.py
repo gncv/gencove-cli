@@ -27,7 +27,6 @@ from gencove.utils import (
 )
 
 from .constants import (
-    ASSIGN_BATCH_SIZE,
     ASSIGN_ERROR,
     FASTQ_EXTENSIONS,
     TMP_UPLOADS_WARNING,
@@ -45,6 +44,7 @@ from .utils import (
     upload_multi_file,
 )
 from ..utils import is_valid_json
+from ...constants import ASSIGN_BATCH_SIZE
 
 
 # pylint: disable=too-many-instance-attributes

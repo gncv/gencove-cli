@@ -119,3 +119,4 @@ DOWNLOAD_TEMPLATE = "{{{}}}/{{{}}}/{{{}}}".format(
 MAX_RETRY_TIME_SECONDS = 300  # 5 minutes
 FASTQ_MAP_EXTENSION = ".fastq-map.csv"
 UPLOAD_PREFIX = "gncv://"
+ASSIGN_BATCH_SIZE = 200

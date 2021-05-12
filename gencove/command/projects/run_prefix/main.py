@@ -7,8 +7,9 @@ import backoff
 from ...base import Command
 from ...utils import is_valid_json, is_valid_uuid
 from .... import client
-from ....constants import UPLOAD_PREFIX
+from ....constants import ASSIGN_BATCH_SIZE, UPLOAD_PREFIX
 from ....exceptions import ValidationError
+from ....utils import batchify
 
 
 class RunPrefix(Command):
@@ -104,10 +105,40 @@ class RunPrefix(Command):
             if self.metadata_json is not None:
                 metadata = json.loads(self.metadata_json)
                 self.echo_info("Assigning metadata to the uploaded samples.")
+            assigned_count = 0
+            for samples_batch in batchify(
+                samples, batch_size=ASSIGN_BATCH_SIZE
+            ):
+                try:
+                    samples_batch_len = len(samples_batch)
+                    self.echo_debug(
+                        "Assigning batch: {}".format(samples_batch_len)
+                    )
+                    self.api_client.add_samples_to_project(
+                        samples, self.project_id, metadata
+                    )
+                    assigned_count += samples_batch_len
+                    self.echo_debug(
+                        "Total assigned: {}".format(assigned_count)
+                    )
+                except client.APIClientError as err:
+                    self.echo_debug(err)
+                    self.echo_error(
+                        "There was an error assigning/running samples."
+                    )
+                    if assigned_count > 0:
+                        self.echo_warning(
+                            "Some of the samples were assigned. "
+                            "Please use the Web UI to assign "
+                            "the rest of the samples."
+                        )
+                    else:
+                        self.echo_error(
+                            "There was an error assigning samples."
+                        )
+                    raise
+            self.echo_info("Assigned all samples to a project.")
 
-            self.api_client.add_samples_to_project(
-                samples, self.project_id, metadata
-            )
         except client.APIClientError as err:
             self.echo_debug(err.message)
             self.echo_error("There was an error assigning samples.")

@@ -416,6 +416,7 @@ class Upload(Command):
 
         return samples
 
+    # duplicated in projects/run_prefix/main.py with the exception difference
     def sample_sheet_paginator(self):
         """Paginate over all sample sheets for the destination.
 

@@ -69,6 +69,7 @@ class RunPrefix(Command):
             return False
         return True
 
+    # duplicated in upload/main.py with the exception difference
     def _get_paginated_sample_sheet(self):
         """Paginate over all sample sheet pages.
 

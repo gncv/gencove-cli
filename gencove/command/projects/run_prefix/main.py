@@ -115,7 +115,7 @@ class RunPrefix(Command):
                         "Assigning batch: {}".format(samples_batch_len)
                     )
                     self.api_client.add_samples_to_project(
-                        samples, self.project_id, metadata
+                        samples_batch, self.project_id, metadata
                     )
                     assigned_count += samples_batch_len
                     self.echo_debug(

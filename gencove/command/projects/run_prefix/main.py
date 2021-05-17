@@ -45,6 +45,7 @@ class RunPrefix(Command):
                 "Retrieving sample sheet: search_term={}".format(self.prefix)
             )
             samples = []
+            self.echo_info("Gathering uploads.")
             for sample_sheet in self._get_paginated_sample_sheet():
                 if not sample_sheet:
                     raise ValidationError("No matching paths found.")
@@ -112,14 +113,14 @@ class RunPrefix(Command):
             ):
                 try:
                     samples_batch_len = len(samples_batch)
-                    self.echo_debug(
+                    self.echo_info(
                         "Assigning batch: {}".format(samples_batch_len)
                     )
                     self.api_client.add_samples_to_project(
                         samples_batch, self.project_id, metadata
                     )
                     assigned_count += samples_batch_len
-                    self.echo_debug(
+                    self.echo_info(
                         "Total assigned: {}".format(assigned_count)
                     )
                 except client.APIClientError as err:

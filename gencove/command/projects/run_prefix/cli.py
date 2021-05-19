@@ -15,15 +15,27 @@ from .main import RunPrefix
     "--metadata-json",
     required=False,
     default=None,
-    help=("Add metadata to all uploads to be assigned to a project."),
+    help=(
+        "Add metadata to all uploads that are to be assigned to a project."
+    ),
 )
 @add_options(common_options)
 def run_prefix(  # pylint: disable=too-many-arguments
     project_id, prefix, metadata_json, host, email, password, api_key
-):
-    """Assign all uploads from a prefix to a project. Optionally add metadata
-    to the samples.
-    """
+):  # pylint: disable=C0301
+    """Assign all uploads from Gencove prefix to a project. Optionally add
+    metadata to the samples.
+
+    Examples:
+
+        Assign uploads to a project:
+
+            gencove projects run-prefix 06a5d04b-526a-4471-83ba-fb54e0941758 gncv://my-project/path
+
+        Assign uploads to a project with metadata:
+
+            gencove projects run-prefix 06a5d04b-526a-4471-83ba-fb54e0941758 gncv://my-project/path --metadata-json='{"batch": "batch1"}'
+    """  # noqa: E501
     RunPrefix(
         project_id,
         prefix,

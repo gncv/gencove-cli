@@ -36,7 +36,7 @@ class List(Command):
                     self.echo_data(get_line(project))
         except APIClientError as err:
             if err.status_code == 404:
-                self.echo_error("Projects do not exist.")
+                self.echo_error("No projects found.")
             raise
 
     def get_paginated_projects(self):

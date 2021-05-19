@@ -22,7 +22,7 @@ MOCKED_UPLOADS = dict(
                 },
                 "r2": {
                     "upload": str(uuid4()),
-                    "destination_path": "gncv://batch1/clientid1_R@.fastq.gz",
+                    "destination_path": "gncv://batch1/clientid1_R2.fastq.gz",
                 },
             },
         },

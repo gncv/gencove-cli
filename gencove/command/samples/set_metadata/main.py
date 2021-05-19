@@ -3,7 +3,7 @@
 import json
 
 from ...base import Command
-from ...utils import is_valid_uuid
+from ...utils import is_valid_json, is_valid_uuid
 from .... import client
 from ....exceptions import ValidationError
 
@@ -30,7 +30,7 @@ class SetMetadata(Command):
         if is_valid_uuid(self.sample_id) is False:
             raise ValidationError("Sample ID is not valid. Exiting.")
 
-        if self._valid_json(self.json_metadata) is False:
+        if is_valid_json(self.json_metadata) is False:
             raise ValidationError("Metadata JSON is not valid. Exiting.")
 
     # no retry for timeouts in order to avoid duplicate heavy operations on
@@ -59,15 +59,6 @@ class SetMetadata(Command):
                 self.echo_error("There was an error assigning metadata.")
             elif err.status_code == 404:
                 self.echo_error(
-                    "Sample {} does not exist or you do not have "
-                    "permission required to access it.".format(self.sample_id)
+                    "Sample {} does not exist.".format(self.sample_id)
                 )
             raise
-
-    def _valid_json(self, metadata):
-        try:
-            json.loads(metadata)
-            return True
-        except ValueError as err:
-            self.echo_error(err)
-            return False

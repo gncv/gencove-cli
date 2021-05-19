@@ -53,10 +53,7 @@ class ListBatches(Command):
                 self.echo_info(err.message)
             elif err.status_code == 404:
                 self.echo_warning(
-                    "Project {} does not exist or you do not have "
-                    "permission required to access it.".format(
-                        self.project_id
-                    )
+                    "Project {} does not exist.".format(self.project_id)
                 )
             else:
                 raise

@@ -106,7 +106,7 @@ def test_list_projects_no_permission(mocker):
         APIClient,
         "list_projects",
         side_effect=APIClientError(
-            message="API Client Error: Not Found: Not found.", status_code=404
+            message="API Client Error: Not Found: Not found.", status_code=403
         ),
         return_value={"detail": "Not found"},
     )
@@ -128,8 +128,8 @@ def test_list_projects_no_permission(mocker):
     echo(
         "\n".join(
             [
-                "ERROR: You do not have permission required to access "
-                "the project list.",
+                "ERROR: You do not have the sufficient permission "
+                "level required to perform this operation.",
                 "ERROR: API Client Error: Not Found: Not found.",
                 "Aborted!",
             ]

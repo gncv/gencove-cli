@@ -1,4 +1,5 @@
 """Common utils used in multiple commands."""
+import json
 import uuid
 
 from gencove.exceptions import ValidationError
@@ -45,6 +46,21 @@ def is_valid_uuid(candidate):
     """
     try:
         uuid.UUID(candidate, version=4)
+        return True
+    except ValueError:
+        return False
+
+
+def is_valid_json(candidate):
+    """Test if provided string is a valid JSON.
+
+    candidate (str): JSON to check
+
+    Returns:
+        bool: True if is a valid JSON, False if not
+    """
+    try:
+        json.loads(candidate)
         return True
     except ValueError:
         return False

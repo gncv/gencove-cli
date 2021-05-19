@@ -14,7 +14,11 @@ from gencove.client import (  # noqa: I100
 )
 from gencove.command.base import Command
 from gencove.command.utils import is_valid_uuid
-from gencove.constants import FASTQ_MAP_EXTENSION, SAMPLE_ASSIGNMENT_STATUS
+from gencove.constants import (
+    FASTQ_MAP_EXTENSION,
+    SAMPLE_ASSIGNMENT_STATUS,
+    UPLOAD_PREFIX,
+)
 from gencove.exceptions import ValidationError
 from gencove.utils import (
     batchify,
@@ -23,11 +27,9 @@ from gencove.utils import (
 )
 
 from .constants import (
-    ASSIGN_BATCH_SIZE,
     ASSIGN_ERROR,
     FASTQ_EXTENSIONS,
     TMP_UPLOADS_WARNING,
-    UPLOAD_PREFIX,
     UPLOAD_STATUSES,
 )
 from .exceptions import SampleSheetError, UploadError, UploadNotFound
@@ -41,6 +43,8 @@ from .utils import (
     upload_file,
     upload_multi_file,
 )
+from ..utils import is_valid_json
+from ...constants import ASSIGN_BATCH_SIZE
 
 
 # pylint: disable=too-many-instance-attributes
@@ -141,16 +145,8 @@ class Upload(Command):
             raise ValidationError("--run-project-id is not valid. Exiting.")
 
         # validate metadata json
-        if self.metadata and self._valid_json(self.metadata) is False:
+        if self.metadata and is_valid_json(self.metadata) is False:
             raise ValidationError("--metadata is not valid JSON. Exiting.")
-
-    def _valid_json(self, metadata):
-        try:
-            json.loads(metadata)
-            return True
-        except ValueError as err:
-            self.echo_error(err)
-            return False
 
     def execute(self):
         """Upload fastq files from host system to Gencove cloud.
@@ -420,6 +416,7 @@ class Upload(Command):
 
         return samples
 
+    # duplicated in projects/run_prefix/main.py with the exception difference
     def sample_sheet_paginator(self):
         """Paginate over all sample sheets for the destination.
 

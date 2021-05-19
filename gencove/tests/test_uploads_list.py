@@ -32,8 +32,7 @@ def test_list_does_not_exist(mocker):
     assert (
         "\n".join(
             [
-                "ERROR: Uploads do not exist or you do not have permission "
-                "required to access them.",
+                "ERROR: Uploads do not exist.",
                 "ERROR: API Client Error: Not Found: Not found.",
                 "Aborted!\n",
             ]
@@ -72,7 +71,7 @@ MOCKED_UPLOADS = dict(
                 },
                 "r2": {
                     "upload": str(uuid4()),
-                    "destination_path": "gncv://batch1/clientid1_R@.fastq.gz",
+                    "destination_path": "gncv://batch1/clientid1_R2.fastq.gz",
                 },
             },
         },

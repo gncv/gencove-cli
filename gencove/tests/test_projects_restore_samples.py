@@ -51,7 +51,7 @@ def test_restore_project_samples__not_owned_project(mocker):
     mocked_restore_project_samples = mocker.patch.object(
         APIClient,
         "restore_project_samples",
-        side_effect=APIClientError(message="", status_code=404),
+        side_effect=APIClientError(message="", status_code=403),
     )
 
     res = runner.invoke(
@@ -66,10 +66,10 @@ def test_restore_project_samples__not_owned_project(mocker):
             "11111111-1111-1111-1111-111111111111,22222222-2222-2222-2222-222222222222",  # noqa
         ],
     )
-    assert res.exit_code == 0
+    assert res.exit_code == 1
     mocked_login.assert_called_once()
     mocked_restore_project_samples.assert_called_once()
-    assert "you do not have permission required" in res.output
+    assert "You do not have the sufficient permission" in res.output
 
 
 def test_restore_project_samples__success__empty_sample_ids(mocker):

@@ -16,8 +16,6 @@ UPLOAD_STATUSES = _UploadStatuses("succeeded", "started", "failed")
 
 FASTQ_EXTENSIONS = (".fastq.gz", ".fastq.bgz", ".fq.gz", ".fq.bgz")
 
-UPLOAD_PREFIX = "gncv://"
-
 UploadOptions = namedtuple(
     "UploadOptions", Optionals._fields + ("project_id", "metadata")
 )
@@ -28,8 +26,6 @@ ASSIGN_ERROR = (
     "and assigning them to project id {}."
     "You can try to assign without upload using following gncv path: {}"
 )
-
-ASSIGN_BATCH_SIZE = 200
 
 FastQ = namedtuple("FastQ", ["client_id", "r_notation", "path"])
 

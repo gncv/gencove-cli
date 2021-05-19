@@ -37,6 +37,13 @@ python38:
   except:
     - tags
 
+python39:
+  image: python:3.9
+  stage: test
+  script: tox -e py39
+  except:
+    - tags
+
 black:
   stage: test
   script: tox -e black_checker

@@ -1,4 +1,5 @@
 """Describe all constants in Gencove CLI."""
+import re
 from collections import namedtuple
 
 HOST = "https://api.gencove.com"
@@ -50,6 +51,15 @@ _SampleAssignmentStatus = namedtuple(
 )
 SAMPLE_ASSIGNMENT_STATUS = _SampleAssignmentStatus(
     "all", "unassigned", "assigned"
+)
+ALLOWED_STATUSES_RE = re.compile(
+    "|".join(
+        [
+            "{}".format(status)
+            for status in SAMPLE_ASSIGNMENT_STATUS._asdict().values()
+        ]
+    ),
+    re.IGNORECASE,
 )
 
 _SampleSheetSortBy = namedtuple("SampleSheetSortBy", ["created", "modified"])

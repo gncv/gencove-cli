@@ -4,5 +4,10 @@ from collections import namedtuple
 from gencove.constants import Optionals
 
 RunPrefixOptionals = namedtuple(
-    "RunPrefixOptionals", Optionals._fields + ("metadata_json",)
+    "RunPrefixOptionals",
+    Optionals._fields
+    + (
+        "status",
+        "metadata_json",
+    ),
 )

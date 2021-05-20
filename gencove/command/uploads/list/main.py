@@ -5,9 +5,8 @@ import backoff
 from gencove.client import APIClientError, APIClientTimeout  # noqa: I100
 from gencove.command.base import Command
 from gencove.command.utils import validate_input
-from gencove.constants import SAMPLE_ASSIGNMENT_STATUS
+from gencove.constants import ALLOWED_STATUSES_RE, SAMPLE_ASSIGNMENT_STATUS
 
-from .constants import ALLOWED_STATUSES_RE
 from .utils import get_line
 
 

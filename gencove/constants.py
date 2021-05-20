@@ -1,9 +1,9 @@
 """Describe all constants in Gencove CLI."""
-from collections import namedtuple
+from gencove.lib import namedtuple_dynamic
 
 HOST = "https://api.gencove.com"
 
-_APIEndpoint = namedtuple(
+_APIEndpoint = namedtuple_dynamic(
     "ApiEndpoint",
     [
         "get_jwt",
@@ -45,24 +45,26 @@ API_ENDPOINTS = _APIEndpoint(
     "/api/v2/project-restore-samples/{id}",
 )
 
-_SampleAssignmentStatus = namedtuple(
+_SampleAssignmentStatus = namedtuple_dynamic(
     "SampleAssignmentStatus", ["all", "unassigned", "assigned"]
 )
 SAMPLE_ASSIGNMENT_STATUS = _SampleAssignmentStatus(
     "all", "unassigned", "assigned"
 )
 
-_SampleSheetSortBy = namedtuple("SampleSheetSortBy", ["created", "modified"])
+_SampleSheetSortBy = namedtuple_dynamic(
+    "SampleSheetSortBy", ["created", "modified"]
+)
 SAMPLES_SHEET_SORT_BY = _SampleSheetSortBy("created", "modified")
 
-_SampleStatus = namedtuple(
+_SampleStatus = namedtuple_dynamic(
     "SampleStatus", ["completed", "succeeded", "failed", "running", "all"]
 )
 SAMPLE_STATUS = _SampleStatus(
     "completed", "succeeded", "failed", "running", "all"
 )
 
-_SampleArchiveStatus = namedtuple(
+_SampleArchiveStatus = namedtuple_dynamic(
     "SampleArchiveStatus",
     [
         "available",
@@ -79,20 +81,22 @@ SAMPLE_ARCHIVE_STATUS = _SampleArchiveStatus(
     "all",
 )
 
-_SampleSortBy = namedtuple(
+_SampleSortBy = namedtuple_dynamic(
     "SampleSortFields", ["created", "modified", "status", "client_id", "id"]
 )
 SAMPLE_SORT_BY = _SampleSortBy(
     "created", "modified", "status", "client_id", "id"
 )
 
-_SortOrder = namedtuple("SortOrder", ["asc", "desc"])
+_SortOrder = namedtuple_dynamic("SortOrder", ["asc", "desc"])
 SORT_ORDER = _SortOrder("asc", "desc")
 
-Credentials = namedtuple("Credentials", ["email", "password", "api_key"])
-Optionals = namedtuple("Optionals", ["host"])
+Credentials = namedtuple_dynamic(
+    "Credentials", ["email", "password", "api_key"]
+)
+Optionals = namedtuple_dynamic("Optionals", ["host"])
 
-_DownloadTemplateParts = namedtuple(
+_DownloadTemplateParts = namedtuple_dynamic(
     "DownloadTemplateParts",
     [
         "client_id",

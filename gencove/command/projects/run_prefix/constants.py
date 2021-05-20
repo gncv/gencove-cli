@@ -1,8 +1,8 @@
 """Constants for run-prefix command."""
-from collections import namedtuple
 
 from gencove.constants import Optionals
+from gencove.lib import namedtuple_dynamic
 
-RunPrefixOptionals = namedtuple(
+RunPrefixOptionals = namedtuple_dynamic(
     "RunPrefixOptionals", Optionals._fields + ("metadata_json",)
 )

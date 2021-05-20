@@ -1,10 +1,10 @@
 """Describe constants in samples subcommand."""
 import re
-from collections import namedtuple
 
 from gencove.constants import Optionals, SAMPLE_ARCHIVE_STATUS, SAMPLE_STATUS
+from gencove.lib import namedtuple_dynamic
 
-SamplesOptions = namedtuple(  # pylint: disable=invalid-name
+SamplesOptions = namedtuple_dynamic(  # pylint: disable=invalid-name
     "SamplesOptions",
     Optionals._fields + ("status", "archive_status", "search"),
 )

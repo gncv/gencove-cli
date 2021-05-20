@@ -1,7 +1,7 @@
 """Describe constants in projects subcommand."""
-from collections import namedtuple
+from gencove.lib import namedtuple_dynamic
 
-ProjectBase = namedtuple(
+Project = namedtuple_dynamic(
     "Project",
     [
         "id",
@@ -14,19 +14,6 @@ ProjectBase = namedtuple(
     ],
 )
 
-
-class Project(ProjectBase):
-    """Project record"""
-
-    __slots__ = ()
-
-    def __new__(cls, *args, **kwargs):
-        for key in tuple(kwargs):
-            if key not in cls._fields:
-                del kwargs[key]
-        return super().__new__(cls, *args, **kwargs)
-
-
-PipelineCapabilities = namedtuple(
+PipelineCapabilities = namedtuple_dynamic(
     "PipelineCapabilities", ["id", "name", "private", "merge_vcfs_enabled"]
 )

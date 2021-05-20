@@ -4,8 +4,6 @@ import backoff
 # pylint: disable=wrong-import-order
 from gencove.client import APIClientError, APIClientTimeout  # noqa: I100
 from gencove.command.base import Command
-from gencove.command.utils import validate_input
-from gencove.constants import ALLOWED_STATUSES_RE, SAMPLE_ASSIGNMENT_STATUS
 
 from .utils import get_line
 
@@ -24,12 +22,7 @@ class ListSampleSheet(Command):
 
     def validate(self):
         """Validate command input."""
-        validate_input(
-            "upload status",
-            self.status,
-            ALLOWED_STATUSES_RE,
-            SAMPLE_ASSIGNMENT_STATUS,
-        )
+        pass  # pylint: disable=unnecessary-pass
 
     def execute(self):
         self.echo_debug(

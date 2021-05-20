@@ -5,14 +5,9 @@ import json
 import backoff
 
 from ...base import Command
-from ...utils import is_valid_json, is_valid_uuid, validate_input
+from ...utils import is_valid_json, is_valid_uuid
 from .... import client
-from ....constants import (
-    ALLOWED_STATUSES_RE,
-    ASSIGN_BATCH_SIZE,
-    SAMPLE_ASSIGNMENT_STATUS,
-    UPLOAD_PREFIX,
-)
+from ....constants import ASSIGN_BATCH_SIZE, UPLOAD_PREFIX
 from ....exceptions import ValidationError
 from ....utils import batchify
 
@@ -43,12 +38,6 @@ class RunPrefix(Command):
             raise ValidationError("Prefix is not valid. Exiting.")
         if self.metadata_json and is_valid_json(self.metadata_json) is False:
             raise ValidationError("Metadata JSON is not valid. Exiting.")
-        validate_input(
-            "upload status",
-            self.status,
-            ALLOWED_STATUSES_RE,
-            SAMPLE_ASSIGNMENT_STATUS,
-        )
 
     def execute(self):
         """Assign samples to the project from the prefixed path."""

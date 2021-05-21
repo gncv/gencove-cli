@@ -7,7 +7,7 @@ RunPrefixOptionals = namedtuple(
     "RunPrefixOptionals",
     Optionals._fields
     + (
-        "status",
         "metadata_json",
+        "status",
     ),
 )

@@ -51,5 +51,5 @@ def run_prefix(  # pylint: disable=too-many-arguments
         project_id,
         prefix,
         Credentials(email, password, api_key),
-        RunPrefixOptionals(host, status, metadata_json),
+        RunPrefixOptionals(host, metadata_json, status),
     ).run()

@@ -20,6 +20,7 @@ class RunPrefix(Command):
         self.project_id = project_id
         self.prefix = prefix
         self.metadata_json = options.metadata_json
+        self.status = options.status
 
     def initialize(self):
         """Initialize run-prefix subcommand."""
@@ -96,6 +97,7 @@ class RunPrefix(Command):
         """Get sample sheet page."""
         return self.api_client.get_sample_sheet(
             gncv_path=self.prefix,
+            assigned_status=self.status,
             next_link=next_link,
         )
 

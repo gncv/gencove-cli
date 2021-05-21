@@ -4,11 +4,9 @@ import backoff
 # pylint: disable=wrong-import-order
 from gencove.client import APIClientError, APIClientTimeout  # noqa: I100
 from gencove.command.base import Command
-from gencove.constants import SAMPLE_ARCHIVE_STATUS, SAMPLE_STATUS
 
-from .constants import ALLOWED_ARCHIVE_STATUSES_RE, ALLOWED_STATUSES_RE
 from .utils import get_line
-from ...utils import is_valid_uuid, validate_input
+from ...utils import is_valid_uuid
 from ....exceptions import ValidationError
 
 
@@ -30,20 +28,6 @@ class ListSamples(Command):
         """Validate command input."""
         if is_valid_uuid(self.project_id) is False:
             raise ValidationError("Project ID is not valid. Exiting.")
-
-        validate_input(
-            "sample status",
-            self.sample_status,
-            ALLOWED_STATUSES_RE,
-            SAMPLE_STATUS,
-        )
-
-        validate_input(
-            "sample archive status",
-            self.sample_archive_status,
-            ALLOWED_ARCHIVE_STATUSES_RE,
-            SAMPLE_ARCHIVE_STATUS,
-        )
 
     def execute(self):
         self.echo_debug(

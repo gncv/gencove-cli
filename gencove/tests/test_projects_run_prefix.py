@@ -1,5 +1,6 @@
 """Test project's run prefix command."""
 
+import copy
 from uuid import uuid4
 
 from click.testing import CliRunner
@@ -19,10 +20,16 @@ MOCKED_UPLOADS = dict(
                 "r1": {
                     "upload": str(uuid4()),
                     "destination_path": "gncv://batch1/clientid1_R1.fastq.gz",
+                    "last_status": {
+                        "status": "unassigned",
+                    },
                 },
                 "r2": {
                     "upload": str(uuid4()),
                     "destination_path": "gncv://batch1/clientid1_R2.fastq.gz",
+                    "last_status": {
+                        "status": "unassigned",
+                    },
                 },
             },
         },
@@ -32,10 +39,18 @@ MOCKED_UPLOADS = dict(
                 "r1": {
                     "upload": str(uuid4()),
                     "destination_path": "gncv://batch2/clientid2_R1.fastq.gz",
+                    "last_status": {
+                        "status": "assigned",
+                    },
                 }
             },
         },
     ],
+)
+
+MOCKED_EMPTY_UPLOADS = dict(
+    meta=dict(next=None),
+    results=[],
 )
 
 
@@ -52,7 +67,7 @@ def test_run_prefix__bad_project_id(mocker):
         run_prefix,
         [
             "1111111",
-            "gncv://path",
+            "gncv://batch",
             "--email",
             "foo@bar.com",
             "--password",
@@ -102,7 +117,7 @@ def test_run_prefix__bad_json(mocker):
         run_prefix,
         [
             str(uuid4()),
-            "gncv://path",
+            "gncv://batch",
             "--metadata-json",
             "{bad:",
             "--email",
@@ -136,7 +151,7 @@ def test_run_prefix__not_owned_project(mocker):
         run_prefix,
         [
             str(uuid4()),
-            "gncv://path",
+            "gncv://batch",
             "--email",
             "foo@bar.com",
             "--password",
@@ -152,14 +167,10 @@ def test_run_prefix__not_owned_project(mocker):
 
 def test_run_prefix__no_paths(mocker):
     """Test run prefix when no paths are present."""
-    mocked_empty_uploads = dict(
-        meta=dict(next=None),
-        results=[],
-    )
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_sample_sheet = mocker.patch.object(
-        APIClient, "get_sample_sheet", return_value=mocked_empty_uploads
+        APIClient, "get_sample_sheet", return_value=MOCKED_EMPTY_UPLOADS
     )
     mocked_add_samples_to_project = mocker.patch.object(
         APIClient,
@@ -170,7 +181,7 @@ def test_run_prefix__no_paths(mocker):
         run_prefix,
         [
             str(uuid4()),
-            "gncv://path",
+            "gncv://batch",
             "--email",
             "foo@bar.com",
             "--password",
@@ -201,7 +212,7 @@ def test_run_prefix__assigning_samples_no_permission(mocker):
         run_prefix,
         [
             str(uuid4()),
-            "gncv://path",
+            "gncv://batch",
             "--email",
             "foo@bar.com",
             "--password",
@@ -232,7 +243,7 @@ def test_run_prefix__assigning_samples_failed(mocker):
         run_prefix,
         [
             str(uuid4()),
-            "gncv://path",
+            "gncv://batch",
             "--email",
             "foo@bar.com",
             "--password",
@@ -263,7 +274,7 @@ def test_run_prefix__success_with_json(mocker):
         run_prefix,
         [
             str(uuid4()),
-            "gncv://path",
+            "gncv://batch",
             "--metadata-json",
             '{"somekey": "somevalue"}',
             "--email",
@@ -277,6 +288,108 @@ def test_run_prefix__success_with_json(mocker):
     mocked_get_sample_sheet.assert_called_once()
     mocked_add_samples_to_project.assert_called_once()
     assert "Assigning metadata to the uploaded samples." in res.output
+
+
+def test_run_prefix__filter_empty(mocker):
+    """Test run prefix when all paths are filtered out."""
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_get_sample_sheet = mocker.patch.object(
+        APIClient, "get_sample_sheet", return_value=MOCKED_EMPTY_UPLOADS
+    )
+    mocked_add_samples_to_project = mocker.patch.object(
+        APIClient,
+        "add_samples_to_project",
+    )
+
+    res = runner.invoke(
+        run_prefix,
+        [
+            str(uuid4()),
+            "gncv://batch",
+            "--status",
+            "assigned",
+            "--email",
+            "foo@bar.com",
+            "--password",
+            "123",
+        ],
+    )
+    assert res.exit_code == 1
+    mocked_login.assert_called_once()
+    mocked_get_sample_sheet.assert_called_once()
+    mocked_add_samples_to_project.assert_not_called()
+    assert "No matching paths found" in res.output
+
+
+def test_run_prefix__filter_success(mocker):
+    """Test run prefix when filter returns some paths."""
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_uploads_copy = copy.deepcopy(MOCKED_UPLOADS)
+    del mocked_uploads_copy["results"][1]
+    mocked_get_sample_sheet = mocker.patch.object(
+        APIClient, "get_sample_sheet", return_value=mocked_uploads_copy
+    )
+    mocked_add_samples_to_project = mocker.patch.object(
+        APIClient,
+        "add_samples_to_project",
+    )
+
+    res = runner.invoke(
+        run_prefix,
+        [
+            str(uuid4()),
+            "gncv://batch",
+            "--status",
+            "unassigned",
+            "--email",
+            "foo@bar.com",
+            "--password",
+            "123",
+        ],
+    )
+    assert res.exit_code == 0
+    mocked_login.assert_called_once()
+    mocked_get_sample_sheet.assert_called_once()
+    mocked_add_samples_to_project.assert_called_once()
+    assert "Number of samples assigned to the project" in res.output
+    assert "Assigning metadata to the uploaded samples." not in res.output
+
+
+def test_run_prefix__success_without_last_status(mocker):
+    """Test run prefix success."""
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_uploads_copy = copy.deepcopy(MOCKED_UPLOADS)
+    del mocked_uploads_copy["results"][0]["fastq"]["r1"]["last_status"]
+    del mocked_uploads_copy["results"][0]["fastq"]["r2"]["last_status"]
+    del mocked_uploads_copy["results"][1]["fastq"]["r1"]["last_status"]
+    mocked_get_sample_sheet = mocker.patch.object(
+        APIClient, "get_sample_sheet", return_value=mocked_uploads_copy
+    )
+    mocked_add_samples_to_project = mocker.patch.object(
+        APIClient,
+        "add_samples_to_project",
+    )
+
+    res = runner.invoke(
+        run_prefix,
+        [
+            str(uuid4()),
+            "gncv://batch",
+            "--email",
+            "foo@bar.com",
+            "--password",
+            "123",
+        ],
+    )
+    assert res.exit_code == 0
+    mocked_login.assert_called_once()
+    mocked_get_sample_sheet.assert_called_once()
+    mocked_add_samples_to_project.assert_called_once()
+    assert "Number of samples assigned to the project" in res.output
+    assert "Assigning metadata to the uploaded samples." not in res.output
 
 
 def test_run_prefix__success(mocker):
@@ -295,7 +408,7 @@ def test_run_prefix__success(mocker):
         run_prefix,
         [
             str(uuid4()),
-            "gncv://path",
+            "gncv://batch",
             "--email",
             "foo@bar.com",
             "--password",

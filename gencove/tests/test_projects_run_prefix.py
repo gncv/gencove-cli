@@ -357,6 +357,41 @@ def test_run_prefix__filter_success(mocker):
     assert "Assigning metadata to the uploaded samples." not in res.output
 
 
+def test_run_prefix__success_without_last_status(mocker):
+    """Test run prefix success."""
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_uploads_copy = copy.deepcopy(MOCKED_UPLOADS)
+    del mocked_uploads_copy["results"][0]["fastq"]["r1"]["last_status"]
+    del mocked_uploads_copy["results"][0]["fastq"]["r2"]["last_status"]
+    del mocked_uploads_copy["results"][1]["fastq"]["r1"]["last_status"]
+    mocked_get_sample_sheet = mocker.patch.object(
+        APIClient, "get_sample_sheet", return_value=mocked_uploads_copy
+    )
+    mocked_add_samples_to_project = mocker.patch.object(
+        APIClient,
+        "add_samples_to_project",
+    )
+
+    res = runner.invoke(
+        run_prefix,
+        [
+            str(uuid4()),
+            "gncv://batch",
+            "--email",
+            "foo@bar.com",
+            "--password",
+            "123",
+        ],
+    )
+    assert res.exit_code == 0
+    mocked_login.assert_called_once()
+    mocked_get_sample_sheet.assert_called_once()
+    mocked_add_samples_to_project.assert_called_once()
+    assert "Number of samples assigned to the project" in res.output
+    assert "Assigning metadata to the uploaded samples." not in res.output
+
+
 def test_run_prefix__success(mocker):
     """Test run prefix success."""
     runner = CliRunner()

@@ -117,7 +117,7 @@ class APIClient:
         headers = {
             "content-type": "application/json",
             "date": None,
-            "gencove-cli": cli_version(),
+            "gencove-cli-version": cli_version(),
         }
         if custom_headers:
             headers.update(custom_headers)

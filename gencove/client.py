@@ -27,6 +27,7 @@ from gencove.constants import (
     SORT_ORDER,
 )
 from gencove.logger import echo_debug
+from gencove.version import version as cli_version
 
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -113,7 +114,11 @@ class APIClient:
         sensitive=False,
     ):
         url = urljoin(text(self.host), text(endpoint))
-        headers = {"content-type": "application/json", "date": None}
+        headers = {
+            "content-type": "application/json",
+            "date": None,
+            "Gencove-cli-version": cli_version(),
+        }
         if custom_headers:
             headers.update(custom_headers)
 

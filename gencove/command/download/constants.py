@@ -4,6 +4,7 @@ from collections import namedtuple
 
 from gencove.constants import DownloadTemplateParts, Optionals
 
+
 _SampleStatuses = namedtuple("SampleStatuses", ["succeeded", "failed"])
 _SampleArchiveStatuses = namedtuple(
     "SampleStatuses", ["available", "restored"]

@@ -1,14 +1,11 @@
 """Download command constants."""
 import re
+from collections import namedtuple
 
 from gencove.constants import DownloadTemplateParts, Optionals
-from gencove.lib import namedtuple_dynamic
 
-
-_SampleStatuses = namedtuple_dynamic(
-    "SampleStatuses", ["succeeded", "failed"]
-)
-_SampleArchiveStatuses = namedtuple_dynamic(
+_SampleStatuses = namedtuple("SampleStatuses", ["succeeded", "failed"])
+_SampleArchiveStatuses = namedtuple(
     "SampleStatuses", ["available", "restored"]
 )
 SAMPLE_STATUSES = _SampleStatuses("succeeded", "failed")
@@ -29,17 +26,17 @@ MEGABYTE = 1024 * KILOBYTE
 NUM_MB_IN_CHUNK = 3
 CHUNK_SIZE = NUM_MB_IN_CHUNK * MEGABYTE
 
-DownloadFilters = namedtuple_dynamic(
+DownloadFilters = namedtuple(
     "Filters", ["project_id", "sample_ids", "file_types"]
 )
-DownloadOptions = namedtuple_dynamic(  # pylint: disable=invalid-name
+DownloadOptions = namedtuple(  # pylint: disable=invalid-name
     "DownloadOptions",
     Optionals._fields + ("skip_existing", "download_template"),
 )
 DEFAULT_FILENAME_TOKEN = "{{{}}}".format(
     DownloadTemplateParts.default_filename
 )
-FilePrefix = namedtuple_dynamic(
+FilePrefix = namedtuple(
     "FilePrefix",
     ["dirs", "filename", "file_extension", "use_default_filename"],
 )

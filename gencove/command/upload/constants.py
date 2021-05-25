@@ -1,7 +1,7 @@
 """Constants for upload command."""
+from collections import namedtuple
 
 from gencove.constants import Optionals
-from gencove.lib import namedtuple_dynamic
 
 # pylint: disable=invalid-name
 
@@ -11,14 +11,12 @@ TMP_UPLOADS_WARNING = (
     "to a project in order to avoid automatic deletion."
 )
 
-_UploadStatuses = namedtuple_dynamic(
-    "UploadStatuses", ["done", "started", "failed"]
-)
+_UploadStatuses = namedtuple("UploadStatuses", ["done", "started", "failed"])
 UPLOAD_STATUSES = _UploadStatuses("succeeded", "started", "failed")
 
 FASTQ_EXTENSIONS = (".fastq.gz", ".fastq.bgz", ".fq.gz", ".fq.bgz")
 
-UploadOptions = namedtuple_dynamic(
+UploadOptions = namedtuple(
     "UploadOptions", Optionals._fields + ("project_id", "metadata")
 )
 
@@ -29,11 +27,11 @@ ASSIGN_ERROR = (
     "You can try to assign without upload using following gncv path: {}"
 )
 
-FastQ = namedtuple_dynamic("FastQ", ["client_id", "r_notation", "path"])
+FastQ = namedtuple("FastQ", ["client_id", "r_notation", "path"])
 
 R_NOTATION_MAP = {"R1": "R1", "R2": "R2", "r1": "R1", "r2": "R2"}
 
-_PathTemplateParts = namedtuple_dynamic(
+_PathTemplateParts = namedtuple(
     "PathTemplateParts", ["client_id", "r_notation"]
 )
 PathTemplateParts = _PathTemplateParts("client_id", "r_notation")

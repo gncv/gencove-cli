@@ -38,6 +38,7 @@ setup(
         "boto3>=1.9.188",
         "progressbar2==3.50.1",
         "backoff==1.10.0",
+        "pydantic==1.8.2",
     ],
     setup_requires=["pytest-runner"],
     tests_require=["pytest", "pytest-mock"],

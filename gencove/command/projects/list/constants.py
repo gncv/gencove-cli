@@ -1,19 +1,7 @@
 """Describe constants in projects subcommand."""
-from typing import Optional
+from typing import Optional, Union
 
 from gencove.models import GencoveBaseModel
-
-
-# pylint: disable=too-few-public-methods
-class Project(GencoveBaseModel):
-    """Project record"""
-
-    name: Optional[str]
-    description: Optional[str]
-    created: Optional[str]
-    organization: Optional[str]
-    sample_count: Optional[str]
-    pipeline_capabilities: Optional[str]
 
 
 # pylint: disable=too-few-public-methods
@@ -26,12 +14,12 @@ class PipelineCapabilities(GencoveBaseModel):
 
 
 # pylint: disable=too-few-public-methods
-class ProjectWithPipelineCapabilities(GencoveBaseModel):
-    """Project record with PipelineCapabilities"""
+class Project(GencoveBaseModel):
+    """Project record"""
 
     name: Optional[str]
     description: Optional[str]
     created: Optional[str]
     organization: Optional[str]
-    sample_count: Optional[str]
-    pipeline_capabilities: Optional[PipelineCapabilities]
+    sample_count: Optional[int]
+    pipeline_capabilities: Optional[Union[str, PipelineCapabilities]]

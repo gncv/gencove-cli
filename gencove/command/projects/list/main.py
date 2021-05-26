@@ -8,7 +8,6 @@ from gencove.command.base import Command
 from .constants import (
     PipelineCapabilities,
     Project,
-    ProjectWithPipelineCapabilities,
 )
 from .utils import get_line
 
@@ -96,4 +95,4 @@ class List(Command):
             )
             project_dict = dict(project)
             project_dict["pipeline_capabilities"] = pipeline_capabilities
-            yield ProjectWithPipelineCapabilities(**project_dict)
+            yield Project(**project_dict)

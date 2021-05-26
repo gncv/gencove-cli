@@ -1,4 +1,5 @@
 """Gencove CLI models"""
+from typing import Optional
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
 
@@ -6,4 +7,4 @@ from pydantic import BaseModel  # pylint: disable=no-name-in-module
 class GencoveBaseModel(BaseModel):
     """Gencove Base Model"""
 
-    id: str
+    id: Optional[str]

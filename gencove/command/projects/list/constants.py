@@ -1,5 +1,9 @@
 """Describe constants in projects subcommand."""
+from datetime import datetime
+from uuid import UUID
 from typing import Optional, Union
+
+from pydantic import HttpUrl
 
 from gencove.models import GencoveBaseModel
 
@@ -19,7 +23,8 @@ class Project(GencoveBaseModel):
 
     name: Optional[str]
     description: Optional[str]
-    created: Optional[str]
+    created: Optional[datetime]
     organization: Optional[str]
     sample_count: Optional[int]
-    pipeline_capabilities: Optional[Union[str, PipelineCapabilities]]
+    pipeline_capabilities: Optional[Union[UUID, PipelineCapabilities]]
+    webhook_url: Optional[HttpUrl]

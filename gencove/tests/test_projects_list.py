@@ -210,8 +210,8 @@ def test_list_projects(mocker):
     echo(
         "\t".join(
             [
-                project.created,
-                project.id,
+                str(project.created),
+                str(project.id),
                 project.name.replace("\t", " "),
                 pipeline.name,
             ]
@@ -256,8 +256,8 @@ def test_list_projects__with_webhook_url(mocker):
     echo(
         "\t".join(
             [
-                project.created,
-                project.id,
+                str(project.created),
+                str(project.id),
                 project.name.replace("\t", " "),
                 pipeline.name,
             ]
@@ -299,8 +299,8 @@ def test_list_projects__with_unexpected_keys(mocker):
     echo(
         "\t".join(
             [
-                project.created,
-                project.id,
+                str(project.created),
+                str(project.id),
                 project.name.replace("\t", " "),
                 pipeline.name,
             ]

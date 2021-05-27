@@ -1,11 +1,11 @@
 """Describe constants in projects subcommand."""
 from datetime import datetime
-from uuid import UUID
 from typing import Optional, Union
+from uuid import UUID
 
-from pydantic import HttpUrl
+from pydantic import HttpUrl  # pylint: disable=no-name-in-module
 
-from gencove.models import GencoveBaseModel
+from gencove.models import GencoveBaseModel  # noqa: I100
 
 
 # pylint: disable=too-few-public-methods

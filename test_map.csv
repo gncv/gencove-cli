@@ -1,4 +1,0 @@
-client_id,r1_notation,path
-barid,r1,test_dir/test.fastq.gz
-barid,r1,test_dir/test_3.fastq.gz
-barid,r1,test_dir/i_dont_exist.fastq.gz

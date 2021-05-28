@@ -24,7 +24,7 @@ from gencove.constants import (
     SAMPLE_ASSIGNMENT_STATUS,
     SampleSortBy,
     SAMPLE_STATUS,
-    SORT_ORDER,
+    SortOrder,
 )
 from gencove.logger import echo_debug
 from gencove.version import version as cli_version
@@ -351,7 +351,7 @@ class APIClient:
         sample_status=SAMPLE_STATUS.all,
         sample_archive_status=SAMPLE_ARCHIVE_STATUS.all,
         sort_by=SampleSortBy.modified,
-        sort_order=SORT_ORDER.desc,
+        sort_order=SortOrder.desc,
     ):
         """List single project's associated samples."""
         project_endpoint = self.endpoints.project_samples.format(
@@ -414,7 +414,7 @@ class APIClient:
         assigned_status=SAMPLE_ASSIGNMENT_STATUS.all,
         next_link=None,
         sort_by=SampleSheetSortBy.created,
-        sort_order=SORT_ORDER.desc,
+        sort_order=SortOrder.desc,
     ):
         """Fetch user samples.
 

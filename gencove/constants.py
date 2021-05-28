@@ -80,8 +80,13 @@ class SampleSortBy(Enum):
     id = "id"
 
 
-_SortOrder = namedtuple("SortOrder", ["asc", "desc"])
-SORT_ORDER = _SortOrder("asc", "desc")
+@unique
+class SortOrder(Enum):
+    """SortOrder enum"""
+
+    asc = "asc"
+    desc = "desc"
+
 
 Credentials = namedtuple("Credentials", ["email", "password", "api_key"])
 Optionals = namedtuple("Optionals", ["host"])

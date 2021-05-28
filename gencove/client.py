@@ -19,7 +19,7 @@ from requests import (  # pylint: disable=W0622
 
 from gencove import constants  # noqa: I100
 from gencove.constants import (
-    SAMPLES_SHEET_SORT_BY,
+    SampleSheetSortBy,
     SAMPLE_ARCHIVE_STATUS,
     SAMPLE_ASSIGNMENT_STATUS,
     SAMPLE_SORT_BY,
@@ -413,7 +413,7 @@ class APIClient:
         gncv_path=None,
         assigned_status=SAMPLE_ASSIGNMENT_STATUS.all,
         next_link=None,
-        sort_by=SAMPLES_SHEET_SORT_BY.created,
+        sort_by=SampleSheetSortBy.created,
         sort_order=SORT_ORDER.desc,
     ):
         """Fetch user samples.

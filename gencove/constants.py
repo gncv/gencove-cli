@@ -35,8 +35,14 @@ SAMPLE_ASSIGNMENT_STATUS = _SampleAssignmentStatus(
     "all", "unassigned", "assigned"
 )
 
-_SampleSheetSortBy = namedtuple("SampleSheetSortBy", ["created", "modified"])
-SAMPLES_SHEET_SORT_BY = _SampleSheetSortBy("created", "modified")
+
+@unique
+class SampleSheetSortBy(Enum):
+    """SampleSheetSortBy enum"""
+
+    created = "created"
+    modified = "modified"
+
 
 _SampleStatus = namedtuple(
     "SampleStatus", ["completed", "succeeded", "failed", "running", "all"]

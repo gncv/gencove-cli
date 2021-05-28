@@ -30,12 +30,13 @@ class ApiEndpoints(Enum):
     PROJECT_RESTORE_SAMPLES = "/api/v2/project-restore-samples/{id}"
 
 
-_SampleAssignmentStatus = namedtuple(
-    "SampleAssignmentStatus", ["all", "unassigned", "assigned"]
-)
-SAMPLE_ASSIGNMENT_STATUS = _SampleAssignmentStatus(
-    "all", "unassigned", "assigned"
-)
+@unique
+class SampleAssignmentStatus(GencoveBaseEnum):
+    """SampleAssignmentStatus enum"""
+
+    ALL = "all"
+    UNASSIGNED = "unassigned"
+    ASSIGNED = "assigned"
 
 
 @unique

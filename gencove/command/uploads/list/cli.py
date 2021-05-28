@@ -2,7 +2,7 @@
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
-from gencove.constants import Credentials, SAMPLE_ASSIGNMENT_STATUS
+from gencove.constants import Credentials, SampleAssignmentStatus
 
 from .constants import UploadsOptions
 from .main import ListSampleSheet
@@ -13,8 +13,8 @@ from .main import ListSampleSheet
 @click.option(
     "--status",
     help="Filter uploads by status of assignment",
-    type=click.Choice(SAMPLE_ASSIGNMENT_STATUS._asdict().values()),
-    default=SAMPLE_ASSIGNMENT_STATUS.all,
+    type=click.Choice(SampleAssignmentStatus._asdict().values()),
+    default=SampleAssignmentStatus.ALL.value,  # pylint: disable=no-member
 )
 @add_options(common_options)
 def list_uploads(  # pylint: disable=E0012,C0330,R0913

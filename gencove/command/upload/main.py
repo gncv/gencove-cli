@@ -16,7 +16,7 @@ from gencove.command.base import Command
 from gencove.command.utils import is_valid_uuid
 from gencove.constants import (
     FASTQ_MAP_EXTENSION,
-    SAMPLE_ASSIGNMENT_STATUS,
+    SampleAssignmentStatus,
     UPLOAD_PREFIX,
 )
 from gencove.exceptions import ValidationError
@@ -445,7 +445,10 @@ class Upload(Command):
     def get_sample_sheet(self, next_link=None):
         """Get samples by gncv path."""
         return self.api_client.get_sample_sheet(
-            self.destination, SAMPLE_ASSIGNMENT_STATUS.unassigned, next_link
+            self.destination,
+            # pylint: disable=no-member
+            SampleAssignmentStatus.UNASSIGNED.value,
+            next_link,
         )
 
     def output_list(self):

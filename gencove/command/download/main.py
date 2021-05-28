@@ -9,7 +9,7 @@ import requests
 from gencove import client  # noqa: I100
 from gencove.command.base import Command
 from gencove.command.download.exceptions import DownloadTemplateError
-from gencove.constants import SAMPLE_ARCHIVE_STATUS
+from gencove.constants import SampleArchiveStatus
 from gencove.exceptions import ValidationError
 
 from .constants import (
@@ -348,7 +348,8 @@ class Download(Command):
             req = self.api_client.get_project_samples(
                 self.filters.project_id,
                 next_page,
-                sample_archive_status=SAMPLE_ARCHIVE_STATUS.available,
+                # pylint: disable=no-member
+                sample_archive_status=SampleArchiveStatus.AVAILABLE.value,
             )
             for sample in req["results"]:
                 yield sample

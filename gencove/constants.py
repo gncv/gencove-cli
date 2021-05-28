@@ -47,6 +47,7 @@ class SampleSheetSortBy(Enum):
     MODIFIED = "modified"
 
 
+@unique
 class SampleStatus(GencoveBaseEnum):
     """SampleStatus enum"""
 
@@ -57,22 +58,14 @@ class SampleStatus(GencoveBaseEnum):
     ALL = "all"
 
 
-_SampleArchiveStatus = namedtuple(
-    "SampleArchiveStatus",
-    [
-        "available",
-        "archived",
-        "restore_requested",
-        "all",
-    ],
-)
+@unique
+class SampleArchiveStatus(GencoveBaseEnum):
+    """SampleArchiveStatus enum"""
 
-SAMPLE_ARCHIVE_STATUS = _SampleArchiveStatus(
-    "available",
-    "archived",
-    "restore_requested",
-    "all",
-)
+    AVAILABLE = "available"
+    ARCHIVED = "archived"
+    RESTORE_REQUESTED = "restore_requested"
+    ALL = "all"
 
 
 @unique

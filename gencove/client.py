@@ -19,7 +19,7 @@ from requests import (  # pylint: disable=W0622
 
 from gencove import constants  # noqa: I100
 from gencove.constants import (
-    SAMPLE_ARCHIVE_STATUS,
+    SampleArchiveStatus,
     SampleAssignmentStatus,
     SampleSheetSortBy,
     SampleSortBy,
@@ -349,7 +349,8 @@ class APIClient:
         next_link=None,
         search="",
         sample_status=SampleStatus.ALL.value,  # pylint: disable=no-member
-        sample_archive_status=SAMPLE_ARCHIVE_STATUS.all,
+        # pylint: disable=no-member
+        sample_archive_status=SampleArchiveStatus.ALL.value,
         sort_by=SampleSortBy.MODIFIED.value,  # pylint: disable=no-member
         sort_order=SortOrder.DESC.value,  # pylint: disable=no-member
     ):

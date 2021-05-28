@@ -4,7 +4,7 @@ import click
 from gencove.command.common_cli_options import add_options, common_options
 from gencove.constants import (
     Credentials,
-    SAMPLE_ARCHIVE_STATUS,
+    SampleArchiveStatus,
     SampleStatus,
 )
 
@@ -26,8 +26,8 @@ from .main import ListSamples
 @click.option(
     "--archive-status",
     help="Get samples with specific archive status",
-    type=click.Choice(SAMPLE_ARCHIVE_STATUS._asdict().values()),
-    default=SAMPLE_ARCHIVE_STATUS.all,
+    type=click.Choice(SampleArchiveStatus._asdict().values()),
+    default=SampleArchiveStatus.ALL.value,  # pylint: disable=no-member
 )
 @add_options(common_options)
 def list_project_samples(  # pylint: disable=E0012,C0330,R0913

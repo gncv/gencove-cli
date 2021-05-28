@@ -68,12 +68,17 @@ SAMPLE_ARCHIVE_STATUS = _SampleArchiveStatus(
     "all",
 )
 
-_SampleSortBy = namedtuple(
-    "SampleSortFields", ["created", "modified", "status", "client_id", "id"]
-)
-SAMPLE_SORT_BY = _SampleSortBy(
-    "created", "modified", "status", "client_id", "id"
-)
+
+@unique
+class SampleSortBy(Enum):
+    """SampleSortBy enum"""
+
+    created = "created"
+    modified = "modified"
+    status = "status"
+    client_id = "client_id"
+    id = "id"
+
 
 _SortOrder = namedtuple("SortOrder", ["asc", "desc"])
 SORT_ORDER = _SortOrder("asc", "desc")

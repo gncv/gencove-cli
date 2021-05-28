@@ -22,7 +22,7 @@ from gencove.constants import (
     SampleSheetSortBy,
     SAMPLE_ARCHIVE_STATUS,
     SAMPLE_ASSIGNMENT_STATUS,
-    SAMPLE_SORT_BY,
+    SampleSortBy,
     SAMPLE_STATUS,
     SORT_ORDER,
 )
@@ -350,7 +350,7 @@ class APIClient:
         search="",
         sample_status=SAMPLE_STATUS.all,
         sample_archive_status=SAMPLE_ARCHIVE_STATUS.all,
-        sort_by=SAMPLE_SORT_BY.modified,
+        sort_by=SampleSortBy.modified,
         sort_order=SORT_ORDER.desc,
     ):
         """List single project's associated samples."""

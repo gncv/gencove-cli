@@ -348,7 +348,6 @@ class Download(Command):
             req = self.api_client.get_project_samples(
                 self.filters.project_id,
                 next_page,
-                # pylint: disable=no-member
                 sample_archive_status=SampleArchiveStatus.AVAILABLE.value,
             )
             for sample in req["results"]:

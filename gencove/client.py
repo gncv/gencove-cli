@@ -348,11 +348,10 @@ class APIClient:
         project_id,
         next_link=None,
         search="",
-        sample_status=SampleStatus.ALL.value,  # pylint: disable=no-member
-        # pylint: disable=no-member
+        sample_status=SampleStatus.ALL.value,
         sample_archive_status=SampleArchiveStatus.ALL.value,
-        sort_by=SampleSortBy.MODIFIED.value,  # pylint: disable=no-member
-        sort_order=SortOrder.DESC.value,  # pylint: disable=no-member
+        sort_by=SampleSortBy.MODIFIED.value,
+        sort_order=SortOrder.DESC.value,
     ):
         """List single project's associated samples."""
         project_endpoint = str(self.endpoints.PROJECT_SAMPLES).format(
@@ -412,7 +411,6 @@ class APIClient:
     def get_sample_sheet(
         self,
         gncv_path=None,
-        # pylint: disable=no-member
         assigned_status=SampleAssignmentStatus.ALL.value,
         next_link=None,
         sort_by=SampleSheetSortBy.CREATED.value,

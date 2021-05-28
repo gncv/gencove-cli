@@ -2,8 +2,6 @@
 from collections import namedtuple
 from enum import Enum, unique
 
-from gencove.models import GencoveBaseEnum
-
 HOST = "https://api.gencove.com"
 
 
@@ -31,12 +29,16 @@ class ApiEndpoints(Enum):
 
 
 @unique
-class SampleAssignmentStatus(GencoveBaseEnum):
+class SampleAssignmentStatus(Enum):
     """SampleAssignmentStatus enum"""
 
     ALL = "all"
     UNASSIGNED = "unassigned"
     ASSIGNED = "assigned"
+
+    @classmethod
+    def _asdict(cls):
+        return {s.name: s.value for s in cls}
 
 
 @unique
@@ -48,7 +50,7 @@ class SampleSheetSortBy(Enum):
 
 
 @unique
-class SampleStatus(GencoveBaseEnum):
+class SampleStatus(Enum):
     """SampleStatus enum"""
 
     COMPLETED = "completed"
@@ -57,15 +59,23 @@ class SampleStatus(GencoveBaseEnum):
     RUNNING = "running"
     ALL = "all"
 
+    @classmethod
+    def _asdict(cls):
+        return {s.name: s.value for s in cls}
+
 
 @unique
-class SampleArchiveStatus(GencoveBaseEnum):
+class SampleArchiveStatus(Enum):
     """SampleArchiveStatus enum"""
 
     AVAILABLE = "available"
     ARCHIVED = "archived"
     RESTORE_REQUESTED = "restore_requested"
     ALL = "all"
+
+    @classmethod
+    def _asdict(cls):
+        return {s.name: s.value for s in cls}
 
 
 @unique
@@ -90,28 +100,26 @@ class SortOrder(Enum):
 Credentials = namedtuple("Credentials", ["email", "password", "api_key"])
 Optionals = namedtuple("Optionals", ["host"])
 
-_DownloadTemplateParts = namedtuple(
-    "DownloadTemplateParts",
-    [
-        "client_id",
-        "gencove_id",
-        "file_type",
-        "file_extension",
-        "default_filename",
-    ],
-)
-# pylint: disable=C0103
-DownloadTemplateParts = _DownloadTemplateParts(
-    "client_id",
-    "gencove_id",
-    "file_type",
-    "file_extension",
-    "default_filename",
-)
+
+@unique
+class DownloadTemplateParts(Enum):
+    """DownloadTemplateParts enum"""
+
+    CLIENT_ID = "client_id"
+    GENCOVE_ID = "gencove_id"
+    FILE_TYPE = "file_type"
+    FILE_EXTENSION = "file_extension"
+    DEFAULT_FILENAME = "default_filename"
+
+    @classmethod
+    def _asdict(cls):
+        return {s.name: s.value for s in cls}
+
+
 DOWNLOAD_TEMPLATE = "{{{}}}/{{{}}}/{{{}}}".format(
-    DownloadTemplateParts.client_id,
-    DownloadTemplateParts.gencove_id,
-    DownloadTemplateParts.default_filename,
+    DownloadTemplateParts.CLIENT_ID.value,
+    DownloadTemplateParts.GENCOVE_ID.value,
+    DownloadTemplateParts.DEFAULT_FILENAME.value,
 )
 
 MAX_RETRY_TIME_SECONDS = 300  # 5 minutes

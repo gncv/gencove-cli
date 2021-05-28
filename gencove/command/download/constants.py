@@ -48,7 +48,7 @@ DownloadOptions = namedtuple(  # pylint: disable=invalid-name
     Optionals._fields + ("skip_existing", "download_template"),
 )
 DEFAULT_FILENAME_TOKEN = "{{{}}}".format(
-    DownloadTemplateParts.default_filename
+    DownloadTemplateParts.DEFAULT_FILENAME.value
 )
 FilePrefix = namedtuple(
     "FilePrefix",

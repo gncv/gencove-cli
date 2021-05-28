@@ -446,7 +446,6 @@ class Upload(Command):
         """Get samples by gncv path."""
         return self.api_client.get_sample_sheet(
             self.destination,
-            # pylint: disable=no-member
             SampleAssignmentStatus.UNASSIGNED.value,
             next_link,
         )

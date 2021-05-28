@@ -24,7 +24,7 @@ from .main import RunPrefix
     "--status",
     help="Filter uploads by status of assignment",
     type=click.Choice(SampleAssignmentStatus._asdict().values()),
-    default=SampleAssignmentStatus.ALL.value,  # pylint: disable=no-member
+    default=SampleAssignmentStatus.ALL.value,
 )
 @add_options(common_options)
 def run_prefix(  # pylint: disable=too-many-arguments

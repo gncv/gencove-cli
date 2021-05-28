@@ -21,13 +21,13 @@ from .main import ListSamples
     "--status",
     help="Get samples with specific status",
     type=click.Choice(SampleStatus._asdict().values()),
-    default=SampleStatus.ALL.value,  # pylint: disable=no-member
+    default=SampleStatus.ALL.value,
 )
 @click.option(
     "--archive-status",
     help="Get samples with specific archive status",
     type=click.Choice(SampleArchiveStatus._asdict().values()),
-    default=SampleArchiveStatus.ALL.value,  # pylint: disable=no-member
+    default=SampleArchiveStatus.ALL.value,
 )
 @add_options(common_options)
 def list_project_samples(  # pylint: disable=E0012,C0330,R0913

@@ -14,7 +14,7 @@ from .main import ListSampleSheet
     "--status",
     help="Filter uploads by status of assignment",
     type=click.Choice(SampleAssignmentStatus._asdict().values()),
-    default=SampleAssignmentStatus.ALL.value,  # pylint: disable=no-member
+    default=SampleAssignmentStatus.ALL.value,
 )
 @add_options(common_options)
 def list_uploads(  # pylint: disable=E0012,C0330,R0913

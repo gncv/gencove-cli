@@ -118,7 +118,7 @@ def test___get_filename_dirs_prefix():
 
     assert resp.dirs == "{}/{}".format(client_id, gencove_id)
     assert resp.filename == "{{{}}}".format(
-        DownloadTemplateParts.default_filename
+        DownloadTemplateParts.DEFAULT_FILENAME.value
     )
     assert resp.file_extension == ""
 
@@ -128,7 +128,7 @@ def test___get_filename_dirs_prefix():
     resp = _get_prefix_parts(template2)
     assert resp.dirs == ""
     assert resp.filename == "{}-{}_{{{}}}".format(
-        client_id, gencove_id, DownloadTemplateParts.file_type
+        client_id, gencove_id, DownloadTemplateParts.FILE_TYPE.value
     )
     assert resp.file_extension == ""
 
@@ -138,7 +138,7 @@ def test___get_filename_dirs_prefix():
     resp = _get_prefix_parts(template3)
     assert resp.dirs == ""
     assert resp.filename == "{}-{}_{{{}}}".format(
-        client_id, gencove_id, DownloadTemplateParts.file_type
+        client_id, gencove_id, DownloadTemplateParts.FILE_TYPE.value
     )
     assert resp.file_extension == "vcf.gz"
 

@@ -39,10 +39,15 @@ FastQ = namedtuple("FastQ", ["client_id", "r_notation", "path"])
 
 R_NOTATION_MAP = {"R1": "R1", "R2": "R2", "r1": "R1", "r2": "R2"}
 
-_PathTemplateParts = namedtuple(
-    "PathTemplateParts", ["client_id", "r_notation"]
-)
-PathTemplateParts = _PathTemplateParts("client_id", "r_notation")
+
+@unique
+class PathTemplateParts(Enum):
+    """PathTemplateParts enum"""
+
+    client_id = "client_id"
+    r_notation = "r_notation"
+
+
 PATH_TEMPLATE = "{{{}}}_{{{}}}.fastq.gz".format(
-    PathTemplateParts.client_id, PathTemplateParts.r_notation
+    PathTemplateParts.client_id.value, PathTemplateParts.r_notation.value
 )

@@ -262,7 +262,7 @@ def get_gncv_path(client_id, r_notation):
     """
     return PATH_TEMPLATE.format(
         **{
-            PathTemplateParts.client_id: client_id,
-            PathTemplateParts.r_notation: r_notation,
+            PathTemplateParts.client_id.value: client_id,
+            PathTemplateParts.r_notation.value: r_notation,
         }
     )

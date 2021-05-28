@@ -1,5 +1,6 @@
 """Constants for upload command."""
 from collections import namedtuple
+from enum import Enum, unique
 
 from gencove.constants import Optionals
 
@@ -11,8 +12,15 @@ TMP_UPLOADS_WARNING = (
     "to a project in order to avoid automatic deletion."
 )
 
-_UploadStatuses = namedtuple("UploadStatuses", ["done", "started", "failed"])
-UPLOAD_STATUSES = _UploadStatuses("succeeded", "started", "failed")
+
+@unique
+class UploadStatuses(Enum):
+    """UploadStatuses enum"""
+
+    done = "succeeded"
+    started = "started"
+    failed = "failed"
+
 
 FASTQ_EXTENSIONS = (".fastq.gz", ".fastq.bgz", ".fq.gz", ".fq.bgz")
 

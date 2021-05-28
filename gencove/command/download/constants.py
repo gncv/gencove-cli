@@ -2,8 +2,11 @@
 import re
 from collections import namedtuple
 from enum import Enum, unique
+from typing import Optional, Tuple
 
-from gencove.constants import DownloadTemplateParts, Optionals
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
+
+from gencove.constants import DownloadTemplateParts, Optionals  # noqa: I100
 
 
 @unique
@@ -40,9 +43,16 @@ MEGABYTE = 1024 * KILOBYTE
 NUM_MB_IN_CHUNK = 3
 CHUNK_SIZE = NUM_MB_IN_CHUNK * MEGABYTE
 
-DownloadFilters = namedtuple(
-    "Filters", ["project_id", "sample_ids", "file_types"]
-)
+
+# pylint: disable=too-few-public-methods
+class DownloadFilters(BaseModel):
+    """DownloadFilters options"""
+
+    project_id: Optional[str]
+    sample_ids: Optional[Tuple[str, ...]]
+    file_types: Optional[Tuple[str, ...]]
+
+
 DownloadOptions = namedtuple(  # pylint: disable=invalid-name
     "DownloadOptions",
     Optionals._fields + ("skip_existing", "download_template"),

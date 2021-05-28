@@ -89,7 +89,7 @@ class APIClientTimeout(APIClientError):
 class APIClient:
     """Gencove API client."""
 
-    endpoints = constants.API_ENDPOINTS
+    endpoints = constants.ApiEndpoints
 
     def __init__(self, host=None):
         """Initialize api client."""

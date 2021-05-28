@@ -21,9 +21,9 @@ from gencove import constants  # noqa: I100
 from gencove.constants import (
     SAMPLE_ARCHIVE_STATUS,
     SAMPLE_ASSIGNMENT_STATUS,
-    SAMPLE_STATUS,
     SampleSheetSortBy,
     SampleSortBy,
+    SampleStatus,
     SortOrder,
 )
 from gencove.logger import echo_debug
@@ -348,10 +348,10 @@ class APIClient:
         project_id,
         next_link=None,
         search="",
-        sample_status=SAMPLE_STATUS.all,
+        sample_status=SampleStatus.ALL.value,  # pylint: disable=no-member
         sample_archive_status=SAMPLE_ARCHIVE_STATUS.all,
-        sort_by=SampleSortBy.MODIFIED,
-        sort_order=SortOrder.DESC,
+        sort_by=SampleSortBy.MODIFIED.value,  # pylint: disable=no-member
+        sort_order=SortOrder.DESC.value,  # pylint: disable=no-member
     ):
         """List single project's associated samples."""
         project_endpoint = str(self.endpoints.PROJECT_SAMPLES).format(

@@ -2,6 +2,8 @@
 from collections import namedtuple
 from enum import Enum, unique
 
+from gencove.models import GencoveBaseEnum
+
 HOST = "https://api.gencove.com"
 
 
@@ -44,12 +46,15 @@ class SampleSheetSortBy(Enum):
     MODIFIED = "modified"
 
 
-_SampleStatus = namedtuple(
-    "SampleStatus", ["completed", "succeeded", "failed", "running", "all"]
-)
-SAMPLE_STATUS = _SampleStatus(
-    "completed", "succeeded", "failed", "running", "all"
-)
+class SampleStatus(GencoveBaseEnum):
+    """SampleStatus enum"""
+
+    COMPLETED = "completed"
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"
+    RUNNING = "running"
+    ALL = "all"
+
 
 _SampleArchiveStatus = namedtuple(
     "SampleArchiveStatus",

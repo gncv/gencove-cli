@@ -1,18 +1,17 @@
 """Download command constants."""
-from enum import Enum, unique
 import re
 from collections import namedtuple
+from enum import Enum, unique
 
 from gencove.constants import DownloadTemplateParts, Optionals
 
 
-_SampleStatuses = namedtuple("SampleStatuses", ["succeeded", "failed"])
-"""_SampleArchiveStatuses = namedtuple(
-    "SampleStatuses", ["available", "restored"]
-)"""
-SAMPLE_STATUSES = _SampleStatuses("succeeded", "failed")
+@unique
+class SampleStatuses(Enum):
+    """SampleStatuses as enum"""
 
-# SampleArchiveStatuses = _SampleArchiveStatuses("available", "restored")
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"
 
 
 @unique
@@ -24,7 +23,9 @@ class SampleArchiveStatuses(Enum):
 
 
 ALLOWED_STATUSES_RE = re.compile(
-    "{}|{}".format(SAMPLE_STATUSES.succeeded, SAMPLE_STATUSES.failed),
+    "{}|{}".format(
+        SampleStatuses.SUCCEEDED.value, SampleStatuses.FAILED.value
+    ),
     re.IGNORECASE,
 )
 ALLOWED_ARCHIVE_STATUSES_RE = re.compile(

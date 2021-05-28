@@ -5,7 +5,10 @@ import backoff
 from gencove.client import APIClientError, APIClientTimeout  # noqa: I100
 from gencove.command.base import Command
 
-from .constants import PipelineCapabilities, Project
+from .constants import (
+    PipelineCapabilities,
+    Project,
+)
 from .utils import get_line
 
 
@@ -90,6 +93,6 @@ class List(Command):
             pipeline_capabilities = self.get_pipeline_capabilities(
                 project.pipeline_capabilities
             )
-            yield project._replace(
-                pipeline_capabilities=pipeline_capabilities
-            )
+            project_dict = dict(project)
+            project_dict["pipeline_capabilities"] = pipeline_capabilities
+            yield Project(**project_dict)

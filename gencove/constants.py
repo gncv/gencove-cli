@@ -9,23 +9,23 @@ HOST = "https://api.gencove.com"
 class ApiEndpoints(Enum):
     """ApiEndpoints enum"""
 
-    get_jwt = "/api/v2/jwt-create/"
-    refresh_jwt = "/api/v2/jwt-refresh/"
-    verify_jwt = "/api/v2/jwt-verify/"
-    upload_details = "/api/v2/uploads-post-data/"
-    get_upload_credentials = "/api/v2/upload-credentials/"
-    project_samples = "/api/v2/project-samples/{id}"
-    sample_details = "/api/v2/samples/{id}"
-    sample_qc_metrics = "/api/v2/sample-quality-controls/{id}"
-    sample_sheet = "/api/v2/sample-sheet/"
-    projects = "/api/v2/projects/"
-    pipeline_capabilities = "/api/v2/pipeline-capabilities/{id}"
-    project_batch_types = "/api/v2/project-batch-types/{id}"
-    project_batches = "/api/v2/project-batches/{id}"
-    batches = "/api/v2/batches/{id}"
-    project_merge_vcfs = "/api/v2/project-merge-vcfs/{id}"
-    sample_metadata = "/api/v2/sample-metadata/{id}"
-    project_restore_samples = "/api/v2/project-restore-samples/{id}"
+    GET_JWT = "/api/v2/jwt-create/"
+    REFRESH_JWT = "/api/v2/jwt-refresh/"
+    VERIFY_JWT = "/api/v2/jwt-verify/"
+    UPLOAD_DETAILS = "/api/v2/uploads-post-data/"
+    GET_UPLOAD_CREDENTIALS = "/api/v2/upload-credentials/"
+    PROJECT_SAMPLES = "/api/v2/project-samples/{id}"
+    SAMPLE_DETAILS = "/api/v2/samples/{id}"
+    SAMPLE_QC_METRICS = "/api/v2/sample-quality-controls/{id}"
+    SAMPLE_SHEET = "/api/v2/sample-sheet/"
+    PROJECTS = "/api/v2/projects/"
+    PIPELINE_CAPABILITES = "/api/v2/pipeline-capabilities/{id}"
+    PROJECT_BATCH_TYPES = "/api/v2/project-batch-types/{id}"
+    PROJECT_BATCHES = "/api/v2/project-batches/{id}"
+    BATCHES = "/api/v2/batches/{id}"
+    PROJECT_MERGE_VCFS = "/api/v2/project-merge-vcfs/{id}"
+    SAMPLE_METADATA = "/api/v2/sample-metadata/{id}"
+    PROJECT_RESTORE_SAMPLES = "/api/v2/project-restore-samples/{id}"
 
 
 _SampleAssignmentStatus = namedtuple(
@@ -40,8 +40,8 @@ SAMPLE_ASSIGNMENT_STATUS = _SampleAssignmentStatus(
 class SampleSheetSortBy(Enum):
     """SampleSheetSortBy enum"""
 
-    created = "created"
-    modified = "modified"
+    CREATED = "created"
+    MODIFIED = "modified"
 
 
 _SampleStatus = namedtuple(
@@ -73,19 +73,19 @@ SAMPLE_ARCHIVE_STATUS = _SampleArchiveStatus(
 class SampleSortBy(Enum):
     """SampleSortBy enum"""
 
-    created = "created"
-    modified = "modified"
-    status = "status"
-    client_id = "client_id"
-    id = "id"
+    CREATED = "created"
+    MODIFIED = "modified"
+    STATUS = "status"
+    CLIENT_ID = "client_id"
+    ID = "id"
 
 
 @unique
 class SortOrder(Enum):
     """SortOrder enum"""
 
-    asc = "asc"
-    desc = "desc"
+    ASC = "asc"
+    DESC = "desc"
 
 
 Credentials = namedtuple("Credentials", ["email", "password", "api_key"])

@@ -12,4 +12,6 @@ class GencoveBaseModel(BaseModel):
 
 
 class RefreshJWTResponse(BaseModel):
+    """RefreshJWTResponse model"""
+
     access: str

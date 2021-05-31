@@ -27,8 +27,8 @@ from gencove.constants import (
     SORT_ORDER,
 )
 from gencove.logger import echo_debug
-from gencove.version import version as cli_version
 from gencove.models import RefreshJWTResponse
+from gencove.version import version as cli_version
 
 
 class DateTimeEncoder(json.JSONEncoder):

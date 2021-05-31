@@ -2,7 +2,9 @@
 from collections import namedtuple
 from enum import Enum, unique
 
-from gencove.constants import Optionals
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
+
+from gencove.constants import Optionals  # noqa: I100
 
 # pylint: disable=invalid-name
 
@@ -35,7 +37,15 @@ ASSIGN_ERROR = (
     "You can try to assign without upload using following gncv path: {}"
 )
 
-FastQ = namedtuple("FastQ", ["client_id", "r_notation", "path"])
+
+# pylint: disable=too-few-public-methods
+class FastQ(BaseModel):
+    """FastQ model"""
+
+    client_id: str
+    r_notation: str
+    path: str
+
 
 R_NOTATION_MAP = {"R1": "R1", "R2": "R2", "r1": "R1", "r2": "R2"}
 

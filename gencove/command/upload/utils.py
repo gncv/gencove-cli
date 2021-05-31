@@ -180,7 +180,7 @@ def _validate_fastq(fastq):
     """Validate fastq object.
 
     Args:
-        fastq (FastQ:namedtuple): fastq object
+        fastq (FastQ): fastq object
     Returns:
         None if all good
     Raises:
@@ -205,11 +205,11 @@ def _validate_fastq(fastq):
 
 def _validate_header(header):
     header_columns = header.values()
-    for column in FastQ._fields:
+    for column in FastQ.__fields__:
         if column not in header_columns:
             raise ValidationError(
                 "Unexpected CSV header. Expected: {}".format(
-                    ", ".join(FastQ._fields)
+                    ", ".join(FastQ.__fields__)
                 )
             )
 
@@ -237,7 +237,7 @@ def parse_fastqs_map_file(fastqs_map_path):
     """
     fastqs = defaultdict(list)
     with open(fastqs_map_path) as fastqs_file:
-        reader = csv.DictReader(fastqs_file, fieldnames=FastQ._fields)
+        reader = csv.DictReader(fastqs_file, fieldnames=FastQ.__fields__)
         # read headers row
         header = next(reader)
         _validate_header(header)

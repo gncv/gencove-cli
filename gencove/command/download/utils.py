@@ -30,10 +30,10 @@ def _get_prefix_parts(full_prefix):
     prefix_parts = full_prefix.split("/")
     file_name, _, file_ext = prefix_parts[-1].partition(".")
     return FilePrefix(
-        "/".join(prefix_parts[:-1]),
-        file_name,
-        file_ext,
-        DEFAULT_FILENAME_TOKEN in full_prefix,
+        dirs="/".join(prefix_parts[:-1]),
+        filename=file_name,
+        file_extension=file_ext,
+        use_default_filename=(DEFAULT_FILENAME_TOKEN in full_prefix),
     )
 
 

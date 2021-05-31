@@ -60,10 +60,18 @@ DownloadOptions = namedtuple(  # pylint: disable=invalid-name
 DEFAULT_FILENAME_TOKEN = "{{{}}}".format(
     DownloadTemplateParts.DEFAULT_FILENAME.value
 )
-FilePrefix = namedtuple(
-    "FilePrefix",
-    ["dirs", "filename", "file_extension", "use_default_filename"],
-)
+
+
+# pylint: disable=too-few-public-methods
+class FilePrefix(BaseModel):
+    """FilePrefix model"""
+
+    dirs: str
+    filename: str
+    file_extension: str
+    use_default_filename: bool
+
+
 FILENAME_RE = re.compile("filename=(.+)")
 
 # Leaving the line below since it is a great explaination of FILE_TYPES_MAPPER

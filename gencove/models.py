@@ -9,3 +9,7 @@ class GencoveBaseModel(BaseModel):
     """Gencove Base Model"""
 
     id: UUID
+
+
+class RefreshJWTResponse(BaseModel):
+    access: str

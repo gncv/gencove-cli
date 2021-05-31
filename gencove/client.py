@@ -28,6 +28,7 @@ from gencove.constants import (
 )
 from gencove.logger import echo_debug
 from gencove.version import version as cli_version
+from gencove.models import RefreshJWTResponse
 
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -211,7 +212,7 @@ class APIClient:
     def _refresh_authentication(self):
         echo_debug("Refreshing authentication")
         jwt = self.refresh_token(self._jwt_refresh_token)
-        self._set_jwt(jwt["access"])
+        self._set_jwt(jwt.access)
 
     def _get_authorization(self):
         if self._api_key:
@@ -226,10 +227,11 @@ class APIClient:
         authorized=False,
         sensitive=False,
         refreshed=False,
+        model=None,
     ):
         headers = {} if not authorized else self._get_authorization()
         try:
-            return self._request(
+            response = self._request(
                 endpoint,
                 params=payload,
                 method="post",
@@ -237,6 +239,9 @@ class APIClient:
                 custom_headers=headers,
                 sensitive=sensitive,
             )
+            if model:
+                return model(**response.json())
+            return response
         except APIClientError as err:
             if not refreshed and err.status_code and err.status_code == 401:
                 self._refresh_authentication()
@@ -300,6 +305,7 @@ class APIClient:
             self.endpoints.refresh_jwt,
             {"refresh": refresh_token},
             sensitive=True,
+            model=RefreshJWTResponse,
         )
 
     def validate_token(self, token):

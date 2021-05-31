@@ -126,7 +126,7 @@ def download(  # pylint: disable=E0012,C0330,R0913
         DownloadFilters(
             project_id=project_id, sample_ids=s_ids, file_types=f_types
         ),
-        Credentials(email, password, api_key),
+        Credentials(email=email, password=password, api_key=api_key),
         DownloadOptions(host, skip_existing, download_template),
         download_urls,
         no_progress,

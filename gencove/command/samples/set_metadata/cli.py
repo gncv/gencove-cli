@@ -28,6 +28,6 @@ def set_metadata(
     SetMetadata(
         sample_id,
         json,
-        Credentials(email, password, api_key),
+        Credentials(email=email, password=password, api_key=api_key),
         Optionals(host),
     ).run()

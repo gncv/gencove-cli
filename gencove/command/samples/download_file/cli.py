@@ -64,7 +64,7 @@ def download_file(
             sample_id,
             file_type,
             sys.stdout.buffer,
-            Credentials(email, password, api_key),
+            Credentials(email=email, password=password, api_key=api_key),
             Optionals(host),
             no_progress,
         ).run()
@@ -75,7 +75,9 @@ def download_file(
                     sample_id,
                     file_type,
                     destination_file,
-                    Credentials(email, password, api_key),
+                    Credentials(
+                        email=email, password=password, api_key=api_key
+                    ),
                     Optionals(host),
                     no_progress,
                 ).run()

@@ -36,6 +36,6 @@ def list_project_samples(  # pylint: disable=E0012,C0330,R0913
     """List samples in a project."""
     ListSamples(
         project_id,
-        Credentials(email, password, api_key),
+        Credentials(email=email, password=password, api_key=api_key),
         SamplesOptions(host, status, archive_status, search),
     ).run()

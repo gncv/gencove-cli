@@ -11,4 +11,7 @@ from .main import List
 @add_options(common_options)
 def list_projects(host, email, password, api_key):
     """List your projects."""
-    List(Credentials(email, password, api_key), Optionals(host)).run()
+    List(
+        Credentials(email=email, password=password, api_key=api_key),
+        Optionals(host),
+    ).run()

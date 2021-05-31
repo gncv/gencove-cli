@@ -13,5 +13,7 @@ from .main import ListBatches
 def list_project_batches(project_id, host, email, password, api_key):
     """List batches that are available for a project."""
     ListBatches(
-        project_id, Credentials(email, password, api_key), Optionals(host)
+        project_id,
+        Credentials(email=email, password=password, api_key=api_key),
+        Optionals(host),
     ).run()

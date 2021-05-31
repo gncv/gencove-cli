@@ -2,6 +2,8 @@
 from collections import namedtuple
 from enum import Enum, unique
 
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
+
 HOST = "https://api.gencove.com"
 
 
@@ -97,7 +99,15 @@ class SortOrder(Enum):
     DESC = "desc"
 
 
-Credentials = namedtuple("Credentials", ["email", "password", "api_key"])
+# pylint: disable=too-few-public-methods
+class Credentials(BaseModel):
+    """Credentials model"""
+
+    email: str
+    password: str
+    api_key: str
+
+
 Optionals = namedtuple("Optionals", ["host"])
 
 

@@ -81,7 +81,7 @@ MOCKED_PROJECTS_WITH_UNEXPECTED_KEYS = dict(
             "description": "",
             "created": (datetime.utcnow() - timedelta(days=7)).isoformat(),
             "organization": str(uuid4()),
-            "webhook_url": None,
+            "webhook_url": "",
             "sample_count": 1,
             "pipeline_capabilities": str(uuid4()),
             "roles": [],

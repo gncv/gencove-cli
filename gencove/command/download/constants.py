@@ -1,12 +1,14 @@
 """Download command constants."""
 import re
-from collections import namedtuple
 from enum import Enum, unique
 from typing import Optional, Tuple
 
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
-from gencove.constants import DownloadTemplateParts, Optionals  # noqa: I100
+from gencove.constants import (  # noqa: I100
+    BaseOptionals,
+    DownloadTemplateParts,
+)
 
 
 @unique
@@ -53,10 +55,14 @@ class DownloadFilters(BaseModel):
     file_types: Optional[Tuple[str, ...]]
 
 
-DownloadOptions = namedtuple(  # pylint: disable=invalid-name
-    "DownloadOptions",
-    Optionals._fields + ("skip_existing", "download_template"),
-)
+# pylint: disable=too-few-public-methods
+class DownloadOptions(BaseOptionals):
+    """DownloadOptions model"""
+
+    skip_existing: Optional[bool]
+    download_template: Optional[str]
+
+
 DEFAULT_FILENAME_TOKEN = "{{{}}}".format(
     DownloadTemplateParts.DEFAULT_FILENAME.value
 )

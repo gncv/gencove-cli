@@ -127,7 +127,11 @@ def download(  # pylint: disable=E0012,C0330,R0913
             project_id=project_id, sample_ids=s_ids, file_types=f_types
         ),
         Credentials(email=email, password=password, api_key=api_key),
-        DownloadOptions(host, skip_existing, download_template),
+        DownloadOptions(
+            host=host,
+            skip_existing=skip_existing,
+            download_template=download_template,
+        ),
         download_urls,
         no_progress,
     ).run()

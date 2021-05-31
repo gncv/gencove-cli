@@ -23,5 +23,5 @@ def list_uploads(  # pylint: disable=E0012,C0330,R0913
     """List user uploads."""
     ListSampleSheet(
         Credentials(email=email, password=password, api_key=api_key),
-        UploadsOptions(host, status, search),
+        UploadsOptions(host=host, status=status, search=search),
     ).run()

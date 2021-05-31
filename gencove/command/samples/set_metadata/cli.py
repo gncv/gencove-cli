@@ -29,5 +29,5 @@ def set_metadata(
         sample_id,
         json,
         Credentials(email=email, password=password, api_key=api_key),
-        Optionals(host),
+        Optionals(host=host),
     ).run()

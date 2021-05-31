@@ -1,11 +1,11 @@
 """Constants for run-prefix command."""
 from typing import Optional
 
-from gencove.constants import BaseOptionals
+from gencove.constants import Optionals
 
 
 # pylint: disable=too-few-public-methods
-class RunPrefixOptionals(BaseOptionals):
+class RunPrefixOptionals(Optionals):
     """RunPrefixOptionals model"""
 
     metadata_json: Optional[str]

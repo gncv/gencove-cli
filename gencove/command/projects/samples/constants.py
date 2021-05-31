@@ -1,11 +1,11 @@
 """Describe constants in samples subcommand."""
 from typing import Optional
 
-from gencove.constants import BaseOptionals
+from gencove.constants import Optionals
 
 
 # pylint: disable=too-few-public-methods
-class SamplesOptions(BaseOptionals):
+class SamplesOptions(Optionals):
     """SamplesOptions model"""
 
     status: Optional[str]

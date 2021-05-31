@@ -15,5 +15,5 @@ def list_project_batches(project_id, host, email, password, api_key):
     ListBatches(
         project_id,
         Credentials(email=email, password=password, api_key=api_key),
-        Optionals(host),
+        Optionals(host=host),
     ).run()

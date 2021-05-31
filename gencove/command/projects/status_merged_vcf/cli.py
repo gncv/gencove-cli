@@ -21,5 +21,5 @@ def status_merged_vcf(
     StatusMergedVCF(
         project_id,
         Credentials(email=email, password=password, api_key=api_key),
-        Optionals(host),
+        Optionals(host=host),
     ).run()

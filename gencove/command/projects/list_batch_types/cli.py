@@ -15,5 +15,5 @@ def list_project_batch_types(project_id, host, email, password, api_key):
     ListBatchTypes(
         project_id,
         Credentials(email=email, password=password, api_key=api_key),
-        Optionals(host),
+        Optionals(host=host),
     ).run()

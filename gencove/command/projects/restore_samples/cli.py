@@ -37,5 +37,5 @@ def restore_project_samples(  # pylint: disable=too-many-arguments
         project_id,
         sample_ids,
         Credentials(email=email, password=password, api_key=api_key),
-        Optionals(host),
+        Optionals(host=host),
     ).run()

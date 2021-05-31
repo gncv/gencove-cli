@@ -47,5 +47,5 @@ def create_project_batch(  # pylint: disable=too-many-arguments
         batch_name,
         sample_ids,
         Credentials(email=email, password=password, api_key=api_key),
-        Optionals(host),
+        Optionals(host=host),
     ).run()

@@ -21,5 +21,5 @@ def create_merged_vcf(
     CreateMergedVCF(
         project_id,
         Credentials(email=email, password=password, api_key=api_key),
-        Optionals(host),
+        Optionals(host=host),
     ).run()

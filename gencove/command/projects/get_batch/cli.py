@@ -31,6 +31,6 @@ def get_batch(
         batch_id,
         output_filename,
         Credentials(email=email, password=password, api_key=api_key),
-        Optionals(host),
+        Optionals(host=host),
         no_progress,
     ).run()

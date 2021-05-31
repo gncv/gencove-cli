@@ -1,5 +1,4 @@
 """Describe all constants in Gencove CLI."""
-from collections import namedtuple
 from enum import Enum, unique
 from typing import Optional
 
@@ -109,12 +108,9 @@ class Credentials(BaseModel):
     api_key: str
 
 
-Optionals = namedtuple("Optionals", ["host"])
-
-
 # pylint: disable=too-few-public-methods
-class BaseOptionals(BaseModel):
-    """BaseOptionals model"""
+class Optionals(BaseModel):
+    """Optionals model"""
 
     host: Optional[str]
 

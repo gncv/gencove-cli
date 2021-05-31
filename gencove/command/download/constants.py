@@ -6,8 +6,8 @@ from typing import Optional, Tuple
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
 from gencove.constants import (  # noqa: I100
-    BaseOptionals,
     DownloadTemplateParts,
+    Optionals,
 )
 
 
@@ -56,7 +56,7 @@ class DownloadFilters(BaseModel):
 
 
 # pylint: disable=too-few-public-methods
-class DownloadOptions(BaseOptionals):
+class DownloadOptions(Optionals):
     """DownloadOptions model"""
 
     skip_existing: Optional[bool]

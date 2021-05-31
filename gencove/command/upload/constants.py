@@ -4,7 +4,7 @@ from typing import Optional
 
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
-from gencove.constants import BaseOptionals  # noqa: I100
+from gencove.constants import Optionals  # noqa: I100
 
 # pylint: disable=invalid-name
 
@@ -28,7 +28,7 @@ FASTQ_EXTENSIONS = (".fastq.gz", ".fastq.bgz", ".fq.gz", ".fq.bgz")
 
 
 # pylint: disable=too-few-public-methods
-class UploadOptions(BaseOptionals):
+class UploadOptions(Optionals):
     """UploadOptions model"""
 
     project_id: Optional[str]

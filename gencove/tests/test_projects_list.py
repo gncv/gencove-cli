@@ -14,7 +14,7 @@ from gencove.client import (
     APIClientTimeout,
 )  # noqa: I100
 from gencove.command.projects.cli import list_projects
-from gencove.command.projects.list.constants import (
+from gencove.models import (
     PipelineCapabilities,
     Project,
 )

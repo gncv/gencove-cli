@@ -1,6 +1,7 @@
 """Describe all constants in Gencove CLI."""
 from collections import namedtuple
 from enum import Enum, unique
+from typing import Optional
 
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
@@ -109,6 +110,13 @@ class Credentials(BaseModel):
 
 
 Optionals = namedtuple("Optionals", ["host"])
+
+
+# pylint: disable=too-few-public-methods
+class BaseOptionals(BaseModel):
+    """BaseOptionals model"""
+
+    host: Optional[str]
 
 
 @unique

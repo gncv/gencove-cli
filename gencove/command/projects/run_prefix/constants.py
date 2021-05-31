@@ -1,13 +1,12 @@
 """Constants for run-prefix command."""
-from collections import namedtuple
+from typing import Optional
 
-from gencove.constants import Optionals
+from gencove.constants import BaseOptionals
 
-RunPrefixOptionals = namedtuple(
-    "RunPrefixOptionals",
-    Optionals._fields
-    + (
-        "metadata_json",
-        "status",
-    ),
-)
+
+# pylint: disable=too-few-public-methods
+class RunPrefixOptionals(BaseOptionals):
+    """RunPrefixOptionals model"""
+
+    metadata_json: Optional[str]
+    status: Optional[str]

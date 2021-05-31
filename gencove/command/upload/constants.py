@@ -1,10 +1,10 @@
 """Constants for upload command."""
-from collections import namedtuple
 from enum import Enum, unique
+from typing import Optional
 
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
-from gencove.constants import Optionals  # noqa: I100
+from gencove.constants import BaseOptionals  # noqa: I100
 
 # pylint: disable=invalid-name
 
@@ -26,9 +26,14 @@ class UploadStatuses(Enum):
 
 FASTQ_EXTENSIONS = (".fastq.gz", ".fastq.bgz", ".fq.gz", ".fq.bgz")
 
-UploadOptions = namedtuple(
-    "UploadOptions", Optionals._fields + ("project_id", "metadata")
-)
+
+# pylint: disable=too-few-public-methods
+class UploadOptions(BaseOptionals):
+    """UploadOptions model"""
+
+    project_id: Optional[str]
+    metadata: Optional[str]
+
 
 ASSIGN_ERROR = (
     "Your files were successfully uploaded, "

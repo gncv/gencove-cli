@@ -1,9 +1,13 @@
 """Describe constants in samples subcommand."""
-from collections import namedtuple
+from typing import Optional
 
-from gencove.constants import Optionals
+from gencove.constants import BaseOptionals
 
-SamplesOptions = namedtuple(  # pylint: disable=invalid-name
-    "SamplesOptions",
-    Optionals._fields + ("status", "archive_status", "search"),
-)
+
+# pylint: disable=too-few-public-methods
+class SamplesOptions(BaseOptionals):
+    """SamplesOptions model"""
+
+    status: Optional[str]
+    archive_status: Optional[str]
+    search: Optional[str]

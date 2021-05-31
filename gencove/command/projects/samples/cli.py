@@ -37,5 +37,10 @@ def list_project_samples(  # pylint: disable=E0012,C0330,R0913
     ListSamples(
         project_id,
         Credentials(email=email, password=password, api_key=api_key),
-        SamplesOptions(host, status, archive_status, search),
+        SamplesOptions(
+            host=host,
+            status=status,
+            archive_status=archive_status,
+            search=search,
+        ),
     ).run()

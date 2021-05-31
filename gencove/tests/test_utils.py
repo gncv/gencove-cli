@@ -239,20 +239,22 @@ def test_fastqs_map_file_path_does_not_exist():
 
 def test_fastqs_map_file_has_wrong_header():
     """Test that header is validated properly."""
-    with open("test_map.csv", "w") as map_file:
-        writer = csv.writer(map_file)
-        writer.writerows(
-            [
-                ["client_id", "r1_notation", "path"],
-                ["barid", "r1", "test_dir/test.fastq.gz"],
-                ["barid", "r1", "test_dir/test_3.fastq.gz"],
-                ["barid", "r1", "test_dir/i_dont_exist.fastq.gz"],
-            ]
-        )
-    try:
-        parse_fastqs_map_file("test_map.csv")
-    except ValidationError as err:
-        assert "Unexpected CSV header" in err.args[0]
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        with open("test_map.csv", "w") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r1_notation", "path"],
+                    ["barid", "r1", "test_dir/test.fastq.gz"],
+                    ["barid", "r1", "test_dir/test_3.fastq.gz"],
+                    ["barid", "r1", "test_dir/i_dont_exist.fastq.gz"],
+                ]
+            )
+        try:
+            parse_fastqs_map_file("test_map.csv")
+        except ValidationError as err:
+            assert "Unexpected CSV header" in err.args[0]
 
 
 def test__validate_header():

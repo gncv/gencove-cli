@@ -19,9 +19,9 @@ TMP_UPLOADS_WARNING = (
 class UploadStatuses(Enum):
     """UploadStatuses enum"""
 
-    done = "succeeded"
-    started = "started"
-    failed = "failed"
+    DONE = "succeeded"
+    STARTED = "started"
+    FAILED = "failed"
 
 
 FASTQ_EXTENSIONS = (".fastq.gz", ".fastq.bgz", ".fq.gz", ".fq.bgz")

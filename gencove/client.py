@@ -437,7 +437,9 @@ class APIClient:
             },
         )
         return self._get(
-            self.endpoints.SAMPLE_SHEET, query_params=params, authorized=True
+            self.endpoints.SAMPLE_SHEET.value,
+            query_params=params,
+            authorized=True,
         )
 
     def list_projects(self, next_link=None):
@@ -460,7 +462,9 @@ class APIClient:
         """
         params = self._add_query_params(next_link)
         return self._get(
-            self.endpoints.PROJECTS, query_params=params, authorized=True
+            self.endpoints.PROJECTS.value,
+            query_params=params,
+            authorized=True,
         )
 
     def get_pipeline_capabilities(self, pipeline_id):
@@ -533,7 +537,7 @@ class APIClient:
 
     def get_project(self, project_id):
         """Get single project."""
-        project_endpoint = self.endpoints.PROJECTS.value.format(id=project_id)
+        project_endpoint = f"{self.endpoints.PROJECTS.value}{project_id}"
         return self._get(project_endpoint, authorized=True)
 
     def create_merged_vcf(self, project_id):

@@ -69,7 +69,7 @@ class Download(Command):
             try:
                 samples_generator = self._get_paginated_samples()
                 for sample in samples_generator:
-                    self.sample_ids.add(sample["id"])
+                    self.sample_ids.add(sample.id)
             except client.APIClientError as err:
                 raise ValidationError(
                     "Project id {} not found.".format(self.filters.project_id)
@@ -350,9 +350,9 @@ class Download(Command):
                 next_page,
                 sample_archive_status=SAMPLE_ARCHIVE_STATUS.available,
             )
-            for sample in req["results"]:
+            for sample in req.results:
                 yield sample
-            next_page = req["meta"]["next"]
+            next_page = req.meta.next
             get_samples = next_page is not None
 
     def output_list(self):

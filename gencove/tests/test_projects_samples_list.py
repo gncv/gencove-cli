@@ -9,6 +9,7 @@ from click.testing import CliRunner
 from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.projects.cli import list_project_samples
 from gencove.logger import echo_data
+from gencove.models import GetProjectSamplesResponse
 
 
 def test_list_empty(mocker):
@@ -18,7 +19,9 @@ def test_list_empty(mocker):
     mocked_get_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
-        return_value=dict(results=[], meta=dict(next=None)),
+        return_value=GetProjectSamplesResponse(
+            results=[], meta=dict(next=None)
+        ),
     )
     res = runner.invoke(
         list_project_samples,
@@ -141,7 +144,9 @@ def test_list_project_samples(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_project_samples = mocker.patch.object(
-        APIClient, "get_project_samples", return_value=mocked_samples
+        APIClient,
+        "get_project_samples",
+        return_value=GetProjectSamplesResponse(**mocked_samples),
     )
 
     res = runner.invoke(

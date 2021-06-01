@@ -10,6 +10,7 @@ from click.testing import CliRunner
 
 from gencove.cli import download
 from gencove.client import APIClient
+from gencove.models import GetProjectSamplesResponse
 
 
 def test_no_required_options():
@@ -64,7 +65,9 @@ def test_project_id_provided(mocker):
         mocked_project_samples = mocker.patch.object(
             APIClient,
             "get_project_samples",
-            return_value={"results": [{"id": 0}], "meta": {"next": None}},
+            return_value=GetProjectSamplesResponse(
+                **{"results": [{"id": 0}], "meta": {"next": None}}
+            ),
         )
         mocked_sample_details = mocker.patch.object(
             APIClient,
@@ -341,7 +344,9 @@ def test_download_stdout_no_flag(mocker):
     mocked_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
-        return_value={"results": [{"id": 0}], "meta": {"next": None}},
+        return_value=GetProjectSamplesResponse(
+            **{"results": [{"id": 0}], "meta": {"next": None}}
+        ),
     )
     res = runner.invoke(
         download,
@@ -371,7 +376,9 @@ def test_download_stdout_with_flag(mocker):
     mocked_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
-        return_value={"results": [{"id": 0}], "meta": {"next": None}},
+        return_value=GetProjectSamplesResponse(
+            **{"results": [{"id": 0}], "meta": {"next": None}}
+        ),
     )
     last_status_id = str(uuid4())
     archive_last_status_id = str(uuid4())
@@ -458,7 +465,9 @@ def test_download_urls_to_file(mocker):
     mocked_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
-        return_value={"results": [{"id": 0}], "meta": {"next": None}},
+        return_value=GetProjectSamplesResponse(
+            **{"results": [{"id": 0}], "meta": {"next": None}}
+        ),
     )
     last_status_id = str(uuid4())
     archive_last_status_id = str(uuid4())
@@ -594,7 +603,9 @@ def test_project_id_provided_skip_existing_qc_and_metadata(mocker):
         mocked_project_samples = mocker.patch.object(
             APIClient,
             "get_project_samples",
-            return_value={"results": [{"id": 0}], "meta": {"next": None}},
+            return_value=GetProjectSamplesResponse(
+                **{"results": [{"id": 0}], "meta": {"next": None}}
+            ),
         )
         mocked_sample_details = mocker.patch.object(
             APIClient,
@@ -767,7 +778,9 @@ def test_project_id_provided_filter_not_archived(mocker):
         mocked_project_samples = mocker.patch.object(
             APIClient,
             "get_project_samples",
-            return_value={"results": [], "meta": {"next": None}},
+            return_value=GetProjectSamplesResponse(
+                **{"results": [], "meta": {"next": None}}
+            ),
         )
         mocked_sample_details = mocker.patch.object(
             APIClient,

@@ -12,10 +12,10 @@ def get_line(sample):
     """
     return "\t".join(
         [
-            sample["last_status"]["created"],
-            sample["id"],
-            sample["client_id"],
-            sample["last_status"]["status"],
-            sample["archive_last_status"]["status"],
+            sample.last_status.created.isoformat(),
+            str(sample.id),
+            str(sample.client_id),
+            sample.last_status.status,
+            sample.archive_last_status.status,
         ]
     )

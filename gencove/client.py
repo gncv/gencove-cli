@@ -29,6 +29,7 @@ from gencove.constants import (
 from gencove.logger import echo_debug
 from gencove.models import (
     CreateJWTResponse,
+    GetProjectSamplesResponse,
     RefreshJWTResponse,
     UploadCredentialsResponse,
     UploadsPostDataResponse,
@@ -390,7 +391,10 @@ class APIClient:
             },
         )
         return self._get(
-            project_endpoint, query_params=params, authorized=True
+            project_endpoint,
+            query_params=params,
+            authorized=True,
+            model=GetProjectSamplesResponse,
         )
 
     def add_samples_to_project(self, samples, project_id, metadata=None):

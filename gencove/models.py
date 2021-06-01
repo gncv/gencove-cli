@@ -63,7 +63,7 @@ class UploadsPostDataResponse(BaseModel):
 class ResponseMeta(BaseModel):
     """ResponseMeta model"""
 
-    count: int
+    count: Optional[int]
     next: Optional[str]
     previous: Optional[str]
 
@@ -110,16 +110,19 @@ class SampleFile(GencoveBaseModel):
     file_type: str
 
 
-class SampleDetails(GencoveBaseModel):
+class SampleDetails(BaseModel):
     """SampleDetails model"""
 
-    created: datetime
-    modified: datetime
-    client_id: str
-    physical_id: str
-    legacy_id: str
-    last_status: StatusObject
-    archive_last_status: StatusObject
+    # Should migrate id to GencoveBaseModel,
+    # current type are for tests compatibility
+    id: Optional[Union[UUID, str]]
+    created: Optional[datetime]
+    modified: Optional[datetime]
+    client_id: Optional[str]
+    physical_id: Optional[str]
+    legacy_id: Optional[str]
+    last_status: Optional[StatusObject]
+    archive_last_status: Optional[StatusObject]
     files: Optional[List[SampleFile]]
 
 

@@ -27,7 +27,11 @@ from gencove.constants import (
     SORT_ORDER,
 )
 from gencove.logger import echo_debug
-from gencove.models import RefreshJWTResponse, VerifyJWTResponse
+from gencove.models import (
+    CreateJWTResponse,
+    RefreshJWTResponse,
+    VerifyJWTResponse,
+)
 from gencove.version import version as cli_version
 
 
@@ -327,12 +331,13 @@ class APIClient:
             self.endpoints.get_jwt,
             dict(email=email, password=password),
             sensitive=True,
+            model=CreateJWTResponse,
         )
 
     def login(self, email, password):
         """Log user in."""
         jwt = self.get_jwt(email, password)
-        self._set_jwt(jwt["access"], jwt["refresh"])
+        self._set_jwt(jwt.access, jwt.refresh)
 
     def get_upload_details(self, gncv_file_path):
         """Get file upload details.

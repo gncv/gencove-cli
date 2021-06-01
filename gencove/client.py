@@ -27,7 +27,7 @@ from gencove.constants import (
     SORT_ORDER,
 )
 from gencove.logger import echo_debug
-from gencove.models import RefreshJWTResponse
+from gencove.models import RefreshJWTResponse, VerifyJWTResponse
 from gencove.version import version as cli_version
 
 
@@ -315,7 +315,10 @@ class APIClient:
     def validate_token(self, token):
         """Validate jwt token."""
         return self._post(
-            self.endpoints.verify_jwt, {"token": token}, sensitive=True
+            self.endpoints.verify_jwt,
+            {"token": token},
+            sensitive=True,
+            model=VerifyJWTResponse,
         )
 
     def get_jwt(self, email, password):

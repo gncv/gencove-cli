@@ -259,10 +259,11 @@ class APIClient:
         authorized=False,
         sensitive=False,
         refreshed=False,
+        model=None,
     ):
         headers = {} if not authorized else self._get_authorization()
         try:
-            return self._request(
+            response = self._request(
                 endpoint,
                 params=query_params,
                 method="get",
@@ -270,6 +271,9 @@ class APIClient:
                 custom_headers=headers,
                 sensitive=sensitive,
             )
+            if model:
+                return model(**response.json())
+            return response
         except APIClientError as err:
             if not refreshed and err.status_code and err.status_code == 401:
                 self._refresh_authentication()

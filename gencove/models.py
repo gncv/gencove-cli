@@ -37,21 +37,27 @@ class S3Object(BaseModel):
     object_name: str
 
 
-class StatusObject(GencoveBaseModel):
+class StatusObject(BaseModel):
     """StatusObject model"""
 
+    # Should migrate id to GencoveBaseModel,
+    # current type are for tests compatibility
+    id: Optional[Union[UUID, str]]
     status: str
     note: Optional[str]
-    created: datetime
+    created: Optional[datetime]
     transition_cutoff: Optional[datetime]
 
 
-class UploadsPostDataResponse(GencoveBaseModel):
+class UploadsPostDataResponse(BaseModel):
     """UploadsPostDataResponse model"""
 
-    destination_path: str
+    # Should migrate id to GencoveBaseModel,
+    # current type are for tests compatibility
+    id: Optional[Union[UUID, str]]
+    destination_path: Optional[str]
     s3: S3Object
-    last_status: StatusObject
+    last_status: Optional[StatusObject]
 
 
 class ResponseMeta(BaseModel):

@@ -165,7 +165,7 @@ def seek_files_to_upload(path, path_root=""):
 
 def get_get_upload_details_retry_predicate(resp):
     """Triggers retry if upload details came back without last status."""
-    return not resp["last_status"]
+    return not resp.last_status
 
 
 def get_filename_from_path(full_path, source):

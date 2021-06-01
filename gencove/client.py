@@ -30,6 +30,7 @@ from gencove.logger import echo_debug
 from gencove.models import (
     CreateJWTResponse,
     RefreshJWTResponse,
+    UploadCredentialsResponse,
     UploadsPostDataResponse,
     VerifyJWTResponse,
 )
@@ -361,6 +362,7 @@ class APIClient:
             self.endpoints.get_upload_credentials,
             authorized=True,
             sensitive=True,
+            model=UploadCredentialsResponse,
         )
 
     def get_project_samples(

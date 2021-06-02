@@ -1,7 +1,8 @@
 """Download command constants."""
 import re
+from uuid import UUID
 from enum import Enum, unique
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
@@ -50,8 +51,8 @@ CHUNK_SIZE = NUM_MB_IN_CHUNK * MEGABYTE
 class DownloadFilters(BaseModel):
     """DownloadFilters options"""
 
-    project_id: Optional[str]
-    sample_ids: Optional[Tuple[str, ...]]
+    project_id: Optional[Union[UUID, str]]
+    sample_ids: Optional[Tuple[Union[UUID, str], ...]]
     file_types: Optional[Tuple[str, ...]]
 
 

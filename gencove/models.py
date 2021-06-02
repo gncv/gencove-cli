@@ -13,21 +13,20 @@ class GencoveBaseModel(BaseModel):
     id: UUID
 
 
-class RefreshJWTResponse(BaseModel):
-    """RefreshJWTResponse model"""
+class AccessJWT(BaseModel):
+    """AccessJWT model"""
 
     access: str
 
 
-class CreateJWTResponse(BaseModel):
-    """CreateJWTResponse model"""
+class CreateJWT(AccessJWT):
+    """CreateJWT model"""
 
-    access: str
     refresh: str
 
 
-class VerifyJWTResponse(BaseModel):
-    """VerifyJWTResponse model"""
+class VerifyJWT(BaseModel):
+    """VerifyJWT model"""
 
 
 class S3Object(BaseModel):
@@ -37,8 +36,8 @@ class S3Object(BaseModel):
     object_name: Optional[str]
 
 
-class StatusObject(GencoveBaseModel):
-    """StatusObject model"""
+class GencoveStatus(GencoveBaseModel):
+    """GencoveStatus model"""
 
     status: Optional[str]
     note: Optional[str]
@@ -46,12 +45,12 @@ class StatusObject(GencoveBaseModel):
     transition_cutoff: Optional[datetime]
 
 
-class UploadsPostDataResponse(GencoveBaseModel):
-    """UploadsPostDataResponse model"""
+class UploadsPostData(GencoveBaseModel):
+    """UploadsPostData model"""
 
     destination_path: Optional[str]
     s3: Optional[S3Object]
-    last_status: Optional[StatusObject]
+    last_status: Optional[GencoveStatus]
 
 
 class ResponseMeta(BaseModel):
@@ -85,8 +84,8 @@ class Project(GencoveBaseModel):
     webhook_url: Optional[HttpUrl]  # deprecated
 
 
-class UploadCredentialsResponse(BaseModel):
-    """UploadCredentialsResponse model"""
+class UploadCredentials(BaseModel):
+    """UploadCredentials model"""
 
     version: Optional[int]
     access_key: Optional[str]
@@ -112,13 +111,13 @@ class SampleDetails(GencoveBaseModel):
     client_id: Optional[str]
     physical_id: Optional[str]
     legacy_id: Optional[str]
-    last_status: Optional[StatusObject]
-    archive_last_status: Optional[StatusObject]
+    last_status: Optional[GencoveStatus]
+    archive_last_status: Optional[GencoveStatus]
     files: Optional[List[SampleFile]]
 
 
-class GetProjectSamplesResponse(BaseModel):
-    """GetProjectSamplesResponse model"""
+class ProjectSamples(BaseModel):
+    """ProjectSamples model"""
 
     meta: ResponseMeta
     results: Optional[List[SampleDetails]]
@@ -137,17 +136,17 @@ class Fastqs(BaseModel):
     r2: Optional[UploadCreate]
 
 
-class SampleSheetCreate(BaseModel):
-    """SampleSheetCreate model"""
+class SampleSheet(BaseModel):
+    """SampleSheet model"""
 
     client_id: Optional[str]
     fastq: Optional[Fastqs]
 
 
-class CreateProjectSamplesResponse(BaseModel):
-    """CreateProjectSamplesResponse model"""
+class UploadSamples(BaseModel):
+    """UploadSamples model"""
 
-    uploads: Optional[List[SampleSheetCreate]]
+    uploads: Optional[List[SampleSheet]]
     metadata: Optional[Any]
 
 
@@ -158,8 +157,8 @@ class QualityControlType(BaseModel):
     type: Optional[str]
 
 
-class QualityControlSelf(BaseModel):
-    """QualityControlSelf model"""
+class QualityControlData(BaseModel):
+    """QualityControlData model"""
 
     value_expected: Optional[float]
     value_measured: Optional[float]
@@ -170,11 +169,11 @@ class QualityControl(BaseModel):
     """QualityControl model"""
 
     quality_control_type: Optional[QualityControlType]
-    quality_control: Optional[QualityControlSelf]
+    quality_control: Optional[QualityControlData]
 
 
-class SampleQCResponse(BaseModel):
-    """SampleQCResponse model"""
+class SampleQC(BaseModel):
+    """SampleQC model"""
 
     meta: ResponseMeta
     results: Optional[List[QualityControl]]
@@ -185,25 +184,25 @@ class UploadNestedList(BaseModel):
 
     upload: Optional[UUID]
     destination_path: Optional[str]
-    last_status: Optional[StatusObject]
+    last_status: Optional[GencoveStatus]
 
 
-class UploadFastQ(BaseModel):
-    """UploadFastQ model"""
+class ClientFastQ(BaseModel):
+    """ClientFastQ model"""
 
     client_id: Optional[str]
     fastq: Optional[UploadNestedList]
 
 
-class SampleSheetResponse(BaseModel):
-    """SampleSheetResponse model"""
+class UploadFastQ(BaseModel):
+    """UploadFastQ model"""
 
     meta: ResponseMeta
-    results: Optional[List[UploadFastQ]]
+    results: Optional[List[ClientFastQ]]
 
 
-class GetProjectsResponse(BaseModel):
-    """GetProjectsResponse model"""
+class Projects(BaseModel):
+    """Projects model"""
 
     meta: ResponseMeta
     results: Optional[List[Project]]
@@ -216,8 +215,8 @@ class BatchType(BaseModel):
     description: Optional[str]
 
 
-class ProjectBatchTypesResponse(BaseModel):
-    """ProjectBatchTypesResponse model"""
+class ProjectBatchTypes(BaseModel):
+    """ProjectBatchTypes model"""
 
     meta: ResponseMeta
     results: Optional[List[BatchType]]
@@ -229,12 +228,12 @@ class BatchDetail(GencoveBaseModel):
     name: Optional[str]
     batch_type: Optional[str]
     sample_ids: Optional[List[UUID]]
-    last_status: Optional[StatusObject]
+    last_status: Optional[GencoveStatus]
     files: Optional[List[SampleFile]]
 
 
-class GetProjectBatchesResponse(BaseModel):
-    """GetProjectBatchesResponse model"""
+class ProjectBatches(BaseModel):
+    """ProjectBatches model"""
 
     meta: ResponseMeta
     results: Optional[List[BatchDetail]]
@@ -245,7 +244,7 @@ class ProjectMergeVCFs(GencoveBaseModel):
 
     created: Optional[datetime]
     user: Optional[UUID]
-    last_status: Optional[StatusObject]
+    last_status: Optional[GencoveStatus]
     up_to_date: Optional[bool]
 
 

@@ -27,7 +27,7 @@ from gencove.constants import (
     SORT_ORDER,
 )
 from gencove.logger import echo_debug
-from gencove.models import RefreshJWTResponse
+from gencove.models import AccessJWT
 from gencove.version import version as cli_version
 
 
@@ -305,7 +305,7 @@ class APIClient:
             self.endpoints.refresh_jwt,
             {"refresh": refresh_token},
             sensitive=True,
-            model=RefreshJWTResponse,
+            model=AccessJWT,
         )
 
     def validate_token(self, token):

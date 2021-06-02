@@ -7,6 +7,7 @@ from gencove.constants import (
     SampleArchiveStatus,
     SampleStatus,
 )
+from gencove.utils import enum_as_dict
 
 from .constants import SamplesOptions
 from .main import ListSamples
@@ -20,13 +21,13 @@ from .main import ListSamples
 @click.option(
     "--status",
     help="Get samples with specific status",
-    type=click.Choice(SampleStatus._asdict().values()),
+    type=click.Choice(enum_as_dict(SampleStatus).values()),
     default=SampleStatus.ALL.value,
 )
 @click.option(
     "--archive-status",
     help="Get samples with specific archive status",
-    type=click.Choice(SampleArchiveStatus._asdict().values()),
+    type=click.Choice(enum_as_dict(SampleArchiveStatus).values()),
     default=SampleArchiveStatus.ALL.value,
 )
 @add_options(common_options)

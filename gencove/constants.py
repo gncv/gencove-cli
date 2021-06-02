@@ -38,10 +38,6 @@ class SampleAssignmentStatus(Enum):
     UNASSIGNED = "unassigned"
     ASSIGNED = "assigned"
 
-    @classmethod
-    def _asdict(cls):
-        return {s.name: s.value for s in cls}
-
 
 @unique
 class SampleSheetSortBy(Enum):
@@ -61,10 +57,6 @@ class SampleStatus(Enum):
     RUNNING = "running"
     ALL = "all"
 
-    @classmethod
-    def _asdict(cls):
-        return {s.name: s.value for s in cls}
-
 
 @unique
 class SampleArchiveStatus(Enum):
@@ -74,10 +66,6 @@ class SampleArchiveStatus(Enum):
     ARCHIVED = "archived"
     RESTORE_REQUESTED = "restore_requested"
     ALL = "all"
-
-    @classmethod
-    def _asdict(cls):
-        return {s.name: s.value for s in cls}
 
 
 @unique
@@ -124,10 +112,6 @@ class DownloadTemplateParts(Enum):
     FILE_TYPE = "file_type"
     FILE_EXTENSION = "file_extension"
     DEFAULT_FILENAME = "default_filename"
-
-    @classmethod
-    def _asdict(cls):
-        return {s.name: s.value for s in cls}
 
 
 DOWNLOAD_TEMPLATE = "{{{}}}/{{{}}}/{{{}}}".format(

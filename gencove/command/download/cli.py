@@ -8,6 +8,7 @@ from gencove.constants import (
     DownloadTemplateParts,
 )
 from gencove.logger import echo_debug
+from gencove.utils import enum_as_dict
 
 from .constants import DownloadFilters, DownloadOptions
 from .main import Download
@@ -45,7 +46,7 @@ from .main import Download
             "\n".join(
                 [
                     "{{{}}}".format(v)
-                    for v in DownloadTemplateParts._asdict().values()
+                    for v in enum_as_dict(DownloadTemplateParts).values()
                 ]
             ),
         )

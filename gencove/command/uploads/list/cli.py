@@ -3,6 +3,7 @@ import click
 
 from gencove.command.common_cli_options import add_options, common_options
 from gencove.constants import Credentials, SampleAssignmentStatus
+from gencove.utils import enum_as_dict
 
 from .constants import UploadsOptions
 from .main import ListSampleSheet
@@ -13,7 +14,7 @@ from .main import ListSampleSheet
 @click.option(
     "--status",
     help="Filter uploads by status of assignment",
-    type=click.Choice(SampleAssignmentStatus._asdict().values()),
+    type=click.Choice(enum_as_dict(SampleAssignmentStatus).values()),
     default=SampleAssignmentStatus.ALL.value,
 )
 @add_options(common_options)

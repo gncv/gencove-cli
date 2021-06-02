@@ -17,6 +17,7 @@ from gencove.command.upload.utils import (
 from gencove.command.utils import is_valid_uuid
 from gencove.constants import DOWNLOAD_TEMPLATE, DownloadTemplateParts
 from gencove.exceptions import ValidationError
+from gencove.utils import enum_as_dict
 
 
 def test_upload_file(mocker):
@@ -43,7 +44,7 @@ def test_download_template_tokens():
         "file_type",
         "file_extension",
         "default_filename",
-    ] == list(DownloadTemplateParts._asdict().values())
+    ] == list(enum_as_dict(DownloadTemplateParts).values())
 
 
 # pylint: disable=too-many-locals

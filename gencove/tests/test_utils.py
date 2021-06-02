@@ -240,6 +240,8 @@ def test_fastqs_map_file_path_does_not_exist():
 def test_fastqs_map_file_has_wrong_header():
     """Test that header is validated properly."""
     runner = CliRunner()
+    # This context manager is used to avoid unnecessarily creating a
+    # test_map.csv file in the root of the project on every test run
     with runner.isolated_filesystem():
         with open("test_map.csv", "w") as map_file:
             writer = csv.writer(map_file)

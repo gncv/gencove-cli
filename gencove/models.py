@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any, List, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, HttpUrl  # pylint: disable=no-name-in-module
+from pydantic import BaseModel, HttpUrl
 
 
 # pylint: disable=too-few-public-methods

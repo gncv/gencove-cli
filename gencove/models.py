@@ -39,7 +39,7 @@ class S3Object(BaseModel):
 class GencoveStatus(BaseModel):
     """GencoveStatus model"""
 
-    # TODO: migrate id to GencoveBaseModel,
+    # migrate id to GencoveBaseModel,
     # current type are for tests compatibility
     id: Optional[Union[UUID, str]]
     status: Optional[str]
@@ -51,7 +51,7 @@ class GencoveStatus(BaseModel):
 class UploadsPostData(BaseModel):
     """UploadsPostData model"""
 
-    # TODO: migrate id to GencoveBaseModel,
+    # migrate id to GencoveBaseModel,
     # current type are for tests compatibility
     id: Optional[Union[UUID, str]]
     destination_path: Optional[str]
@@ -112,7 +112,7 @@ class SampleFile(GencoveBaseModel):
 class SampleDetails(BaseModel):
     """SampleDetails model"""
 
-    # TODO: migrate id to GencoveBaseModel,
+    # migrate id to GencoveBaseModel,
     # current type are for tests compatibility
     id: Optional[Union[UUID, str]]
     created: Optional[datetime]

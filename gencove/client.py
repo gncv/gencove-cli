@@ -28,10 +28,11 @@ from gencove.constants import (
 )
 from gencove.logger import echo_debug
 from gencove.models import (
+    AccessJWT,
     CreateJWT,
     ProjectSamples,
-    AccessJWT,
     UploadCredentials,
+    UploadsPostData,
     VerifyJWT,
 )
 from gencove.version import version as cli_version
@@ -353,7 +354,7 @@ class APIClient:
             self.endpoints.upload_details,
             dict(destination_path=gncv_file_path),
             authorized=True,
-            model=UploadsPostDataResponse,
+            model=UploadsPostData,
         )
 
     def get_upload_credentials(self):

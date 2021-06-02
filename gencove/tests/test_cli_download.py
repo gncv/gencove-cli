@@ -10,7 +10,7 @@ from click.testing import CliRunner
 
 from gencove.cli import download
 from gencove.client import APIClient
-from gencove.models import GetProjectSamplesResponse
+from gencove.models import ProjectSamples
 
 
 def test_no_required_options():
@@ -65,7 +65,7 @@ def test_project_id_provided(mocker):
         mocked_project_samples = mocker.patch.object(
             APIClient,
             "get_project_samples",
-            return_value=GetProjectSamplesResponse(
+            return_value=ProjectSamples(
                 **{"results": [{"id": 0}], "meta": {"next": None}}
             ),
         )
@@ -344,7 +344,7 @@ def test_download_stdout_no_flag(mocker):
     mocked_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
-        return_value=GetProjectSamplesResponse(
+        return_value=ProjectSamples(
             **{"results": [{"id": 0}], "meta": {"next": None}}
         ),
     )
@@ -376,7 +376,7 @@ def test_download_stdout_with_flag(mocker):
     mocked_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
-        return_value=GetProjectSamplesResponse(
+        return_value=ProjectSamples(
             **{"results": [{"id": 0}], "meta": {"next": None}}
         ),
     )
@@ -465,7 +465,7 @@ def test_download_urls_to_file(mocker):
     mocked_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
-        return_value=GetProjectSamplesResponse(
+        return_value=ProjectSamples(
             **{"results": [{"id": 0}], "meta": {"next": None}}
         ),
     )
@@ -603,7 +603,7 @@ def test_project_id_provided_skip_existing_qc_and_metadata(mocker):
         mocked_project_samples = mocker.patch.object(
             APIClient,
             "get_project_samples",
-            return_value=GetProjectSamplesResponse(
+            return_value=ProjectSamples(
                 **{"results": [{"id": 0}], "meta": {"next": None}}
             ),
         )
@@ -778,7 +778,7 @@ def test_project_id_provided_filter_not_archived(mocker):
         mocked_project_samples = mocker.patch.object(
             APIClient,
             "get_project_samples",
-            return_value=GetProjectSamplesResponse(
+            return_value=ProjectSamples(
                 **{"results": [], "meta": {"next": None}}
             ),
         )

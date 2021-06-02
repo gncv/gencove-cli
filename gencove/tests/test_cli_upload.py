@@ -11,7 +11,7 @@ from click.testing import CliRunner
 from gencove.cli import upload
 from gencove.client import APIClient, APIClientTimeout
 from gencove.constants import UPLOAD_PREFIX
-from gencove.models import UploadsPostDataResponse
+from gencove.models import UploadsPostData
 
 
 def test_upload(mocker):
@@ -31,7 +31,7 @@ def test_upload(mocker):
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value=UploadsPostDataResponse(
+            return_value=UploadsPostData(
                 **{
                     "last_status": {"status": ""},
                     "s3": {"bucket": "test", "object_name": "test"},
@@ -149,7 +149,7 @@ def test_upload_and_run_immediately(mocker):
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value=UploadsPostDataResponse(
+            return_value=UploadsPostData(
                 **{
                     "id": "test",
                     "last_status": {"status": ""},
@@ -217,7 +217,7 @@ def test_upload_and_run_immediately__with_metadata(mocker):
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value=UploadsPostDataResponse(
+            return_value=UploadsPostData(
                 **{
                     "id": "test",
                     "last_status": {"status": ""},
@@ -287,7 +287,7 @@ def test_upload_and_run_immediately__invalid_metadata(mocker):
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value=UploadsPostDataResponse(
+            return_value=UploadsPostData(
                 **{
                     "id": "test",
                     "last_status": {"status": ""},
@@ -387,7 +387,7 @@ def test_upload_and_run_immediately_something_went_wrong(mocker):
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value=UploadsPostDataResponse(
+            return_value=UploadsPostData(
                 **{
                     "id": "test",
                     "last_status": {"status": ""},
@@ -446,7 +446,7 @@ def test_upload_and_run_immediately_with_output_to_file(mocker):
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value=UploadsPostDataResponse(
+            return_value=UploadsPostData(
                 **{
                     "id": "test",
                     "last_status": {"status": ""},
@@ -526,7 +526,7 @@ def test_upload_and_run_immediately_with_output_to_nested_file(mocker):
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value=UploadsPostDataResponse(
+            return_value=UploadsPostData(
                 **{
                     "id": "test",
                     "last_status": {"status": ""},
@@ -605,7 +605,7 @@ def test_upload_and_run_immediately_with_stdout(mocker):
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value=UploadsPostDataResponse(
+            return_value=UploadsPostData(
                 **{
                     "id": "test",
                     "last_status": {"status": ""},
@@ -686,7 +686,7 @@ def test_upload_without_progressbar(mocker):
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value=UploadsPostDataResponse(
+            return_value=UploadsPostData(
                 **{
                     "id": "test",
                     "last_status": {"status": ""},
@@ -735,7 +735,7 @@ def test_upload_and_run_immediately_without_progressbar(mocker):
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value=UploadsPostDataResponse(
+            return_value=UploadsPostData(
                 **{
                     "id": "test",
                     "last_status": {"status": ""},
@@ -804,7 +804,7 @@ def test_upload_and_run_immediately_slow_response_retry(mocker):
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value=UploadsPostDataResponse(
+            return_value=UploadsPostData(
                 **{
                     "id": "test",
                     "last_status": {"status": ""},

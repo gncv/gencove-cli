@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any, List, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, HttpUrl  # pylint: disable=no-name-in-module
+from pydantic import BaseModel, HttpUrl
 
 
 # pylint: disable=too-few-public-methods
@@ -13,51 +13,50 @@ class GencoveBaseModel(BaseModel):
     id: UUID
 
 
-class RefreshJWTResponse(BaseModel):
-    """RefreshJWTResponse model"""
+class AccessJWT(BaseModel):
+    """AccessJWT model"""
 
     access: str
 
 
-class CreateJWTResponse(BaseModel):
-    """CreateJWTResponse model"""
+class CreateJWT(AccessJWT):
+    """CreateJWT model"""
 
-    access: str
     refresh: str
 
 
-class VerifyJWTResponse(BaseModel):
-    """VerifyJWTResponse model"""
+class VerifyJWT(BaseModel):
+    """VerifyJWT model"""
 
 
 class S3Object(BaseModel):
     """S3Object model"""
 
-    bucket: str
-    object_name: str
+    bucket: Optional[str]
+    object_name: Optional[str]
 
 
-class StatusObject(BaseModel):
-    """StatusObject model"""
+class GencoveStatus(BaseModel):
+    """GencoveStatus model"""
 
-    # Should migrate id to GencoveBaseModel,
+    # TODO: migrate id to GencoveBaseModel,
     # current type are for tests compatibility
     id: Optional[Union[UUID, str]]
-    status: str
+    status: Optional[str]
     note: Optional[str]
     created: Optional[datetime]
     transition_cutoff: Optional[datetime]
 
 
-class UploadsPostDataResponse(BaseModel):
-    """UploadsPostDataResponse model"""
+class UploadsPostData(BaseModel):
+    """UploadsPostData model"""
 
-    # Should migrate id to GencoveBaseModel,
+    # TODO: migrate id to GencoveBaseModel,
     # current type are for tests compatibility
     id: Optional[Union[UUID, str]]
     destination_path: Optional[str]
-    s3: S3Object
-    last_status: Optional[StatusObject]
+    s3: Optional[S3Object]
+    last_status: Optional[GencoveStatus]
 
 
 class ResponseMeta(BaseModel):
@@ -91,29 +90,29 @@ class Project(GencoveBaseModel):
     webhook_url: Optional[HttpUrl]  # deprecated
 
 
-class UploadCredentialsResponse(BaseModel):
-    """UploadCredentialsResponse model"""
+class UploadCredentials(BaseModel):
+    """UploadCredentials model"""
 
-    version: int
-    access_key: str
-    secret_key: str
-    token: str
-    expiry_time: datetime
+    version: Optional[int]
+    access_key: Optional[str]
+    secret_key: Optional[str]
+    token: Optional[str]
+    expiry_time: Optional[datetime]
 
 
 class SampleFile(GencoveBaseModel):
     """SampleFile model"""
 
-    s3_path: str
+    s3_path: Optional[str]
     size: Optional[int]
-    download_url: HttpUrl
-    file_type: str
+    download_url: Optional[HttpUrl]
+    file_type: Optional[str]
 
 
 class SampleDetails(BaseModel):
     """SampleDetails model"""
 
-    # Should migrate id to GencoveBaseModel,
+    # TODO: migrate id to GencoveBaseModel,
     # current type are for tests compatibility
     id: Optional[Union[UUID, str]]
     created: Optional[datetime]
@@ -121,13 +120,13 @@ class SampleDetails(BaseModel):
     client_id: Optional[str]
     physical_id: Optional[str]
     legacy_id: Optional[str]
-    last_status: Optional[StatusObject]
-    archive_last_status: Optional[StatusObject]
+    last_status: Optional[GencoveStatus]
+    archive_last_status: Optional[GencoveStatus]
     files: Optional[List[SampleFile]]
 
 
-class GetProjectSamplesResponse(BaseModel):
-    """GetProjectSamplesResponse model"""
+class ProjectSamples(BaseModel):
+    """ProjectSamples model"""
 
     meta: ResponseMeta
     results: Optional[List[SampleDetails]]
@@ -136,83 +135,83 @@ class GetProjectSamplesResponse(BaseModel):
 class UploadCreate(BaseModel):
     """UploadCreate model"""
 
-    upload: UUID
+    upload: Optional[UUID]
 
 
 class Fastqs(BaseModel):
     """Fastqs model"""
 
-    r1: UploadCreate
-    r2: UploadCreate
+    r1: Optional[UploadCreate]
+    r2: Optional[UploadCreate]
 
 
-class SampleSheetCreate(BaseModel):
-    """SampleSheetCreate model"""
+class SampleSheet(BaseModel):
+    """SampleSheet model"""
 
-    client_id: UUID
-    fastq: Fastqs
+    client_id: Optional[str]
+    fastq: Optional[Fastqs]
 
 
-class CreateProjectSamplesResponse(BaseModel):
-    """CreateProjectSamplesResponse model"""
+class UploadSamples(BaseModel):
+    """UploadSamples model"""
 
-    uploads: List[SampleSheetCreate]
+    uploads: Optional[List[SampleSheet]]
     metadata: Optional[Any]
 
 
 class QualityControlType(BaseModel):
     """QualityControlType model"""
 
-    key: str
-    type: str
+    key: Optional[str]
+    type: Optional[str]
 
 
-class QualityControlSelf(BaseModel):
-    """QualityControlSelf model"""
+class QualityControlData(BaseModel):
+    """QualityControlData model"""
 
     value_expected: Optional[float]
     value_measured: Optional[float]
-    status: str
+    status: Optional[str]
 
 
 class QualityControl(BaseModel):
     """QualityControl model"""
 
-    quality_control_type: QualityControlType
-    quality_control: QualityControlSelf
+    quality_control_type: Optional[QualityControlType]
+    quality_control: Optional[QualityControlData]
 
 
-class SampleQCResponse(BaseModel):
-    """SampleQCResponse model"""
+class SampleQC(BaseModel):
+    """SampleQC model"""
 
     meta: ResponseMeta
-    results: List[QualityControl]
+    results: Optional[List[QualityControl]]
 
 
 class UploadNestedList(BaseModel):
     """UploadNestedList model"""
 
-    upload: UUID
+    upload: Optional[UUID]
     destination_path: Optional[str]
-    last_status: StatusObject
+    last_status: Optional[GencoveStatus]
+
+
+class ClientFastQ(BaseModel):
+    """ClientFastQ model"""
+
+    client_id: Optional[str]
+    fastq: Optional[UploadNestedList]
 
 
 class UploadFastQ(BaseModel):
     """UploadFastQ model"""
 
-    client_id: UUID
-    fastq: UploadNestedList
-
-
-class SampleSheetResponse(BaseModel):
-    """SampleSheetResponse model"""
-
     meta: ResponseMeta
-    results: Optional[List[UploadFastQ]]
+    results: Optional[List[ClientFastQ]]
 
 
-class GetProjectsResponse(BaseModel):
-    """GetProjectsResponse model"""
+class Projects(BaseModel):
+    """Projects model"""
 
     meta: ResponseMeta
     results: Optional[List[Project]]
@@ -221,12 +220,12 @@ class GetProjectsResponse(BaseModel):
 class BatchType(BaseModel):
     """BatchType model"""
 
-    key: str
-    description: str
+    key: Optional[str]
+    description: Optional[str]
 
 
-class ProjectBatchTypesResponse(BaseModel):
-    """ProjectBatchTypesResponse model"""
+class ProjectBatchTypes(BaseModel):
+    """ProjectBatchTypes model"""
 
     meta: ResponseMeta
     results: Optional[List[BatchType]]
@@ -235,15 +234,15 @@ class ProjectBatchTypesResponse(BaseModel):
 class BatchDetail(GencoveBaseModel):
     """BatchDetail model"""
 
-    name: str
-    batch_type: str
+    name: Optional[str]
+    batch_type: Optional[str]
     sample_ids: Optional[List[UUID]]
-    last_status: StatusObject
-    files: List[SampleFile]
+    last_status: Optional[GencoveStatus]
+    files: Optional[List[SampleFile]]
 
 
-class GetProjectBatchesResponse(BaseModel):
-    """GetProjectBatchesResponse model"""
+class ProjectBatches(BaseModel):
+    """ProjectBatches model"""
 
     meta: ResponseMeta
     results: Optional[List[BatchDetail]]
@@ -252,10 +251,10 @@ class GetProjectBatchesResponse(BaseModel):
 class ProjectMergeVCFs(GencoveBaseModel):
     """ProjectMergeVCFs model"""
 
-    created: datetime
-    user: UUID
-    last_status: StatusObject
-    up_to_date: bool
+    created: Optional[datetime]
+    user: Optional[UUID]
+    last_status: Optional[GencoveStatus]
+    up_to_date: Optional[bool]
 
 
 class SampleMetadata(GencoveBaseModel):

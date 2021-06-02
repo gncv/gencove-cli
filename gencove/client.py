@@ -28,12 +28,11 @@ from gencove.constants import (
 )
 from gencove.logger import echo_debug
 from gencove.models import (
-    CreateJWTResponse,
-    GetProjectSamplesResponse,
-    RefreshJWTResponse,
-    UploadCredentialsResponse,
-    UploadsPostDataResponse,
-    VerifyJWTResponse,
+    CreateJWT,
+    ProjectSamples,
+    AccessJWT,
+    UploadCredentials,
+    VerifyJWT,
 )
 from gencove.version import version as cli_version
 
@@ -316,7 +315,7 @@ class APIClient:
             self.endpoints.refresh_jwt,
             {"refresh": refresh_token},
             sensitive=True,
-            model=RefreshJWTResponse,
+            model=AccessJWT,
         )
 
     def validate_token(self, token):
@@ -325,7 +324,7 @@ class APIClient:
             self.endpoints.verify_jwt,
             {"token": token},
             sensitive=True,
-            model=VerifyJWTResponse,
+            model=VerifyJWT,
         )
 
     def get_jwt(self, email, password):
@@ -334,7 +333,7 @@ class APIClient:
             self.endpoints.get_jwt,
             dict(email=email, password=password),
             sensitive=True,
-            model=CreateJWTResponse,
+            model=CreateJWT,
         )
 
     def login(self, email, password):
@@ -363,7 +362,7 @@ class APIClient:
             self.endpoints.get_upload_credentials,
             authorized=True,
             sensitive=True,
-            model=UploadCredentialsResponse,
+            model=UploadCredentials,
         )
 
     def get_project_samples(
@@ -394,7 +393,7 @@ class APIClient:
             project_endpoint,
             query_params=params,
             authorized=True,
-            model=GetProjectSamplesResponse,
+            model=ProjectSamples,
         )
 
     def add_samples_to_project(self, samples, project_id, metadata=None):

@@ -1,8 +1,8 @@
 """Download command constants."""
 import re
-from uuid import UUID
 from enum import Enum, unique
 from typing import Optional, Tuple, Union
+from uuid import UUID
 
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 

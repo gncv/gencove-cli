@@ -6,8 +6,11 @@ Exclude imports from linters due to install aliases breaking the rules.
 import datetime
 import json
 import time
+from uuid import UUID
 from builtins import str as text  # noqa
 from urllib.parse import parse_qs, urljoin, urlparse
+
+from pydantic import BaseModel
 
 from requests import (  # pylint: disable=W0622
     ConnectTimeout,
@@ -31,20 +34,27 @@ from gencove.models import (
     AccessJWT,
     CreateJWT,
     ProjectSamples,
+    SampleSheet,
     UploadCredentials,
     UploadsPostData,
 )
 from gencove.version import version as cli_version
 
 
-class DateTimeEncoder(json.JSONEncoder):
-    """JSON encoder that knows how to encode datetime objects."""
+class CustomEncoder(json.JSONEncoder):
+    """JSON encoder that knows how to encode `datetime`, `UUID`
+    and `pydantic.BaseModel` objects.
+    """
 
     # pylint: disable=method-hidden
     def default(self, o):
         """Override default method of JSONEncoder."""
         if isinstance(o, datetime.datetime):
             return o.isoformat()
+        if isinstance(o, BaseModel):
+            return o.dict()
+        if isinstance(o, UUID):
+            return str(o)
         return json.JSONEncoder.default(self, o)
 
 
@@ -107,7 +117,7 @@ class APIClient:
 
     @staticmethod
     def _serialize_post_payload(payload):
-        return json.dumps(payload, cls=DateTimeEncoder)
+        return json.dumps(payload, cls=CustomEncoder)
 
     # pylint: disable=bad-option-value,bad-continuation,too-many-arguments
     # pylint: disable=too-many-branches
@@ -246,7 +256,7 @@ class APIClient:
                 sensitive=sensitive,
             )
             if model:
-                return model(**response.json())
+                return model(**response)
             return response
         except APIClientError as err:
             if not refreshed and err.status_code and err.status_code == 401:
@@ -278,7 +288,7 @@ class APIClient:
                 sensitive=sensitive,
             )
             if model:
-                return model(**response.json())
+                return model(**response)
             return response
         except APIClientError as err:
             if not refreshed and err.status_code and err.status_code == 401:
@@ -456,6 +466,7 @@ class APIClient:
             self.endpoints.SAMPLE_SHEET.value,
             query_params=params,
             authorized=True,
+            model=SampleSheet,
         )
 
     def list_projects(self, next_link=None):

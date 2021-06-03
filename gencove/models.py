@@ -93,7 +93,7 @@ class UploadCredentials(BaseModel):
     access_key: Optional[str]
     secret_key: Optional[str]
     token: Optional[str]
-    expiry_time: Optional[datetime]
+    expiry_time: Optional[str]  # needs to be str for boto3 to work
 
 
 class SampleFile(GencoveBaseModel):
@@ -128,7 +128,7 @@ class ProjectSamples(BaseModel):
     results: Optional[List[SampleDetails]]
 
 
-class UploadCreate(BaseModel):
+class Upload(BaseModel):
     """UploadCreate model"""
 
     upload: Optional[UUID]
@@ -137,15 +137,23 @@ class UploadCreate(BaseModel):
 class Fastqs(BaseModel):
     """Fastqs model"""
 
-    r1: Optional[UploadCreate]
-    r2: Optional[UploadCreate]
+    r1: Optional[Upload]
+    r2: Optional[Upload]
+
+
+class Sample(BaseModel):
+    """Sample model"""
+
+    client_id: Optional[str]
+    fastq: Optional[Fastqs]
+    sample: Optional[UUID]
 
 
 class SampleSheet(BaseModel):
     """SampleSheet model"""
 
-    client_id: Optional[str]
-    fastq: Optional[Fastqs]
+    meta: ResponseMeta
+    results: Optional[List[Sample]]
 
 
 class UploadSamples(BaseModel):

@@ -372,13 +372,13 @@ class Upload(Command):
             for sample in sample_sheet:
                 self.echo_debug("Checking sample: {}".format(sample))
                 add_it = False
-                if "r1" in sample["fastq"]:
-                    if sample["fastq"]["r1"]["upload"] in search_uploads:
+                if sample.fastq.r1:
+                    if sample.fastq.r1.upload in search_uploads:
                         add_it = True
-                        search_uploads.remove(sample["fastq"]["r1"]["upload"])
+                        search_uploads.remove(sample.fastq.r1.upload)
                         self.echo_debug(
                             "Found sample for upload r1: {}".format(
-                                sample["fastq"]["r1"]["upload"]
+                                sample.fastq.r1.upload
                             )
                         )
                     else:
@@ -388,13 +388,13 @@ class Upload(Command):
                             )
                         )
                         raise UploadNotFound
-                if "r2" in sample["fastq"]:
-                    if sample["fastq"]["r2"]["upload"] in search_uploads:
+                if sample.fastq.r2:
+                    if sample.fastq.r2.upload in search_uploads:
                         add_it = True
-                        search_uploads.remove(sample["fastq"]["r2"]["upload"])
+                        search_uploads.remove(sample.fastq.r2.upload)
                         self.echo_debug(
                             "Found sample for upload r2: {}".format(
-                                sample["fastq"]["r2"]["upload"]
+                                sample.fastq.r2.upload
                             )
                         )
                     else:
@@ -429,8 +429,8 @@ class Upload(Command):
             self.echo_debug("Get sample sheet page")
             try:
                 resp = self.get_sample_sheet(next_link)
-                yield resp["results"]
-                next_link = resp["meta"]["next"]
+                yield resp.results
+                next_link = resp.meta.next
                 more = next_link is not None
             except APIClientError as err:
                 self.echo_debug(err)

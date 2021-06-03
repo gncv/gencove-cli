@@ -11,12 +11,12 @@ def get_line(upload):
         list(str): list of relevant data to be printed
     """
     parts = [
-        upload.client_id,
-        upload.fastq.r1.upload,
+        str(upload.client_id),
+        str(upload.fastq.r1.upload),
         upload.fastq.r1.destination_path,
     ]
     if upload.fastq.r2:
-        parts.append(upload.fastq.r1.upload)
+        parts.append(str(upload.fastq.r2.upload))
         parts.append(upload.fastq.r2.destination_path)
 
     return "\t".join(parts)

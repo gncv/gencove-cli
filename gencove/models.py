@@ -131,7 +131,10 @@ class ProjectSamples(BaseModel):
 class Upload(BaseModel):
     """UploadCreate model"""
 
-    upload: Optional[UUID]
+    # should be UUID, leaving Union[UUID, str] so tests pass
+    upload: Optional[Union[UUID, str]]
+    destination_path: Optional[str]
+    last_status: Optional[GencoveStatus]
 
 
 class Fastqs(BaseModel):
@@ -159,7 +162,7 @@ class SampleSheet(BaseModel):
 class UploadSamples(BaseModel):
     """UploadSamples model"""
 
-    uploads: Optional[List[SampleSheet]]
+    uploads: Optional[List[Sample]]
     metadata: Optional[Any]
 
 
@@ -192,19 +195,11 @@ class SampleQC(BaseModel):
     results: Optional[List[QualityControl]]
 
 
-class UploadNestedList(BaseModel):
-    """UploadNestedList model"""
-
-    upload: Optional[UUID]
-    destination_path: Optional[str]
-    last_status: Optional[GencoveStatus]
-
-
 class ClientFastQ(BaseModel):
     """ClientFastQ model"""
 
     client_id: Optional[str]
-    fastq: Optional[UploadNestedList]
+    fastq: Optional[Upload]
 
 
 class UploadFastQ(BaseModel):

@@ -11,6 +11,7 @@ from gencove.client import (  # noqa: I100
     APIClientError,
     APIClientTimeout,
     APIClientTooManyRequestsError,
+    CustomEncoder,
 )
 from gencove.command.base import Command
 from gencove.command.utils import is_valid_uuid
@@ -325,7 +326,8 @@ class Upload(Command):
                 assigned_batch = self.api_client.add_samples_to_project(
                     samples_batch, self.project_id, metadata_api
                 )
-                self.assigned_samples.extend(assigned_batch)
+                if assigned_batch.uploads:
+                    self.assigned_samples.extend(assigned_batch.uploads)
                 assigned_count += samples_batch_len
                 if not self.no_progress:
                     progress_bar.update(samples_batch_len)
@@ -454,13 +456,19 @@ class Upload(Command):
         """Output JSON of assigning samples to a project."""
         self.echo_debug("Outputting JSON.")
         if self.output == "-":
-            self.echo_data(json.dumps(self.assigned_samples, indent=4))
+            self.echo_data(
+                json.dumps(self.assigned_samples, indent=4, cls=CustomEncoder)
+            )
         else:
             dirname = os.path.dirname(self.output)
             if dirname and not os.path.exists(dirname):
                 os.makedirs(dirname)
             with open(self.output, "w") as json_file:
-                json_file.write(json.dumps(self.assigned_samples, indent=4))
+                json_file.write(
+                    json.dumps(
+                        self.assigned_samples, indent=4, cls=CustomEncoder
+                    )
+                )
             self.echo_info(
                 "Assigned samples response outputted to {}".format(
                     self.output

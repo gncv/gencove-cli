@@ -36,6 +36,7 @@ from gencove.models import (
     ProjectSamples,
     SampleSheet,
     UploadCredentials,
+    UploadSamples,
     UploadsPostData,
 )
 from gencove.version import version as cli_version
@@ -52,7 +53,7 @@ class CustomEncoder(json.JSONEncoder):
         if isinstance(o, datetime.datetime):
             return o.isoformat()
         if isinstance(o, BaseModel):
-            return o.dict()
+            return {**o.dict(exclude_unset=True), **o.dict(exclude_none=True)}
         if isinstance(o, UUID):
             return str(o)
         return json.JSONEncoder.default(self, o)
@@ -411,6 +412,7 @@ class APIClient:
             self.endpoints.PROJECT_SAMPLES.value.format(id=project_id),
             payload,
             authorized=True,
+            model=UploadSamples,
         )
 
     def get_sample_details(self, sample_id):

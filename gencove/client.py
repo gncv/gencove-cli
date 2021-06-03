@@ -308,12 +308,6 @@ class APIClient:
             model=AccessJWT,
         )
 
-    def validate_token(self, token):
-        """Validate jwt token."""
-        return self._post(
-            self.endpoints.verify_jwt, {"token": token}, sensitive=True
-        )
-
     def get_jwt(self, email, password):
         """Get jwt token."""
         return self._post(

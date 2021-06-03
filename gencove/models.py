@@ -25,10 +25,6 @@ class CreateJWT(AccessJWT):
     refresh: str
 
 
-class VerifyJWT(BaseModel):
-    """VerifyJWT model"""
-
-
 class S3Object(BaseModel):
     """S3Object model"""
 

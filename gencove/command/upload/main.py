@@ -16,7 +16,7 @@ from gencove.command.base import Command
 from gencove.command.utils import is_valid_uuid
 from gencove.constants import (
     FASTQ_MAP_EXTENSION,
-    SAMPLE_ASSIGNMENT_STATUS,
+    SampleAssignmentStatus,
     UPLOAD_PREFIX,
 )
 from gencove.exceptions import ValidationError
@@ -30,7 +30,7 @@ from .constants import (
     ASSIGN_ERROR,
     FASTQ_EXTENSIONS,
     TMP_UPLOADS_WARNING,
-    UPLOAD_STATUSES,
+    UploadStatuses,
 )
 from .exceptions import SampleSheetError, UploadError, UploadNotFound
 from .multi_file_reader import MultiFileReader
@@ -208,7 +208,10 @@ class Upload(Command):
 
         upload_details = self.get_upload_details(gncv_path)
 
-        if upload_details["last_status"]["status"] == UPLOAD_STATUSES.done:
+        if (
+            upload_details["last_status"]["status"]
+            == UploadStatuses.DONE.value
+        ):
             self.echo_info("File was already uploaded: {}".format(gncv_path))
             return upload_details
 
@@ -252,7 +255,10 @@ class Upload(Command):
                 raise UploadError  # pylint: disable=W0707
             raise err
 
-        if upload_details["last_status"]["status"] == UPLOAD_STATUSES.done:
+        if (
+            upload_details["last_status"]["status"]
+            == UploadStatuses.DONE.value
+        ):
             self.echo_info(
                 "File was already uploaded: {}".format(clean_file_path)
             )
@@ -445,7 +451,9 @@ class Upload(Command):
     def get_sample_sheet(self, next_link=None):
         """Get samples by gncv path."""
         return self.api_client.get_sample_sheet(
-            self.destination, SAMPLE_ASSIGNMENT_STATUS.unassigned, next_link
+            self.destination,
+            SampleAssignmentStatus.UNASSIGNED.value,
+            next_link,
         )
 
     def output_list(self):

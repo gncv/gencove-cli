@@ -20,6 +20,6 @@ def create_merged_vcf(
     """Merge VCF files in a project."""
     CreateMergedVCF(
         project_id,
-        Credentials(email, password, api_key),
-        Optionals(host),
+        Credentials(email=email, password=password, api_key=api_key),
+        Optionals(host=host),
     ).run()

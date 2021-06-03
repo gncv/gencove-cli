@@ -30,10 +30,10 @@ def _get_prefix_parts(full_prefix):
     prefix_parts = full_prefix.split("/")
     file_name, _, file_ext = prefix_parts[-1].partition(".")
     return FilePrefix(
-        "/".join(prefix_parts[:-1]),
-        file_name,
-        file_ext,
-        DEFAULT_FILENAME_TOKEN in full_prefix,
+        dirs="/".join(prefix_parts[:-1]),
+        filename=file_name,
+        file_extension=file_ext,
+        use_default_filename=(DEFAULT_FILENAME_TOKEN in full_prefix),
     )
 
 
@@ -124,9 +124,9 @@ def build_file_path(
     # fmt: off
     destination_filename = destination_filename.format(
         **{
-            DownloadTemplateParts.file_type: FILE_TYPES_MAPPER.get(deliverable["file_type"]) or deliverable["file_type"],  # noqa: E501  # pylint: disable=line-too-long
-            DownloadTemplateParts.file_extension: deliverable_type_from_filename(source_filename),  # noqa: E501  # pylint: disable=line-too-long
-            DownloadTemplateParts.default_filename: source_filename,
+            DownloadTemplateParts.FILE_TYPE.value: FILE_TYPES_MAPPER.get(deliverable["file_type"]) or deliverable["file_type"],  # noqa: E501  # pylint: disable=line-too-long
+            DownloadTemplateParts.FILE_EXTENSION.value: deliverable_type_from_filename(source_filename),  # noqa: E501  # pylint: disable=line-too-long
+            DownloadTemplateParts.DEFAULT_FILENAME.value: source_filename,
         }
     )
     # fmt: on
@@ -309,15 +309,15 @@ def get_download_template_format_params(client_id, gencove_id):
         format parts : dict
     """
     return {
-        DownloadTemplateParts.client_id: client_id,
-        DownloadTemplateParts.gencove_id: gencove_id,
-        DownloadTemplateParts.file_type: "{{{}}}".format(
-            DownloadTemplateParts.file_type
+        DownloadTemplateParts.CLIENT_ID.value: client_id,
+        DownloadTemplateParts.GENCOVE_ID.value: gencove_id,
+        DownloadTemplateParts.FILE_TYPE.value: "{{{}}}".format(
+            DownloadTemplateParts.FILE_TYPE.value
         ),
-        DownloadTemplateParts.file_extension: "{{{}}}".format(
-            DownloadTemplateParts.file_extension
+        DownloadTemplateParts.FILE_EXTENSION.value: "{{{}}}".format(
+            DownloadTemplateParts.FILE_EXTENSION.value
         ),
-        DownloadTemplateParts.default_filename: "{{{}}}".format(
-            DownloadTemplateParts.default_filename
+        DownloadTemplateParts.DEFAULT_FILENAME.value: "{{{}}}".format(
+            DownloadTemplateParts.DEFAULT_FILENAME.value
         ),
     }

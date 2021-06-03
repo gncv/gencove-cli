@@ -8,6 +8,7 @@ from gencove.constants import (
     DownloadTemplateParts,
 )
 from gencove.logger import echo_debug
+from gencove.utils import enum_as_dict
 
 from .constants import DownloadFilters, DownloadOptions
 from .main import Download
@@ -45,7 +46,7 @@ from .main import Download
             "\n".join(
                 [
                     "{{{}}}".format(v)
-                    for v in DownloadTemplateParts._asdict().values()
+                    for v in enum_as_dict(DownloadTemplateParts).values()
                 ]
             ),
         )
@@ -123,9 +124,15 @@ def download(  # pylint: disable=E0012,C0330,R0913
 
     Download(
         destination,
-        DownloadFilters(project_id, s_ids, f_types),
-        Credentials(email, password, api_key),
-        DownloadOptions(host, skip_existing, download_template),
+        DownloadFilters(
+            project_id=project_id, sample_ids=s_ids, file_types=f_types
+        ),
+        Credentials(email=email, password=password, api_key=api_key),
+        DownloadOptions(
+            host=host,
+            skip_existing=skip_existing,
+            download_template=download_template,
+        ),
         download_urls,
         no_progress,
     ).run()

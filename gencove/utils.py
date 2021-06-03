@@ -161,3 +161,15 @@ def batchify(items_list, batch_size=500):
         yield items_list[start:end]
         start += batch_size
         left_to_process -= batch_size
+
+
+def enum_as_dict(enum):
+    """Convert enum to dict.
+
+    Args:
+        enum (Enum): Enumeration to be converted to dict.
+
+    Returns:
+        dict Dictionary representation of enum.
+    """
+    return {s.name: s.value for s in enum}

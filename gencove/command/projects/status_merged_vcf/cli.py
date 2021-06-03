@@ -20,6 +20,6 @@ def status_merged_vcf(
     """Get status of merge VCF files job in a project."""
     StatusMergedVCF(
         project_id,
-        Credentials(email, password, api_key),
-        Optionals(host),
+        Credentials(email=email, password=password, api_key=api_key),
+        Optionals(host=host),
     ).run()

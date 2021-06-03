@@ -19,12 +19,12 @@ from requests import (  # pylint: disable=W0622
 
 from gencove import constants  # noqa: I100
 from gencove.constants import (
-    SAMPLES_SHEET_SORT_BY,
-    SAMPLE_ARCHIVE_STATUS,
-    SAMPLE_ASSIGNMENT_STATUS,
-    SAMPLE_SORT_BY,
-    SAMPLE_STATUS,
-    SORT_ORDER,
+    SampleArchiveStatus,
+    SampleAssignmentStatus,
+    SampleSheetSortBy,
+    SampleSortBy,
+    SampleStatus,
+    SortOrder,
 )
 from gencove.logger import echo_debug
 from gencove.models import (
@@ -96,7 +96,7 @@ class APIClientTimeout(APIClientError):
 class APIClient:
     """Gencove API client."""
 
-    endpoints = constants.API_ENDPOINTS
+    endpoints = constants.ApiEndpoints
 
     def __init__(self, host=None):
         """Initialize api client."""
@@ -312,7 +312,7 @@ class APIClient:
     def refresh_token(self, refresh_token):
         """Refresh jwt token."""
         return self._post(
-            self.endpoints.refresh_jwt,
+            self.endpoints.REFRESH_JWT.value,
             {"refresh": refresh_token},
             sensitive=True,
             model=AccessJWT,
@@ -321,7 +321,7 @@ class APIClient:
     def get_jwt(self, email, password):
         """Get jwt token."""
         return self._post(
-            self.endpoints.get_jwt,
+            self.endpoints.GET_JWT.value,
             dict(email=email, password=password),
             sensitive=True,
             model=CreateJWT,
@@ -341,7 +341,7 @@ class APIClient:
             dict: Upload details from the backend
         """
         return self._post(
-            self.endpoints.upload_details,
+            self.endpoints.UPLOAD_DETAILS.value,
             dict(destination_path=gncv_file_path),
             authorized=True,
             model=UploadsPostData,
@@ -350,7 +350,7 @@ class APIClient:
     def get_upload_credentials(self):
         """Get aws credentials for user."""
         return self._post(
-            self.endpoints.get_upload_credentials,
+            self.endpoints.GET_UPLOAD_CREDENTIALS.value,
             authorized=True,
             sensitive=True,
             model=UploadCredentials,
@@ -361,13 +361,13 @@ class APIClient:
         project_id,
         next_link=None,
         search="",
-        sample_status=SAMPLE_STATUS.all,
-        sample_archive_status=SAMPLE_ARCHIVE_STATUS.all,
-        sort_by=SAMPLE_SORT_BY.modified,
-        sort_order=SORT_ORDER.desc,
+        sample_status=SampleStatus.ALL.value,
+        sample_archive_status=SampleArchiveStatus.ALL.value,
+        sort_by=SampleSortBy.MODIFIED.value,
+        sort_order=SortOrder.DESC.value,
     ):
         """List single project's associated samples."""
-        project_endpoint = self.endpoints.project_samples.format(
+        project_endpoint = self.endpoints.PROJECT_SAMPLES.value.format(
             id=project_id
         )
         params = self._add_query_params(
@@ -398,7 +398,7 @@ class APIClient:
         payload = {"uploads": samples, "metadata": metadata}
 
         return self._post(
-            self.endpoints.project_samples.format(id=project_id),
+            self.endpoints.PROJECT_SAMPLES.value.format(id=project_id),
             payload,
             authorized=True,
         )
@@ -406,7 +406,7 @@ class APIClient:
     def get_sample_details(self, sample_id):
         """Fetch single sample details."""
         return self._get(
-            self.endpoints.sample_details.format(id=sample_id),
+            self.endpoints.SAMPLE_DETAILS.value.format(id=sample_id),
             authorized=True,
         )
 
@@ -420,17 +420,17 @@ class APIClient:
             list of qc params objects.
         """
         return self._get(
-            self.endpoints.sample_qc_metrics.format(id=sample_id),
+            self.endpoints.SAMPLE_QC_METRICS.value.format(id=sample_id),
             authorized=True,
         )
 
     def get_sample_sheet(
         self,
         gncv_path=None,
-        assigned_status=SAMPLE_ASSIGNMENT_STATUS.all,
+        assigned_status=SampleAssignmentStatus.ALL.value,
         next_link=None,
-        sort_by=SAMPLES_SHEET_SORT_BY.created,
-        sort_order=SORT_ORDER.desc,
+        sort_by=SampleSheetSortBy.CREATED.value,
+        sort_order=SortOrder.DESC.value,
     ):
         """Fetch user samples.
 
@@ -453,7 +453,9 @@ class APIClient:
             },
         )
         return self._get(
-            self.endpoints.sample_sheet, query_params=params, authorized=True
+            self.endpoints.SAMPLE_SHEET.value,
+            query_params=params,
+            authorized=True,
         )
 
     def list_projects(self, next_link=None):
@@ -476,7 +478,9 @@ class APIClient:
         """
         params = self._add_query_params(next_link)
         return self._get(
-            self.endpoints.projects, query_params=params, authorized=True
+            self.endpoints.PROJECTS.value,
+            query_params=params,
+            authorized=True,
         )
 
     def get_pipeline_capabilities(self, pipeline_id):
@@ -489,14 +493,14 @@ class APIClient:
             dict: pipeline details
         """
         resp = self._get(
-            self.endpoints.pipeline_capabilities.replace("{id}", pipeline_id),
+            self.endpoints.PIPELINE_CAPABILITES.value.format(id=pipeline_id),
             authorized=True,
         )
         return resp
 
     def get_project_batch_types(self, project_id, next_link=None):
         """List single project's available batch types."""
-        project_endpoint = self.endpoints.project_batch_types.format(
+        project_endpoint = self.endpoints.PROJECT_BATCH_TYPES.value.format(
             id=project_id
         )
         params = self._add_query_params(next_link)
@@ -506,7 +510,7 @@ class APIClient:
 
     def get_project_batches(self, project_id, next_link=None):
         """List single project's batches."""
-        project_endpoint = self.endpoints.project_batches.format(
+        project_endpoint = self.endpoints.PROJECT_BATCHES.value.format(
             id=project_id
         )
         params = self._add_query_params(next_link)
@@ -518,7 +522,7 @@ class APIClient:
         self, project_id, batch_type, batch_name, sample_ids
     ):
         """Making a post request to create project batch."""
-        project_endpoint = self.endpoints.project_batches.format(
+        project_endpoint = self.endpoints.PROJECT_BATCHES.value.format(
             id=project_id
         )
 
@@ -532,13 +536,13 @@ class APIClient:
 
     def get_batch(self, batch_id):
         """Get single batch."""
-        batches_endpoint = self.endpoints.batches.format(id=batch_id)
+        batches_endpoint = self.endpoints.BATCHES.value.format(id=batch_id)
         return self._get(batches_endpoint, authorized=True)
 
     def restore_project_samples(self, project_id, sample_ids):
         """Make a request to restore samples in given project."""
         restore_project_samples_endpoint = (
-            self.endpoints.project_restore_samples.format(id=project_id)
+            self.endpoints.PROJECT_RESTORE_SAMPLES.value.format(id=project_id)
         )
 
         payload = {"sample_ids": sample_ids}
@@ -549,34 +553,34 @@ class APIClient:
 
     def get_project(self, project_id):
         """Get single project."""
-        project_endpoint = "{}{}".format(self.endpoints.projects, project_id)
+        project_endpoint = f"{self.endpoints.PROJECTS.value}{project_id}"
         return self._get(project_endpoint, authorized=True)
 
     def create_merged_vcf(self, project_id):
         """Merge VCF files for a project."""
-        merge_vcf_endpoint = self.endpoints.project_merge_vcfs.format(
+        merge_vcf_endpoint = self.endpoints.PROJECT_MERGE_VCFS.value.format(
             id=project_id
         )
         return self._post(merge_vcf_endpoint, authorized=True)
 
     def retrieve_merged_vcf(self, project_id):
         """Retrieve the status of the merge command for a project."""
-        merge_vcf_endpoint = self.endpoints.project_merge_vcfs.format(
+        merge_vcf_endpoint = self.endpoints.PROJECT_MERGE_VCFS.value.format(
             id=project_id
         )
         return self._get(merge_vcf_endpoint, authorized=True)
 
     def get_metadata(self, sample_id):
         """Retrieve the metadata for a sample."""
-        sample_metadata_endpoint = self.endpoints.sample_metadata.format(
-            id=sample_id
+        sample_metadata_endpoint = (
+            self.endpoints.SAMPLE_METADATA.value.format(id=sample_id)
         )
         return self._get(sample_metadata_endpoint, authorized=True)
 
     def set_metadata(self, sample_id, metadata):
         """Assign the metadata to a sample."""
-        sample_metadata_endpoint = self.endpoints.sample_metadata.format(
-            id=sample_id
+        sample_metadata_endpoint = (
+            self.endpoints.SAMPLE_METADATA.value.format(id=sample_id)
         )
         payload = {
             "metadata": metadata,

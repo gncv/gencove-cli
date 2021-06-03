@@ -299,6 +299,8 @@ def test_enum_as_dict():
     """Test that the function enum_as_dict returns properly formatted dict."""
 
     class TestEnum(Enum):
+        """Enum for testing"""
+
         KEY1 = "key1"
         KEY2 = "key2"
         KEY3 = "key3"

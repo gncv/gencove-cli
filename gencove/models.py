@@ -83,7 +83,7 @@ class Project(GencoveBaseModel):
     sample_count: Optional[int]
     pipeline_capabilities: Optional[Union[UUID, PipelineCapabilities]]
     roles: Optional[dict]
-    webhook_url: Optional[HttpUrl]  # deprecated
+    webhook_url: Optional[Union[HttpUrl, str]]  # deprecated
 
 
 class UploadCredentials(BaseModel):

@@ -51,6 +51,9 @@ CHUNK_SIZE = NUM_MB_IN_CHUNK * MEGABYTE
 class DownloadFilters(BaseModel):
     """DownloadFilters options"""
 
+    # project_id and sample_ids should be UUID instead of Union[UUID, str]
+    # some tests break on UUID because they are using arbitrary strings
+    # fix tests and then modify
     project_id: Optional[Union[UUID, str]]
     sample_ids: Optional[Tuple[Union[UUID, str], ...]]
     file_types: Optional[Tuple[str, ...]]

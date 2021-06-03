@@ -33,7 +33,6 @@ from gencove.models import (
     ProjectSamples,
     UploadCredentials,
     UploadsPostData,
-    VerifyJWT,
 )
 from gencove.version import version as cli_version
 
@@ -317,15 +316,6 @@ class APIClient:
             {"refresh": refresh_token},
             sensitive=True,
             model=AccessJWT,
-        )
-
-    def validate_token(self, token):
-        """Validate jwt token."""
-        return self._post(
-            self.endpoints.verify_jwt,
-            {"token": token},
-            sensitive=True,
-            model=VerifyJWT,
         )
 
     def get_jwt(self, email, password):

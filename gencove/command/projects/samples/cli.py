@@ -4,9 +4,10 @@ import click
 from gencove.command.common_cli_options import add_options, common_options
 from gencove.constants import (
     Credentials,
-    SAMPLE_ARCHIVE_STATUS,
-    SAMPLE_STATUS,
+    SampleArchiveStatus,
+    SampleStatus,
 )
+from gencove.utils import enum_as_dict
 
 from .constants import SamplesOptions
 from .main import ListSamples
@@ -20,14 +21,14 @@ from .main import ListSamples
 @click.option(
     "--status",
     help="Get samples with specific status",
-    type=click.Choice(SAMPLE_STATUS._asdict().values()),
-    default=SAMPLE_STATUS.all,
+    type=click.Choice(enum_as_dict(SampleStatus).values()),
+    default=SampleStatus.ALL.value,
 )
 @click.option(
     "--archive-status",
     help="Get samples with specific archive status",
-    type=click.Choice(SAMPLE_ARCHIVE_STATUS._asdict().values()),
-    default=SAMPLE_ARCHIVE_STATUS.all,
+    type=click.Choice(enum_as_dict(SampleArchiveStatus).values()),
+    default=SampleArchiveStatus.ALL.value,
 )
 @add_options(common_options)
 def list_project_samples(  # pylint: disable=E0012,C0330,R0913
@@ -36,6 +37,11 @@ def list_project_samples(  # pylint: disable=E0012,C0330,R0913
     """List samples in a project."""
     ListSamples(
         project_id,
-        Credentials(email, password, api_key),
-        SamplesOptions(host, status, archive_status, search),
+        Credentials(email=email, password=password, api_key=api_key),
+        SamplesOptions(
+            host=host,
+            status=status,
+            archive_status=archive_status,
+            search=search,
+        ),
     ).run()

@@ -1,7 +1,10 @@
 """Constants for upload command."""
-from collections import namedtuple
+from enum import Enum, unique
+from typing import Optional
 
-from gencove.constants import Optionals
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
+
+from gencove.constants import Optionals  # noqa: I100
 
 # pylint: disable=invalid-name
 
@@ -11,14 +14,26 @@ TMP_UPLOADS_WARNING = (
     "to a project in order to avoid automatic deletion."
 )
 
-_UploadStatuses = namedtuple("UploadStatuses", ["done", "started", "failed"])
-UPLOAD_STATUSES = _UploadStatuses("succeeded", "started", "failed")
+
+@unique
+class UploadStatuses(Enum):
+    """UploadStatuses enum"""
+
+    DONE = "succeeded"
+    STARTED = "started"
+    FAILED = "failed"
+
 
 FASTQ_EXTENSIONS = (".fastq.gz", ".fastq.bgz", ".fq.gz", ".fq.bgz")
 
-UploadOptions = namedtuple(
-    "UploadOptions", Optionals._fields + ("project_id", "metadata")
-)
+
+# pylint: disable=too-few-public-methods
+class UploadOptions(Optionals):
+    """UploadOptions model"""
+
+    project_id: Optional[str]
+    metadata: Optional[str]
+
 
 ASSIGN_ERROR = (
     "Your files were successfully uploaded, "
@@ -27,14 +42,27 @@ ASSIGN_ERROR = (
     "You can try to assign without upload using following gncv path: {}"
 )
 
-FastQ = namedtuple("FastQ", ["client_id", "r_notation", "path"])
+
+# pylint: disable=too-few-public-methods
+class FastQ(BaseModel):
+    """FastQ model"""
+
+    client_id: str
+    r_notation: str
+    path: str
+
 
 R_NOTATION_MAP = {"R1": "R1", "R2": "R2", "r1": "R1", "r2": "R2"}
 
-_PathTemplateParts = namedtuple(
-    "PathTemplateParts", ["client_id", "r_notation"]
-)
-PathTemplateParts = _PathTemplateParts("client_id", "r_notation")
+
+@unique
+class PathTemplateParts(Enum):
+    """PathTemplateParts enum"""
+
+    client_id = "client_id"
+    r_notation = "r_notation"
+
+
 PATH_TEMPLATE = "{{{}}}_{{{}}}.fastq.gz".format(
-    PathTemplateParts.client_id, PathTemplateParts.r_notation
+    PathTemplateParts.client_id.value, PathTemplateParts.r_notation.value
 )

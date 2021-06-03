@@ -64,8 +64,8 @@ def download_file(
             sample_id,
             file_type,
             sys.stdout.buffer,
-            Credentials(email, password, api_key),
-            Optionals(host),
+            Credentials(email=email, password=password, api_key=api_key),
+            Optionals(host=host),
             no_progress,
         ).run()
     else:
@@ -75,8 +75,10 @@ def download_file(
                     sample_id,
                     file_type,
                     destination_file,
-                    Credentials(email, password, api_key),
-                    Optionals(host),
+                    Credentials(
+                        email=email, password=password, api_key=api_key
+                    ),
+                    Optionals(host=host),
                     no_progress,
                 ).run()
         except IsADirectoryError:

@@ -1,6 +1,7 @@
 """Tests for utils of Gencove CLI."""
 import csv
 import os
+from enum import Enum
 
 from click.testing import CliRunner
 
@@ -17,6 +18,7 @@ from gencove.command.upload.utils import (
 from gencove.command.utils import is_valid_uuid
 from gencove.constants import DOWNLOAD_TEMPLATE, DownloadTemplateParts
 from gencove.exceptions import ValidationError
+from gencove.utils import enum_as_dict
 
 
 def test_upload_file(mocker):
@@ -43,7 +45,7 @@ def test_download_template_tokens():
         "file_type",
         "file_extension",
         "default_filename",
-    ] == list(DownloadTemplateParts._asdict().values())
+    ] == list(enum_as_dict(DownloadTemplateParts).values())
 
 
 # pylint: disable=too-many-locals
@@ -118,7 +120,7 @@ def test___get_filename_dirs_prefix():
 
     assert resp.dirs == "{}/{}".format(client_id, gencove_id)
     assert resp.filename == "{{{}}}".format(
-        DownloadTemplateParts.default_filename
+        DownloadTemplateParts.DEFAULT_FILENAME.value
     )
     assert resp.file_extension == ""
 
@@ -128,7 +130,7 @@ def test___get_filename_dirs_prefix():
     resp = _get_prefix_parts(template2)
     assert resp.dirs == ""
     assert resp.filename == "{}-{}_{{{}}}".format(
-        client_id, gencove_id, DownloadTemplateParts.file_type
+        client_id, gencove_id, DownloadTemplateParts.FILE_TYPE.value
     )
     assert resp.file_extension == ""
 
@@ -138,7 +140,7 @@ def test___get_filename_dirs_prefix():
     resp = _get_prefix_parts(template3)
     assert resp.dirs == ""
     assert resp.filename == "{}-{}_{{{}}}".format(
-        client_id, gencove_id, DownloadTemplateParts.file_type
+        client_id, gencove_id, DownloadTemplateParts.FILE_TYPE.value
     )
     assert resp.file_extension == "vcf.gz"
 
@@ -239,20 +241,24 @@ def test_fastqs_map_file_path_does_not_exist():
 
 def test_fastqs_map_file_has_wrong_header():
     """Test that header is validated properly."""
-    with open("test_map.csv", "w") as map_file:
-        writer = csv.writer(map_file)
-        writer.writerows(
-            [
-                ["client_id", "r1_notation", "path"],
-                ["barid", "r1", "test_dir/test.fastq.gz"],
-                ["barid", "r1", "test_dir/test_3.fastq.gz"],
-                ["barid", "r1", "test_dir/i_dont_exist.fastq.gz"],
-            ]
-        )
-    try:
-        parse_fastqs_map_file("test_map.csv")
-    except ValidationError as err:
-        assert "Unexpected CSV header" in err.args[0]
+    runner = CliRunner()
+    # This context manager is used to avoid unnecessarily creating a
+    # test_map.csv file in the root of the project on every test run
+    with runner.isolated_filesystem():
+        with open("test_map.csv", "w") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r1_notation", "path"],
+                    ["barid", "r1", "test_dir/test.fastq.gz"],
+                    ["barid", "r1", "test_dir/test_3.fastq.gz"],
+                    ["barid", "r1", "test_dir/i_dont_exist.fastq.gz"],
+                ]
+            )
+        try:
+            parse_fastqs_map_file("test_map.csv")
+        except ValidationError as err:
+            assert "Unexpected CSV header" in err.args[0]
 
 
 def test__validate_header():
@@ -287,3 +293,20 @@ def test_is_valid_uuid__is_not_valid__too_short():
 def test_is_valid_uuid__is_not_valid__text():
     """Test that random word is not a valid UUID"""
     assert is_valid_uuid("foo") is False
+
+
+def test_enum_as_dict():
+    """Test that the function enum_as_dict returns properly formatted dict."""
+
+    class TestEnum(Enum):
+        """Enum for testing"""
+
+        KEY1 = "key1"
+        KEY2 = "key2"
+        KEY3 = "key3"
+
+    assert enum_as_dict(TestEnum) == {
+        "KEY1": "key1",
+        "KEY2": "key2",
+        "KEY3": "key3",
+    }

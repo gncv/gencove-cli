@@ -8,7 +8,6 @@ _APIEndpoint = namedtuple(
     [
         "get_jwt",
         "refresh_jwt",
-        "verify_jwt",
         "upload_details",
         "get_upload_credentials",
         "project_samples",
@@ -28,7 +27,6 @@ _APIEndpoint = namedtuple(
 API_ENDPOINTS = _APIEndpoint(
     "/api/v2/jwt-create/",
     "/api/v2/jwt-refresh/",
-    "/api/v2/jwt-verify/",
     "/api/v2/uploads-post-data/",
     "/api/v2/upload-credentials/",
     "/api/v2/project-samples/{id}",

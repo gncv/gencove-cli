@@ -1,6 +1,7 @@
 """Tests for utils of Gencove CLI."""
 import csv
 import os
+from enum import Enum
 
 from click.testing import CliRunner
 
@@ -292,3 +293,18 @@ def test_is_valid_uuid__is_not_valid__too_short():
 def test_is_valid_uuid__is_not_valid__text():
     """Test that random word is not a valid UUID"""
     assert is_valid_uuid("foo") is False
+
+
+def test_enum_as_dict():
+    """Test that the function enum_as_dict returns properly formatted dict."""
+
+    class TestEnum(Enum):
+        KEY1 = "key1"
+        KEY2 = "key2"
+        KEY3 = "key3"
+
+    assert enum_as_dict(TestEnum) == {
+        "KEY1": "key1",
+        "KEY2": "key2",
+        "KEY3": "key3",
+    }

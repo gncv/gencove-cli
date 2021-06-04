@@ -34,6 +34,7 @@ from gencove.models import (
     AccessJWT,
     CreateJWT,
     ProjectSamples,
+    Projects,
     SampleDetails,
     SampleQC,
     SampleSheet,
@@ -498,6 +499,7 @@ class APIClient:
             self.endpoints.PROJECTS.value,
             query_params=params,
             authorized=True,
+            model=Projects,
         )
 
     def get_pipeline_capabilities(self, pipeline_id):

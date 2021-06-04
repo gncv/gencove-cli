@@ -51,8 +51,8 @@ class List(Command):
             self.echo_debug("Get projects page")
             resp = self.get_projects(next_link)
 
-            yield [Project(**result) for result in resp["results"]]
-            next_link = resp["meta"]["next"]
+            yield resp.results
+            next_link = resp.meta.next
             more = next_link is not None
 
     @backoff.on_exception(

@@ -17,6 +17,7 @@ from gencove.command.projects.cli import list_projects
 from gencove.models import (
     PipelineCapabilities,
     Project,
+    Projects,
 )
 
 
@@ -27,7 +28,7 @@ def test_list_empty(mocker):
     mocked_get_projects = mocker.patch.object(
         APIClient,
         "list_projects",
-        return_value=dict(results=[], meta=dict(next=None)),
+        return_value=Projects(results=[], meta=dict(next=None)),
     )
     res = runner.invoke(
         list_projects, ["--email", "foo@bar.com", "--password", "123"]
@@ -166,7 +167,7 @@ def test_list_projects_slow_response_retry_pipeline(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_projects = mocker.patch.object(
-        APIClient, "list_projects", return_value=MOCKED_PROJECTS
+        APIClient, "list_projects", return_value=Projects(**MOCKED_PROJECTS)
     )
     mocked_get_pipeline_capabilities = mocker.patch.object(
         APIClient,
@@ -187,7 +188,7 @@ def test_list_projects(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_projects = mocker.patch.object(
-        APIClient, "list_projects", return_value=MOCKED_PROJECTS
+        APIClient, "list_projects", return_value=Projects(**MOCKED_PROJECTS)
     )
     mocked_get_pipeline_capabilities = mocker.patch.object(
         APIClient,
@@ -233,7 +234,7 @@ def test_list_projects__with_webhook_url(mocker):
     mocked_get_projects = mocker.patch.object(
         APIClient,
         "list_projects",
-        return_value=MOCKED_PROJECTS_WITH_WEBHOOK_URL,
+        return_value=Projects(**MOCKED_PROJECTS_WITH_WEBHOOK_URL),
     )
     mocked_get_pipeline_capabilities = mocker.patch.object(
         APIClient,
@@ -276,7 +277,7 @@ def test_list_projects__with_unexpected_keys(mocker):
     mocked_get_projects = mocker.patch.object(
         APIClient,
         "list_projects",
-        return_value=MOCKED_PROJECTS_WITH_UNEXPECTED_KEYS,
+        return_value=Projects(**MOCKED_PROJECTS_WITH_UNEXPECTED_KEYS),
     )
     mocked_get_pipeline_capabilities = mocker.patch.object(
         APIClient,

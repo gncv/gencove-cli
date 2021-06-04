@@ -1,9 +1,6 @@
 """Utilities for processing batches."""
 
 
-from gencove.models import BatchDetail
-
-
 def get_line(batch):
     """Build a list of relevant data to be printed.
 
@@ -13,22 +10,12 @@ def get_line(batch):
     Returns:
         str: tab delimited list of relevant data to be printed
     """
-    if isinstance(batch, BatchDetail):
-        return "\t".join(
-            [
-                str(batch.id),
-                batch.last_status.created.isoformat(),
-                batch.last_status.status,
-                batch.batch_type,
-                batch.name,
-            ]  # noqa
-        )
     return "\t".join(
         [
-            batch["id"],
-            batch["last_status"]["created"],
-            batch["last_status"]["status"],
-            batch["batch_type"],
-            batch["name"],
+            str(batch.id),
+            batch.last_status.created.isoformat(),
+            batch.last_status.status,
+            batch.batch_type,
+            batch.name,
         ]  # noqa
     )

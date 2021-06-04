@@ -35,6 +35,7 @@ from gencove.models import (
     BatchDetail,
     CreateJWT,
     PipelineCapabilities,
+    Project,
     ProjectBatchTypes,
     ProjectBatches,
     ProjectSamples,
@@ -586,7 +587,7 @@ class APIClient:
     def get_project(self, project_id):
         """Get single project."""
         project_endpoint = f"{self.endpoints.PROJECTS.value}{project_id}"
-        return self._get(project_endpoint, authorized=True)
+        return self._get(project_endpoint, authorized=True, model=Project)
 
     def create_merged_vcf(self, project_id):
         """Merge VCF files for a project."""

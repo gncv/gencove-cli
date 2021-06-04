@@ -38,6 +38,7 @@ from gencove.models import (
     Project,
     ProjectBatchTypes,
     ProjectBatches,
+    ProjectMergeVCFs,
     ProjectSamples,
     Projects,
     SampleDetails,
@@ -594,7 +595,9 @@ class APIClient:
         merge_vcf_endpoint = self.endpoints.PROJECT_MERGE_VCFS.value.format(
             id=project_id
         )
-        return self._post(merge_vcf_endpoint, authorized=True)
+        return self._post(
+            merge_vcf_endpoint, authorized=True, model=ProjectMergeVCFs
+        )
 
     def retrieve_merged_vcf(self, project_id):
         """Retrieve the status of the merge command for a project."""

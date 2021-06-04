@@ -9,6 +9,7 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient, APIClientError  # noqa: I100
 from gencove.command.projects.cli import create_merged_vcf
+from gencove.models import ProjectMergeVCFs
 
 
 def test_create_merged_vcf__bad_project_id(mocker):
@@ -21,6 +22,7 @@ def test_create_merged_vcf__bad_project_id(mocker):
     mocked_create_merged_vcf = mocker.patch.object(
         APIClient,
         "create_merged_vcf",
+        return_value=ProjectMergeVCFs(id=uuid4()),
     )
 
     res = runner.invoke(
@@ -290,13 +292,13 @@ def test_create_merged_vcf__success(mocker):
     project_id = str(uuid4())
     mocked_response = {
         "id": project_id,
-        "created": "2020-09-14T08:59:00.480Z",
+        "created": "2020-09-14T08:59:00.480",
         "user": str(uuid4()),
         "last_status": {
             "id": str(uuid4()),
             "status": "running",
             "note": "",
-            "created": "2020-07-28T12:46:22.719862Z",
+            "created": "2020-07-28T12:46:22.719862",
         },
         "up_to_date": False,
     }
@@ -305,7 +307,9 @@ def test_create_merged_vcf__success(mocker):
 
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_merged_vcf = mocker.patch.object(
-        APIClient, "create_merged_vcf", return_value=mocked_response
+        APIClient,
+        "create_merged_vcf",
+        return_value=ProjectMergeVCFs(**mocked_response),
     )
 
     res = runner.invoke(

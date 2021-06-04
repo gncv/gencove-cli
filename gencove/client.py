@@ -604,7 +604,9 @@ class APIClient:
         merge_vcf_endpoint = self.endpoints.PROJECT_MERGE_VCFS.value.format(
             id=project_id
         )
-        return self._get(merge_vcf_endpoint, authorized=True)
+        return self._get(
+            merge_vcf_endpoint, authorized=True, model=ProjectMergeVCFs
+        )
 
     def get_metadata(self, sample_id):
         """Retrieve the metadata for a sample."""

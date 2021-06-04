@@ -23,13 +23,12 @@ def get_line(batch):
                 batch.name,
             ]  # noqa
         )
-    else:
-        return "\t".join(
-            [
-                batch["id"],
-                batch["last_status"]["created"],
-                batch["last_status"]["status"],
-                batch["batch_type"],
-                batch["name"],
-            ]  # noqa
-        )
+    return "\t".join(
+        [
+            batch["id"],
+            batch["last_status"]["created"],
+            batch["last_status"]["status"],
+            batch["batch_type"],
+            batch["name"],
+        ]  # noqa
+    )

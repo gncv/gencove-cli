@@ -1,6 +1,5 @@
 """Test project's batch types list command."""
 
-from gencove.models import ProjectBatchTypes
 import io
 import sys
 from uuid import uuid4
@@ -10,6 +9,7 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient, APIClientTimeout  # noqa: I100
 from gencove.command.projects.cli import list_project_batch_types
+from gencove.models import ProjectBatchTypes
 
 
 def test_list_project_batch_types__empty(mocker):

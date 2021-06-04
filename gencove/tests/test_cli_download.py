@@ -3,15 +3,15 @@ import io
 import json
 import os
 import sys
-from uuid import uuid4
 from datetime import datetime
+from uuid import uuid4
 
 from click import echo
 from click.testing import CliRunner
 
 from gencove.cli import download
 from gencove.client import APIClient
-from gencove.models import ProjectSamples, Sample, SampleDetails, SampleQC
+from gencove.models import ProjectSamples, SampleDetails, SampleQC
 
 
 def test_no_required_options():

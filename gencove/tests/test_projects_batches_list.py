@@ -1,6 +1,5 @@
 """Test project's batches list command."""
 
-from gencove.models import ProjectBatches
 import io
 import sys
 from uuid import uuid4
@@ -10,6 +9,7 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient, APIClientTimeout  # noqa: I100
 from gencove.command.projects.cli import list_project_batches
+from gencove.models import ProjectBatches
 
 
 def test_list_project_batches__empty(mocker):

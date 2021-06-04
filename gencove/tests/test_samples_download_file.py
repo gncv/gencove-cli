@@ -1,11 +1,11 @@
 """Test download command."""
-from gencove.models import SampleDetails
 from uuid import uuid4
 
 from click.testing import CliRunner
 
 from gencove.client import APIClient
 from gencove.command.samples.cli import download_file
+from gencove.models import SampleDetails
 
 import requests  # pylint: disable=wrong-import-order
 

@@ -4,7 +4,7 @@ import backoff
 # pylint: disable=wrong-import-order
 from gencove.client import APIClientError, APIClientTimeout  # noqa: I100
 from gencove.command.base import Command
-from gencove.models import PipelineCapabilities, Project
+from gencove.models import Project
 
 from .utils import get_line
 

@@ -1,5 +1,4 @@
 """Download command utilities."""
-from gencove.models import SampleFile
 import json
 import os
 import re
@@ -15,6 +14,7 @@ from gencove.constants import (  # noqa: I100
     MAX_RETRY_TIME_SECONDS,
 )
 from gencove.logger import echo_debug, echo_info, echo_warning
+from gencove.models import SampleFile
 from gencove.utils import get_progress_bar
 
 from .constants import (

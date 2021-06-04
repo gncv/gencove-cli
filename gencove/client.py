@@ -34,6 +34,7 @@ from gencove.models import (
     AccessJWT,
     CreateJWT,
     ProjectSamples,
+    SampleDetails,
     SampleSheet,
     UploadCredentials,
     UploadSamples,
@@ -420,6 +421,7 @@ class APIClient:
         return self._get(
             self.endpoints.SAMPLE_DETAILS.value.format(id=sample_id),
             authorized=True,
+            model=SampleDetails,
         )
 
     def get_sample_qc_metrics(self, sample_id):

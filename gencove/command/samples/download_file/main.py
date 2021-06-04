@@ -81,15 +81,15 @@ class DownloadFile(Command):
 
         self.echo_debug(
             "Processing sample id {}, status {}".format(
-                sample["id"], sample["last_status"]["status"]
+                sample.id, sample.last_status.status
             )
         )
 
         file_to_download = None
 
-        for sample_file in sample["files"]:
+        for sample_file in sample.files:
             # pylint: disable=E0012,C0330
-            if self.file_type == sample_file["file_type"]:
+            if self.file_type == sample_file.file_type:
                 file_to_download = sample_file
                 break
 
@@ -102,6 +102,6 @@ class DownloadFile(Command):
         else:
             download_file(
                 self.destination,
-                file_to_download["download_url"],
+                file_to_download.download_url,
                 self.no_progress,
             )

@@ -1,4 +1,5 @@
 """Download command utilities."""
+from gencove.models import SampleFile
 import json
 import os
 import re
@@ -109,10 +110,20 @@ def build_file_path(
          str : file path on current file system
     """
     prefix = _get_prefix_parts(file_with_prefix)
-    # fmt: off
-    # the source filename includes extensions as well.
-    source_filename = filename if filename else get_filename_from_download_url(deliverable["download_url"])  # noqa: E501  # pylint: disable=line-too-long
-    # fmt: on
+    download_url, file_type = "", ""
+    if isinstance(deliverable, SampleFile):
+        download_url, file_type = (
+            deliverable.download_url,
+            deliverable.file_type,
+        )
+    else:
+        download_url, file_type = (
+            deliverable.get("download_url"),
+            deliverable.get("file_type"),
+        )
+    source_filename = (
+        filename if filename else get_filename_from_download_url(download_url)
+    )
 
     destination_filename = prefix.filename
     if prefix.file_extension:
@@ -124,7 +135,7 @@ def build_file_path(
     # fmt: off
     destination_filename = destination_filename.format(
         **{
-            DownloadTemplateParts.FILE_TYPE.value: FILE_TYPES_MAPPER.get(deliverable["file_type"]) or deliverable["file_type"],  # noqa: E501  # pylint: disable=line-too-long
+            DownloadTemplateParts.FILE_TYPE.value: FILE_TYPES_MAPPER.get(file_type) or file_type,  # noqa: E501  # pylint: disable=line-too-long
             DownloadTemplateParts.FILE_EXTENSION.value: deliverable_type_from_filename(source_filename),  # noqa: E501  # pylint: disable=line-too-long
             DownloadTemplateParts.DEFAULT_FILENAME.value: source_filename,
         }

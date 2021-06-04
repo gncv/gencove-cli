@@ -4,13 +4,14 @@ import json
 import os
 import sys
 from uuid import uuid4
+from datetime import datetime
 
 from click import echo
 from click.testing import CliRunner
 
 from gencove.cli import download
 from gencove.client import APIClient
-from gencove.models import ProjectSamples
+from gencove.models import ProjectSamples, Sample, SampleDetails
 
 
 def test_no_required_options():
@@ -72,28 +73,30 @@ def test_project_id_provided(mocker):
         mocked_sample_details = mocker.patch.object(
             APIClient,
             "get_sample_details",
-            return_value={
-                "id": 0,
-                "client_id": 1,
-                "last_status": {
-                    "id": str(uuid4()),
-                    "status": "succeeded",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                },
-                "archive_last_status": {
-                    "id": str(uuid4()),
-                    "status": "available",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
-                },
-                "files": [
-                    {
+            return_value=SampleDetails(
+                **{
+                    "id": 0,
+                    "client_id": 1,
+                    "last_status": {
                         "id": str(uuid4()),
-                        "file_type": "txt",
-                        "download_url": "https://foo.com/bar.txt",
-                    }
-                ],
-            },
+                        "status": "succeeded",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                    },
+                    "archive_last_status": {
+                        "id": str(uuid4()),
+                        "status": "available",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                        "transition_cutoff": "2020-08-28T12:46:22.719862Z",
+                    },
+                    "files": [
+                        {
+                            "id": str(uuid4()),
+                            "file_type": "txt",
+                            "download_url": "https://foo.com/bar.txt",
+                        }
+                    ],
+                }
+            ),
         )
         mocked_qc_metrics = mocker.patch.object(
             APIClient,
@@ -141,28 +144,30 @@ def test_sample_ids_provided(mocker):
         mocked_sample_details = mocker.patch.object(
             APIClient,
             "get_sample_details",
-            return_value={
-                "id": 0,
-                "client_id": 1,
-                "last_status": {
-                    "id": str(uuid4()),
-                    "status": "succeeded",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                },
-                "archive_last_status": {
-                    "id": str(uuid4()),
-                    "status": "available",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
-                },
-                "files": [
-                    {
+            return_value=SampleDetails(
+                **{
+                    "id": 0,
+                    "client_id": 1,
+                    "last_status": {
                         "id": str(uuid4()),
-                        "file_type": "txt",
-                        "download_url": "https://foo.com/bar.txt",
-                    }
-                ],
-            },
+                        "status": "succeeded",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                    },
+                    "archive_last_status": {
+                        "id": str(uuid4()),
+                        "status": "available",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                        "transition_cutoff": "2020-08-28T12:46:22.719862Z",
+                    },
+                    "files": [
+                        {
+                            "id": str(uuid4()),
+                            "file_type": "txt",
+                            "download_url": "https://foo.com/bar.txt",
+                        }
+                    ],
+                }
+            ),
         )
         mocked_qc_metrics = mocker.patch.object(
             APIClient,
@@ -214,22 +219,24 @@ def test_sample_ids_provided_no_qc_file(mocker):
         mocked_sample_details = mocker.patch.object(
             APIClient,
             "get_sample_details",
-            return_value={
-                "id": 0,
-                "client_id": 1,
-                "last_status": {
-                    "id": str(uuid4()),
-                    "status": "succeeded",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                },
-                "archive_last_status": {
-                    "id": str(uuid4()),
-                    "status": "available",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
-                },
-                "files": [],
-            },
+            return_value=SampleDetails(
+                **{
+                    "id": 0,
+                    "client_id": 1,
+                    "last_status": {
+                        "id": str(uuid4()),
+                        "status": "succeeded",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                    },
+                    "archive_last_status": {
+                        "id": str(uuid4()),
+                        "status": "available",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                        "transition_cutoff": "2020-08-28T12:46:22.719862Z",
+                    },
+                    "files": [],
+                }
+            ),
         )
         mocked_qc_metrics = mocker.patch.object(
             APIClient,
@@ -270,22 +277,24 @@ def test_sample_ids_provided_no_metadata_file(mocker):
         mocked_sample_details = mocker.patch.object(
             APIClient,
             "get_sample_details",
-            return_value={
-                "id": 0,
-                "client_id": 1,
-                "last_status": {
-                    "id": str(uuid4()),
-                    "status": "succeeded",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                },
-                "archive_last_status": {
-                    "id": str(uuid4()),
-                    "status": "available",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
-                },
-                "files": [],
-            },
+            return_value=SampleDetails(
+                **{
+                    "id": 0,
+                    "client_id": 1,
+                    "last_status": {
+                        "id": str(uuid4()),
+                        "status": "succeeded",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                    },
+                    "archive_last_status": {
+                        "id": str(uuid4()),
+                        "status": "available",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                        "transition_cutoff": "2020-08-28T12:46:22.719862Z",
+                    },
+                    "files": [],
+                }
+            ),
         )
         mocked_get_metadata = mocker.patch.object(
             APIClient,
@@ -383,31 +392,35 @@ def test_download_stdout_with_flag(mocker):
     last_status_id = str(uuid4())
     archive_last_status_id = str(uuid4())
     file_id = str(uuid4())
+    created = datetime.fromisoformat("2020-07-28T12:46:22.719862")
+    transition_cutoff = datetime.fromisoformat("2020-08-28T12:46:22.719862")
     mocked_sample_details = mocker.patch.object(
         APIClient,
         "get_sample_details",
-        return_value={
-            "id": 0,
-            "client_id": 1,
-            "last_status": {
-                "id": last_status_id,
-                "status": "succeeded",
-                "created": "2020-07-28T12:46:22.719862Z",
-            },
-            "archive_last_status": {
-                "id": archive_last_status_id,
-                "status": "available",
-                "created": "2020-07-28T12:46:22.719862Z",
-                "transition_cutoff": "2020-08-28T12:46:22.719862Z",
-            },
-            "files": [
-                {
-                    "id": file_id,
-                    "file_type": "txt",
-                    "download_url": "https://foo.com/bar.txt",
-                }
-            ],
-        },
+        return_value=SampleDetails(
+            **{
+                "id": "0",
+                "client_id": "1",
+                "last_status": {
+                    "id": last_status_id,
+                    "status": "succeeded",
+                    "created": created.isoformat(),
+                },
+                "archive_last_status": {
+                    "id": archive_last_status_id,
+                    "status": "available",
+                    "created": created.isoformat(),
+                    "transition_cutoff": transition_cutoff.isoformat(),
+                },
+                "files": [
+                    {
+                        "id": file_id,
+                        "file_type": "txt",
+                        "download_url": "https://foo.com/bar.txt",
+                    }
+                ],
+            }
+        ),
     )
     res = runner.invoke(
         download,
@@ -431,18 +444,18 @@ def test_download_stdout_with_flag(mocker):
     mocked_result = json.dumps(
         [
             {
-                "gencove_id": 0,
-                "client_id": 1,
+                "gencove_id": "0",
+                "client_id": "1",
                 "last_status": {
                     "id": last_status_id,
                     "status": "succeeded",
-                    "created": "2020-07-28T12:46:22.719862Z",
+                    "created": created.isoformat(),
                 },
                 "archive_last_status": {
                     "id": archive_last_status_id,
                     "status": "available",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
+                    "created": created.isoformat(),
+                    "transition_cutoff": transition_cutoff.isoformat(),
                 },
                 "files": {
                     "txt": {
@@ -475,28 +488,30 @@ def test_download_urls_to_file(mocker):
     mocked_sample_details = mocker.patch.object(
         APIClient,
         "get_sample_details",
-        return_value={
-            "id": 0,
-            "client_id": 1,
-            "last_status": {
-                "id": last_status_id,
-                "status": "succeeded",
-                "created": "2020-07-28T12:46:22.719862Z",
-            },
-            "archive_last_status": {
-                "id": archive_last_status_id,
-                "status": "available",
-                "created": "2020-07-28T12:46:22.719862Z",
-                "transition_cutoff": "2020-08-28T12:46:22.719862Z",
-            },
-            "files": [
-                {
-                    "id": file_id,
-                    "file_type": "txt",
-                    "download_url": "https://foo.com/bar.txt",
-                }
-            ],
-        },
+        return_value=SampleDetails(
+            **{
+                "id": 0,
+                "client_id": 1,
+                "last_status": {
+                    "id": last_status_id,
+                    "status": "succeeded",
+                    "created": "2020-07-28T12:46:22.719862Z",
+                },
+                "archive_last_status": {
+                    "id": archive_last_status_id,
+                    "status": "available",
+                    "created": "2020-07-28T12:46:22.719862Z",
+                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
+                },
+                "files": [
+                    {
+                        "id": file_id,
+                        "file_type": "txt",
+                        "download_url": "https://foo.com/bar.txt",
+                    }
+                ],
+            }
+        ),
     )
     mocked_output_list = mocker.patch(
         "gencove.command.download.main.Download.output_list"
@@ -532,28 +547,30 @@ def test_download_no_progress(mocker):
         mocked_sample_details = mocker.patch.object(
             APIClient,
             "get_sample_details",
-            return_value={
-                "id": 0,
-                "client_id": 1,
-                "last_status": {
-                    "id": str(uuid4()),
-                    "status": "succeeded",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                },
-                "archive_last_status": {
-                    "id": str(uuid4()),
-                    "status": "available",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
-                },
-                "files": [
-                    {
+            return_value=SampleDetails(
+                **{
+                    "id": 0,
+                    "client_id": 1,
+                    "last_status": {
                         "id": str(uuid4()),
-                        "file_type": "txt",
-                        "download_url": "https://foo.com/bar.txt",
-                    }
-                ],
-            },
+                        "status": "succeeded",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                    },
+                    "archive_last_status": {
+                        "id": str(uuid4()),
+                        "status": "available",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                        "transition_cutoff": "2020-08-28T12:46:22.719862Z",
+                    },
+                    "files": [
+                        {
+                            "id": str(uuid4()),
+                            "file_type": "txt",
+                            "download_url": "https://foo.com/bar.txt",
+                        }
+                    ],
+                }
+            ),
         )
         mocked_qc_metrics = mocker.patch.object(
             APIClient,
@@ -610,28 +627,30 @@ def test_project_id_provided_skip_existing_qc_and_metadata(mocker):
         mocked_sample_details = mocker.patch.object(
             APIClient,
             "get_sample_details",
-            return_value={
-                "id": 0,
-                "client_id": 1,
-                "last_status": {
-                    "id": str(uuid4()),
-                    "status": "succeeded",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                },
-                "archive_last_status": {
-                    "id": str(uuid4()),
-                    "status": "available",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
-                },
-                "files": [
-                    {
+            return_value=SampleDetails(
+                **{
+                    "id": 0,
+                    "client_id": 1,
+                    "last_status": {
                         "id": str(uuid4()),
-                        "file_type": "txt",
-                        "download_url": "https://foo.com/bar.txt",
-                    }
-                ],
-            },
+                        "status": "succeeded",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                    },
+                    "archive_last_status": {
+                        "id": str(uuid4()),
+                        "status": "available",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                        "transition_cutoff": "2020-08-28T12:46:22.719862Z",
+                    },
+                    "files": [
+                        {
+                            "id": str(uuid4()),
+                            "file_type": "txt",
+                            "download_url": "https://foo.com/bar.txt",
+                        }
+                    ],
+                }
+            ),
         )
         mocked_qc_metrics = mocker.patch.object(
             APIClient,
@@ -710,28 +729,30 @@ def test_download_not_working_because_archived(mocker):
         mocked_sample_details = mocker.patch.object(
             APIClient,
             "get_sample_details",
-            return_value={
-                "id": 0,
-                "client_id": 1,
-                "last_status": {
-                    "id": str(uuid4()),
-                    "status": "succeeded",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                },
-                "archive_last_status": {
-                    "id": str(uuid4()),
-                    "status": "archived",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
-                },
-                "files": [
-                    {
+            return_value=SampleDetails(
+                **{
+                    "id": 0,
+                    "client_id": 1,
+                    "last_status": {
                         "id": str(uuid4()),
-                        "file_type": "txt",
-                        "download_url": None,
-                    }
-                ],
-            },
+                        "status": "succeeded",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                    },
+                    "archive_last_status": {
+                        "id": str(uuid4()),
+                        "status": "archived",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                        "transition_cutoff": "2020-08-28T12:46:22.719862Z",
+                    },
+                    "files": [
+                        {
+                            "id": str(uuid4()),
+                            "file_type": "txt",
+                            "download_url": None,
+                        }
+                    ],
+                }
+            ),
         )
         mocked_qc_metrics = mocker.patch.object(
             APIClient,
@@ -785,28 +806,30 @@ def test_project_id_provided_filter_not_archived(mocker):
         mocked_sample_details = mocker.patch.object(
             APIClient,
             "get_sample_details",
-            return_value={
-                "id": 0,
-                "client_id": 1,
-                "last_status": {
-                    "id": str(uuid4()),
-                    "status": "succeeded",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                },
-                "archive_last_status": {
-                    "id": str(uuid4()),
-                    "status": "archived",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
-                },
-                "files": [
-                    {
+            return_value=SampleDetails(
+                **{
+                    "id": 0,
+                    "client_id": 1,
+                    "last_status": {
                         "id": str(uuid4()),
-                        "file_type": "txt",
-                        "download_url": None,
-                    }
-                ],
-            },
+                        "status": "succeeded",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                    },
+                    "archive_last_status": {
+                        "id": str(uuid4()),
+                        "status": "archived",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                        "transition_cutoff": "2020-08-28T12:46:22.719862Z",
+                    },
+                    "files": [
+                        {
+                            "id": str(uuid4()),
+                            "file_type": "txt",
+                            "download_url": None,
+                        }
+                    ],
+                }
+            ),
         )
         mocked_qc_metrics = mocker.patch.object(
             APIClient,

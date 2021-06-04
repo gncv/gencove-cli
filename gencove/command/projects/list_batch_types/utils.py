@@ -12,7 +12,7 @@ def get_line(batch_type):
     """
     return "\t".join(
         [
-            batch_type["key"],
-            batch_type["description"],
+            batch_type.key,
+            batch_type.description,
         ]
     )

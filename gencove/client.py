@@ -34,6 +34,7 @@ from gencove.models import (
     AccessJWT,
     CreateJWT,
     PipelineCapabilities,
+    ProjectBatchTypes,
     ProjectSamples,
     Projects,
     SampleDetails,
@@ -526,7 +527,10 @@ class APIClient:
         )
         params = self._add_query_params(next_link)
         return self._get(
-            project_endpoint, query_params=params, authorized=True
+            project_endpoint,
+            query_params=params,
+            authorized=True,
+            model=ProjectBatchTypes,
         )
 
     def get_project_batches(self, project_id, next_link=None):

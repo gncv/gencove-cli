@@ -287,13 +287,14 @@ def save_qc_file(path, api_client, sample_id, skip_existing=True):
         echo_info("Skipping existing file: {}".format(path))
         return
     try:
-        content = api_client.get_sample_qc_metrics(sample_id)["results"]
+        sample_qcs = api_client.get_sample_qc_metrics(sample_id).results
     except client.APIClientError:
         echo_warning("Error getting sample quality control metrics.")
         raise
     echo_info("Downloading file to: {}".format(path))
     with open(path, "w") as qc_file:
-        json.dump(content, qc_file)
+        content = json.dumps(sample_qcs, cls=client.CustomEncoder)
+        qc_file.write(content)
     echo_info("Finished downloading a file: {}".format(path))
 
 

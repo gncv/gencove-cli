@@ -11,7 +11,7 @@ from click.testing import CliRunner
 
 from gencove.cli import download
 from gencove.client import APIClient
-from gencove.models import ProjectSamples, Sample, SampleDetails
+from gencove.models import ProjectSamples, Sample, SampleDetails, SampleQC
 
 
 def test_no_required_options():
@@ -101,7 +101,7 @@ def test_project_id_provided(mocker):
         mocked_qc_metrics = mocker.patch.object(
             APIClient,
             "get_sample_qc_metrics",
-            return_value={"results": [{"foo": 12}]},
+            return_value=SampleQC(**{"results": [{"foo": 12}], "meta": {}}),
         )
         mocked_get_metadata = mocker.patch.object(
             APIClient,
@@ -172,7 +172,7 @@ def test_sample_ids_provided(mocker):
         mocked_qc_metrics = mocker.patch.object(
             APIClient,
             "get_sample_qc_metrics",
-            return_value={"results": [{"foo": 12}]},
+            return_value=SampleQC(**{"results": [{"foo": 12}], "meta": {}}),
         )
         mocked_get_metadata = mocker.patch.object(
             APIClient,
@@ -241,7 +241,7 @@ def test_sample_ids_provided_no_qc_file(mocker):
         mocked_qc_metrics = mocker.patch.object(
             APIClient,
             "get_sample_qc_metrics",
-            return_value={"results": [{"foo": 12}]},
+            return_value=SampleQC(**{"results": [{"foo": 12}], "meta": {}}),
         )
         mocked_get_metadata = mocker.patch.object(
             APIClient,
@@ -304,7 +304,7 @@ def test_sample_ids_provided_no_metadata_file(mocker):
         mocked_qc_metrics = mocker.patch.object(
             APIClient,
             "get_sample_qc_metrics",
-            return_value={"results": [{"foo": 12}]},
+            return_value=SampleQC(**{"results": [{"foo": 12}], "meta": {}}),
         )
         res = runner.invoke(
             download,
@@ -575,7 +575,7 @@ def test_download_no_progress(mocker):
         mocked_qc_metrics = mocker.patch.object(
             APIClient,
             "get_sample_qc_metrics",
-            return_value={"results": [{"foo": 12}]},
+            return_value=SampleQC(**{"results": [{"foo": 12}], "meta": {}}),
         )
         mocked_get_metadata = mocker.patch.object(
             APIClient,
@@ -655,7 +655,7 @@ def test_project_id_provided_skip_existing_qc_and_metadata(mocker):
         mocked_qc_metrics = mocker.patch.object(
             APIClient,
             "get_sample_qc_metrics",
-            return_value={"results": [{"foo": 12}]},
+            return_value=SampleQC(**{"results": [{"foo": 12}], "meta": {}}),
         )
         mocked_get_metadata = mocker.patch.object(
             APIClient,
@@ -692,7 +692,7 @@ def test_project_id_provided_skip_existing_qc_and_metadata(mocker):
         mocked_qc_metrics = mocker.patch.object(
             APIClient,
             "get_sample_qc_metrics",
-            return_value={"results": [{"foo": 12}]},
+            return_value=SampleQC(**{"results": [{"foo": 12}], "meta": {}}),
         )
         mocked_get_metadata = mocker.patch.object(
             APIClient,
@@ -757,7 +757,7 @@ def test_download_not_working_because_archived(mocker):
         mocked_qc_metrics = mocker.patch.object(
             APIClient,
             "get_sample_qc_metrics",
-            return_value={"results": [{"foo": 12}]},
+            return_value=SampleQC(**{"results": [{"foo": 12}], "meta": {}}),
         )
         mocked_get_metadata = mocker.patch.object(
             APIClient,
@@ -834,7 +834,7 @@ def test_project_id_provided_filter_not_archived(mocker):
         mocked_qc_metrics = mocker.patch.object(
             APIClient,
             "get_sample_qc_metrics",
-            return_value={"results": [{"foo": 12}]},
+            return_value=SampleQC(**{"results": [{"foo": 12}], "meta": {}}),
         )
         mocked_get_metadata = mocker.patch.object(
             APIClient,

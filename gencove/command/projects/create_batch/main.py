@@ -72,7 +72,7 @@ class CreateBatch(Command):
                 sample_ids=self.sample_ids,
             )
             self.echo_debug(created_batches_details)
-            for batch in created_batches_details["results"]:
+            for batch in created_batches_details.results:
                 self.echo_data(get_line(batch))
         except client.APIClientError as err:
             self.echo_debug(err)

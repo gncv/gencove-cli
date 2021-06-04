@@ -3,7 +3,6 @@ import io
 import json
 import os
 import sys
-from datetime import datetime
 from uuid import uuid4
 
 from click import echo
@@ -392,8 +391,8 @@ def test_download_stdout_with_flag(mocker):
     last_status_id = str(uuid4())
     archive_last_status_id = str(uuid4())
     file_id = str(uuid4())
-    created = datetime.fromisoformat("2020-07-28T12:46:22.719862")
-    transition_cutoff = datetime.fromisoformat("2020-08-28T12:46:22.719862")
+    created = "2020-07-28T12:46:22.719862"
+    transition_cutoff = "2020-08-28T12:46:22.719862"
     mocked_sample_details = mocker.patch.object(
         APIClient,
         "get_sample_details",
@@ -404,13 +403,13 @@ def test_download_stdout_with_flag(mocker):
                 "last_status": {
                     "id": last_status_id,
                     "status": "succeeded",
-                    "created": created.isoformat(),
+                    "created": created,
                 },
                 "archive_last_status": {
                     "id": archive_last_status_id,
                     "status": "available",
-                    "created": created.isoformat(),
-                    "transition_cutoff": transition_cutoff.isoformat(),
+                    "created": created,
+                    "transition_cutoff": transition_cutoff,
                 },
                 "files": [
                     {
@@ -449,13 +448,13 @@ def test_download_stdout_with_flag(mocker):
                 "last_status": {
                     "id": last_status_id,
                     "status": "succeeded",
-                    "created": created.isoformat(),
+                    "created": created,
                 },
                 "archive_last_status": {
                     "id": archive_last_status_id,
                     "status": "available",
-                    "created": created.isoformat(),
-                    "transition_cutoff": transition_cutoff.isoformat(),
+                    "created": created,
+                    "transition_cutoff": transition_cutoff,
                 },
                 "files": {
                     "txt": {

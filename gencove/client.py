@@ -32,6 +32,7 @@ from gencove.constants import (
 from gencove.logger import echo_debug
 from gencove.models import (
     AccessJWT,
+    BatchDetail,
     CreateJWT,
     PipelineCapabilities,
     ProjectBatchTypes,
@@ -561,7 +562,9 @@ class APIClient:
             "sample_ids": sample_ids,
         }
 
-        return self._post(project_endpoint, payload, authorized=True)
+        return self._post(
+            project_endpoint, payload, authorized=True, model=BatchDetail
+        )
 
     def get_batch(self, batch_id):
         """Get single batch."""

@@ -73,8 +73,7 @@ class List(Command):
     )
     def get_pipeline_capabilities(self, pipeline_id):
         """Get pipeline capabilities."""
-        resp = self.api_client.get_pipeline_capabilities(pipeline_id)
-        return PipelineCapabilities(**resp)
+        return self.api_client.get_pipeline_capabilities(pipeline_id)
 
     def augment_projects_with_pipeline_capabilities(self, projects):
         """Fetch pipeline capabilities and append it to the project.

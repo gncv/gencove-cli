@@ -33,6 +33,7 @@ from gencove.logger import echo_debug
 from gencove.models import (
     AccessJWT,
     CreateJWT,
+    PipelineCapabilities,
     ProjectSamples,
     Projects,
     SampleDetails,
@@ -514,6 +515,7 @@ class APIClient:
         resp = self._get(
             self.endpoints.PIPELINE_CAPABILITES.value.format(id=pipeline_id),
             authorized=True,
+            model=PipelineCapabilities,
         )
         return resp
 

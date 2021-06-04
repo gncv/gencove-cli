@@ -114,7 +114,7 @@ def test_list_projects_no_permission(mocker):
     mocked_get_pipeline_capabilities = mocker.patch.object(
         APIClient,
         "get_pipeline_capabilities",
-        return_value=MOCKED_PIPELINE_CAPABILITY,
+        return_value=PipelineCapabilities(**MOCKED_PIPELINE_CAPABILITY),
     )
     res = runner.invoke(
         list_projects, ["--email", "foo@bar.com", "--password", "123"]
@@ -193,7 +193,7 @@ def test_list_projects(mocker):
     mocked_get_pipeline_capabilities = mocker.patch.object(
         APIClient,
         "get_pipeline_capabilities",
-        return_value=MOCKED_PIPELINE_CAPABILITY,
+        return_value=PipelineCapabilities(**MOCKED_PIPELINE_CAPABILITY),
     )
     res = runner.invoke(
         list_projects, ["--email", "foo@bar.com", "--password", "123"]
@@ -239,7 +239,7 @@ def test_list_projects__with_webhook_url(mocker):
     mocked_get_pipeline_capabilities = mocker.patch.object(
         APIClient,
         "get_pipeline_capabilities",
-        return_value=MOCKED_PIPELINE_CAPABILITY,
+        return_value=PipelineCapabilities(**MOCKED_PIPELINE_CAPABILITY),
     )
     res = runner.invoke(
         list_projects, ["--email", "foo@bar.com", "--password", "123"]
@@ -282,7 +282,7 @@ def test_list_projects__with_unexpected_keys(mocker):
     mocked_get_pipeline_capabilities = mocker.patch.object(
         APIClient,
         "get_pipeline_capabilities",
-        return_value=MOCKED_PIPELINE_CAPABILITY,
+        return_value=PipelineCapabilities(**MOCKED_PIPELINE_CAPABILITY),
     )
     res = runner.invoke(
         list_projects, ["--email", "foo@bar.com", "--password", "123"]

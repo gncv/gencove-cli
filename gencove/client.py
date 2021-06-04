@@ -569,7 +569,7 @@ class APIClient:
     def get_batch(self, batch_id):
         """Get single batch."""
         batches_endpoint = self.endpoints.BATCHES.value.format(id=batch_id)
-        return self._get(batches_endpoint, authorized=True)
+        return self._get(batches_endpoint, authorized=True, model=BatchDetail)
 
     def restore_project_samples(self, project_id, sample_ids):
         """Make a request to restore samples in given project."""

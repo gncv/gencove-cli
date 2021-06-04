@@ -6,6 +6,7 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient, APIClientTimeout  # noqa: I100
 from gencove.command.projects.cli import get_batch
+from gencove.models import BatchDetail
 
 
 def test_get_batch__empty(mocker):
@@ -16,7 +17,7 @@ def test_get_batch__empty(mocker):
     mocked_get_batch = mocker.patch.object(
         APIClient,
         "get_batch",
-        return_value=dict(
+        return_value=BatchDetail(
             id=batch_id,
             name="cli-test-1",
             batch_type="batch-type-1",
@@ -53,7 +54,7 @@ def test_get_batch__not_empty(mocker):
         mocked_get_batch = mocker.patch.object(
             APIClient,
             "get_batch",
-            return_value=dict(
+            return_value=BatchDetail(
                 id=batch_id,
                 name="cli-test-1",
                 batch_type="batch-type-1",
@@ -65,7 +66,7 @@ def test_get_batch__not_empty(mocker):
                 ),
                 files=[
                     dict(
-                        id="file-id-1",
+                        id=str(uuid4()),
                         s3_path=(
                             "output/simple_vcf2finalreport/job-id-1/"
                             "simple_vcf2finalreport/report.zip"
@@ -119,7 +120,7 @@ def test_get_batch__no_progress_not_empty(mocker):
         mocked_get_batch = mocker.patch.object(
             APIClient,
             "get_batch",
-            return_value=dict(
+            return_value=BatchDetail(
                 id=batch_id,
                 name="cli-test-1",
                 batch_type="batch-type-1",
@@ -131,7 +132,7 @@ def test_get_batch__no_progress_not_empty(mocker):
                 ),
                 files=[
                     dict(
-                        id="file-id-1",
+                        id=str(uuid4()),
                         s3_path=(
                             "output/simple_vcf2finalreport/job-id-1/"
                             "simple_vcf2finalreport/report.zip"

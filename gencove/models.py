@@ -261,7 +261,7 @@ class ProjectMergeVCFs(GencoveBaseModel):
     up_to_date: Optional[bool]
 
 
-class SampleMetadata(GencoveBaseModel):
+class SampleMetadata(BaseModel):
     """SampleMetadata model"""
 
     metadata: Optional[Any]

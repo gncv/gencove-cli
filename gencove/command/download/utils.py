@@ -261,13 +261,14 @@ def save_metadata_file(path, api_client, sample_id, skip_existing=True):
         echo_info("Skipping existing file: {}".format(path))
         return
     try:
-        content = api_client.get_metadata(sample_id)
+        metadata = api_client.get_metadata(sample_id)
     except client.APIClientError:
         echo_warning("Error getting sample metadata.")
         raise
     echo_info("Downloading file to: {}".format(path))
     with open(path, "w") as metadata_file:
-        json.dump(content, metadata_file)
+        content = json.dumps(metadata, cls=client.CustomEncoder)
+        metadata_file.write(content)
     echo_info("Finished downloading a file: {}".format(path))
 
 

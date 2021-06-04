@@ -42,6 +42,7 @@ from gencove.models import (
     ProjectSamples,
     Projects,
     SampleDetails,
+    SampleMetadata,
     SampleQC,
     SampleSheet,
     UploadCredentials,
@@ -613,7 +614,9 @@ class APIClient:
         sample_metadata_endpoint = (
             self.endpoints.SAMPLE_METADATA.value.format(id=sample_id)
         )
-        return self._get(sample_metadata_endpoint, authorized=True)
+        return self._get(
+            sample_metadata_endpoint, authorized=True, model=SampleMetadata
+        )
 
     def set_metadata(self, sample_id, metadata):
         """Assign the metadata to a sample."""
@@ -623,4 +626,9 @@ class APIClient:
         payload = {
             "metadata": metadata,
         }
-        return self._post(sample_metadata_endpoint, payload, authorized=True)
+        return self._post(
+            sample_metadata_endpoint,
+            payload,
+            authorized=True,
+            model=SampleMetadata,
+        )

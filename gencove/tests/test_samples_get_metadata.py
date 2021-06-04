@@ -10,6 +10,7 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.samples.cli import get_metadata
+from gencove.models import SampleMetadata
 
 
 def test_get_metadata__bad_sample_id(mocker):
@@ -83,7 +84,7 @@ def test_get_metadata__empty(mocker):
     mocked_get_metadata = mocker.patch.object(
         APIClient,
         "get_metadata",
-        return_value=dict(
+        return_value=SampleMetadata(
             metadata=None,
         ),
     )
@@ -116,7 +117,7 @@ def test_get_metadata__success_custom_filename(mocker):
     mocked_get_metadata = mocker.patch.object(
         APIClient,
         "get_metadata",
-        return_value=mocked_response,
+        return_value=SampleMetadata(**mocked_response),
     )
     custom_filename = "result.json"
     with runner.isolated_filesystem():
@@ -152,7 +153,7 @@ def test_get_metadata__success_nested_custom_filename(mocker):
     mocked_get_metadata = mocker.patch.object(
         APIClient,
         "get_metadata",
-        return_value=mocked_response,
+        return_value=SampleMetadata(**mocked_response),
     )
     custom_filename = "somefolder/result.json"
     with runner.isolated_filesystem():
@@ -188,7 +189,7 @@ def test_get_metadata__success_stdout(mocker):
     mocked_get_metadata = mocker.patch.object(
         APIClient,
         "get_metadata",
-        return_value=mocked_response,
+        return_value=SampleMetadata(**mocked_response),
     )
 
     res = runner.invoke(

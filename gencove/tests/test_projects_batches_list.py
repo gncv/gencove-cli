@@ -1,5 +1,6 @@
 """Test project's batches list command."""
 
+from gencove.models import ProjectBatches
 import io
 import sys
 from uuid import uuid4
@@ -18,7 +19,7 @@ def test_list_project_batches__empty(mocker):
     mocked_get_project_batches = mocker.patch.object(
         APIClient,
         "get_project_batches",
-        return_value=dict(results=[], meta=dict(next=None)),
+        return_value=ProjectBatches(results=[], meta=dict(next=None)),
     )
     res = runner.invoke(
         list_project_batches,
@@ -45,7 +46,7 @@ MOCKED_BATCHES = dict(
                 }
             ],
             "last_status": {
-                "created": "2020-07-27T12:46:22.719862Z",
+                "created": "2020-07-27T12:46:22.719862",
                 "id": str(uuid4()),
                 "status": "succeeded",
             },
@@ -62,7 +63,7 @@ MOCKED_BATCHES = dict(
                 }
             ],
             "last_status": {
-                "created": "2020-07-28T12:46:22.719862Z",
+                "created": "2020-07-28T12:46:22.719862",
                 "id": str(uuid4()),
                 "status": "running",
             },
@@ -76,7 +77,9 @@ def test_list_project_batches__not_empty(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_project_batches = mocker.patch.object(
-        APIClient, "get_project_batches", return_value=MOCKED_BATCHES
+        APIClient,
+        "get_project_batches",
+        return_value=ProjectBatches(**MOCKED_BATCHES),
     )
 
     res = runner.invoke(

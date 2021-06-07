@@ -178,7 +178,7 @@ class Upload(Command):
         for file_path in self.fastqs:
             upload = self.upload_from_file_path(file_path, s3_client)
             if self.project_id and upload:
-                self.upload_ids.add(upload["id"])
+                self.upload_ids.add(str(upload.id))
 
         self.echo_info("All files were successfully uploaded.")
 
@@ -189,7 +189,7 @@ class Upload(Command):
                 key, fastqs, s3_client
             )
             if self.project_id and upload:
-                self.upload_ids.add(upload["id"])
+                self.upload_ids.add(str(upload.id))
 
         self.echo_info("All files were successfully uploaded.")
 
@@ -209,8 +209,8 @@ class Upload(Command):
         upload_details = self.get_upload_details(gncv_path)
 
         if (
-            upload_details["last_status"]["status"]
-            == UploadStatuses.DONE.value
+            upload_details.last_status
+            and upload_details.last_status.status == UploadStatuses.DONE.value
         ):
             self.echo_info("File was already uploaded: {}".format(gncv_path))
             return upload_details
@@ -219,8 +219,8 @@ class Upload(Command):
         upload_multi_file(
             s3_client,
             MultiFileReader(fastqs),
-            upload_details["s3"]["bucket"],
-            upload_details["s3"]["object_name"],
+            upload_details.s3.bucket,
+            upload_details.s3.object_name,
             self.no_progress,
         )
         return upload_details
@@ -256,8 +256,8 @@ class Upload(Command):
             raise err
 
         if (
-            upload_details["last_status"]["status"]
-            == UploadStatuses.DONE.value
+            upload_details.last_status
+            and upload_details.last_status.status == UploadStatuses.DONE.value
         ):
             self.echo_info(
                 "File was already uploaded: {}".format(clean_file_path)
@@ -270,8 +270,8 @@ class Upload(Command):
         upload_file(
             s3_client=s3_client,
             file_name=file_path,
-            bucket=upload_details["s3"]["bucket"],
-            object_name=upload_details["s3"]["object_name"],
+            bucket=upload_details.s3.bucket,
+            object_name=upload_details.s3.object_name,
             no_progress=self.no_progress,
         )
         return upload_details

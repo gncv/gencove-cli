@@ -27,7 +27,13 @@ from gencove.constants import (
     SortOrder,
 )
 from gencove.logger import echo_debug
-from gencove.models import AccessJWT
+from gencove.models import (
+    AccessJWT,
+    CreateJWT,
+    ProjectSamples,
+    UploadCredentials,
+    UploadsPostData,
+)
 from gencove.version import version as cli_version
 
 
@@ -259,10 +265,11 @@ class APIClient:
         authorized=False,
         sensitive=False,
         refreshed=False,
+        model=None,
     ):
         headers = {} if not authorized else self._get_authorization()
         try:
-            return self._request(
+            response = self._request(
                 endpoint,
                 params=query_params,
                 method="get",
@@ -270,6 +277,9 @@ class APIClient:
                 custom_headers=headers,
                 sensitive=sensitive,
             )
+            if model:
+                return model(**response.json())
+            return response
         except APIClientError as err:
             if not refreshed and err.status_code and err.status_code == 401:
                 self._refresh_authentication()
@@ -314,12 +324,13 @@ class APIClient:
             self.endpoints.GET_JWT.value,
             dict(email=email, password=password),
             sensitive=True,
+            model=CreateJWT,
         )
 
     def login(self, email, password):
         """Log user in."""
         jwt = self.get_jwt(email, password)
-        self._set_jwt(jwt["access"], jwt["refresh"])
+        self._set_jwt(jwt.access, jwt.refresh)
 
     def get_upload_details(self, gncv_file_path):
         """Get file upload details.
@@ -333,6 +344,7 @@ class APIClient:
             self.endpoints.UPLOAD_DETAILS.value,
             dict(destination_path=gncv_file_path),
             authorized=True,
+            model=UploadsPostData,
         )
 
     def get_upload_credentials(self):
@@ -341,6 +353,7 @@ class APIClient:
             self.endpoints.GET_UPLOAD_CREDENTIALS.value,
             authorized=True,
             sensitive=True,
+            model=UploadCredentials,
         )
 
     def get_project_samples(
@@ -368,7 +381,10 @@ class APIClient:
             },
         )
         return self._get(
-            project_endpoint, query_params=params, authorized=True
+            project_endpoint,
+            query_params=params,
+            authorized=True,
+            model=ProjectSamples,
         )
 
     def add_samples_to_project(self, samples, project_id, metadata=None):

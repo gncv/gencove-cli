@@ -10,6 +10,7 @@ from click.testing import CliRunner
 
 from gencove.cli import download
 from gencove.client import APIClient
+from gencove.models import ProjectSamples
 
 
 def test_no_required_options():
@@ -61,16 +62,19 @@ def test_project_id_provided(mocker):
         mocked_login = mocker.patch.object(
             APIClient, "login", return_value=None
         )
+        sample_id = str(uuid4())
         mocked_project_samples = mocker.patch.object(
             APIClient,
             "get_project_samples",
-            return_value={"results": [{"id": 0}], "meta": {"next": None}},
+            return_value=ProjectSamples(
+                **{"results": [{"id": sample_id}], "meta": {"next": None}}
+            ),
         )
         mocked_sample_details = mocker.patch.object(
             APIClient,
             "get_sample_details",
             return_value={
-                "id": 0,
+                "id": sample_id,
                 "client_id": 1,
                 "last_status": {
                     "id": str(uuid4()),
@@ -338,10 +342,13 @@ def test_download_stdout_no_flag(mocker):
     """Test command exits if no flag provided and stdout defined."""
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    sample_id = str(uuid4())
     mocked_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
-        return_value={"results": [{"id": 0}], "meta": {"next": None}},
+        return_value=ProjectSamples(
+            **{"results": [{"id": sample_id}], "meta": {"next": None}}
+        ),
     )
     res = runner.invoke(
         download,
@@ -368,10 +375,13 @@ def test_download_stdout_with_flag(mocker):
     """Test command outputs json to stdout."""
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    sample_id = str(uuid4())
     mocked_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
-        return_value={"results": [{"id": 0}], "meta": {"next": None}},
+        return_value=ProjectSamples(
+            **{"results": [{"id": sample_id}], "meta": {"next": None}}
+        ),
     )
     last_status_id = str(uuid4())
     archive_last_status_id = str(uuid4())
@@ -380,7 +390,7 @@ def test_download_stdout_with_flag(mocker):
         APIClient,
         "get_sample_details",
         return_value={
-            "id": 0,
+            "id": sample_id,
             "client_id": 1,
             "last_status": {
                 "id": last_status_id,
@@ -424,7 +434,7 @@ def test_download_stdout_with_flag(mocker):
     mocked_result = json.dumps(
         [
             {
-                "gencove_id": 0,
+                "gencove_id": sample_id,
                 "client_id": 1,
                 "last_status": {
                     "id": last_status_id,
@@ -455,10 +465,13 @@ def test_download_urls_to_file(mocker):
     """Test saving downloaded urls output to a json file."""
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    sample_id = str(uuid4())
     mocked_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
-        return_value={"results": [{"id": 0}], "meta": {"next": None}},
+        return_value=ProjectSamples(
+            **{"results": [{"id": sample_id}], "meta": {"next": None}}
+        ),
     )
     last_status_id = str(uuid4())
     archive_last_status_id = str(uuid4())
@@ -467,7 +480,7 @@ def test_download_urls_to_file(mocker):
         APIClient,
         "get_sample_details",
         return_value={
-            "id": 0,
+            "id": sample_id,
             "client_id": 1,
             "last_status": {
                 "id": last_status_id,
@@ -591,16 +604,19 @@ def test_project_id_provided_skip_existing_qc_and_metadata(mocker):
         mocked_login = mocker.patch.object(
             APIClient, "login", return_value=None
         )
+        sample_id = str(uuid4())
         mocked_project_samples = mocker.patch.object(
             APIClient,
             "get_project_samples",
-            return_value={"results": [{"id": 0}], "meta": {"next": None}},
+            return_value=ProjectSamples(
+                **{"results": [{"id": sample_id}], "meta": {"next": None}}
+            ),
         )
         mocked_sample_details = mocker.patch.object(
             APIClient,
             "get_sample_details",
             return_value={
-                "id": 0,
+                "id": sample_id,
                 "client_id": 1,
                 "last_status": {
                     "id": str(uuid4()),
@@ -767,7 +783,9 @@ def test_project_id_provided_filter_not_archived(mocker):
         mocked_project_samples = mocker.patch.object(
             APIClient,
             "get_project_samples",
-            return_value={"results": [], "meta": {"next": None}},
+            return_value=ProjectSamples(
+                **{"results": [], "meta": {"next": None}}
+            ),
         )
         mocked_sample_details = mocker.patch.object(
             APIClient,

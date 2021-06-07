@@ -52,7 +52,7 @@ class UploadsPostData(GencoveBaseModel):
 class ResponseMeta(BaseModel):
     """ResponseMeta model"""
 
-    count: int
+    count: Optional[int]
     next: Optional[str]
     previous: Optional[str]
 

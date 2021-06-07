@@ -430,7 +430,6 @@ def test_download_stdout_with_flag(mocker):
     mocked_project_samples.assert_called_once()
     mocked_sample_details.assert_called_once()
     output_line = io.BytesIO()
-    old_stdout = sys.stdout
     sys.stdout = output_line
     mocked_result = json.dumps(
         [

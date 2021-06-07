@@ -41,12 +41,9 @@ class GencoveStatus(GencoveBaseModel):
     transition_cutoff: Optional[datetime]
 
 
-class UploadsPostData(BaseModel):
+class UploadsPostData(GencoveBaseModel):
     """UploadsPostData model"""
 
-    # migrate id to GencoveBaseModel,
-    # current type are for tests compatibility
-    id: Optional[Union[UUID, str]]
     destination_path: Optional[str]
     s3: Optional[S3Object]
     last_status: Optional[GencoveStatus]

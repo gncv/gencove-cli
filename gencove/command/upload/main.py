@@ -179,7 +179,7 @@ class Upload(Command):
         for file_path in self.fastqs:
             upload = self.upload_from_file_path(file_path, s3_client)
             if self.project_id and upload:
-                self.upload_ids.add(str(upload.id))
+                self.upload_ids.add(upload.id)
 
         self.echo_info("All files were successfully uploaded.")
 
@@ -190,7 +190,7 @@ class Upload(Command):
                 key, fastqs, s3_client
             )
             if self.project_id and upload:
-                self.upload_ids.add(str(upload.id))
+                self.upload_ids.add(upload.id)
 
         self.echo_info("All files were successfully uploaded.")
 

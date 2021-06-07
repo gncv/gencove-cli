@@ -99,12 +99,9 @@ class SampleFile(GencoveBaseModel):
     file_type: Optional[str]
 
 
-class SampleDetails(BaseModel):
+class SampleDetails(GencoveBaseModel):
     """SampleDetails model"""
 
-    # migrate id to GencoveBaseModel,
-    # current type are for tests compatibility
-    id: Optional[Union[UUID, str]]
     created: Optional[datetime]
     modified: Optional[datetime]
     client_id: Optional[str]

@@ -179,7 +179,7 @@ class Upload(Command):
         for file_path in self.fastqs:
             upload = self.upload_from_file_path(file_path, s3_client)
             if self.project_id and upload:
-                self.upload_ids.add(upload.id)
+                self.upload_ids.add(str(upload.id))
 
         self.echo_info("All files were successfully uploaded.")
 
@@ -190,7 +190,7 @@ class Upload(Command):
                 key, fastqs, s3_client
             )
             if self.project_id and upload:
-                self.upload_ids.add(upload.id)
+                self.upload_ids.add(str(upload.id))
 
         self.echo_info("All files were successfully uploaded.")
 
@@ -209,7 +209,10 @@ class Upload(Command):
 
         upload_details = self.get_upload_details(gncv_path)
 
-        if upload_details.last_status.status == UploadStatuses.DONE.value:
+        if (
+            upload_details.last_status
+            and upload_details.last_status.status == UploadStatuses.DONE.value
+        ):
             self.echo_info("File was already uploaded: {}".format(gncv_path))
             return upload_details
 
@@ -253,7 +256,10 @@ class Upload(Command):
                 raise UploadError  # pylint: disable=W0707
             raise err
 
-        if upload_details.last_status.status == UploadStatuses.DONE.value:
+        if (
+            upload_details.last_status
+            and upload_details.last_status.status == UploadStatuses.DONE.value
+        ):
             self.echo_info(
                 "File was already uploaded: {}".format(clean_file_path)
             )

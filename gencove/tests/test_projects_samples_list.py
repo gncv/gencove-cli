@@ -122,12 +122,14 @@ def test_list_project_samples(mocker):
                 "id": str(uuid4()),
                 "client_id": "tester client id",
                 "last_status": {
+                    "id": str(uuid4()),
                     "created": (
                         datetime.utcnow() - timedelta(days=3)
                     ).isoformat(),
                     "status": "succeeded",
                 },
                 "archive_last_status": {
+                    "id": str(uuid4()),
                     "status": "available",
                     "created": (
                         datetime.utcnow() - timedelta(days=1)

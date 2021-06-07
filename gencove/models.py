@@ -32,12 +32,9 @@ class S3Object(BaseModel):
     object_name: Optional[str]
 
 
-class GencoveStatus(BaseModel):
+class GencoveStatus(GencoveBaseModel):
     """GencoveStatus model"""
 
-    # migrate id to GencoveBaseModel,
-    # current type are for tests compatibility
-    id: Optional[Union[UUID, str]]
     status: Optional[str]
     note: Optional[str]
     created: Optional[datetime]

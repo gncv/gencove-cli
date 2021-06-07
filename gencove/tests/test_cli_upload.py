@@ -4,6 +4,7 @@ import json
 import os
 import sys
 from uuid import uuid4
+import uuid
 
 from click import echo
 from click.testing import CliRunner
@@ -33,7 +34,7 @@ def test_upload(mocker):
             "get_upload_details",
             return_value=UploadsPostData(
                 **{
-                    "last_status": {"status": ""},
+                    "last_status": {"id": str(uuid4()), "status": ""},
                     "s3": {"bucket": "test", "object_name": "test"},
                 }
             ),
@@ -152,7 +153,7 @@ def test_upload_and_run_immediately(mocker):
             return_value=UploadsPostData(
                 **{
                     "id": "test",
-                    "last_status": {"status": ""},
+                    "last_status": {"id": str(uuid4()), "status": ""},
                     "s3": {"bucket": "test", "object_name": "test"},
                 }
             ),
@@ -220,7 +221,7 @@ def test_upload_and_run_immediately__with_metadata(mocker):
             return_value=UploadsPostData(
                 **{
                     "id": "test",
-                    "last_status": {"status": ""},
+                    "last_status": {"id": str(uuid4()), "status": ""},
                     "s3": {"bucket": "test", "object_name": "test"},
                 }
             ),
@@ -290,7 +291,7 @@ def test_upload_and_run_immediately__invalid_metadata(mocker):
             return_value=UploadsPostData(
                 **{
                     "id": "test",
-                    "last_status": {"status": ""},
+                    "last_status": {"id": str(uuid4()), "status": ""},
                     "s3": {"bucket": "test", "object_name": "test"},
                 }
             ),
@@ -390,7 +391,7 @@ def test_upload_and_run_immediately_something_went_wrong(mocker):
             return_value=UploadsPostData(
                 **{
                     "id": "test",
-                    "last_status": {"status": ""},
+                    "last_status": {"id": str(uuid4()), "status": ""},
                     "s3": {"bucket": "test", "object_name": "test"},
                 }
             ),
@@ -449,7 +450,7 @@ def test_upload_and_run_immediately_with_output_to_file(mocker):
             return_value=UploadsPostData(
                 **{
                     "id": "test",
-                    "last_status": {"status": ""},
+                    "last_status": {"id": str(uuid4()), "status": ""},
                     "s3": {"bucket": "test", "object_name": "test"},
                 }
             ),
@@ -529,7 +530,7 @@ def test_upload_and_run_immediately_with_output_to_nested_file(mocker):
             return_value=UploadsPostData(
                 **{
                     "id": "test",
-                    "last_status": {"status": ""},
+                    "last_status": {"id": str(uuid4()), "status": ""},
                     "s3": {"bucket": "test", "object_name": "test"},
                 }
             ),
@@ -608,7 +609,7 @@ def test_upload_and_run_immediately_with_stdout(mocker):
             return_value=UploadsPostData(
                 **{
                     "id": "test",
-                    "last_status": {"status": ""},
+                    "last_status": {"id": str(uuid4()), "status": ""},
                     "s3": {"bucket": "test", "object_name": "test"},
                 }
             ),
@@ -689,7 +690,7 @@ def test_upload_without_progressbar(mocker):
             return_value=UploadsPostData(
                 **{
                     "id": "test",
-                    "last_status": {"status": ""},
+                    "last_status": {"id": str(uuid4()), "status": ""},
                     "s3": {"bucket": "test", "object_name": "test"},
                 }
             ),
@@ -738,7 +739,7 @@ def test_upload_and_run_immediately_without_progressbar(mocker):
             return_value=UploadsPostData(
                 **{
                     "id": "test",
-                    "last_status": {"status": ""},
+                    "last_status": {"id": str(uuid4()), "status": ""},
                     "s3": {"bucket": "test", "object_name": "test"},
                 }
             ),
@@ -807,7 +808,7 @@ def test_upload_and_run_immediately_slow_response_retry(mocker):
             return_value=UploadsPostData(
                 **{
                     "id": "test",
-                    "last_status": {"status": ""},
+                    "last_status": {"id": str(uuid4()), "status": ""},
                     "s3": {"bucket": "test", "object_name": "test"},
                 }
             ),

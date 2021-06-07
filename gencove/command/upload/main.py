@@ -208,7 +208,10 @@ class Upload(Command):
 
         upload_details = self.get_upload_details(gncv_path)
 
-        if upload_details.last_status.status == UploadStatuses.DONE.value:
+        if (
+            upload_details.last_status
+            and upload_details.last_status.status == UploadStatuses.DONE.value
+        ):
             self.echo_info("File was already uploaded: {}".format(gncv_path))
             return upload_details
 
@@ -252,7 +255,10 @@ class Upload(Command):
                 raise UploadError  # pylint: disable=W0707
             raise err
 
-        if upload_details.last_status.status == UploadStatuses.DONE.value:
+        if (
+            upload_details.last_status
+            and upload_details.last_status.status == UploadStatuses.DONE.value
+        ):
             self.echo_info(
                 "File was already uploaded: {}".format(clean_file_path)
             )

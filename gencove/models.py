@@ -87,7 +87,7 @@ class UploadCredentials(BaseModel):
     access_key: Optional[str]
     secret_key: Optional[str]
     token: Optional[str]
-    expiry_time: Optional[datetime]
+    expiry_time: Optional[str]  # needs to be str for boto3 to work
 
 
 class SampleFile(GencoveBaseModel):
@@ -119,30 +119,40 @@ class ProjectSamples(BaseModel):
     results: Optional[List[SampleDetails]]
 
 
-class UploadCreate(BaseModel):
-    """UploadCreate model"""
+class Upload(BaseModel):
+    """Upload model"""
 
     upload: Optional[UUID]
+    destination_path: Optional[str]
+    last_status: Optional[GencoveStatus]
 
 
 class Fastqs(BaseModel):
     """Fastqs model"""
 
-    r1: Optional[UploadCreate]
-    r2: Optional[UploadCreate]
+    r1: Optional[Upload]
+    r2: Optional[Upload]
+
+
+class Sample(BaseModel):
+    """Sample model"""
+
+    client_id: Optional[str]
+    fastq: Optional[Fastqs]
+    sample: Optional[UUID]
 
 
 class SampleSheet(BaseModel):
     """SampleSheet model"""
 
-    client_id: Optional[str]
-    fastq: Optional[Fastqs]
+    meta: ResponseMeta
+    results: Optional[List[Sample]]
 
 
 class UploadSamples(BaseModel):
     """UploadSamples model"""
 
-    uploads: Optional[List[SampleSheet]]
+    uploads: Optional[List[Sample]]
     metadata: Optional[Any]
 
 
@@ -175,19 +185,11 @@ class SampleQC(BaseModel):
     results: Optional[List[QualityControl]]
 
 
-class UploadNestedList(BaseModel):
-    """UploadNestedList model"""
-
-    upload: Optional[UUID]
-    destination_path: Optional[str]
-    last_status: Optional[GencoveStatus]
-
-
 class ClientFastQ(BaseModel):
     """ClientFastQ model"""
 
     client_id: Optional[str]
-    fastq: Optional[UploadNestedList]
+    fastq: Optional[Upload]
 
 
 class UploadFastQ(BaseModel):

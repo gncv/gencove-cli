@@ -10,6 +10,7 @@ from gencove.client import (
     APIClientError,
 )  # noqa: I100
 from gencove.command.projects.cli import run_prefix
+from gencove.models import SampleSheet, UploadSamples
 
 MOCKED_UPLOADS = dict(
     meta=dict(next=None),
@@ -21,6 +22,7 @@ MOCKED_UPLOADS = dict(
                     "upload": str(uuid4()),
                     "destination_path": "gncv://batch1/clientid1_R1.fastq.gz",
                     "last_status": {
+                        "id": str(uuid4()),
                         "status": "unassigned",
                     },
                 },
@@ -28,6 +30,7 @@ MOCKED_UPLOADS = dict(
                     "upload": str(uuid4()),
                     "destination_path": "gncv://batch1/clientid1_R2.fastq.gz",
                     "last_status": {
+                        "id": str(uuid4()),
                         "status": "unassigned",
                     },
                 },
@@ -40,6 +43,7 @@ MOCKED_UPLOADS = dict(
                     "upload": str(uuid4()),
                     "destination_path": "gncv://batch2/clientid2_R1.fastq.gz",
                     "last_status": {
+                        "id": str(uuid4()),
                         "status": "assigned",
                     },
                 }
@@ -170,11 +174,14 @@ def test_run_prefix__no_paths(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_sample_sheet = mocker.patch.object(
-        APIClient, "get_sample_sheet", return_value=MOCKED_EMPTY_UPLOADS
+        APIClient,
+        "get_sample_sheet",
+        return_value=SampleSheet(**MOCKED_EMPTY_UPLOADS),
     )
     mocked_add_samples_to_project = mocker.patch.object(
         APIClient,
         "add_samples_to_project",
+        return_value=UploadSamples(**{}),
     )
 
     res = runner.invoke(
@@ -200,7 +207,9 @@ def test_run_prefix__assigning_samples_no_permission(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_sample_sheet = mocker.patch.object(
-        APIClient, "get_sample_sheet", return_value=MOCKED_UPLOADS
+        APIClient,
+        "get_sample_sheet",
+        return_value=SampleSheet(**MOCKED_UPLOADS),
     )
     mocked_add_samples_to_project = mocker.patch.object(
         APIClient,
@@ -231,7 +240,9 @@ def test_run_prefix__assigning_samples_failed(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_sample_sheet = mocker.patch.object(
-        APIClient, "get_sample_sheet", return_value=MOCKED_UPLOADS
+        APIClient,
+        "get_sample_sheet",
+        return_value=SampleSheet(**MOCKED_UPLOADS),
     )
     mocked_add_samples_to_project = mocker.patch.object(
         APIClient,
@@ -263,11 +274,14 @@ def test_run_prefix__success_with_json(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_sample_sheet = mocker.patch.object(
-        APIClient, "get_sample_sheet", return_value=MOCKED_UPLOADS
+        APIClient,
+        "get_sample_sheet",
+        return_value=SampleSheet(**MOCKED_UPLOADS),
     )
     mocked_add_samples_to_project = mocker.patch.object(
         APIClient,
         "add_samples_to_project",
+        return_value=UploadSamples(**{}),
     )
 
     res = runner.invoke(
@@ -295,11 +309,14 @@ def test_run_prefix__filter_empty(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_sample_sheet = mocker.patch.object(
-        APIClient, "get_sample_sheet", return_value=MOCKED_EMPTY_UPLOADS
+        APIClient,
+        "get_sample_sheet",
+        return_value=SampleSheet(**MOCKED_EMPTY_UPLOADS),
     )
     mocked_add_samples_to_project = mocker.patch.object(
         APIClient,
         "add_samples_to_project",
+        return_value=UploadSamples(**{}),
     )
 
     res = runner.invoke(
@@ -329,7 +346,9 @@ def test_run_prefix__filter_success(mocker):
     mocked_uploads_copy = copy.deepcopy(MOCKED_UPLOADS)
     del mocked_uploads_copy["results"][1]
     mocked_get_sample_sheet = mocker.patch.object(
-        APIClient, "get_sample_sheet", return_value=mocked_uploads_copy
+        APIClient,
+        "get_sample_sheet",
+        return_value=SampleSheet(**mocked_uploads_copy),
     )
     mocked_add_samples_to_project = mocker.patch.object(
         APIClient,
@@ -366,11 +385,14 @@ def test_run_prefix__success_without_last_status(mocker):
     del mocked_uploads_copy["results"][0]["fastq"]["r2"]["last_status"]
     del mocked_uploads_copy["results"][1]["fastq"]["r1"]["last_status"]
     mocked_get_sample_sheet = mocker.patch.object(
-        APIClient, "get_sample_sheet", return_value=mocked_uploads_copy
+        APIClient,
+        "get_sample_sheet",
+        return_value=SampleSheet(**mocked_uploads_copy),
     )
     mocked_add_samples_to_project = mocker.patch.object(
         APIClient,
         "add_samples_to_project",
+        return_value=UploadSamples(**{}),
     )
 
     res = runner.invoke(
@@ -397,11 +419,14 @@ def test_run_prefix__success(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_sample_sheet = mocker.patch.object(
-        APIClient, "get_sample_sheet", return_value=MOCKED_UPLOADS
+        APIClient,
+        "get_sample_sheet",
+        return_value=SampleSheet(**MOCKED_UPLOADS),
     )
     mocked_add_samples_to_project = mocker.patch.object(
         APIClient,
         "add_samples_to_project",
+        return_value=UploadSamples(**{}),
     )
 
     res = runner.invoke(

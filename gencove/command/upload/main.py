@@ -11,6 +11,7 @@ from gencove.client import (  # noqa: I100
     APIClientError,
     APIClientTimeout,
     APIClientTooManyRequestsError,
+    CustomEncoder,
 )
 from gencove.command.base import Command
 from gencove.command.utils import is_valid_uuid
@@ -178,7 +179,7 @@ class Upload(Command):
         for file_path in self.fastqs:
             upload = self.upload_from_file_path(file_path, s3_client)
             if self.project_id and upload:
-                self.upload_ids.add(str(upload.id))
+                self.upload_ids.add(upload.id)
 
         self.echo_info("All files were successfully uploaded.")
 
@@ -189,7 +190,7 @@ class Upload(Command):
                 key, fastqs, s3_client
             )
             if self.project_id and upload:
-                self.upload_ids.add(str(upload.id))
+                self.upload_ids.add(upload.id)
 
         self.echo_info("All files were successfully uploaded.")
 
@@ -331,7 +332,8 @@ class Upload(Command):
                 assigned_batch = self.api_client.add_samples_to_project(
                     samples_batch, self.project_id, metadata_api
                 )
-                self.assigned_samples.extend(assigned_batch)
+                if assigned_batch.uploads:
+                    self.assigned_samples.extend(assigned_batch.uploads)
                 assigned_count += samples_batch_len
                 if not self.no_progress:
                     progress_bar.update(samples_batch_len)
@@ -378,13 +380,13 @@ class Upload(Command):
             for sample in sample_sheet:
                 self.echo_debug("Checking sample: {}".format(sample))
                 add_it = False
-                if "r1" in sample["fastq"]:
-                    if sample["fastq"]["r1"]["upload"] in search_uploads:
+                if sample.fastq and sample.fastq.r1:
+                    if sample.fastq.r1.upload in search_uploads:
                         add_it = True
-                        search_uploads.remove(sample["fastq"]["r1"]["upload"])
+                        search_uploads.remove(sample.fastq.r1.upload)
                         self.echo_debug(
                             "Found sample for upload r1: {}".format(
-                                sample["fastq"]["r1"]["upload"]
+                                sample.fastq.r1.upload
                             )
                         )
                     else:
@@ -394,13 +396,13 @@ class Upload(Command):
                             )
                         )
                         raise UploadNotFound
-                if "r2" in sample["fastq"]:
-                    if sample["fastq"]["r2"]["upload"] in search_uploads:
+                if sample.fastq and sample.fastq.r2:
+                    if sample.fastq.r2.upload in search_uploads:
                         add_it = True
-                        search_uploads.remove(sample["fastq"]["r2"]["upload"])
+                        search_uploads.remove(sample.fastq.r2.upload)
                         self.echo_debug(
                             "Found sample for upload r2: {}".format(
-                                sample["fastq"]["r2"]["upload"]
+                                sample.fastq.r2.upload
                             )
                         )
                     else:
@@ -435,8 +437,8 @@ class Upload(Command):
             self.echo_debug("Get sample sheet page")
             try:
                 resp = self.get_sample_sheet(next_link)
-                yield resp["results"]
-                next_link = resp["meta"]["next"]
+                yield resp.results
+                next_link = resp.meta.next
                 more = next_link is not None
             except APIClientError as err:
                 self.echo_debug(err)
@@ -460,13 +462,19 @@ class Upload(Command):
         """Output JSON of assigning samples to a project."""
         self.echo_debug("Outputting JSON.")
         if self.output == "-":
-            self.echo_data(json.dumps(self.assigned_samples, indent=4))
+            self.echo_data(
+                json.dumps(self.assigned_samples, indent=4, cls=CustomEncoder)
+            )
         else:
             dirname = os.path.dirname(self.output)
             if dirname and not os.path.exists(dirname):
                 os.makedirs(dirname)
             with open(self.output, "w") as json_file:
-                json_file.write(json.dumps(self.assigned_samples, indent=4))
+                json_file.write(
+                    json.dumps(
+                        self.assigned_samples, indent=4, cls=CustomEncoder
+                    )
+                )
             self.echo_info(
                 "Assigned samples response outputted to {}".format(
                     self.output

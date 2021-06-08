@@ -9,6 +9,7 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.uploads.list.cli import list_uploads
+from gencove.models import SampleSheet
 
 
 def test_list_does_not_exist(mocker):
@@ -48,7 +49,7 @@ def test_list_empty(mocker):
     mocked_get_projects = mocker.patch.object(
         APIClient,
         "get_sample_sheet",
-        return_value=dict(results=[], meta=dict(next=None)),
+        return_value=SampleSheet(results=[], meta=dict(next=None)),
     )
     res = runner.invoke(
         list_uploads, ["--email", "foo@bar.com", "--password", "123"]
@@ -140,7 +141,9 @@ def test_list_uploads(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_sample_sheet = mocker.patch.object(
-        APIClient, "get_sample_sheet", return_value=MOCKED_UPLOADS
+        APIClient,
+        "get_sample_sheet",
+        return_value=SampleSheet(**MOCKED_UPLOADS),
     )
     res = runner.invoke(
         list_uploads, ["--email", "foo@bar.com", "--password", "123"]

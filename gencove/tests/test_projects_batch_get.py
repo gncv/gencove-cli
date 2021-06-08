@@ -23,7 +23,7 @@ def test_get_batch__empty(mocker):
             batch_type="batch-type-1",
             sample_ids=["sample-id-1", "sample-id-2"],
             last_status=dict(
-                id="last-status-id-1",
+                id=str(uuid4()),
                 status="running",
                 created="2020-08-02T22:13:54.547167Z",
             ),
@@ -60,7 +60,7 @@ def test_get_batch__not_empty(mocker):
                 batch_type="batch-type-1",
                 sample_ids=["sample-id-1", "sample-id-2"],
                 last_status=dict(
-                    id="last-status-id-1",
+                    id=str(uuid4()),
                     status="running",
                     created="2020-08-02T22:13:54.547167Z",
                 ),
@@ -126,7 +126,7 @@ def test_get_batch__no_progress_not_empty(mocker):
                 batch_type="batch-type-1",
                 sample_ids=["sample-id-1", "sample-id-2"],
                 last_status=dict(
-                    id="last-status-id-1",
+                    id=str(uuid4()),
                     status="running",
                     created="2020-08-02T22:13:54.547167Z",
                 ),

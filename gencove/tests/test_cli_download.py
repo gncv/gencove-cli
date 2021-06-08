@@ -146,12 +146,13 @@ def test_sample_ids_provided(mocker):
         mocked_login = mocker.patch.object(
             APIClient, "login", return_value=None
         )
+        sample_id = str(uuid4())
         mocked_sample_details = mocker.patch.object(
             APIClient,
             "get_sample_details",
             return_value=SampleDetails(
                 **{
-                    "id": 0,
+                    "id": sample_id,
                     "client_id": 1,
                     "last_status": {
                         "id": str(uuid4()),
@@ -204,7 +205,7 @@ def test_sample_ids_provided(mocker):
         assert res.exit_code == 0
         mocked_login.assert_called_once()
         mocked_download_file.assert_called_once_with(
-            "cli_test_data/1/0/bar.txt",
+            f"cli_test_data/1/{sample_id}/bar.txt",
             "https://foo.com/bar.txt",
             True,
             False,
@@ -226,7 +227,7 @@ def test_sample_ids_provided_no_qc_file(mocker):
             "get_sample_details",
             return_value=SampleDetails(
                 **{
-                    "id": 0,
+                    "id": str(uuid4()),
                     "client_id": 1,
                     "last_status": {
                         "id": str(uuid4()),
@@ -284,7 +285,7 @@ def test_sample_ids_provided_no_metadata_file(mocker):
             "get_sample_details",
             return_value=SampleDetails(
                 **{
-                    "id": 0,
+                    "id": str(uuid4()),
                     "client_id": 1,
                     "last_status": {
                         "id": str(uuid4()),
@@ -452,7 +453,7 @@ def test_download_stdout_with_flag(mocker):
         [
             {
                 "gencove_id": sample_id,
-                "client_id": 1,
+                "client_id": "1",
                 "last_status": {
                     "id": last_status_id,
                     "status": "succeeded",
@@ -552,12 +553,13 @@ def test_download_no_progress(mocker):
         mocked_login = mocker.patch.object(
             APIClient, "login", return_value=None
         )
+        sample_id = str(uuid4())
         mocked_sample_details = mocker.patch.object(
             APIClient,
             "get_sample_details",
             return_value=SampleDetails(
                 **{
-                    "id": 0,
+                    "id": sample_id,
                     "client_id": 1,
                     "last_status": {
                         "id": str(uuid4()),
@@ -611,7 +613,10 @@ def test_download_no_progress(mocker):
         assert res.exit_code == 0
         mocked_login.assert_called_once()
         mocked_download_file.assert_called_once_with(
-            "cli_test_data/1/0/bar.txt", "https://foo.com/bar.txt", True, True
+            f"cli_test_data/1/{sample_id}/bar.txt",
+            "https://foo.com/bar.txt",
+            True,
+            True,
         )
         mocked_sample_details.assert_called_once()
         mocked_qc_metrics.assert_called_once()
@@ -740,7 +745,7 @@ def test_download_not_working_because_archived(mocker):
             "get_sample_details",
             return_value=SampleDetails(
                 **{
-                    "id": 0,
+                    "id": str(uuid4()),
                     "client_id": 1,
                     "last_status": {
                         "id": str(uuid4()),
@@ -817,7 +822,7 @@ def test_project_id_provided_filter_not_archived(mocker):
             "get_sample_details",
             return_value=SampleDetails(
                 **{
-                    "id": 0,
+                    "id": str(uuid4()),
                     "client_id": 1,
                     "last_status": {
                         "id": str(uuid4()),

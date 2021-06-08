@@ -209,7 +209,10 @@ class Upload(Command):
 
         upload_details = self.get_upload_details(gncv_path)
 
-        if upload_details.last_status.status == UploadStatuses.DONE.value:
+        if (
+            upload_details.last_status
+            and upload_details.last_status.status == UploadStatuses.DONE.value
+        ):
             self.echo_info("File was already uploaded: {}".format(gncv_path))
             return upload_details
 
@@ -253,7 +256,10 @@ class Upload(Command):
                 raise UploadError  # pylint: disable=W0707
             raise err
 
-        if upload_details.last_status.status == UploadStatuses.DONE.value:
+        if (
+            upload_details.last_status
+            and upload_details.last_status.status == UploadStatuses.DONE.value
+        ):
             self.echo_info(
                 "File was already uploaded: {}".format(clean_file_path)
             )
@@ -374,7 +380,7 @@ class Upload(Command):
             for sample in sample_sheet:
                 self.echo_debug("Checking sample: {}".format(sample))
                 add_it = False
-                if sample.fastq.r1:
+                if sample.fastq and sample.fastq.r1:
                     if sample.fastq.r1.upload in search_uploads:
                         add_it = True
                         search_uploads.remove(sample.fastq.r1.upload)
@@ -390,7 +396,7 @@ class Upload(Command):
                             )
                         )
                         raise UploadNotFound
-                if sample.fastq.r2:
+                if sample.fastq and sample.fastq.r2:
                     if sample.fastq.r2.upload in search_uploads:
                         add_it = True
                         search_uploads.remove(sample.fastq.r2.upload)

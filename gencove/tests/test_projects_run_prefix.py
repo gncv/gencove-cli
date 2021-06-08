@@ -22,6 +22,7 @@ MOCKED_UPLOADS = dict(
                     "upload": str(uuid4()),
                     "destination_path": "gncv://batch1/clientid1_R1.fastq.gz",
                     "last_status": {
+                        "id": str(uuid4()),
                         "status": "unassigned",
                     },
                 },
@@ -29,6 +30,7 @@ MOCKED_UPLOADS = dict(
                     "upload": str(uuid4()),
                     "destination_path": "gncv://batch1/clientid1_R2.fastq.gz",
                     "last_status": {
+                        "id": str(uuid4()),
                         "status": "unassigned",
                     },
                 },
@@ -41,6 +43,7 @@ MOCKED_UPLOADS = dict(
                     "upload": str(uuid4()),
                     "destination_path": "gncv://batch2/clientid2_R1.fastq.gz",
                     "last_status": {
+                        "id": str(uuid4()),
                         "status": "assigned",
                     },
                 }

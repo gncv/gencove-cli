@@ -67,11 +67,12 @@ def test_project_id_provided(mocker):
         mocked_login = mocker.patch.object(
             APIClient, "login", return_value=None
         )
+        sample_id = str(uuid4())
         mocked_project_samples = mocker.patch.object(
             APIClient,
             "get_project_samples",
             return_value=ProjectSamples(
-                **{"results": [{"id": 0}], "meta": {"next": None}}
+                **{"results": [{"id": sample_id}], "meta": {"next": None}}
             ),
         )
         mocked_sample_details = mocker.patch.object(
@@ -79,7 +80,7 @@ def test_project_id_provided(mocker):
             "get_sample_details",
             return_value=SampleDetails(
                 **{
-                    "id": 0,
+                    "id": sample_id,
                     "client_id": 1,
                     "last_status": {
                         "id": str(uuid4()),
@@ -354,11 +355,12 @@ def test_download_stdout_no_flag(mocker):
     """Test command exits if no flag provided and stdout defined."""
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    sample_id = str(uuid4())
     mocked_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
         return_value=ProjectSamples(
-            **{"results": [{"id": 0}], "meta": {"next": None}}
+            **{"results": [{"id": sample_id}], "meta": {"next": None}}
         ),
     )
     res = runner.invoke(
@@ -386,11 +388,12 @@ def test_download_stdout_with_flag(mocker):
     """Test command outputs json to stdout."""
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    sample_id = str(uuid4())
     mocked_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
         return_value=ProjectSamples(
-            **{"results": [{"id": 0}], "meta": {"next": None}}
+            **{"results": [{"id": sample_id}], "meta": {"next": None}}
         ),
     )
     last_status_id = str(uuid4())
@@ -403,7 +406,7 @@ def test_download_stdout_with_flag(mocker):
         "get_sample_details",
         return_value=SampleDetails(
             **{
-                "id": "0",
+                "id": sample_id,
                 "client_id": "1",
                 "last_status": {
                     "id": last_status_id,
@@ -448,8 +451,8 @@ def test_download_stdout_with_flag(mocker):
     mocked_result = json.dumps(
         [
             {
-                "gencove_id": "0",
-                "client_id": "1",
+                "gencove_id": sample_id,
+                "client_id": 1,
                 "last_status": {
                     "id": last_status_id,
                     "status": "succeeded",
@@ -479,11 +482,12 @@ def test_download_urls_to_file(mocker):
     """Test saving downloaded urls output to a json file."""
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    sample_id = str(uuid4())
     mocked_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
         return_value=ProjectSamples(
-            **{"results": [{"id": 0}], "meta": {"next": None}}
+            **{"results": [{"id": sample_id}], "meta": {"next": None}}
         ),
     )
     last_status_id = str(uuid4())
@@ -494,7 +498,7 @@ def test_download_urls_to_file(mocker):
         "get_sample_details",
         return_value=SampleDetails(
             **{
-                "id": 0,
+                "id": sample_id,
                 "client_id": 1,
                 "last_status": {
                     "id": last_status_id,
@@ -621,11 +625,12 @@ def test_project_id_provided_skip_existing_qc_and_metadata(mocker):
         mocked_login = mocker.patch.object(
             APIClient, "login", return_value=None
         )
+        sample_id = str(uuid4())
         mocked_project_samples = mocker.patch.object(
             APIClient,
             "get_project_samples",
             return_value=ProjectSamples(
-                **{"results": [{"id": 0}], "meta": {"next": None}}
+                **{"results": [{"id": sample_id}], "meta": {"next": None}}
             ),
         )
         mocked_sample_details = mocker.patch.object(
@@ -633,7 +638,7 @@ def test_project_id_provided_skip_existing_qc_and_metadata(mocker):
             "get_sample_details",
             return_value=SampleDetails(
                 **{
-                    "id": 0,
+                    "id": sample_id,
                     "client_id": 1,
                     "last_status": {
                         "id": str(uuid4()),

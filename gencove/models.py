@@ -32,24 +32,18 @@ class S3Object(BaseModel):
     object_name: Optional[str]
 
 
-class GencoveStatus(BaseModel):
+class GencoveStatus(GencoveBaseModel):
     """GencoveStatus model"""
 
-    # migrate id to GencoveBaseModel,
-    # current type are for tests compatibility
-    id: Optional[Union[UUID, str]]
     status: Optional[str]
     note: Optional[str]
     created: Optional[datetime]
     transition_cutoff: Optional[datetime]
 
 
-class UploadsPostData(BaseModel):
+class UploadsPostData(GencoveBaseModel):
     """UploadsPostData model"""
 
-    # migrate id to GencoveBaseModel,
-    # current type are for tests compatibility
-    id: Optional[Union[UUID, str]]
     destination_path: Optional[str]
     s3: Optional[S3Object]
     last_status: Optional[GencoveStatus]
@@ -70,15 +64,6 @@ class PipelineCapabilities(GencoveBaseModel):
     name: Optional[str]
     private: Optional[bool]
     merge_vcfs_enabled: Optional[bool]
-
-
-class SampleFile(GencoveBaseModel):
-    """SampleFile model"""
-
-    s3_path: Optional[str]
-    size: Optional[int]
-    download_url: Optional[HttpUrl]
-    file_type: Optional[str]
 
 
 # pylint: disable=too-few-public-methods
@@ -106,12 +91,18 @@ class UploadCredentials(BaseModel):
     expiry_time: Optional[str]  # needs to be str for boto3 to work
 
 
-class SampleDetails(BaseModel):
+class SampleFile(GencoveBaseModel):
+    """SampleFile model"""
+
+    s3_path: Optional[str]
+    size: Optional[int]
+    download_url: Optional[HttpUrl]
+    file_type: Optional[str]
+
+
+class SampleDetails(GencoveBaseModel):
     """SampleDetails model"""
 
-    # migrate id to GencoveBaseModel,
-    # current type are for tests compatibility
-    id: Optional[Union[UUID, str]]
     created: Optional[datetime]
     modified: Optional[datetime]
     client_id: Optional[str]
@@ -130,10 +121,9 @@ class ProjectSamples(BaseModel):
 
 
 class Upload(BaseModel):
-    """UploadCreate model"""
+    """Upload model"""
 
-    # should be UUID, leaving Union[UUID, str] so tests pass
-    upload: Optional[Union[UUID, str]]
+    upload: Optional[UUID]
     destination_path: Optional[str]
     last_status: Optional[GencoveStatus]
 

@@ -120,10 +120,9 @@ class ProjectSamples(BaseModel):
 
 
 class Upload(BaseModel):
-    """UploadCreate model"""
+    """Upload model"""
 
-    # should be UUID, leaving Union[UUID, str] so tests pass
-    upload: Optional[Union[UUID, str]]
+    upload: Optional[UUID]
     destination_path: Optional[str]
     last_status: Optional[GencoveStatus]
 

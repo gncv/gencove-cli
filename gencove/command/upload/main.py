@@ -380,7 +380,7 @@ class Upload(Command):
             for sample in sample_sheet:
                 self.echo_debug("Checking sample: {}".format(sample))
                 add_it = False
-                if sample.fastq.r1:
+                if sample.fastq and sample.fastq.r1:
                     if sample.fastq.r1.upload in search_uploads:
                         add_it = True
                         search_uploads.remove(sample.fastq.r1.upload)
@@ -396,7 +396,7 @@ class Upload(Command):
                             )
                         )
                         raise UploadNotFound
-                if sample.fastq.r2:
+                if sample.fastq and sample.fastq.r2:
                     if sample.fastq.r2.upload in search_uploads:
                         add_it = True
                         search_uploads.remove(sample.fastq.r2.upload)

@@ -267,8 +267,7 @@ def save_metadata_file(path, api_client, sample_id, skip_existing=True):
         raise
     echo_info("Downloading file to: {}".format(path))
     with open(path, "w") as metadata_file:
-        content = json.dumps(metadata, cls=client.CustomEncoder)
-        metadata_file.write(content)
+        metadata_file.write(metadata.json())
     echo_info("Finished downloading a file: {}".format(path))
 
 

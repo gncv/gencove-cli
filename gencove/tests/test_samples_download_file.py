@@ -67,7 +67,7 @@ def test_samples_download_file_local(mocker):
             return_value=SampleDetails(
                 **{
                     "id": sample_id,
-                    "client_id": 1,
+                    "client_id": "1",
                     "last_status": {
                         "id": last_status_id,
                         "status": "succeeded",
@@ -131,7 +131,7 @@ def test_samples_download_file_stdout(mocker):
         return_value=SampleDetails(
             **{
                 "id": sample_id,
-                "client_id": 1,
+                "client_id": "1",
                 "last_status": {
                     "id": last_status_id,
                     "status": "succeeded",

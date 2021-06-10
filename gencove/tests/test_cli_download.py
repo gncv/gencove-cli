@@ -81,7 +81,7 @@ def test_project_id_provided(mocker):
             return_value=SampleDetails(
                 **{
                     "id": sample_id,
-                    "client_id": 1,
+                    "client_id": "1",
                     "last_status": {
                         "id": str(uuid4()),
                         "status": "succeeded",
@@ -153,7 +153,7 @@ def test_sample_ids_provided(mocker):
             return_value=SampleDetails(
                 **{
                     "id": sample_id,
-                    "client_id": 1,
+                    "client_id": "1",
                     "last_status": {
                         "id": str(uuid4()),
                         "status": "succeeded",
@@ -228,7 +228,7 @@ def test_sample_ids_provided_no_qc_file(mocker):
             return_value=SampleDetails(
                 **{
                     "id": str(uuid4()),
-                    "client_id": 1,
+                    "client_id": "1",
                     "last_status": {
                         "id": str(uuid4()),
                         "status": "succeeded",
@@ -286,7 +286,7 @@ def test_sample_ids_provided_no_metadata_file(mocker):
             return_value=SampleDetails(
                 **{
                     "id": str(uuid4()),
-                    "client_id": 1,
+                    "client_id": "1",
                     "last_status": {
                         "id": str(uuid4()),
                         "status": "succeeded",
@@ -500,7 +500,7 @@ def test_download_urls_to_file(mocker):
         return_value=SampleDetails(
             **{
                 "id": sample_id,
-                "client_id": 1,
+                "client_id": "1",
                 "last_status": {
                     "id": last_status_id,
                     "status": "succeeded",
@@ -560,7 +560,7 @@ def test_download_no_progress(mocker):
             return_value=SampleDetails(
                 **{
                     "id": sample_id,
-                    "client_id": 1,
+                    "client_id": "1",
                     "last_status": {
                         "id": str(uuid4()),
                         "status": "succeeded",
@@ -644,7 +644,7 @@ def test_project_id_provided_skip_existing_qc_and_metadata(mocker):
             return_value=SampleDetails(
                 **{
                     "id": sample_id,
-                    "client_id": 1,
+                    "client_id": "1",
                     "last_status": {
                         "id": str(uuid4()),
                         "status": "succeeded",
@@ -746,7 +746,7 @@ def test_download_not_working_because_archived(mocker):
             return_value=SampleDetails(
                 **{
                     "id": str(uuid4()),
-                    "client_id": 1,
+                    "client_id": "1",
                     "last_status": {
                         "id": str(uuid4()),
                         "status": "succeeded",
@@ -823,7 +823,7 @@ def test_project_id_provided_filter_not_archived(mocker):
             return_value=SampleDetails(
                 **{
                     "id": str(uuid4()),
-                    "client_id": 1,
+                    "client_id": "1",
                     "last_status": {
                         "id": str(uuid4()),
                         "status": "succeeded",

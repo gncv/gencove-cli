@@ -19,7 +19,7 @@ def test_create_project_batches__missing_batch_type(mocker):
     mocked_create_project_batch = mocker.patch.object(
         APIClient,
         "create_project_batch",
-        return_value=BatchDetail(**{}),
+        return_value=BatchDetail(id=str(uuid4())),
     )
     res = runner.invoke(
         create_project_batch,
@@ -46,7 +46,7 @@ def test_create_project_batches__missing_batch_name(mocker):
     mocked_create_project_batch = mocker.patch.object(
         APIClient,
         "create_project_batch",
-        return_value=BatchDetail(**{}),
+        return_value=BatchDetail(id=str(uuid4())),
     )
     res = runner.invoke(
         create_project_batch,
@@ -75,7 +75,7 @@ def test_create_project_batches__bad_project_id(mocker):
     mocked_create_project_batch = mocker.patch.object(
         APIClient,
         "create_project_batch",
-        return_value=BatchDetail(**{}),
+        return_value=BatchDetail(id=str(uuid4())),
     )
     res = runner.invoke(
         create_project_batch,
@@ -106,7 +106,7 @@ def test_create_project_batches__not_owned_project(mocker):
     mocked_create_project_batch = mocker.patch.object(
         APIClient,
         "create_project_batch",
-        return_value=BatchDetail(**mocked_response),
+        return_value=mocked_response,
     )
 
     mocked_create_project_batch = mocker.patch.object(
@@ -154,7 +154,7 @@ def test_create_project_batches__duplicate_client_ids(mocker):
     mocked_create_project_batch = mocker.patch.object(
         APIClient,
         "create_project_batch",
-        return_value=BatchDetail(**mocked_response),
+        return_value=mocked_response,
     )
 
     mocked_create_project_batch = mocker.patch.object(

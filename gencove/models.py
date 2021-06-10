@@ -221,16 +221,12 @@ class ProjectBatchTypes(BaseModel):
     results: Optional[List[BatchType]]
 
 
-class BatchDetail(BaseModel):
+class BatchDetail(GencoveBaseModel):
     """BatchDetail model"""
 
-    # migrate id to GencoveBaseModel,
-    # current type are for tests compatibility
-    id: Optional[Union[UUID, str]]
     name: Optional[str]
     batch_type: Optional[str]
-    # Api returns errors on sample_ids
-    sample_ids: Optional[List[Union[UUID, str]]]
+    sample_ids: Optional[List[UUID]]
     last_status: Optional[GencoveStatus]
     files: Optional[List[SampleFile]]
 

@@ -8,6 +8,9 @@ from gencove.client import APIClient, APIClientTimeout  # noqa: I100
 from gencove.command.projects.cli import get_batch
 from gencove.models import BatchDetail
 
+_SAMPLE_ID_1 = str(uuid4())
+_SAMPLE_ID_2 = str(uuid4())
+
 
 def test_get_batch__empty(mocker):
     """Test project has not batches."""
@@ -21,7 +24,7 @@ def test_get_batch__empty(mocker):
             id=batch_id,
             name="cli-test-1",
             batch_type="batch-type-1",
-            sample_ids=["sample-id-1", "sample-id-2"],
+            sample_ids=[_SAMPLE_ID_1, _SAMPLE_ID_2],
             last_status=dict(
                 id=str(uuid4()),
                 status="running",
@@ -58,7 +61,7 @@ def test_get_batch__not_empty(mocker):
                 id=batch_id,
                 name="cli-test-1",
                 batch_type="batch-type-1",
-                sample_ids=["sample-id-1", "sample-id-2"],
+                sample_ids=[_SAMPLE_ID_1, _SAMPLE_ID_2],
                 last_status=dict(
                     id=str(uuid4()),
                     status="running",
@@ -124,7 +127,7 @@ def test_get_batch__no_progress_not_empty(mocker):
                 id=batch_id,
                 name="cli-test-1",
                 batch_type="batch-type-1",
-                sample_ids=["sample-id-1", "sample-id-2"],
+                sample_ids=[_SAMPLE_ID_1, _SAMPLE_ID_2],
                 last_status=dict(
                     id=str(uuid4()),
                     status="running",

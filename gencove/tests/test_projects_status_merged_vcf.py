@@ -123,13 +123,13 @@ def test_status_merged_vcf__success_but_job_failed(mocker):
     project_id = str(uuid4())
     mocked_response = {
         "id": project_id,
-        "created": "2020-09-14T08:59:00.480",
+        "created": "2020-09-14T08:59:00.480Z",
         "user": str(uuid4()),
         "last_status": {
             "id": str(uuid4()),
             "status": "failed",
             "note": "",
-            "created": "2020-07-28T12:46:22.719862",
+            "created": "2020-07-28T12:46:22.719862Z",
         },
         "up_to_date": False,
     }
@@ -194,13 +194,13 @@ def test_status_merged_vcf__success(mocker):
     project_id = str(uuid4())
     mocked_response = {
         "id": project_id,
-        "created": "2020-09-14T08:59:00.480",
+        "created": "2020-09-14T08:59:00.480+00:00",
         "user": str(uuid4()),
         "last_status": {
             "id": str(uuid4()),
             "status": "success",
             "note": "",
-            "created": "2020-07-28T12:46:22.719862",
+            "created": "2020-07-28T12:46:22.719862+00:00",
         },
         "up_to_date": False,
     }

@@ -400,8 +400,8 @@ def test_download_stdout_with_flag(mocker):
     last_status_id = str(uuid4())
     archive_last_status_id = str(uuid4())
     file_id = str(uuid4())
-    created = "2020-07-28T12:46:22.719862"
-    transition_cutoff = "2020-08-28T12:46:22.719862"
+    created = "2020-07-28T12:46:22.719862+00:00"
+    transition_cutoff = "2020-08-28T12:46:22.719862+00:00"
     mocked_sample_details = mocker.patch.object(
         APIClient,
         "get_sample_details",

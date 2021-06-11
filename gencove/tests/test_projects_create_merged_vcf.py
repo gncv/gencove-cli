@@ -292,13 +292,13 @@ def test_create_merged_vcf__success(mocker):
     project_id = str(uuid4())
     mocked_response = {
         "id": project_id,
-        "created": "2020-09-14T08:59:00.480",
+        "created": "2020-09-14T08:59:00.480+00:00",
         "user": str(uuid4()),
         "last_status": {
             "id": str(uuid4()),
             "status": "running",
             "note": "",
-            "created": "2020-07-28T12:46:22.719862",
+            "created": "2020-07-28T12:46:22.719862+00:00",
         },
         "up_to_date": False,
     }

@@ -46,7 +46,7 @@ MOCKED_BATCHES = dict(
                 }
             ],
             "last_status": {
-                "created": "2020-07-27T12:46:22.719862",
+                "created": "2020-07-27T12:46:22.719862+00:00",
                 "id": str(uuid4()),
                 "status": "succeeded",
             },
@@ -63,7 +63,7 @@ MOCKED_BATCHES = dict(
                 }
             ],
             "last_status": {
-                "created": "2020-07-28T12:46:22.719862",
+                "created": "2020-07-28T12:46:22.719862+00:00",
                 "id": str(uuid4()),
                 "status": "running",
             },

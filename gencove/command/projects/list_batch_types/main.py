@@ -70,8 +70,8 @@ class ListBatchTypes(Command):
         while more:
             self.echo_debug("Get batch types page")
             resp = self.get_batch_types(next_link)
-            yield resp["results"]
-            next_link = resp["meta"]["next"]
+            yield resp.results
+            next_link = resp.meta.next
             more = next_link is not None
 
     @backoff.on_exception(

@@ -66,6 +66,15 @@ class PipelineCapabilities(GencoveBaseModel):
     merge_vcfs_enabled: Optional[bool]
 
 
+class SampleFile(GencoveBaseModel):
+    """SampleFile model"""
+
+    s3_path: Optional[str]
+    size: Optional[int]
+    download_url: Optional[HttpUrl]
+    file_type: Optional[str]
+
+
 # pylint: disable=too-few-public-methods
 class Project(GencoveBaseModel):
     """Project record"""
@@ -78,6 +87,7 @@ class Project(GencoveBaseModel):
     pipeline_capabilities: Optional[Union[UUID, PipelineCapabilities]]
     roles: Optional[dict]
     webhook_url: Optional[Union[HttpUrl, str]]  # deprecated
+    files: Optional[List[SampleFile]]
 
 
 class UploadCredentials(BaseModel):
@@ -88,15 +98,6 @@ class UploadCredentials(BaseModel):
     secret_key: Optional[str]
     token: Optional[str]
     expiry_time: Optional[str]  # needs to be str for boto3 to work
-
-
-class SampleFile(GencoveBaseModel):
-    """SampleFile model"""
-
-    s3_path: Optional[str]
-    size: Optional[int]
-    download_url: Optional[HttpUrl]
-    file_type: Optional[str]
 
 
 class SampleDetails(GencoveBaseModel):
@@ -246,7 +247,7 @@ class ProjectMergeVCFs(GencoveBaseModel):
     up_to_date: Optional[bool]
 
 
-class SampleMetadata(GencoveBaseModel):
+class SampleMetadata(BaseModel):
     """SampleMetadata model"""
 
     metadata: Optional[Any]

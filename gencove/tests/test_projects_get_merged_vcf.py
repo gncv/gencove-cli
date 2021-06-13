@@ -6,6 +6,7 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.projects.cli import get_merged_vcf
+from gencove.models import Project
 
 
 def test_get_merged_vcf__bad_project_id(mocker):
@@ -18,6 +19,7 @@ def test_get_merged_vcf__bad_project_id(mocker):
     mocked_get_project = mocker.patch.object(
         APIClient,
         "get_project",
+        return_value=Project(id=str(uuid4())),
     )
 
     res = runner.invoke(
@@ -78,7 +80,7 @@ def test_get_merged_vcf__empty(mocker):
     mocked_get_project = mocker.patch.object(
         APIClient,
         "get_project",
-        return_value=dict(
+        return_value=Project(
             id=project_id,
             name="Project Cadmus",
             description="",
@@ -123,7 +125,7 @@ def test_get_merged_vcf_custom_filename(mocker):
     mocked_get_project = mocker.patch.object(
         APIClient,
         "get_project",
-        return_value=dict(
+        return_value=Project(
             id=project_id,
             name="Project Cadmus",
             description="",
@@ -182,7 +184,7 @@ def test_get_merged_vcf__no_progress_success(mocker):
     mocked_get_project = mocker.patch.object(
         APIClient,
         "get_project",
-        return_value=dict(
+        return_value=Project(
             id=project_id,
             name="Project Cadmus",
             description="",
@@ -282,7 +284,7 @@ def test_get_merged_vcf__success(mocker):
     mocked_get_project = mocker.patch.object(
         APIClient,
         "get_project",
-        return_value=dict(
+        return_value=Project(
             id=project_id,
             name="Project Cadmus",
             description="",
@@ -347,7 +349,7 @@ def test_get_merged_vcf__success__project_with_legacy_webhhok_url(mocker):
     mocked_get_project = mocker.patch.object(
         APIClient,
         "get_project",
-        return_value=dict(
+        return_value=Project(
             id=project_id,
             name="Project Cadmus",
             description="",

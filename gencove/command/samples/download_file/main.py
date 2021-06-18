@@ -4,6 +4,10 @@ import backoff
 
 import requests
 
+from gencove.command.download.constants import (  # noqa: I100
+    ALLOWED_ARCHIVE_STATUSES_RE,
+)
+
 from .utils import download_file, fatal_process_sample_error
 from ...base import Command
 from ...utils import is_valid_uuid
@@ -85,6 +89,14 @@ class DownloadFile(Command):
             )
         )
 
+        if not ALLOWED_ARCHIVE_STATUSES_RE.match(
+            sample.archive_last_status.status
+        ):
+            raise ValidationError(
+                "Sample with id {} is archived and cannot be downloaded - "
+                "please restore the sample and try again.".format(sample.id)
+            )
+
         file_to_download = None
 
         for sample_file in sample.files:
@@ -93,7 +105,7 @@ class DownloadFile(Command):
                 file_to_download = sample_file
                 break
 
-        if file_to_download is None:
+        if file_to_download is None or file_to_download.download_url is None:
             self.echo_warning(
                 "File not found for sample with id {} and file type {}".format(
                     self.sample_id, self.file_type

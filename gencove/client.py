@@ -566,7 +566,7 @@ class APIClient:
         }
 
         return self._post(
-            project_endpoint, payload, authorized=True, model=BatchDetail
+            project_endpoint, payload, authorized=True, model=ProjectBatches
         )
 
     def get_batch(self, batch_id):

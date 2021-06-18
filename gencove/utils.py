@@ -29,6 +29,7 @@ def get_s3_client_refreshable(refresh_method):
     """
 
     def refresh_to_dict():
+        """Turn pydantic model into `dict`. Needed for botocore."""
         return refresh_method().dict()
 
     session = get_session()

@@ -35,7 +35,7 @@ setup(
         "six>=1.5",
         "Click>=7.0",
         "requests>=2.19.1",
-        "boto3>=1.9.188",
+        "boto3>=1.17.97",
         "progressbar2==3.50.1",
         "backoff==1.10.0",
         "pydantic==1.8.2",

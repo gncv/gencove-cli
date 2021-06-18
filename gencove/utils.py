@@ -27,10 +27,15 @@ def get_s3_client_refreshable(refresh_method):
 
     :param refresh_method: function that can get fresh credentials
     """
+
+    def refresh_to_dict():
+        """Turn pydantic model into `dict`. Needed for botocore."""
+        return refresh_method().dict()
+
     session = get_session()
     session_credentials = RefreshableCredentials.create_from_metadata(
-        metadata=refresh_method(),
-        refresh_using=refresh_method,
+        metadata=refresh_to_dict(),
+        refresh_using=refresh_to_dict,
         method="sts-assume-role",
     )
     # pylint: disable=protected-access

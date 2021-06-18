@@ -6,6 +6,10 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient, APIClientTimeout  # noqa: I100
 from gencove.command.projects.cli import get_batch
+from gencove.models import BatchDetail
+
+_SAMPLE_ID_1 = str(uuid4())
+_SAMPLE_ID_2 = str(uuid4())
 
 
 def test_get_batch__empty(mocker):
@@ -16,13 +20,13 @@ def test_get_batch__empty(mocker):
     mocked_get_batch = mocker.patch.object(
         APIClient,
         "get_batch",
-        return_value=dict(
+        return_value=BatchDetail(
             id=batch_id,
             name="cli-test-1",
             batch_type="batch-type-1",
-            sample_ids=["sample-id-1", "sample-id-2"],
+            sample_ids=[_SAMPLE_ID_1, _SAMPLE_ID_2],
             last_status=dict(
-                id="last-status-id-1",
+                id=str(uuid4()),
                 status="running",
                 created="2020-08-02T22:13:54.547167Z",
             ),
@@ -53,19 +57,19 @@ def test_get_batch__not_empty(mocker):
         mocked_get_batch = mocker.patch.object(
             APIClient,
             "get_batch",
-            return_value=dict(
+            return_value=BatchDetail(
                 id=batch_id,
                 name="cli-test-1",
                 batch_type="batch-type-1",
-                sample_ids=["sample-id-1", "sample-id-2"],
+                sample_ids=[_SAMPLE_ID_1, _SAMPLE_ID_2],
                 last_status=dict(
-                    id="last-status-id-1",
+                    id=str(uuid4()),
                     status="running",
                     created="2020-08-02T22:13:54.547167Z",
                 ),
                 files=[
                     dict(
-                        id="file-id-1",
+                        id=str(uuid4()),
                         s3_path=(
                             "output/simple_vcf2finalreport/job-id-1/"
                             "simple_vcf2finalreport/report.zip"
@@ -119,19 +123,19 @@ def test_get_batch__no_progress_not_empty(mocker):
         mocked_get_batch = mocker.patch.object(
             APIClient,
             "get_batch",
-            return_value=dict(
+            return_value=BatchDetail(
                 id=batch_id,
                 name="cli-test-1",
                 batch_type="batch-type-1",
-                sample_ids=["sample-id-1", "sample-id-2"],
+                sample_ids=[_SAMPLE_ID_1, _SAMPLE_ID_2],
                 last_status=dict(
-                    id="last-status-id-1",
+                    id=str(uuid4()),
                     status="running",
                     created="2020-08-02T22:13:54.547167Z",
                 ),
                 files=[
                     dict(
-                        id="file-id-1",
+                        id=str(uuid4()),
                         s3_path=(
                             "output/simple_vcf2finalreport/job-id-1/"
                             "simple_vcf2finalreport/report.zip"

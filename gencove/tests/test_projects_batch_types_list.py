@@ -9,6 +9,7 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient, APIClientTimeout  # noqa: I100
 from gencove.command.projects.cli import list_project_batch_types
+from gencove.models import ProjectBatchTypes
 
 
 def test_list_project_batch_types__empty(mocker):
@@ -18,7 +19,7 @@ def test_list_project_batch_types__empty(mocker):
     mocked_get_project_batch_types = mocker.patch.object(
         APIClient,
         "get_project_batch_types",
-        return_value=dict(results=[], meta=dict(next=None)),
+        return_value=ProjectBatchTypes(results=[], meta=dict(next=None)),
     )
     res = runner.invoke(
         list_project_batch_types,
@@ -69,7 +70,9 @@ def test_list_project_batch_types__not_empty(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_project_batch_types = mocker.patch.object(
-        APIClient, "get_project_batch_types", return_value=MOCKED_BATCH_TYPES
+        APIClient,
+        "get_project_batch_types",
+        return_value=ProjectBatchTypes(**MOCKED_BATCH_TYPES),
     )
 
     res = runner.invoke(

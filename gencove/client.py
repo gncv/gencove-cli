@@ -6,8 +6,11 @@ Exclude imports from linters due to install aliases breaking the rules.
 import datetime
 import json
 import time
+from uuid import UUID
 from builtins import str as text  # noqa
 from urllib.parse import parse_qs, urljoin, urlparse
+
+from pydantic import BaseModel
 
 from requests import (  # pylint: disable=W0622
     ConnectTimeout,
@@ -27,17 +30,42 @@ from gencove.constants import (
     SortOrder,
 )
 from gencove.logger import echo_debug
+from gencove.models import (
+    AccessJWT,
+    BatchDetail,
+    CreateJWT,
+    PipelineCapabilities,
+    Project,
+    ProjectBatchTypes,
+    ProjectBatches,
+    ProjectMergeVCFs,
+    ProjectSamples,
+    Projects,
+    SampleDetails,
+    SampleMetadata,
+    SampleQC,
+    SampleSheet,
+    UploadCredentials,
+    UploadSamples,
+    UploadsPostData,
+)
 from gencove.version import version as cli_version
 
 
-class DateTimeEncoder(json.JSONEncoder):
-    """JSON encoder that knows how to encode datetime objects."""
+class CustomEncoder(json.JSONEncoder):
+    """JSON encoder that knows how to encode `datetime`, `UUID`
+    and `pydantic.BaseModel` objects.
+    """
 
     # pylint: disable=method-hidden
     def default(self, o):
         """Override default method of JSONEncoder."""
         if isinstance(o, datetime.datetime):
             return o.isoformat()
+        if isinstance(o, BaseModel):
+            return {**o.dict(exclude_unset=True), **o.dict(exclude_none=True)}
+        if isinstance(o, UUID):
+            return str(o)
         return json.JSONEncoder.default(self, o)
 
 
@@ -100,7 +128,7 @@ class APIClient:
 
     @staticmethod
     def _serialize_post_payload(payload):
-        return json.dumps(payload, cls=DateTimeEncoder)
+        return json.dumps(payload, cls=CustomEncoder)
 
     # pylint: disable=bad-option-value,bad-continuation,too-many-arguments
     # pylint: disable=too-many-branches
@@ -211,7 +239,7 @@ class APIClient:
     def _refresh_authentication(self):
         echo_debug("Refreshing authentication")
         jwt = self.refresh_token(self._jwt_refresh_token)
-        self._set_jwt(jwt["access"])
+        self._set_jwt(jwt.access)
 
     def _get_authorization(self):
         if self._api_key:
@@ -226,10 +254,11 @@ class APIClient:
         authorized=False,
         sensitive=False,
         refreshed=False,
+        model=None,
     ):
         headers = {} if not authorized else self._get_authorization()
         try:
-            return self._request(
+            response = self._request(
                 endpoint,
                 params=payload,
                 method="post",
@@ -237,6 +266,9 @@ class APIClient:
                 custom_headers=headers,
                 sensitive=sensitive,
             )
+            if model:
+                return model(**response)
+            return response
         except APIClientError as err:
             if not refreshed and err.status_code and err.status_code == 401:
                 self._refresh_authentication()
@@ -254,10 +286,11 @@ class APIClient:
         authorized=False,
         sensitive=False,
         refreshed=False,
+        model=None,
     ):
         headers = {} if not authorized else self._get_authorization()
         try:
-            return self._request(
+            response = self._request(
                 endpoint,
                 params=query_params,
                 method="get",
@@ -265,6 +298,9 @@ class APIClient:
                 custom_headers=headers,
                 sensitive=sensitive,
             )
+            if model:
+                return model(**response)
+            return response
         except APIClientError as err:
             if not refreshed and err.status_code and err.status_code == 401:
                 self._refresh_authentication()
@@ -300,12 +336,7 @@ class APIClient:
             self.endpoints.REFRESH_JWT.value,
             {"refresh": refresh_token},
             sensitive=True,
-        )
-
-    def validate_token(self, token):
-        """Validate jwt token."""
-        return self._post(
-            self.endpoints.VERIFY_JWT.value, {"token": token}, sensitive=True
+            model=AccessJWT,
         )
 
     def get_jwt(self, email, password):
@@ -314,12 +345,13 @@ class APIClient:
             self.endpoints.GET_JWT.value,
             dict(email=email, password=password),
             sensitive=True,
+            model=CreateJWT,
         )
 
     def login(self, email, password):
         """Log user in."""
         jwt = self.get_jwt(email, password)
-        self._set_jwt(jwt["access"], jwt["refresh"])
+        self._set_jwt(jwt.access, jwt.refresh)
 
     def get_upload_details(self, gncv_file_path):
         """Get file upload details.
@@ -333,6 +365,7 @@ class APIClient:
             self.endpoints.UPLOAD_DETAILS.value,
             dict(destination_path=gncv_file_path),
             authorized=True,
+            model=UploadsPostData,
         )
 
     def get_upload_credentials(self):
@@ -341,6 +374,7 @@ class APIClient:
             self.endpoints.GET_UPLOAD_CREDENTIALS.value,
             authorized=True,
             sensitive=True,
+            model=UploadCredentials,
         )
 
     def get_project_samples(
@@ -368,7 +402,10 @@ class APIClient:
             },
         )
         return self._get(
-            project_endpoint, query_params=params, authorized=True
+            project_endpoint,
+            query_params=params,
+            authorized=True,
+            model=ProjectSamples,
         )
 
     def add_samples_to_project(self, samples, project_id, metadata=None):
@@ -385,6 +422,7 @@ class APIClient:
             self.endpoints.PROJECT_SAMPLES.value.format(id=project_id),
             payload,
             authorized=True,
+            model=UploadSamples,
         )
 
     def get_sample_details(self, sample_id):
@@ -392,6 +430,7 @@ class APIClient:
         return self._get(
             self.endpoints.SAMPLE_DETAILS.value.format(id=sample_id),
             authorized=True,
+            model=SampleDetails,
         )
 
     def get_sample_qc_metrics(self, sample_id):
@@ -406,6 +445,7 @@ class APIClient:
         return self._get(
             self.endpoints.SAMPLE_QC_METRICS.value.format(id=sample_id),
             authorized=True,
+            model=SampleQC,
         )
 
     def get_sample_sheet(
@@ -440,6 +480,7 @@ class APIClient:
             self.endpoints.SAMPLE_SHEET.value,
             query_params=params,
             authorized=True,
+            model=SampleSheet,
         )
 
     def list_projects(self, next_link=None):
@@ -465,6 +506,7 @@ class APIClient:
             self.endpoints.PROJECTS.value,
             query_params=params,
             authorized=True,
+            model=Projects,
         )
 
     def get_pipeline_capabilities(self, pipeline_id):
@@ -479,6 +521,7 @@ class APIClient:
         resp = self._get(
             self.endpoints.PIPELINE_CAPABILITES.value.format(id=pipeline_id),
             authorized=True,
+            model=PipelineCapabilities,
         )
         return resp
 
@@ -489,7 +532,10 @@ class APIClient:
         )
         params = self._add_query_params(next_link)
         return self._get(
-            project_endpoint, query_params=params, authorized=True
+            project_endpoint,
+            query_params=params,
+            authorized=True,
+            model=ProjectBatchTypes,
         )
 
     def get_project_batches(self, project_id, next_link=None):
@@ -499,7 +545,10 @@ class APIClient:
         )
         params = self._add_query_params(next_link)
         return self._get(
-            project_endpoint, query_params=params, authorized=True
+            project_endpoint,
+            query_params=params,
+            authorized=True,
+            model=ProjectBatches,
         )
 
     def create_project_batch(
@@ -516,12 +565,14 @@ class APIClient:
             "sample_ids": sample_ids,
         }
 
-        return self._post(project_endpoint, payload, authorized=True)
+        return self._post(
+            project_endpoint, payload, authorized=True, model=ProjectBatches
+        )
 
     def get_batch(self, batch_id):
         """Get single batch."""
         batches_endpoint = self.endpoints.BATCHES.value.format(id=batch_id)
-        return self._get(batches_endpoint, authorized=True)
+        return self._get(batches_endpoint, authorized=True, model=BatchDetail)
 
     def restore_project_samples(self, project_id, sample_ids):
         """Make a request to restore samples in given project."""
@@ -538,28 +589,34 @@ class APIClient:
     def get_project(self, project_id):
         """Get single project."""
         project_endpoint = f"{self.endpoints.PROJECTS.value}{project_id}"
-        return self._get(project_endpoint, authorized=True)
+        return self._get(project_endpoint, authorized=True, model=Project)
 
     def create_merged_vcf(self, project_id):
         """Merge VCF files for a project."""
         merge_vcf_endpoint = self.endpoints.PROJECT_MERGE_VCFS.value.format(
             id=project_id
         )
-        return self._post(merge_vcf_endpoint, authorized=True)
+        return self._post(
+            merge_vcf_endpoint, authorized=True, model=ProjectMergeVCFs
+        )
 
     def retrieve_merged_vcf(self, project_id):
         """Retrieve the status of the merge command for a project."""
         merge_vcf_endpoint = self.endpoints.PROJECT_MERGE_VCFS.value.format(
             id=project_id
         )
-        return self._get(merge_vcf_endpoint, authorized=True)
+        return self._get(
+            merge_vcf_endpoint, authorized=True, model=ProjectMergeVCFs
+        )
 
     def get_metadata(self, sample_id):
         """Retrieve the metadata for a sample."""
         sample_metadata_endpoint = (
             self.endpoints.SAMPLE_METADATA.value.format(id=sample_id)
         )
-        return self._get(sample_metadata_endpoint, authorized=True)
+        return self._get(
+            sample_metadata_endpoint, authorized=True, model=SampleMetadata
+        )
 
     def set_metadata(self, sample_id, metadata):
         """Assign the metadata to a sample."""
@@ -569,4 +626,9 @@ class APIClient:
         payload = {
             "metadata": metadata,
         }
-        return self._post(sample_metadata_endpoint, payload, authorized=True)
+        return self._post(
+            sample_metadata_endpoint,
+            payload,
+            authorized=True,
+            model=SampleMetadata,
+        )

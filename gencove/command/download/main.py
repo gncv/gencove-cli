@@ -69,7 +69,7 @@ class Download(Command):
             try:
                 samples_generator = self._get_paginated_samples()
                 for sample in samples_generator:
-                    self.sample_ids.add(sample["id"])
+                    self.sample_ids.add(sample.id)
             except client.APIClientError as err:
                 raise ValidationError(
                     "Project id {} not found.".format(self.filters.project_id)
@@ -156,23 +156,21 @@ class Download(Command):
 
         self.echo_debug(
             "Processing sample id {}, status {}".format(
-                sample["id"], sample["last_status"]["status"]
+                sample.id, sample.last_status.status
             )
         )
 
         if not ALLOWED_ARCHIVE_STATUSES_RE.match(
-            sample["archive_last_status"]["status"]
+            sample.archive_last_status.status
         ):
             raise ValidationError(
                 "Sample with id {} is archived and cannot be downloaded - "
-                "please restore the sample and try again.".format(
-                    sample["id"]
-                )
+                "please restore the sample and try again.".format(sample.id)
             )
 
-        if not ALLOWED_STATUSES_RE.match(sample["last_status"]["status"]):
+        if not ALLOWED_STATUSES_RE.match(sample.last_status.status):
             self.echo_warning(
-                "Sample #{} has no deliverable.".format(sample["id"]),
+                "Sample #{} has no deliverable.".format(sample.id),
             )
             return
 
@@ -181,9 +179,7 @@ class Download(Command):
         )
 
         file_with_prefix = self.options.download_template.format(
-            **get_download_template_format_params(
-                sample["client_id"], sample["id"]
-            )
+            **get_download_template_format_params(sample.client_id, sample.id)
         )
         self.echo_debug(
             "file path with prefix is: {}".format(file_with_prefix)
@@ -208,29 +204,29 @@ class Download(Command):
 
         self.download_files.append(
             {
-                "gencove_id": sample["id"],
-                "client_id": sample["client_id"],
+                "gencove_id": sample.id,
+                "client_id": sample.client_id,
                 "last_status": {
-                    "id": sample["last_status"]["id"],
-                    "status": sample["last_status"]["status"],
-                    "created": sample["last_status"]["created"],
+                    "id": sample.last_status.id,
+                    "status": sample.last_status.status,
+                    "created": sample.last_status.created,
                 },
                 "archive_last_status": {
-                    "id": sample["archive_last_status"]["id"],
-                    "status": sample["archive_last_status"]["status"],
-                    "created": sample["archive_last_status"]["created"],
+                    "id": sample.archive_last_status.id,
+                    "status": sample.archive_last_status.status,
+                    "created": sample.archive_last_status.created,
                     "transition_cutoff": (
-                        sample["archive_last_status"]["transition_cutoff"]
+                        sample.archive_last_status.transition_cutoff
                     ),
                 },
                 "files": {},
             }
         )
 
-        for sample_file in sample["files"]:
+        for sample_file in sample.files:
             # pylint: disable=E0012,C0330
             if self.filters.file_types and not file_types_re.match(
-                sample_file["file_type"]
+                sample_file.file_type
             ):
                 self.echo_debug(
                     "Deliverable file type is not in desired file types"
@@ -245,13 +241,13 @@ class Download(Command):
                     file_path,
                     download_file,
                     file_path,
-                    sample_file["download_url"],
+                    sample_file.download_url,
                     self.options.skip_existing,
                     self.no_progress,
                 )
-            self.download_files[-1]["files"][sample_file["file_type"]] = {
-                "id": sample_file["id"],
-                "download_url": sample_file["download_url"],
+            self.download_files[-1]["files"][sample_file.file_type] = {
+                "id": sample_file.id,
+                "download_url": sample_file.download_url,
             }
 
     def validate_and_download(
@@ -350,19 +346,29 @@ class Download(Command):
                 next_page,
                 sample_archive_status=SampleArchiveStatus.AVAILABLE.value,
             )
-            for sample in req["results"]:
+            for sample in req.results:
                 yield sample
-            next_page = req["meta"]["next"]
+            next_page = req.meta.next
             get_samples = next_page is not None
 
     def output_list(self):
         """Output reformatted JSON of each individual sample."""
         self.echo_debug("Outputting JSON.")
         if self.download_to == "-":
-            self.echo_data(json.dumps(self.download_files, indent=4))
+            self.echo_data(
+                json.dumps(
+                    self.download_files, indent=4, cls=client.CustomEncoder
+                )
+            )
         else:
             with open(self.download_to, "w") as json_file:
-                json_file.write(json.dumps(self.download_files, indent=4))
+                json_file.write(
+                    json.dumps(
+                        self.download_files,
+                        indent=4,
+                        cls=client.CustomEncoder,
+                    )
+                )
             self.echo_info(
                 "Samples and their deliverables download URLs outputted to "
                 "{}".format(self.download_to)

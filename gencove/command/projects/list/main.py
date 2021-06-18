@@ -4,11 +4,8 @@ import backoff
 # pylint: disable=wrong-import-order
 from gencove.client import APIClientError, APIClientTimeout  # noqa: I100
 from gencove.command.base import Command
+from gencove.models import Project
 
-from .constants import (
-    PipelineCapabilities,
-    Project,
-)
 from .utils import get_line
 
 
@@ -54,8 +51,8 @@ class List(Command):
             self.echo_debug("Get projects page")
             resp = self.get_projects(next_link)
 
-            yield [Project(**result) for result in resp["results"]]
-            next_link = resp["meta"]["next"]
+            yield resp.results
+            next_link = resp.meta.next
             more = next_link is not None
 
     @backoff.on_exception(
@@ -76,8 +73,7 @@ class List(Command):
     )
     def get_pipeline_capabilities(self, pipeline_id):
         """Get pipeline capabilities."""
-        resp = self.api_client.get_pipeline_capabilities(pipeline_id)
-        return PipelineCapabilities(**resp)
+        return self.api_client.get_pipeline_capabilities(pipeline_id)
 
     def augment_projects_with_pipeline_capabilities(self, projects):
         """Fetch pipeline capabilities and append it to the project.

@@ -9,6 +9,7 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient, APIClientError  # noqa: I100
 from gencove.command.projects.cli import create_project_batch
+from gencove.models import BatchDetail, ProjectBatches
 
 
 def test_create_project_batches__missing_batch_type(mocker):
@@ -18,6 +19,7 @@ def test_create_project_batches__missing_batch_type(mocker):
     mocked_create_project_batch = mocker.patch.object(
         APIClient,
         "create_project_batch",
+        return_value=BatchDetail(id=str(uuid4())),
     )
     res = runner.invoke(
         create_project_batch,
@@ -44,6 +46,7 @@ def test_create_project_batches__missing_batch_name(mocker):
     mocked_create_project_batch = mocker.patch.object(
         APIClient,
         "create_project_batch",
+        return_value=BatchDetail(id=str(uuid4())),
     )
     res = runner.invoke(
         create_project_batch,
@@ -72,6 +75,7 @@ def test_create_project_batches__bad_project_id(mocker):
     mocked_create_project_batch = mocker.patch.object(
         APIClient,
         "create_project_batch",
+        return_value=BatchDetail(id=str(uuid4())),
     )
     res = runner.invoke(
         create_project_batch,
@@ -100,13 +104,15 @@ def test_create_project_batches__not_owned_project(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_project_batch = mocker.patch.object(
-        APIClient, "create_project_batch", return_value=mocked_response
+        APIClient,
+        "create_project_batch",
+        return_value=mocked_response,
     )
 
     mocked_create_project_batch = mocker.patch.object(
         APIClient,
         "create_project_batch",
-        side_effect=APIClientError(message="", status_code=404),
+        side_effect=APIClientError(message="", status_code=403),
     )
 
     res = runner.invoke(
@@ -123,10 +129,10 @@ def test_create_project_batches__not_owned_project(mocker):
             "foo bar",
         ],
     )
-    assert res.exit_code == 0
+    assert res.exit_code == 1
     mocked_login.assert_called_once()
     mocked_create_project_batch.assert_called_once()
-    assert "you do not have permission required" in res.output
+    assert "You do not have the sufficient permission" in res.output
 
 
 def test_create_project_batches__duplicate_client_ids(mocker):
@@ -146,7 +152,9 @@ def test_create_project_batches__duplicate_client_ids(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_project_batch = mocker.patch.object(
-        APIClient, "create_project_batch", return_value=mocked_response
+        APIClient,
+        "create_project_batch",
+        return_value=mocked_response,
     )
 
     mocked_create_project_batch = mocker.patch.object(
@@ -185,7 +193,7 @@ def test_create_project_batches__success__with_sample_ids(mocker):
                 "name": "foo bar",
                 "batch_type": "hd777k",
                 "last_status": {
-                    "created": "2020-07-28T12:46:22.719862Z",
+                    "created": "2020-07-28T12:46:22.719862",
                     "id": str(uuid4()),
                     "status": "running",
                 },
@@ -196,7 +204,9 @@ def test_create_project_batches__success__with_sample_ids(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_project_batch = mocker.patch.object(
-        APIClient, "create_project_batch", return_value=mocked_response
+        APIClient,
+        "create_project_batch",
+        return_value=ProjectBatches(**mocked_response),
     )
 
     res = runner.invoke(
@@ -247,7 +257,7 @@ def test_create_project_batches__success__without_sample_ids(mocker):
                 "name": "foo bar",
                 "batch_type": "hd777k",
                 "last_status": {
-                    "created": "2020-07-28T12:46:22.719862Z",
+                    "created": "2020-07-28T12:46:22.719862",
                     "id": str(uuid4()),
                     "status": "running",
                 },
@@ -258,7 +268,9 @@ def test_create_project_batches__success__without_sample_ids(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_project_batch = mocker.patch.object(
-        APIClient, "create_project_batch", return_value=mocked_response
+        APIClient,
+        "create_project_batch",
+        return_value=ProjectBatches(**mocked_response),
     )
 
     res = runner.invoke(

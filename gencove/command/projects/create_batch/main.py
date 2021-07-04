@@ -72,7 +72,7 @@ class CreateBatch(Command):
                 sample_ids=self.sample_ids,
             )
             self.echo_debug(created_batches_details)
-            for batch in created_batches_details["results"]:
+            for batch in created_batches_details.results:
                 self.echo_data(get_line(batch))
         except client.APIClientError as err:
             self.echo_debug(err)
@@ -84,10 +84,7 @@ class CreateBatch(Command):
                 self.echo_info(err.message)
             elif err.status_code == 404:
                 self.echo_warning(
-                    "Project {} does not exist or you do not have "
-                    "permission required to access it.".format(
-                        self.project_id
-                    )
+                    "Project {} does not exist.".format(self.project_id)
                 )
             else:
                 raise

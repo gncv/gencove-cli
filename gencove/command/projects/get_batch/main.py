@@ -42,28 +42,28 @@ class GetBatch(Command):
 
         try:
             batch = self.get_batch()
-            if len(batch["files"]) == 0:
+            if not batch.files:
                 raise ValidationError(
                     "There are no deliverables available for batch {}.".format(
                         self.batch_id
                     )
                 )
-            if len(batch["files"]) > 1:
+            if len(batch.files) > 1:
                 self.echo_warning(
                     "There is more than one deliverable available for "
                     "batch {}.".format(self.batch_id)
                 )
-            deliverable = batch["files"][0]
+            deliverable = batch.files[0]
             download_path = (
                 self.output_filename
                 if self.output_filename
                 else download.utils.get_filename_from_download_url(
-                    deliverable["download_url"]
+                    deliverable.download_url
                 )
             )
             download.utils.download_file(
                 download_path,
-                deliverable["download_url"],
+                deliverable.download_url,
                 no_progress=self.no_progress,
             )
 
@@ -75,8 +75,7 @@ class GetBatch(Command):
                 self.echo_info(err.message)
             elif err.status_code == 404:
                 self.echo_warning(
-                    "Batch {} does not exist or you do not have "
-                    "permission required to access it.".format(self.batch_id),
+                    "Batch {} does not exist.".format(self.batch_id),
                 )
             else:
                 raise

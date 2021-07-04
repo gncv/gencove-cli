@@ -57,8 +57,8 @@ class GetMergedVCF(Command):
             merged_vcf = next(
                 (
                     f
-                    for f in project["files"]
-                    if f["file_type"] == "impute-vcf-merged"
+                    for f in project.files
+                    if f.file_type == "impute-vcf-merged"
                 ),
                 None,
             )
@@ -72,21 +72,18 @@ class GetMergedVCF(Command):
                 self.output_filename
                 if self.output_filename
                 else download.utils.get_filename_from_download_url(
-                    merged_vcf["download_url"]
+                    merged_vcf.download_url
                 )
             )
             download.utils.download_file(
                 download_path,
-                merged_vcf["download_url"],
+                merged_vcf.download_url,
                 no_progress=self.no_progress,
             )
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 404:
                 self.echo_error(
-                    "Project {} does not exist or you do not have "
-                    "permission required to access it.".format(
-                        self.project_id
-                    )
+                    "Project {} does not exist.".format(self.project_id)
                 )
             raise

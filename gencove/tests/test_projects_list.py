@@ -14,9 +14,10 @@ from gencove.client import (
     APIClientTimeout,
 )  # noqa: I100
 from gencove.command.projects.cli import list_projects
-from gencove.command.projects.list.constants import (
+from gencove.models import (
     PipelineCapabilities,
     Project,
+    Projects,
 )
 
 
@@ -27,7 +28,7 @@ def test_list_empty(mocker):
     mocked_get_projects = mocker.patch.object(
         APIClient,
         "list_projects",
-        return_value=dict(results=[], meta=dict(next=None)),
+        return_value=Projects(results=[], meta=dict(next=None)),
     )
     res = runner.invoke(
         list_projects, ["--email", "foo@bar.com", "--password", "123"]
@@ -81,7 +82,7 @@ MOCKED_PROJECTS_WITH_UNEXPECTED_KEYS = dict(
             "description": "",
             "created": (datetime.utcnow() - timedelta(days=7)).isoformat(),
             "organization": str(uuid4()),
-            "webhook_url": None,
+            "webhook_url": "",
             "sample_count": 1,
             "pipeline_capabilities": str(uuid4()),
             "roles": [],
@@ -106,14 +107,14 @@ def test_list_projects_no_permission(mocker):
         APIClient,
         "list_projects",
         side_effect=APIClientError(
-            message="API Client Error: Not Found: Not found.", status_code=404
+            message="API Client Error: Not Found: Not found.", status_code=403
         ),
         return_value={"detail": "Not found"},
     )
     mocked_get_pipeline_capabilities = mocker.patch.object(
         APIClient,
         "get_pipeline_capabilities",
-        return_value=MOCKED_PIPELINE_CAPABILITY,
+        return_value=PipelineCapabilities(**MOCKED_PIPELINE_CAPABILITY),
     )
     res = runner.invoke(
         list_projects, ["--email", "foo@bar.com", "--password", "123"]
@@ -128,8 +129,8 @@ def test_list_projects_no_permission(mocker):
     echo(
         "\n".join(
             [
-                "ERROR: You do not have permission required to access "
-                "the project list.",
+                "ERROR: You do not have the sufficient permission "
+                "level required to perform this operation.",
                 "ERROR: API Client Error: Not Found: Not found.",
                 "Aborted!",
             ]
@@ -166,7 +167,7 @@ def test_list_projects_slow_response_retry_pipeline(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_projects = mocker.patch.object(
-        APIClient, "list_projects", return_value=MOCKED_PROJECTS
+        APIClient, "list_projects", return_value=Projects(**MOCKED_PROJECTS)
     )
     mocked_get_pipeline_capabilities = mocker.patch.object(
         APIClient,
@@ -187,12 +188,12 @@ def test_list_projects(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_projects = mocker.patch.object(
-        APIClient, "list_projects", return_value=MOCKED_PROJECTS
+        APIClient, "list_projects", return_value=Projects(**MOCKED_PROJECTS)
     )
     mocked_get_pipeline_capabilities = mocker.patch.object(
         APIClient,
         "get_pipeline_capabilities",
-        return_value=MOCKED_PIPELINE_CAPABILITY,
+        return_value=PipelineCapabilities(**MOCKED_PIPELINE_CAPABILITY),
     )
     res = runner.invoke(
         list_projects, ["--email", "foo@bar.com", "--password", "123"]
@@ -210,8 +211,8 @@ def test_list_projects(mocker):
     echo(
         "\t".join(
             [
-                project.created,
-                project.id,
+                str(project.created),
+                str(project.id),
                 project.name.replace("\t", " "),
                 pipeline.name,
             ]
@@ -233,12 +234,12 @@ def test_list_projects__with_webhook_url(mocker):
     mocked_get_projects = mocker.patch.object(
         APIClient,
         "list_projects",
-        return_value=MOCKED_PROJECTS_WITH_WEBHOOK_URL,
+        return_value=Projects(**MOCKED_PROJECTS_WITH_WEBHOOK_URL),
     )
     mocked_get_pipeline_capabilities = mocker.patch.object(
         APIClient,
         "get_pipeline_capabilities",
-        return_value=MOCKED_PIPELINE_CAPABILITY,
+        return_value=PipelineCapabilities(**MOCKED_PIPELINE_CAPABILITY),
     )
     res = runner.invoke(
         list_projects, ["--email", "foo@bar.com", "--password", "123"]
@@ -256,8 +257,8 @@ def test_list_projects__with_webhook_url(mocker):
     echo(
         "\t".join(
             [
-                project.created,
-                project.id,
+                str(project.created),
+                str(project.id),
                 project.name.replace("\t", " "),
                 pipeline.name,
             ]
@@ -276,12 +277,12 @@ def test_list_projects__with_unexpected_keys(mocker):
     mocked_get_projects = mocker.patch.object(
         APIClient,
         "list_projects",
-        return_value=MOCKED_PROJECTS_WITH_UNEXPECTED_KEYS,
+        return_value=Projects(**MOCKED_PROJECTS_WITH_UNEXPECTED_KEYS),
     )
     mocked_get_pipeline_capabilities = mocker.patch.object(
         APIClient,
         "get_pipeline_capabilities",
-        return_value=MOCKED_PIPELINE_CAPABILITY,
+        return_value=PipelineCapabilities(**MOCKED_PIPELINE_CAPABILITY),
     )
     res = runner.invoke(
         list_projects, ["--email", "foo@bar.com", "--password", "123"]
@@ -299,8 +300,8 @@ def test_list_projects__with_unexpected_keys(mocker):
     echo(
         "\t".join(
             [
-                project.created,
-                project.id,
+                str(project.created),
+                str(project.id),
                 project.name.replace("\t", " "),
                 pipeline.name,
             ]

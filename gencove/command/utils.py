@@ -1,38 +1,11 @@
 """Common utils used in multiple commands."""
+import json
 import uuid
-
-from gencove.exceptions import ValidationError
 
 
 def sanitize_string(output):
     """Removes unwanted characters from output string."""
     return output.replace("\t", " ")
-
-
-def validate_input(key, provided_value, allowed_values_re, allowed_values):
-    """Validates provided value is in allowed values.
-
-    Args:
-        key(str): key for which the provided value is being validated
-        provided_value (str): one of sort order/sort by field/sample status
-        allowed_values_re(re.compiled value): values to compare against,
-            compiled via re module
-        allowed_values(namedtuple): of valid values for the key
-
-    Returns:
-        None: if everything is valid
-
-    Raises:
-         ValidationError: with validation error message
-    """
-    if not allowed_values_re.match(provided_value):
-        raise ValidationError(
-            "Unknown {} value: {}. Allowed values are: {}".format(
-                key,
-                provided_value,
-                ", ".join(allowed_values._asdict().values()),
-            )
-        )
 
 
 def is_valid_uuid(candidate):
@@ -45,6 +18,21 @@ def is_valid_uuid(candidate):
     """
     try:
         uuid.UUID(candidate, version=4)
+        return True
+    except ValueError:
+        return False
+
+
+def is_valid_json(candidate):
+    """Test if provided string is a valid JSON.
+
+    candidate (str): JSON to check
+
+    Returns:
+        bool: True if is a valid JSON, False if not
+    """
+    try:
+        json.loads(candidate)
         return True
     except ValueError:
         return False

@@ -61,6 +61,11 @@ class Command(object):  # pylint: disable=R0205
             self.echo_error(err.message)
             raise click.Abort()
         except APIClientError as err:
+            if err.status_code == 403:
+                self.echo_error(
+                    "You do not have the sufficient permission "
+                    "level required to perform this operation."
+                )
             self.echo_error(err.message)
             if LOG_LEVEL == DEBUG:
                 raise err

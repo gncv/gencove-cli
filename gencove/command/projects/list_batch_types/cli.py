@@ -13,5 +13,7 @@ from .main import ListBatchTypes
 def list_project_batch_types(project_id, host, email, password, api_key):
     """List batch types that are available for a project."""
     ListBatchTypes(
-        project_id, Credentials(email, password, api_key), Optionals(host)
+        project_id,
+        Credentials(email=email, password=password, api_key=api_key),
+        Optionals(host=host),
     ).run()

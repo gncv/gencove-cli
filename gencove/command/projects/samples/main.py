@@ -4,11 +4,9 @@ import backoff
 # pylint: disable=wrong-import-order
 from gencove.client import APIClientError, APIClientTimeout  # noqa: I100
 from gencove.command.base import Command
-from gencove.constants import SAMPLE_ARCHIVE_STATUS, SAMPLE_STATUS
 
-from .constants import ALLOWED_ARCHIVE_STATUSES_RE, ALLOWED_STATUSES_RE
 from .utils import get_line
-from ...utils import is_valid_uuid, validate_input
+from ...utils import is_valid_uuid
 from ....exceptions import ValidationError
 
 
@@ -31,20 +29,6 @@ class ListSamples(Command):
         if is_valid_uuid(self.project_id) is False:
             raise ValidationError("Project ID is not valid. Exiting.")
 
-        validate_input(
-            "sample status",
-            self.sample_status,
-            ALLOWED_STATUSES_RE,
-            SAMPLE_STATUS,
-        )
-
-        validate_input(
-            "sample archive status",
-            self.sample_archive_status,
-            ALLOWED_ARCHIVE_STATUSES_RE,
-            SAMPLE_ARCHIVE_STATUS,
-        )
-
     def execute(self):
         self.echo_debug(
             "Retrieving sample sheet: "
@@ -65,10 +49,7 @@ class ListSamples(Command):
         except APIClientError as err:
             if err.status_code == 404:
                 self.echo_error(
-                    "Project {} does not exist or you do not have "
-                    "permission required to access it.".format(
-                        self.project_id
-                    )
+                    "Project {} does not exist.".format(self.project_id)
                 )
             raise
 
@@ -83,8 +64,8 @@ class ListSamples(Command):
         while more:
             self.echo_debug("Get sample sheet page")
             resp = self.get_samples(next_link)
-            yield resp["results"]
-            next_link = resp["meta"]["next"]
+            yield resp.results
+            next_link = resp.meta.next
             more = next_link is not None
 
     @backoff.on_exception(

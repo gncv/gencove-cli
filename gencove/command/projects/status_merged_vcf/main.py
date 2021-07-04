@@ -52,7 +52,7 @@ class StatusMergedVCF(Command):
                 self.project_id
             )
             self.echo_debug(merge_details_status)
-            if merge_details_status["last_status"]["status"] == "failed":
+            if merge_details_status.last_status.status == "failed":
                 self.echo_warning("The job failed merging.")
             self.echo_data(get_line(merge_details_status))
         except client.APIClientError as err:
@@ -64,8 +64,7 @@ class StatusMergedVCF(Command):
                 )
             elif err.status_code == 404:
                 self.echo_error(
-                    "Project {} does not exist or you do not have "
-                    "permission required to access it or there are no "
+                    "Project {} does not exist or there are no "
                     "running jobs associated with it.".format(self.project_id)
                 )
             raise

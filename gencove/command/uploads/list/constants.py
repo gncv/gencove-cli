@@ -1,19 +1,12 @@
 """Describe constants in samples subcommand."""
-import re
-from collections import namedtuple
+from typing import Optional
 
-from gencove.constants import Optionals, SAMPLE_ASSIGNMENT_STATUS
+from gencove.constants import Optionals
 
-UploadsOptions = namedtuple(  # pylint: disable=invalid-name
-    "UploadsOptions", Optionals._fields + ("status", "search")
-)
 
-ALLOWED_STATUSES_RE = re.compile(
-    "|".join(
-        [
-            "{}".format(status)
-            for status in SAMPLE_ASSIGNMENT_STATUS._asdict().values()
-        ]
-    ),
-    re.IGNORECASE,
-)
+# pylint: disable=too-few-public-methods
+class UploadsOptions(Optionals):
+    """UploadsOptions model"""
+
+    status: Optional[str]
+    search: Optional[str]

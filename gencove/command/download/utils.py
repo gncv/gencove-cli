@@ -14,6 +14,7 @@ from gencove.constants import (  # noqa: I100
     MAX_RETRY_TIME_SECONDS,
 )
 from gencove.logger import echo_debug, echo_info, echo_warning
+from gencove.models import SampleFile
 from gencove.utils import get_progress_bar
 
 from .constants import (
@@ -30,10 +31,10 @@ def _get_prefix_parts(full_prefix):
     prefix_parts = full_prefix.split("/")
     file_name, _, file_ext = prefix_parts[-1].partition(".")
     return FilePrefix(
-        "/".join(prefix_parts[:-1]),
-        file_name,
-        file_ext,
-        DEFAULT_FILENAME_TOKEN in full_prefix,
+        dirs="/".join(prefix_parts[:-1]),
+        filename=file_name,
+        file_extension=file_ext,
+        use_default_filename=(DEFAULT_FILENAME_TOKEN in full_prefix),
     )
 
 
@@ -109,10 +110,20 @@ def build_file_path(
          str : file path on current file system
     """
     prefix = _get_prefix_parts(file_with_prefix)
-    # fmt: off
-    # the source filename includes extensions as well.
-    source_filename = filename if filename else get_filename_from_download_url(deliverable["download_url"])  # noqa: E501  # pylint: disable=line-too-long
-    # fmt: on
+    download_url, file_type = "", ""
+    if isinstance(deliverable, SampleFile):
+        download_url, file_type = (
+            deliverable.download_url,
+            deliverable.file_type,
+        )
+    else:
+        download_url, file_type = (
+            deliverable.get("download_url"),
+            deliverable.get("file_type"),
+        )
+    source_filename = (
+        filename if filename else get_filename_from_download_url(download_url)
+    )
 
     destination_filename = prefix.filename
     if prefix.file_extension:
@@ -124,9 +135,9 @@ def build_file_path(
     # fmt: off
     destination_filename = destination_filename.format(
         **{
-            DownloadTemplateParts.file_type: FILE_TYPES_MAPPER.get(deliverable["file_type"]) or deliverable["file_type"],  # noqa: E501  # pylint: disable=line-too-long
-            DownloadTemplateParts.file_extension: deliverable_type_from_filename(source_filename),  # noqa: E501  # pylint: disable=line-too-long
-            DownloadTemplateParts.default_filename: source_filename,
+            DownloadTemplateParts.FILE_TYPE.value: FILE_TYPES_MAPPER.get(file_type) or file_type,  # noqa: E501  # pylint: disable=line-too-long
+            DownloadTemplateParts.FILE_EXTENSION.value: deliverable_type_from_filename(source_filename),  # noqa: E501  # pylint: disable=line-too-long
+            DownloadTemplateParts.DEFAULT_FILENAME.value: source_filename,
         }
     )
     # fmt: on
@@ -250,13 +261,13 @@ def save_metadata_file(path, api_client, sample_id, skip_existing=True):
         echo_info("Skipping existing file: {}".format(path))
         return
     try:
-        content = api_client.get_metadata(sample_id)
+        metadata = api_client.get_metadata(sample_id)
     except client.APIClientError:
         echo_warning("Error getting sample metadata.")
         raise
     echo_info("Downloading file to: {}".format(path))
     with open(path, "w") as metadata_file:
-        json.dump(content, metadata_file)
+        metadata_file.write(metadata.json())
     echo_info("Finished downloading a file: {}".format(path))
 
 
@@ -276,13 +287,14 @@ def save_qc_file(path, api_client, sample_id, skip_existing=True):
         echo_info("Skipping existing file: {}".format(path))
         return
     try:
-        content = api_client.get_sample_qc_metrics(sample_id)["results"]
+        sample_qcs = api_client.get_sample_qc_metrics(sample_id).results
     except client.APIClientError:
         echo_warning("Error getting sample quality control metrics.")
         raise
     echo_info("Downloading file to: {}".format(path))
     with open(path, "w") as qc_file:
-        json.dump(content, qc_file)
+        content = json.dumps(sample_qcs, cls=client.CustomEncoder)
+        qc_file.write(content)
     echo_info("Finished downloading a file: {}".format(path))
 
 
@@ -309,15 +321,15 @@ def get_download_template_format_params(client_id, gencove_id):
         format parts : dict
     """
     return {
-        DownloadTemplateParts.client_id: client_id,
-        DownloadTemplateParts.gencove_id: gencove_id,
-        DownloadTemplateParts.file_type: "{{{}}}".format(
-            DownloadTemplateParts.file_type
+        DownloadTemplateParts.CLIENT_ID.value: client_id,
+        DownloadTemplateParts.GENCOVE_ID.value: gencove_id,
+        DownloadTemplateParts.FILE_TYPE.value: "{{{}}}".format(
+            DownloadTemplateParts.FILE_TYPE.value
         ),
-        DownloadTemplateParts.file_extension: "{{{}}}".format(
-            DownloadTemplateParts.file_extension
+        DownloadTemplateParts.FILE_EXTENSION.value: "{{{}}}".format(
+            DownloadTemplateParts.FILE_EXTENSION.value
         ),
-        DownloadTemplateParts.default_filename: "{{{}}}".format(
-            DownloadTemplateParts.default_filename
+        DownloadTemplateParts.DEFAULT_FILENAME.value: "{{{}}}".format(
+            DownloadTemplateParts.DEFAULT_FILENAME.value
         ),
     }

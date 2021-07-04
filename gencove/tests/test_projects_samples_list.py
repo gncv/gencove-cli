@@ -9,6 +9,7 @@ from click.testing import CliRunner
 from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.projects.cli import list_project_samples
 from gencove.logger import echo_data
+from gencove.models import ProjectSamples
 
 
 def test_list_empty(mocker):
@@ -18,7 +19,7 @@ def test_list_empty(mocker):
     mocked_get_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
-        return_value=dict(results=[], meta=dict(next=None)),
+        return_value=ProjectSamples(results=[], meta=dict(next=None)),
     )
     res = runner.invoke(
         list_project_samples,
@@ -84,8 +85,7 @@ def test_list_projects_no_project(mocker):
     echo_data(
         "\n".join(
             [
-                "ERROR: Project {} does not exist or you do not have"
-                " permission required to access it.".format(project_id),
+                "ERROR: Project {} does not exist.".format(project_id),
                 "ERROR: API Client Error: Not Found: Not found.",
                 "Aborted!",
             ]
@@ -122,12 +122,14 @@ def test_list_project_samples(mocker):
                 "id": str(uuid4()),
                 "client_id": "tester client id",
                 "last_status": {
+                    "id": str(uuid4()),
                     "created": (
                         datetime.utcnow() - timedelta(days=3)
                     ).isoformat(),
                     "status": "succeeded",
                 },
                 "archive_last_status": {
+                    "id": str(uuid4()),
                     "status": "available",
                     "created": (
                         datetime.utcnow() - timedelta(days=1)
@@ -142,7 +144,9 @@ def test_list_project_samples(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_project_samples = mocker.patch.object(
-        APIClient, "get_project_samples", return_value=mocked_samples
+        APIClient,
+        "get_project_samples",
+        return_value=ProjectSamples(**mocked_samples),
     )
 
     res = runner.invoke(

@@ -10,7 +10,8 @@ from click.testing import CliRunner
 
 from gencove.cli import upload
 from gencove.client import APIClient, APIClientTimeout
-from gencove.command.upload.constants import UPLOAD_PREFIX
+from gencove.constants import UPLOAD_PREFIX
+from gencove.models import SampleSheet, UploadSamples, UploadsPostData
 
 
 def test_upload(mocker):
@@ -27,13 +28,17 @@ def test_upload(mocker):
         mocked_get_credentials = mocker.patch(
             "gencove.command.upload.main.get_s3_client_refreshable"
         )
+        upload_id = str(uuid4())
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value={
-                "last_status": {"status": ""},
-                "s3": {"bucket": "test", "object_name": "test"},
-            },
+            return_value=UploadsPostData(
+                **{
+                    "id": upload_id,
+                    "last_status": {"id": str(uuid4()), "status": ""},
+                    "s3": {"bucket": "test", "object_name": "test"},
+                }
+            ),
         )
         mocked_upload_file = mocker.patch(
             "gencove.command.upload.main.upload_file"
@@ -143,14 +148,17 @@ def test_upload_and_run_immediately(mocker):
         mocked_get_credentials = mocker.patch(
             "gencove.command.upload.main.get_s3_client_refreshable"
         )
+        upload_id = str(uuid4())
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value={
-                "id": "test",
-                "last_status": {"status": ""},
-                "s3": {"bucket": "test", "object_name": "test"},
-            },
+            return_value=UploadsPostData(
+                **{
+                    "id": upload_id,
+                    "last_status": {"id": str(uuid4()), "status": ""},
+                    "s3": {"bucket": "test", "object_name": "test"},
+                }
+            ),
         )
         mocked_upload_file = mocker.patch(
             "gencove.command.upload.main.upload_file"
@@ -158,15 +166,22 @@ def test_upload_and_run_immediately(mocker):
         mocked_get_sample_sheet = mocker.patch.object(
             APIClient,
             "get_sample_sheet",
-            return_value={
-                "meta": {"next": None},
-                "results": [
-                    {"client_id": "foo", "fastq": {"r1": {"upload": "test"}}}
-                ],
-            },
+            return_value=SampleSheet(
+                **{
+                    "meta": {"next": None},
+                    "results": [
+                        {
+                            "client_id": "foo",
+                            "fastq": {"r1": {"upload": upload_id}},
+                        }
+                    ],
+                }
+            ),
         )
         mocked_assign_sample = mocker.patch.object(
-            APIClient, "add_samples_to_project", return_value={}
+            APIClient,
+            "add_samples_to_project",
+            return_value=UploadSamples(**{}),
         )
         mocked_regular_progress_bar = mocker.patch(
             "gencove.command.upload.main.get_regular_progress_bar"
@@ -209,14 +224,17 @@ def test_upload_and_run_immediately__with_metadata(mocker):
         mocked_get_credentials = mocker.patch(
             "gencove.command.upload.main.get_s3_client_refreshable"
         )
+        upload_id = str(uuid4())
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value={
-                "id": "test",
-                "last_status": {"status": ""},
-                "s3": {"bucket": "test", "object_name": "test"},
-            },
+            return_value=UploadsPostData(
+                **{
+                    "id": upload_id,
+                    "last_status": {"id": str(uuid4()), "status": ""},
+                    "s3": {"bucket": "test", "object_name": "test"},
+                }
+            ),
         )
         mocked_upload_file = mocker.patch(
             "gencove.command.upload.main.upload_file"
@@ -224,15 +242,22 @@ def test_upload_and_run_immediately__with_metadata(mocker):
         mocked_get_sample_sheet = mocker.patch.object(
             APIClient,
             "get_sample_sheet",
-            return_value={
-                "meta": {"next": None},
-                "results": [
-                    {"client_id": "foo", "fastq": {"r1": {"upload": "test"}}}
-                ],
-            },
+            return_value=SampleSheet(
+                **{
+                    "meta": {"next": None},
+                    "results": [
+                        {
+                            "client_id": "foo",
+                            "fastq": {"r1": {"upload": upload_id}},
+                        }
+                    ],
+                }
+            ),
         )
         mocked_assign_sample = mocker.patch.object(
-            APIClient, "add_samples_to_project", return_value={}
+            APIClient,
+            "add_samples_to_project",
+            return_value=UploadSamples(**{}),
         )
         mocked_regular_progress_bar = mocker.patch(
             "gencove.command.upload.main.get_regular_progress_bar"
@@ -277,14 +302,17 @@ def test_upload_and_run_immediately__invalid_metadata(mocker):
         mocked_get_credentials = mocker.patch(
             "gencove.command.upload.main.get_s3_client_refreshable"
         )
+        upload_id = str(uuid4())
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value={
-                "id": "test",
-                "last_status": {"status": ""},
-                "s3": {"bucket": "test", "object_name": "test"},
-            },
+            return_value=UploadsPostData(
+                **{
+                    "id": upload_id,
+                    "last_status": {"id": str(uuid4()), "status": ""},
+                    "s3": {"bucket": "test", "object_name": "test"},
+                }
+            ),
         )
         mocked_upload_file = mocker.patch(
             "gencove.command.upload.main.upload_file"
@@ -292,12 +320,17 @@ def test_upload_and_run_immediately__invalid_metadata(mocker):
         mocked_get_sample_sheet = mocker.patch.object(
             APIClient,
             "get_sample_sheet",
-            return_value={
-                "meta": {"next": None},
-                "results": [
-                    {"client_id": "foo", "fastq": {"r1": {"upload": "test"}}}
-                ],
-            },
+            return_value=SampleSheet(
+                **{
+                    "meta": {"next": None},
+                    "results": [
+                        {
+                            "client_id": "foo",
+                            "fastq": {"r1": {"upload": upload_id}},
+                        }
+                    ],
+                }
+            ),
         )
         mocked_assign_sample = mocker.patch.object(
             APIClient, "add_samples_to_project", return_value={}
@@ -375,14 +408,17 @@ def test_upload_and_run_immediately_something_went_wrong(mocker):
         mocked_get_credentials = mocker.patch(
             "gencove.command.upload.main.get_s3_client_refreshable"
         )
+        upload_id = str(uuid4())
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value={
-                "id": "test",
-                "last_status": {"status": ""},
-                "s3": {"bucket": "test", "object_name": "test"},
-            },
+            return_value=UploadsPostData(
+                **{
+                    "id": upload_id,
+                    "last_status": {"id": str(uuid4()), "status": ""},
+                    "s3": {"bucket": "test", "object_name": "test"},
+                }
+            ),
         )
         mocked_upload_file = mocker.patch(
             "gencove.command.upload.main.upload_file"
@@ -390,7 +426,9 @@ def test_upload_and_run_immediately_something_went_wrong(mocker):
         mocked_get_sample_sheet = mocker.patch.object(
             APIClient,
             "get_sample_sheet",
-            return_value={"meta": {"next": None}, "results": []},
+            return_value=SampleSheet(
+                **{"meta": {"next": None}, "results": []}
+            ),
         )
         mocked_assign_sample = mocker.patch.object(
             APIClient, "add_samples_to_project", return_value={}
@@ -432,14 +470,17 @@ def test_upload_and_run_immediately_with_output_to_file(mocker):
         mocked_get_credentials = mocker.patch(
             "gencove.command.upload.main.get_s3_client_refreshable"
         )
+        upload_id = str(uuid4())
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value={
-                "id": "test",
-                "last_status": {"status": ""},
-                "s3": {"bucket": "test", "object_name": "test"},
-            },
+            return_value=UploadsPostData(
+                **{
+                    "id": upload_id,
+                    "last_status": {"id": str(uuid4()), "status": ""},
+                    "s3": {"bucket": "test", "object_name": "test"},
+                }
+            ),
         )
         mocked_upload_file = mocker.patch(
             "gencove.command.upload.main.upload_file"
@@ -447,24 +488,32 @@ def test_upload_and_run_immediately_with_output_to_file(mocker):
         mocked_get_sample_sheet = mocker.patch.object(
             APIClient,
             "get_sample_sheet",
-            return_value={
-                "meta": {"next": None},
-                "results": [
-                    {"client_id": "foo", "fastq": {"r1": {"upload": "test"}}}
-                ],
-            },
+            return_value=SampleSheet(
+                **{
+                    "meta": {"next": None},
+                    "results": [
+                        {
+                            "client_id": "foo",
+                            "fastq": {"r1": {"upload": upload_id}},
+                        }
+                    ],
+                }
+            ),
         )
-        upload_id = str(uuid4())
         sample_id = str(uuid4())
-        mocked_response = [
-            {
-                "client_id": "foo",
-                "fastq": {"r1": {"upload": upload_id}},
-                "sample": sample_id,
-            }
-        ]
+        mocked_response = {
+            "uploads": [
+                {
+                    "client_id": "foo",
+                    "fastq": {"r1": {"upload": upload_id}},
+                    "sample": sample_id,
+                }
+            ],
+        }
         mocked_assign_sample = mocker.patch.object(
-            APIClient, "add_samples_to_project", return_value=mocked_response
+            APIClient,
+            "add_samples_to_project",
+            return_value=UploadSamples(**mocked_response),
         )
 
         mocker.patch("gencove.command.upload.main.get_regular_progress_bar")
@@ -493,7 +542,9 @@ def test_upload_and_run_immediately_with_output_to_file(mocker):
         output_content = None
         with open("samples.json", "r") as output_file:
             output_content = output_file.read()
-        assert json.dumps(mocked_response, indent=4) == output_content
+        assert (
+            json.dumps(mocked_response["uploads"], indent=4) == output_content
+        )
 
 
 def test_upload_and_run_immediately_with_output_to_nested_file(mocker):
@@ -510,14 +561,18 @@ def test_upload_and_run_immediately_with_output_to_nested_file(mocker):
         mocked_get_credentials = mocker.patch(
             "gencove.command.upload.main.get_s3_client_refreshable"
         )
+        upload_id = str(uuid4())
+        sample_id = str(uuid4())
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value={
-                "id": "test",
-                "last_status": {"status": ""},
-                "s3": {"bucket": "test", "object_name": "test"},
-            },
+            return_value=UploadsPostData(
+                **{
+                    "id": upload_id,
+                    "last_status": {"id": str(uuid4()), "status": ""},
+                    "s3": {"bucket": "test", "object_name": "test"},
+                }
+            ),
         )
         mocked_upload_file = mocker.patch(
             "gencove.command.upload.main.upload_file"
@@ -525,24 +580,31 @@ def test_upload_and_run_immediately_with_output_to_nested_file(mocker):
         mocked_get_sample_sheet = mocker.patch.object(
             APIClient,
             "get_sample_sheet",
-            return_value={
-                "meta": {"next": None},
-                "results": [
-                    {"client_id": "foo", "fastq": {"r1": {"upload": "test"}}}
-                ],
-            },
+            return_value=SampleSheet(
+                **{
+                    "meta": {"next": None},
+                    "results": [
+                        {
+                            "client_id": "foo",
+                            "fastq": {"r1": {"upload": upload_id}},
+                        }
+                    ],
+                }
+            ),
         )
-        upload_id = str(uuid4())
-        sample_id = str(uuid4())
-        mocked_response = [
-            {
-                "client_id": "foo",
-                "fastq": {"r1": {"upload": upload_id}},
-                "sample": sample_id,
-            }
-        ]
+        mocked_response = {
+            "uploads": [
+                {
+                    "client_id": "foo",
+                    "fastq": {"r1": {"upload": upload_id}},
+                    "sample": sample_id,
+                }
+            ],
+        }
         mocked_assign_sample = mocker.patch.object(
-            APIClient, "add_samples_to_project", return_value=mocked_response
+            APIClient,
+            "add_samples_to_project",
+            return_value=UploadSamples(**mocked_response),
         )
 
         mocker.patch("gencove.command.upload.main.get_regular_progress_bar")
@@ -570,7 +632,9 @@ def test_upload_and_run_immediately_with_output_to_nested_file(mocker):
         mocked_assign_sample.assert_called_once()
         with open("somefolder/samples.json", "r") as output_file:
             output_content = output_file.read()
-        assert json.dumps(mocked_response, indent=4) == output_content
+        assert (
+            json.dumps(mocked_response["uploads"], indent=4) == output_content
+        )
 
 
 def test_upload_and_run_immediately_with_stdout(mocker):
@@ -587,14 +651,17 @@ def test_upload_and_run_immediately_with_stdout(mocker):
         mocked_get_credentials = mocker.patch(
             "gencove.command.upload.main.get_s3_client_refreshable"
         )
+        upload_id = str(uuid4())
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value={
-                "id": "test",
-                "last_status": {"status": ""},
-                "s3": {"bucket": "test", "object_name": "test"},
-            },
+            return_value=UploadsPostData(
+                **{
+                    "id": upload_id,
+                    "last_status": {"id": str(uuid4()), "status": ""},
+                    "s3": {"bucket": "test", "object_name": "test"},
+                }
+            ),
         )
         mocked_upload_file = mocker.patch(
             "gencove.command.upload.main.upload_file"
@@ -602,24 +669,32 @@ def test_upload_and_run_immediately_with_stdout(mocker):
         mocked_get_sample_sheet = mocker.patch.object(
             APIClient,
             "get_sample_sheet",
-            return_value={
-                "meta": {"next": None},
-                "results": [
-                    {"client_id": "foo", "fastq": {"r1": {"upload": "test"}}}
-                ],
-            },
+            return_value=SampleSheet(
+                **{
+                    "meta": {"next": None},
+                    "results": [
+                        {
+                            "client_id": "foo",
+                            "fastq": {"r1": {"upload": upload_id}},
+                        }
+                    ],
+                }
+            ),
         )
-        upload_id = str(uuid4())
         sample_id = str(uuid4())
-        mocked_response = [
-            {
-                "client_id": "foo",
-                "fastq": {"r1": {"upload": upload_id}},
-                "sample": sample_id,
-            }
-        ]
+        mocked_response = {
+            "uploads": [
+                {
+                    "client_id": "foo",
+                    "fastq": {"r1": {"upload": upload_id}},
+                    "sample": sample_id,
+                }
+            ],
+        }
         mocked_assign_sample = mocker.patch.object(
-            APIClient, "add_samples_to_project", return_value=mocked_response
+            APIClient,
+            "add_samples_to_project",
+            return_value=UploadSamples(**mocked_response),
         )
 
         mocker.patch("gencove.command.upload.main.get_regular_progress_bar")
@@ -648,7 +723,7 @@ def test_upload_and_run_immediately_with_stdout(mocker):
         mocked_assign_sample.assert_called_once()
         output_line = io.BytesIO()
         sys.stdout = output_line
-        echo(json.dumps(mocked_response, indent=4))
+        echo(json.dumps(mocked_response["uploads"], indent=4))
         assert output_line.getvalue() in res.output.encode()
 
 
@@ -666,14 +741,17 @@ def test_upload_without_progressbar(mocker):
         mocked_get_credentials = mocker.patch(
             "gencove.command.upload.main.get_s3_client_refreshable"
         )
+        upload_id = str(uuid4())
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value={
-                "id": "test",
-                "last_status": {"status": ""},
-                "s3": {"bucket": "test", "object_name": "test"},
-            },
+            return_value=UploadsPostData(
+                **{
+                    "id": upload_id,
+                    "last_status": {"id": str(uuid4()), "status": ""},
+                    "s3": {"bucket": "test", "object_name": "test"},
+                }
+            ),
         )
         mocked_upload_file = mocker.patch(
             "gencove.command.upload.main.upload_file"
@@ -713,14 +791,17 @@ def test_upload_and_run_immediately_without_progressbar(mocker):
         mocked_get_credentials = mocker.patch(
             "gencove.command.upload.main.get_s3_client_refreshable"
         )
+        upload_id = str(uuid4())
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value={
-                "id": "test",
-                "last_status": {"status": ""},
-                "s3": {"bucket": "test", "object_name": "test"},
-            },
+            return_value=UploadsPostData(
+                **{
+                    "id": upload_id,
+                    "last_status": {"id": str(uuid4()), "status": ""},
+                    "s3": {"bucket": "test", "object_name": "test"},
+                }
+            ),
         )
         mocked_upload_file = mocker.patch(
             "gencove.command.upload.main.upload_file"
@@ -728,15 +809,22 @@ def test_upload_and_run_immediately_without_progressbar(mocker):
         mocked_get_sample_sheet = mocker.patch.object(
             APIClient,
             "get_sample_sheet",
-            return_value={
-                "meta": {"next": None},
-                "results": [
-                    {"client_id": "foo", "fastq": {"r1": {"upload": "test"}}}
-                ],
-            },
+            return_value=SampleSheet(
+                **{
+                    "meta": {"next": None},
+                    "results": [
+                        {
+                            "client_id": "foo",
+                            "fastq": {"r1": {"upload": upload_id}},
+                        }
+                    ],
+                }
+            ),
         )
         mocked_assign_sample = mocker.patch.object(
-            APIClient, "add_samples_to_project", return_value={}
+            APIClient,
+            "add_samples_to_project",
+            return_value=UploadSamples(**{}),
         )
         mocked_regular_progress_bar = mocker.patch(
             "gencove.command.upload.main.get_regular_progress_bar"
@@ -780,14 +868,17 @@ def test_upload_and_run_immediately_slow_response_retry(mocker):
         mocked_get_credentials = mocker.patch(
             "gencove.command.upload.main.get_s3_client_refreshable"
         )
+        upload_id = str(uuid4())
         mocked_get_upload_details = mocker.patch.object(
             APIClient,
             "get_upload_details",
-            return_value={
-                "id": "test",
-                "last_status": {"status": ""},
-                "s3": {"bucket": "test", "object_name": "test"},
-            },
+            return_value=UploadsPostData(
+                **{
+                    "id": upload_id,
+                    "last_status": {"id": str(uuid4()), "status": ""},
+                    "s3": {"bucket": "test", "object_name": "test"},
+                }
+            ),
         )
         mocked_upload_file = mocker.patch(
             "gencove.command.upload.main.upload_file"

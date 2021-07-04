@@ -1,27 +1,13 @@
 """Describe constants in samples subcommand."""
-import re
-from collections import namedtuple
+from typing import Optional
 
-from gencove.constants import Optionals, SAMPLE_ARCHIVE_STATUS, SAMPLE_STATUS
+from gencove.constants import Optionals
 
-SamplesOptions = namedtuple(  # pylint: disable=invalid-name
-    "SamplesOptions",
-    Optionals._fields + ("status", "archive_status", "search"),
-)
 
-ALLOWED_STATUSES_RE = re.compile(
-    "|".join(
-        ["{}".format(status) for status in SAMPLE_STATUS._asdict().values()]
-    ),
-    re.IGNORECASE,
-)
+# pylint: disable=too-few-public-methods
+class SamplesOptions(Optionals):
+    """SamplesOptions model"""
 
-ALLOWED_ARCHIVE_STATUSES_RE = re.compile(
-    "|".join(
-        [
-            "{}".format(status)
-            for status in SAMPLE_ARCHIVE_STATUS._asdict().values()
-        ]
-    ),
-    re.IGNORECASE,
-)
+    status: Optional[str]
+    archive_status: Optional[str]
+    search: Optional[str]

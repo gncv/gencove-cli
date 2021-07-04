@@ -4,10 +4,7 @@ import backoff
 # pylint: disable=wrong-import-order
 from gencove.client import APIClientError, APIClientTimeout  # noqa: I100
 from gencove.command.base import Command
-from gencove.command.utils import validate_input
-from gencove.constants import SAMPLE_ASSIGNMENT_STATUS
 
-from .constants import ALLOWED_STATUSES_RE
 from .utils import get_line
 
 
@@ -25,12 +22,7 @@ class ListSampleSheet(Command):
 
     def validate(self):
         """Validate command input."""
-        validate_input(
-            "upload status",
-            self.status,
-            ALLOWED_STATUSES_RE,
-            SAMPLE_ASSIGNMENT_STATUS,
-        )
+        pass  # pylint: disable=unnecessary-pass
 
     def execute(self):
         self.echo_debug(
@@ -47,10 +39,7 @@ class ListSampleSheet(Command):
                     self.echo_data(get_line(upload))
         except APIClientError as err:
             if err.status_code == 404:
-                self.echo_error(
-                    "Uploads do not exist or you do not have "
-                    "permission required to access them."
-                )
+                self.echo_error("Uploads do not exist.")
             raise
 
     def get_paginated_sample_sheet(self):
@@ -64,8 +53,8 @@ class ListSampleSheet(Command):
         while more:
             self.echo_debug("Get sample sheet page")
             resp = self.get_sample_sheet(next_link)
-            yield resp["results"]
-            next_link = resp["meta"]["next"]
+            yield resp.results
+            next_link = resp.meta.next
             more = next_link is not None
 
     @backoff.on_exception(

@@ -53,10 +53,7 @@ class ListBatches(Command):
                 self.echo_info(err.message)
             elif err.status_code == 404:
                 self.echo_warning(
-                    "Project {} does not exist or you do not have "
-                    "permission required to access it.".format(
-                        self.project_id
-                    )
+                    "Project {} does not exist.".format(self.project_id)
                 )
             else:
                 raise
@@ -72,8 +69,8 @@ class ListBatches(Command):
         while more:
             self.echo_debug("Get batches page")
             resp = self.get_batches(next_link)
-            yield resp["results"]
-            next_link = resp["meta"]["next"]
+            yield resp.results
+            next_link = resp.meta.next
             more = next_link is not None
 
     @backoff.on_exception(

@@ -36,7 +36,7 @@ def get_merged_vcf(
     GetMergedVCF(
         project_id,
         output_filename,
-        Credentials(email, password, api_key),
-        Optionals(host),
+        Credentials(email=email, password=password, api_key=api_key),
+        Optionals(host=host),
         no_progress,
     ).run()

@@ -12,10 +12,10 @@ def get_line(batch):
     """
     return "\t".join(
         [
-            batch["id"],
-            batch["last_status"]["created"],
-            batch["last_status"]["status"],
-            batch["batch_type"],
-            batch["name"],
+            str(batch.id),
+            batch.last_status.created.isoformat(),
+            batch.last_status.status,
+            batch.batch_type,
+            batch.name,
         ]  # noqa
     )

@@ -5,6 +5,7 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient
 from gencove.command.samples.cli import download_file
+from gencove.models import SampleDetails
 
 import requests  # pylint: disable=wrong-import-order
 
@@ -63,28 +64,30 @@ def test_samples_download_file_local(mocker):
         mocked_sample_details = mocker.patch.object(
             APIClient,
             "get_sample_details",
-            return_value={
-                "id": sample_id,
-                "client_id": 1,
-                "last_status": {
-                    "id": last_status_id,
-                    "status": "succeeded",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                },
-                "archive_last_status": {
-                    "id": archive_last_status_id,
-                    "status": "available",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
-                },
-                "files": [
-                    {
-                        "id": file_id,
-                        "file_type": file_type,
-                        "download_url": "https://foo.com/bar.txt",
-                    }
-                ],
-            },
+            return_value=SampleDetails(
+                **{
+                    "id": sample_id,
+                    "client_id": "1",
+                    "last_status": {
+                        "id": last_status_id,
+                        "status": "succeeded",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                    },
+                    "archive_last_status": {
+                        "id": archive_last_status_id,
+                        "status": "available",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                        "transition_cutoff": "2020-08-28T12:46:22.719862Z",
+                    },
+                    "files": [
+                        {
+                            "id": file_id,
+                            "file_type": file_type,
+                            "download_url": "https://foo.com/bar.txt",
+                        }
+                    ],
+                }
+            ),
         )
         mocked_request = mocker.patch.object(
             requests,
@@ -125,28 +128,30 @@ def test_samples_download_file_stdout(mocker):
     mocked_sample_details = mocker.patch.object(
         APIClient,
         "get_sample_details",
-        return_value={
-            "id": sample_id,
-            "client_id": 1,
-            "last_status": {
-                "id": last_status_id,
-                "status": "succeeded",
-                "created": "2020-07-28T12:46:22.719862Z",
-            },
-            "archive_last_status": {
-                "id": archive_last_status_id,
-                "status": "available",
-                "created": "2020-07-28T12:46:22.719862Z",
-                "transition_cutoff": "2020-08-28T12:46:22.719862Z",
-            },
-            "files": [
-                {
-                    "id": file_id,
-                    "file_type": file_type,
-                    "download_url": "https://foo.com/bar.txt",
-                }
-            ],
-        },
+        return_value=SampleDetails(
+            **{
+                "id": sample_id,
+                "client_id": "1",
+                "last_status": {
+                    "id": last_status_id,
+                    "status": "succeeded",
+                    "created": "2020-07-28T12:46:22.719862Z",
+                },
+                "archive_last_status": {
+                    "id": archive_last_status_id,
+                    "status": "available",
+                    "created": "2020-07-28T12:46:22.719862Z",
+                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
+                },
+                "files": [
+                    {
+                        "id": file_id,
+                        "file_type": file_type,
+                        "download_url": "https://foo.com/bar.txt",
+                    }
+                ],
+            }
+        ),
     )
     mocked_request = mocker.patch.object(
         requests,

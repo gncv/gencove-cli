@@ -9,6 +9,7 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.uploads.list.cli import list_uploads
+from gencove.models import SampleSheet
 
 
 def test_list_does_not_exist(mocker):
@@ -32,8 +33,7 @@ def test_list_does_not_exist(mocker):
     assert (
         "\n".join(
             [
-                "ERROR: Uploads do not exist or you do not have permission "
-                "required to access them.",
+                "ERROR: Uploads do not exist.",
                 "ERROR: API Client Error: Not Found: Not found.",
                 "Aborted!\n",
             ]
@@ -49,7 +49,7 @@ def test_list_empty(mocker):
     mocked_get_projects = mocker.patch.object(
         APIClient,
         "get_sample_sheet",
-        return_value=dict(results=[], meta=dict(next=None)),
+        return_value=SampleSheet(results=[], meta=dict(next=None)),
     )
     res = runner.invoke(
         list_uploads, ["--email", "foo@bar.com", "--password", "123"]
@@ -72,7 +72,7 @@ MOCKED_UPLOADS = dict(
                 },
                 "r2": {
                     "upload": str(uuid4()),
-                    "destination_path": "gncv://batch1/clientid1_R@.fastq.gz",
+                    "destination_path": "gncv://batch1/clientid1_R2.fastq.gz",
                 },
             },
         },
@@ -141,7 +141,9 @@ def test_list_uploads(mocker):
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_sample_sheet = mocker.patch.object(
-        APIClient, "get_sample_sheet", return_value=MOCKED_UPLOADS
+        APIClient,
+        "get_sample_sheet",
+        return_value=SampleSheet(**MOCKED_UPLOADS),
     )
     res = runner.invoke(
         list_uploads, ["--email", "foo@bar.com", "--password", "123"]

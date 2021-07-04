@@ -1,24 +1,43 @@
 """Download command constants."""
 import re
-from collections import namedtuple
+from enum import Enum, unique
+from typing import Optional, Tuple, Union
+from uuid import UUID
 
-from gencove.constants import DownloadTemplateParts, Optionals
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
-
-_SampleStatuses = namedtuple("SampleStatuses", ["succeeded", "failed"])
-_SampleArchiveStatuses = namedtuple(
-    "SampleStatuses", ["available", "restored"]
+from gencove.constants import (  # noqa: I100
+    DownloadTemplateParts,
+    Optionals,
 )
-SAMPLE_STATUSES = _SampleStatuses("succeeded", "failed")
-SAMPLE_ARCHIVE_STATUSES = _SampleArchiveStatuses("available", "restored")
+
+
+@unique
+class SampleStatuses(Enum):
+    """SampleStatuses as enum"""
+
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"
+
+
+@unique
+class SampleArchiveStatuses(Enum):
+    """SampleArchiveStatuses enum"""
+
+    AVAILABLE = "available"
+    RESTORED = "restored"
+
 
 ALLOWED_STATUSES_RE = re.compile(
-    "{}|{}".format(SAMPLE_STATUSES.succeeded, SAMPLE_STATUSES.failed),
+    "{}|{}".format(
+        SampleStatuses.SUCCEEDED.value, SampleStatuses.FAILED.value
+    ),
     re.IGNORECASE,
 )
 ALLOWED_ARCHIVE_STATUSES_RE = re.compile(
     "{}|{}".format(
-        SAMPLE_ARCHIVE_STATUSES.available, SAMPLE_ARCHIVE_STATUSES.restored
+        SampleArchiveStatuses.AVAILABLE.value,
+        SampleArchiveStatuses.RESTORED.value,
     ),
     re.IGNORECASE,
 )
@@ -27,20 +46,42 @@ MEGABYTE = 1024 * KILOBYTE
 NUM_MB_IN_CHUNK = 3
 CHUNK_SIZE = NUM_MB_IN_CHUNK * MEGABYTE
 
-DownloadFilters = namedtuple(
-    "Filters", ["project_id", "sample_ids", "file_types"]
-)
-DownloadOptions = namedtuple(  # pylint: disable=invalid-name
-    "DownloadOptions",
-    Optionals._fields + ("skip_existing", "download_template"),
-)
+
+# pylint: disable=too-few-public-methods
+class DownloadFilters(BaseModel):
+    """DownloadFilters options"""
+
+    # project_id and sample_ids should be UUID instead of Union[UUID, str]
+    # some tests break on UUID because they are using arbitrary strings
+    # fix tests and then modify
+    project_id: Optional[Union[UUID, str]]
+    sample_ids: Optional[Tuple[Union[UUID, str], ...]]
+    file_types: Optional[Tuple[str, ...]]
+
+
+# pylint: disable=too-few-public-methods
+class DownloadOptions(Optionals):
+    """DownloadOptions model"""
+
+    skip_existing: Optional[bool]
+    download_template: Optional[str]
+
+
 DEFAULT_FILENAME_TOKEN = "{{{}}}".format(
-    DownloadTemplateParts.default_filename
+    DownloadTemplateParts.DEFAULT_FILENAME.value
 )
-FilePrefix = namedtuple(
-    "FilePrefix",
-    ["dirs", "filename", "file_extension", "use_default_filename"],
-)
+
+
+# pylint: disable=too-few-public-methods
+class FilePrefix(BaseModel):
+    """FilePrefix model"""
+
+    dirs: str
+    filename: str
+    file_extension: str
+    use_default_filename: bool
+
+
 FILENAME_RE = re.compile("filename=(.+)")
 
 # Leaving the line below since it is a great explaination of FILE_TYPES_MAPPER

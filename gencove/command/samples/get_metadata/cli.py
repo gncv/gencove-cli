@@ -30,6 +30,6 @@ def get_metadata(
     GetMetadata(
         sample_id,
         output_filename,
-        Credentials(email, password, api_key),
-        Optionals(host),
+        Credentials(email=email, password=password, api_key=api_key),
+        Optionals(host=host),
     ).run()

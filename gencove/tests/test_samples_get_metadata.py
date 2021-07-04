@@ -10,6 +10,7 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.samples.cli import get_metadata
+from gencove.models import SampleMetadata
 
 
 def test_get_metadata__bad_sample_id(mocker):
@@ -54,7 +55,7 @@ def test_get_metadata__not_owned_sample(mocker):
         APIClient,
         "get_metadata",
         return_value=mocked_response,
-        side_effect=APIClientError(message="", status_code=404),
+        side_effect=APIClientError(message="", status_code=403),
     )
 
     res = runner.invoke(
@@ -70,7 +71,7 @@ def test_get_metadata__not_owned_sample(mocker):
     assert res.exit_code == 1
     mocked_login.assert_called_once()
     mocked_get_metadata.assert_called_once()
-    assert "you do not have permission required" in res.output
+    assert "You do not have the sufficient permission" in res.output
 
 
 def test_get_metadata__empty(mocker):
@@ -83,7 +84,7 @@ def test_get_metadata__empty(mocker):
     mocked_get_metadata = mocker.patch.object(
         APIClient,
         "get_metadata",
-        return_value=dict(
+        return_value=SampleMetadata(
             metadata=None,
         ),
     )
@@ -116,7 +117,7 @@ def test_get_metadata__success_custom_filename(mocker):
     mocked_get_metadata = mocker.patch.object(
         APIClient,
         "get_metadata",
-        return_value=mocked_response,
+        return_value=SampleMetadata(**mocked_response),
     )
     custom_filename = "result.json"
     with runner.isolated_filesystem():
@@ -152,7 +153,7 @@ def test_get_metadata__success_nested_custom_filename(mocker):
     mocked_get_metadata = mocker.patch.object(
         APIClient,
         "get_metadata",
-        return_value=mocked_response,
+        return_value=SampleMetadata(**mocked_response),
     )
     custom_filename = "somefolder/result.json"
     with runner.isolated_filesystem():
@@ -188,7 +189,7 @@ def test_get_metadata__success_stdout(mocker):
     mocked_get_metadata = mocker.patch.object(
         APIClient,
         "get_metadata",
-        return_value=mocked_response,
+        return_value=SampleMetadata(**mocked_response),
     )
 
     res = runner.invoke(

@@ -13,8 +13,8 @@ def get_line(project):
     """
     return "\t".join(
         [
-            project.created,
-            project.id,
+            str(project.created),
+            str(project.id),
             sanitize_string(project.name),
             sanitize_string(project.pipeline_capabilities.name),
         ]

@@ -1,120 +1,125 @@
 """Describe all constants in Gencove CLI."""
-from collections import namedtuple
+from enum import Enum, unique
+from typing import Optional
+
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
 HOST = "https://api.gencove.com"
 
-_APIEndpoint = namedtuple(
-    "ApiEndpoint",
-    [
-        "get_jwt",
-        "refresh_jwt",
-        "verify_jwt",
-        "upload_details",
-        "get_upload_credentials",
-        "project_samples",
-        "sample_details",
-        "sample_qc_metrics",
-        "sample_sheet",
-        "projects",
-        "pipeline_capabilities",
-        "project_batch_types",
-        "project_batches",
-        "batches",
-        "project_merge_vcfs",
-        "sample_metadata",
-        "project_restore_samples",
-    ],
-)
-API_ENDPOINTS = _APIEndpoint(
-    "/api/v2/jwt-create/",
-    "/api/v2/jwt-refresh/",
-    "/api/v2/jwt-verify/",
-    "/api/v2/uploads-post-data/",
-    "/api/v2/upload-credentials/",
-    "/api/v2/project-samples/{id}",
-    "/api/v2/samples/{id}",
-    "/api/v2/sample-quality-controls/{id}",
-    "/api/v2/sample-sheet/",
-    "/api/v2/projects/",
-    "/api/v2/pipeline-capabilities/{id}",
-    "/api/v2/project-batch-types/{id}",
-    "/api/v2/project-batches/{id}",
-    "/api/v2/batches/{id}",
-    "/api/v2/project-merge-vcfs/{id}",
-    "/api/v2/sample-metadata/{id}",
-    "/api/v2/project-restore-samples/{id}",
-)
 
-_SampleAssignmentStatus = namedtuple(
-    "SampleAssignmentStatus", ["all", "unassigned", "assigned"]
-)
-SAMPLE_ASSIGNMENT_STATUS = _SampleAssignmentStatus(
-    "all", "unassigned", "assigned"
-)
+@unique
+class ApiEndpoints(Enum):
+    """ApiEndpoints enum"""
 
-_SampleSheetSortBy = namedtuple("SampleSheetSortBy", ["created", "modified"])
-SAMPLES_SHEET_SORT_BY = _SampleSheetSortBy("created", "modified")
+    GET_JWT = "/api/v2/jwt-create/"
+    REFRESH_JWT = "/api/v2/jwt-refresh/"
+    UPLOAD_DETAILS = "/api/v2/uploads-post-data/"
+    GET_UPLOAD_CREDENTIALS = "/api/v2/upload-credentials/"
+    PROJECT_SAMPLES = "/api/v2/project-samples/{id}"
+    SAMPLE_DETAILS = "/api/v2/samples/{id}"
+    SAMPLE_QC_METRICS = "/api/v2/sample-quality-controls/{id}"
+    SAMPLE_SHEET = "/api/v2/sample-sheet/"
+    PROJECTS = "/api/v2/projects/"
+    PIPELINE_CAPABILITES = "/api/v2/pipeline-capabilities/{id}"
+    PROJECT_BATCH_TYPES = "/api/v2/project-batch-types/{id}"
+    PROJECT_BATCHES = "/api/v2/project-batches/{id}"
+    BATCHES = "/api/v2/batches/{id}"
+    PROJECT_MERGE_VCFS = "/api/v2/project-merge-vcfs/{id}"
+    SAMPLE_METADATA = "/api/v2/sample-metadata/{id}"
+    PROJECT_RESTORE_SAMPLES = "/api/v2/project-restore-samples/{id}"
 
-_SampleStatus = namedtuple(
-    "SampleStatus", ["completed", "succeeded", "failed", "running", "all"]
-)
-SAMPLE_STATUS = _SampleStatus(
-    "completed", "succeeded", "failed", "running", "all"
-)
 
-_SampleArchiveStatus = namedtuple(
-    "SampleArchiveStatus",
-    [
-        "available",
-        "archived",
-        "restore_requested",
-        "all",
-    ],
-)
+@unique
+class SampleAssignmentStatus(Enum):
+    """SampleAssignmentStatus enum"""
 
-SAMPLE_ARCHIVE_STATUS = _SampleArchiveStatus(
-    "available",
-    "archived",
-    "restore_requested",
-    "all",
-)
+    ALL = "all"
+    UNASSIGNED = "unassigned"
+    ASSIGNED = "assigned"
 
-_SampleSortBy = namedtuple(
-    "SampleSortFields", ["created", "modified", "status", "client_id", "id"]
-)
-SAMPLE_SORT_BY = _SampleSortBy(
-    "created", "modified", "status", "client_id", "id"
-)
 
-_SortOrder = namedtuple("SortOrder", ["asc", "desc"])
-SORT_ORDER = _SortOrder("asc", "desc")
+@unique
+class SampleSheetSortBy(Enum):
+    """SampleSheetSortBy enum"""
 
-Credentials = namedtuple("Credentials", ["email", "password", "api_key"])
-Optionals = namedtuple("Optionals", ["host"])
+    CREATED = "created"
+    MODIFIED = "modified"
 
-_DownloadTemplateParts = namedtuple(
-    "DownloadTemplateParts",
-    [
-        "client_id",
-        "gencove_id",
-        "file_type",
-        "file_extension",
-        "default_filename",
-    ],
-)
-# pylint: disable=C0103
-DownloadTemplateParts = _DownloadTemplateParts(
-    "client_id",
-    "gencove_id",
-    "file_type",
-    "file_extension",
-    "default_filename",
-)
+
+@unique
+class SampleStatus(Enum):
+    """SampleStatus enum"""
+
+    COMPLETED = "completed"
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"
+    RUNNING = "running"
+    ALL = "all"
+
+
+@unique
+class SampleArchiveStatus(Enum):
+    """SampleArchiveStatus enum"""
+
+    AVAILABLE = "available"
+    ARCHIVED = "archived"
+    RESTORE_REQUESTED = "restore_requested"
+    ALL = "all"
+
+
+@unique
+class SampleSortBy(Enum):
+    """SampleSortBy enum"""
+
+    CREATED = "created"
+    MODIFIED = "modified"
+    STATUS = "status"
+    CLIENT_ID = "client_id"
+    ID = "id"
+
+
+@unique
+class SortOrder(Enum):
+    """SortOrder enum"""
+
+    ASC = "asc"
+    DESC = "desc"
+
+
+# pylint: disable=too-few-public-methods
+class Credentials(BaseModel):
+    """Credentials model"""
+
+    email: str
+    password: str
+    api_key: str
+
+
+# pylint: disable=too-few-public-methods
+class Optionals(BaseModel):
+    """Optionals model"""
+
+    host: Optional[str]
+
+
+@unique
+class DownloadTemplateParts(Enum):
+    """DownloadTemplateParts enum"""
+
+    CLIENT_ID = "client_id"
+    GENCOVE_ID = "gencove_id"
+    FILE_TYPE = "file_type"
+    FILE_EXTENSION = "file_extension"
+    DEFAULT_FILENAME = "default_filename"
+
+
 DOWNLOAD_TEMPLATE = "{{{}}}/{{{}}}/{{{}}}".format(
-    DownloadTemplateParts.client_id,
-    DownloadTemplateParts.gencove_id,
-    DownloadTemplateParts.default_filename,
+    DownloadTemplateParts.CLIENT_ID.value,
+    DownloadTemplateParts.GENCOVE_ID.value,
+    DownloadTemplateParts.DEFAULT_FILENAME.value,
 )
 
 MAX_RETRY_TIME_SECONDS = 300  # 5 minutes
 FASTQ_MAP_EXTENSION = ".fastq-map.csv"
+UPLOAD_PREFIX = "gncv://"
+ASSIGN_BATCH_SIZE = 200

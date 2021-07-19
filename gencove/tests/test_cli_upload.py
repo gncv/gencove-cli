@@ -915,7 +915,9 @@ def test_upload_and_run_immediately_slow_response_retry(mocker):
 
 
 def test_upload_retry_after_unauthorized(mocker):
-    """Test that the upload is performed when retrying due to unauthorized http response."""
+    """Test that the upload is performed when retrying due to unauthorized
+    http response.
+    """
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
@@ -929,12 +931,9 @@ def test_upload_retry_after_unauthorized(mocker):
         force_refresh_jwt = True
 
         def _request(
-            endpoint="",
-            params=None,
-            method="get",
-            custom_headers=None,
-            timeout=60,
-            sensitive=False,
+            endpoint,
+            *args,  # pylint: disable=unused-argument
+            **kwargs,  # pylint: disable=unused-argument
         ):
             if ApiEndpoints.UPLOAD_DETAILS.value == endpoint:
                 nonlocal force_refresh_jwt
@@ -946,10 +945,9 @@ def test_upload_retry_after_unauthorized(mocker):
                     "last_status": {"id": str(uuid4()), "status": ""},
                     "s3": {"bucket": "test", "object_name": "test"},
                 }
-            elif ApiEndpoints.REFRESH_JWT.value == endpoint:
+            if ApiEndpoints.REFRESH_JWT.value == endpoint:
                 return {"access": ""}
-            else:
-                return {}
+            return {}
 
         mocked_request = mocker.patch.object(
             APIClient, "_request", side_effect=_request

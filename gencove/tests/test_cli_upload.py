@@ -9,8 +9,8 @@ from click import echo
 from click.testing import CliRunner
 
 from gencove.cli import upload
-from gencove.client import APIClient, APIClientTimeout
-from gencove.constants import UPLOAD_PREFIX
+from gencove.client import APIClient, APIClientError, APIClientTimeout
+from gencove.constants import ApiEndpoints, UPLOAD_PREFIX
 from gencove.models import SampleSheet, UploadSamples, UploadsPostData
 
 
@@ -912,3 +912,60 @@ def test_upload_and_run_immediately_slow_response_retry(mocker):
         mocked_upload_file.assert_called_once()
         assert mocked_get_sample_sheet.call_count == 5
         assert "there was an error automatically running them" in res.output
+
+
+def test_upload_retry_after_unauthorized(mocker):
+    """Test that the upload is performed when retrying due to unauthorized
+    http response.
+    """
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("cli_test_data")
+        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+            fastq_file.write("AAABBB")
+
+        mocked_login = mocker.patch.object(
+            APIClient, "login", return_value=None
+        )
+
+        force_refresh_jwt = True
+
+        def _request(
+            endpoint,
+            *args,  # pylint: disable=unused-argument
+            **kwargs,  # pylint: disable=unused-argument
+        ):
+            if ApiEndpoints.UPLOAD_DETAILS.value == endpoint:
+                nonlocal force_refresh_jwt
+                if force_refresh_jwt:
+                    force_refresh_jwt = False
+                    raise APIClientError("Test error.", 401)
+                return {
+                    "id": str(uuid4()),
+                    "last_status": {"id": str(uuid4()), "status": ""},
+                    "s3": {"bucket": "test", "object_name": "test"},
+                }
+            if ApiEndpoints.REFRESH_JWT.value == endpoint:
+                return {"access": ""}
+            return {}
+
+        mocked_request = mocker.patch.object(
+            APIClient, "_request", side_effect=_request
+        )
+
+        mocked_get_credentials = mocker.patch(
+            "gencove.command.upload.main.get_s3_client_refreshable"
+        )
+
+        res = runner.invoke(
+            upload,
+            ["cli_test_data"],
+            input="\n".join(["foo@bar.com", "123456"]),
+        )
+
+        assert res.exit_code == 0
+        mocked_login.assert_called_once()
+        mocked_get_credentials.assert_called_once()
+        # Call count = upload details + refresh jwt + retry upload details
+        assert mocked_request.call_count == 3
+        assert force_refresh_jwt is False

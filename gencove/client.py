@@ -273,7 +273,13 @@ class APIClient:
             if not refreshed and err.status_code and err.status_code == 401:
                 self._refresh_authentication()
                 return self._post(
-                    endpoint, payload, timeout, authorized, sensitive, True
+                    endpoint,
+                    payload,
+                    timeout,
+                    authorized,
+                    sensitive,
+                    True,
+                    model,
                 )
 
             raise err
@@ -311,6 +317,7 @@ class APIClient:
                     authorized,
                     sensitive,
                     True,
+                    model,
                 )
 
             raise err

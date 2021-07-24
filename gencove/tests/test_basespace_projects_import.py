@@ -48,8 +48,8 @@ def test_basespace_import__bad_json(mocker):
     res = runner.invoke(
         basespace_import,
         [
-            str(uuid4()),
             "1111111",
+            str(uuid4()),
             "--metadata-json",
             "{bad:",
             "--email",
@@ -86,8 +86,8 @@ def test_basespace_import__no_pipeline_capabilities(mocker):
     res = runner.invoke(
         basespace_import,
         [
-            str(uuid4()),
             "1111111",
+            str(uuid4()),
             "--email",
             "foo@bar.com",
             "--password",
@@ -120,8 +120,8 @@ def test_basespace_import__not_owned_project(mocker):
     res = runner.invoke(
         basespace_import,
         [
-            str(uuid4()),
             "1111111",
+            str(uuid4()),
             "--email",
             "foo@bar.com",
             "--password",
@@ -147,8 +147,8 @@ def test_basespace_import__success_with_json(mocker):
     res = runner.invoke(
         basespace_import,
         [
-            str(uuid4()),
             "1111111",
+            str(uuid4()),
             "--metadata-json",
             '{"somekey": "somevalue"}',
             "--email",
@@ -176,8 +176,8 @@ def test_basespace_import__success_with_multiple(mocker):
     res = runner.invoke(
         basespace_import,
         [
-            str(uuid4()),
             "1111111,2222222",
+            str(uuid4()),
             "--email",
             "foo@bar.com",
             "--password",
@@ -203,8 +203,8 @@ def test_basespace_import__success(mocker):
     res = runner.invoke(
         basespace_import,
         [
-            str(uuid4()),
             "1111111",
+            str(uuid4()),
             "--email",
             "foo@bar.com",
             "--password",

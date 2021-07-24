@@ -11,8 +11,8 @@ from .main import BaseSpaceImport
 
 
 @click.command("import")
-@click.argument("project_id")
 @click.argument("basespace_project_ids")
+@click.argument("project_id")
 @click.option(
     "--metadata-json",
     required=False,
@@ -24,8 +24,8 @@ from .main import BaseSpaceImport
 )
 @add_options(common_options)
 def basespace_import(  # pylint: disable=too-many-arguments
-    project_id,
     basespace_project_ids,
+    project_id,
     metadata_json,
     host,
     email,
@@ -39,15 +39,15 @@ def basespace_import(  # pylint: disable=too-many-arguments
 
         Import BioSamples to a project:
 
-            gencove basespace projects import 06a5d04b-526a-4471-83ba-fb54e0941758 12345678
+            gencove basespace projects import 12345678 06a5d04b-526a-4471-83ba-fb54e0941758
 
         Import BioSamples from multiple BaseSpace projects to a project:
 
-            gencove basespace projects import 06a5d04b-526a-4471-83ba-fb54e0941758 12345678,87654321
+            gencove basespace projects import 12345678,87654321 06a5d04b-526a-4471-83ba-fb54e0941758
 
         Import BioSamples to a project with metadata:
 
-            gencove basespace projects import 06a5d04b-526a-4471-83ba-fb54e0941758 12345678 --metadata-json='{"batch": "batch1"}'
+            gencove basespace projects import 12345678 06a5d04b-526a-4471-83ba-fb54e0941758 --metadata-json='{"batch": "batch1"}'
     """  # noqa: E501
     basespace_project_ids = [
         basespace_project_id.strip()
@@ -58,8 +58,8 @@ def basespace_import(  # pylint: disable=too-many-arguments
     )
 
     BaseSpaceImport(
-        project_id,
         basespace_project_ids,
+        project_id,
         Credentials(email=email, password=password, api_key=api_key),
         BaseSpaceImportOptionals(host=host, metadata_json=metadata_json),
     ).run()

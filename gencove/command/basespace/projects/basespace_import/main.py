@@ -12,11 +12,11 @@ class BaseSpaceImport(Command):
     """BaseSpace import command executor."""
 
     def __init__(
-        self, project_id, basespace_project_ids, credentials, options
+        self, basespace_project_ids, project_id, credentials, options
     ):
         super().__init__(credentials, options)
-        self.project_id = project_id
         self.basespace_project_ids = basespace_project_ids
+        self.project_id = project_id
         self.metadata_json = options.metadata_json
 
     def initialize(self):
@@ -56,8 +56,8 @@ class BaseSpaceImport(Command):
                 )
             import_basespace_projects = (
                 self.api_client.import_basespace_projects(
-                    project_id=self.project_id,
                     basespace_project_ids=self.basespace_project_ids,
+                    project_id=self.project_id,
                     metadata=metadata,
                 )
             )

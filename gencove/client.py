@@ -643,20 +643,20 @@ class APIClient:
         )
 
     def import_basespace_projects(
-        self, project_id, basespace_project_ids, metadata=None
+        self, basespace_project_ids, project_id, metadata=None
     ):
         """Make a request to import BioSamples from BaseSpace projects to a given
         project.
 
         Args:
-            project_id (str): project to which to assign the samples
             basespace_project_ids (list of strings): BaseSpace projects
+            project_id (str): project to which to assign the samples
             metadata (str): JSON metadata to be applied to all samples
         """
 
         payload = {
-            "project_id": project_id,
             "basespace_project_ids": basespace_project_ids,
+            "project_id": project_id,
             "metadata": metadata,
         }
 

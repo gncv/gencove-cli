@@ -22,9 +22,13 @@ def biosamples_list(
 
     Examples:
 
-        Import BioSamples to a project:
+        List BioSamples of a BaseSpace project:
 
-            gencove basespace biosamples list <basespace_project_id>
+            gencove basespace biosamples list 12345678
+
+        List BioSamples of a BaseSpace projects:
+
+            gencove basespace biosamples list 12345678,87654321
 
     """
     BioSamplesList(

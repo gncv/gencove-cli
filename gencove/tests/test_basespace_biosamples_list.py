@@ -121,6 +121,45 @@ def test_biosamples_list__slow_response_retry_list(mocker):
     assert mocked_list_biosamples.call_count == 2
 
 
+def test_biosamples_list__multiple(mocker):
+    """Test BaseSpace BioSamples from multiple projects
+    being outputed to the shell.
+    """
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_list_biosamples = mocker.patch.object(
+        APIClient,
+        "list_biosamples",
+        return_value=BaseSpaceBioSample(**MOCKED_BASESPACE_BIOSAMPLES),
+    )
+    res = runner.invoke(
+        biosamples_list,
+        ["1234,4321", "--email", "foo@bar.com", "--password", "123"],
+    )
+    assert res.exit_code == 0
+    mocked_login.assert_called_once()
+    mocked_list_biosamples.assert_called_once()
+
+    basespace_project = BaseSpaceBioSampleDetail(
+        **MOCKED_BASESPACE_BIOSAMPLES["results"][0]
+    )
+
+    output_line = io.BytesIO()
+    sys.stdout = output_line
+    echo(
+        "\t".join(
+            [
+                str(basespace_project.basespace_date_created),
+                str(basespace_project.basespace_id),
+                basespace_project.basespace_bio_sample_name.replace(
+                    "\t", " "
+                ),
+            ]
+        )
+    )
+    assert output_line.getvalue() == res.output.encode()
+
+
 def test_biosamples_list(mocker):
     """Test BaseSpace BioSamples being outputed to the shell."""
     runner = CliRunner()

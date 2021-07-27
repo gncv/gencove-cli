@@ -2,6 +2,7 @@
 import click
 
 from gencove import version
+from gencove.command.basespace import basespace
 from gencove.command.download import download
 from gencove.command.projects import projects
 from gencove.command.samples import samples
@@ -16,6 +17,7 @@ def cli():
     """Gencove's command line interface."""
 
 
+cli.add_command(basespace)
 cli.add_command(download)
 cli.add_command(upload)
 cli.add_command(uploads)

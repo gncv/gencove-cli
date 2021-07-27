@@ -251,3 +251,33 @@ class SampleMetadata(BaseModel):
     """SampleMetadata model"""
 
     metadata: Optional[Any]
+
+
+class BaseSpaceProjectDetail(BaseModel):
+    """BaseSpace project detail model"""
+
+    basespace_id: Optional[str]
+    basespace_name: Optional[str]
+    basespace_date_created: Optional[datetime]
+
+
+class BaseSpaceProject(BaseModel):
+    """BaseSpace project model"""
+
+    meta: ResponseMeta
+    results: Optional[List[BaseSpaceProjectDetail]]
+
+
+class BaseSpaceBioSampleDetail(BaseModel):
+    """BaseSpace BioSample detail model"""
+
+    basespace_id: Optional[str]
+    basespace_bio_sample_name: Optional[str]
+    basespace_date_created: Optional[datetime]
+
+
+class BaseSpaceBioSample(BaseModel):
+    """BaseSpace BioSample model"""
+
+    meta: ResponseMeta
+    results: Optional[List[BaseSpaceBioSampleDetail]]

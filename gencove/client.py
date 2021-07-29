@@ -32,6 +32,8 @@ from gencove.constants import (
 from gencove.logger import echo_debug
 from gencove.models import (
     AccessJWT,
+    BaseSpaceBioSample,
+    BaseSpaceProject,
     BatchDetail,
     CreateJWT,
     PipelineCapabilities,
@@ -638,4 +640,84 @@ class APIClient:
             payload,
             authorized=True,
             model=SampleMetadata,
+        )
+
+    def import_basespace_projects(
+        self, basespace_project_ids, project_id, metadata=None
+    ):
+        """Make a request to import BioSamples from BaseSpace projects to a given
+        project.
+
+        Args:
+            basespace_project_ids (list of strings): BaseSpace projects
+            project_id (str): project to which to assign the samples
+            metadata (str): JSON metadata to be applied to all samples
+        """
+
+        payload = {
+            "basespace_project_ids": basespace_project_ids,
+            "project_id": project_id,
+            "metadata": metadata,
+        }
+
+        return self._post(
+            self.endpoints.BASESPACE_PROJECTS_IMPORT.value,
+            payload,
+            authorized=True,
+        )
+
+    def list_basespace_projects(self, next_link=None):
+        """Make a request to list BaseSpace projects.
+
+        Args:
+            next_link (str, optional): url from previous
+                response['meta']['next'].
+
+        Returns:
+            api response (dict):
+                {
+                    "meta": {
+                        "count": int,
+                        "next": str,
+                        "previous": optional[str],
+                    },
+                    "results": [...]
+                }
+        """
+        params = self._add_query_params(next_link)
+        return self._get(
+            self.endpoints.BASESPACE_PROJECTS_LIST.value,
+            query_params=params,
+            authorized=True,
+            model=BaseSpaceProject,
+        )
+
+    def list_biosamples(self, basespace_project_id, next_link=None):
+        """Make a request to list BioSamples from a BaseSpace project.
+
+        Args:
+            basespace_project_id (str): what BaseSpace project to request
+                BioSamples from
+            next_link (str, optional): url from previous
+                response['meta']['next'].
+
+        Returns:
+            api response (dict):
+                {
+                    "meta": {
+                        "count": int,
+                        "next": str,
+                        "previous": optional[str],
+                    },
+                    "results": [...]
+                }
+        """
+        params = self._add_query_params(next_link)
+        return self._get(
+            self.endpoints.BASESPACE_BIOSAMPLES_LIST.value.format(
+                id=basespace_project_id
+            ),
+            query_params=params,
+            authorized=True,
+            model=BaseSpaceBioSample,
         )

@@ -123,21 +123,27 @@ def login(api_client, credentials):
         api_client.set_api_key(credentials.api_key)
         return True
 
-    email = credentials.email
-    password = credentials.password
-
     if not credentials.email or not credentials.password:
         echo_info("Login required")
-        email = email or click.prompt("Email", type=str, err=True)
-        password = password or click.prompt(
-            "Password", type=str, hide_input=True, err=True
-        )
-
+        if not credentials.email:
+            credentials.email = click.prompt("Email", type=str, err=True)
+        if not credentials.password:
+            credentials.password = click.prompt(
+                "Password", type=str, hide_input=True, err=True
+            )
     try:
-        api_client.login(email, password)
+        api_client.login(
+            credentials.email, credentials.password, credentials.otp_token
+        )
         echo_debug("User logged in successfully")
         return True
     except APIClientError as err:
+        if "otp_token" in err.message:
+            echo_info("One time password required")
+            credentials.otp_token = click.prompt(
+                "One time password", type=str, err=True
+            )
+            return login(api_client, credentials)
         echo_debug("Failed to login: {}".format(err))
         echo_error(
             "Failed to login. Please verify your credentials and try again"

@@ -272,7 +272,11 @@ class APIClient:
                 return model(**response)
             return response
         except APIClientError as err:
-            if not refreshed and err.status_code and err.status_code == 401:
+            if (
+                not refreshed
+                and self._jwt_refresh_token
+                and err.status_code == 401
+            ):
                 self._refresh_authentication()
                 return self._post(
                     endpoint,
@@ -348,18 +352,21 @@ class APIClient:
             model=AccessJWT,
         )
 
-    def get_jwt(self, email, password):
+    def get_jwt(self, email, password, otp_token):
         """Get jwt token."""
+        body = {"email": email, "password": password}
+        if otp_token is not None:
+            body["otp_token"] = otp_token
         return self._post(
             self.endpoints.GET_JWT.value,
-            dict(email=email, password=password),
+            body,
             sensitive=True,
             model=CreateJWT,
         )
 
-    def login(self, email, password):
+    def login(self, email, password, otp_token=None):
         """Log user in."""
-        jwt = self.get_jwt(email, password)
+        jwt = self.get_jwt(email, password, otp_token)
         self._set_jwt(jwt.access, jwt.refresh)
 
     def get_upload_details(self, gncv_file_path):

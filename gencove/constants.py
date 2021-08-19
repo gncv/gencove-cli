@@ -96,6 +96,7 @@ class Credentials(BaseModel):
     email: str
     password: str
     api_key: str
+    otp_token: Optional[str] = None
 
 
 # pylint: disable=too-few-public-methods

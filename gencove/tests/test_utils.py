@@ -5,6 +5,7 @@ from enum import Enum
 
 from click.testing import CliRunner
 
+from gencove.client import APIClient, APIClientError
 from gencove.command.download.utils import (
     _get_prefix_parts,
     build_file_path,
@@ -16,9 +17,14 @@ from gencove.command.upload.utils import (
     upload_file,
 )
 from gencove.command.utils import is_valid_uuid
-from gencove.constants import DOWNLOAD_TEMPLATE, DownloadTemplateParts
+from gencove.constants import (
+    ApiEndpoints,
+    Credentials,
+    DOWNLOAD_TEMPLATE,
+    DownloadTemplateParts,
+)
 from gencove.exceptions import ValidationError
-from gencove.utils import enum_as_dict
+from gencove.utils import enum_as_dict, login
 
 
 def test_upload_file(mocker):
@@ -310,3 +316,40 @@ def test_enum_as_dict():
         "KEY2": "key2",
         "KEY3": "key3",
     }
+
+
+def test_login_mfa(mocker):
+    """Test that the the login function in APIClient asks for the one time
+    password token.
+    """
+    api_client = APIClient()
+    credentials = Credentials(
+        email="foo@bar.com", password="123456", api_key=""
+    )
+
+    def _request(
+        endpoint,
+        params,
+        *args,  # pylint: disable=unused-argument
+        **kwargs,  # pylint: disable=unused-argument
+    ):
+        if endpoint == ApiEndpoints.GET_JWT.value:
+            if "otp_token" not in params:
+                raise APIClientError(
+                    {"otp_token": ["Please enter your OTP token."]}, 401
+                )
+            return {"access": "access", "refresh": "refresh"}
+        return {}
+
+    mocked_request = mocker.patch.object(
+        APIClient, "_request", side_effect=_request
+    )
+    mocked_prompt = mocker.patch(
+        "gencove.utils.click.prompt", return_value="token"
+    )
+
+    login(api_client, credentials)
+    assert mocked_request.call_count == 2
+    mocked_prompt.assert_called_once_with(
+        "One time password", type=str, err=True
+    )

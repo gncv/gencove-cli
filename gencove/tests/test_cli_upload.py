@@ -924,8 +924,14 @@ def test_upload_retry_after_unauthorized(mocker):
         with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
             fastq_file.write("AAABBB")
 
+        def _login(
+            self, email, password, otp_token=None
+        ):  # pylint: disable=unused-argument
+            # pylint: disable=protected-access
+            self._jwt_refresh_token = "refresh_token"
+
         mocked_login = mocker.patch.object(
-            APIClient, "login", return_value=None
+            APIClient, "login", side_effect=_login, autospec=True
         )
 
         force_refresh_jwt = True

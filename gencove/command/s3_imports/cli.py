@@ -6,7 +6,7 @@ from .s3_import.cli import s3_import
 
 
 @click.group()
-def s3():
+def s3():  # pylint: disable=C0103
     """S3 imports managements commands."""
 
 

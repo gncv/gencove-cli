@@ -5,11 +5,11 @@ from gencove import version
 from gencove.command.basespace import basespace
 from gencove.command.download import download
 from gencove.command.projects import projects
+from gencove.command.s3_imports import s3
 from gencove.command.samples import samples
 from gencove.command.upload import upload
 from gencove.command.uploads import uploads
 from gencove.command.webhook import webhooks
-from gencove.command.s3_imports import s3
 
 
 @click.group()

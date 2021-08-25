@@ -1,7 +1,6 @@
 """Import samples from S3 to a project subcommand."""
 
 import json
-import re
 
 from ...base import Command
 from ...utils import is_valid_json, is_valid_uuid

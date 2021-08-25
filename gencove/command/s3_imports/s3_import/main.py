@@ -50,9 +50,7 @@ class S3Import(Command):
             metadata = None
             if self.metadata_json is not None:
                 metadata = json.loads(self.metadata_json)
-                self.echo_info(
-                    "Assigning metadata to the imported BioSamples."
-                )
+                self.echo_info("Assigning metadata to the imported samples.")
             s3_uri_import = self.api_client.s3_uri_import(
                 s3_uri=self.s3_uri,
                 project_id=self.project_id,

@@ -1,4 +1,4 @@
-"""Project import BioSamples from BaseSpace projects shell command definition.
+"""Project import samples from S3 URI to projects shell command definition.
 """
 import click
 

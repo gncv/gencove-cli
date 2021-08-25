@@ -9,6 +9,7 @@ from gencove.command.samples import samples
 from gencove.command.upload import upload
 from gencove.command.uploads import uploads
 from gencove.command.webhook import webhooks
+from gencove.command.s3_imports import s3
 
 
 @click.group()
@@ -23,6 +24,7 @@ cli.add_command(upload)
 cli.add_command(uploads)
 cli.add_command(projects)
 cli.add_command(samples)
+cli.add_command(s3)
 cli.add_command(webhooks)
 
 

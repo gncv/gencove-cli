@@ -69,5 +69,5 @@ This will output all available commands.
 .. click:: gencove.cli:cli
    :prog: gencove
    :show-nested:
-   :commands: upload,download,projects,uploads,samples,webhooks
+   :commands: upload,download,projects,uploads,samples,s3,webhooks
 

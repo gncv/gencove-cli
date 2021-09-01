@@ -5,6 +5,7 @@ from gencove import version
 from gencove.command.basespace import basespace
 from gencove.command.download import download
 from gencove.command.projects import projects
+from gencove.command.s3_imports import s3
 from gencove.command.samples import samples
 from gencove.command.upload import upload
 from gencove.command.uploads import uploads
@@ -23,6 +24,7 @@ cli.add_command(upload)
 cli.add_command(uploads)
 cli.add_command(projects)
 cli.add_command(samples)
+cli.add_command(s3)
 cli.add_command(webhooks)
 
 

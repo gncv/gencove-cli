@@ -1,0 +1,148 @@
+interactions:
+- request:
+    body: '{}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2'
+      Gencove-cli-version:
+      - 2.1.5
+      User-Agent:
+      - python-requests/2.26.0
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/upload-credentials/
+  response:
+    body:
+      string: '{"version": 1, "access_key": "mock_access_key", "secret_key": "mock_secret_key",
+        "token": "mock_token", "expiry_time": "2021-09-03T22:39:09+00:00"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '582'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 03 Sep 2021 21:39:09 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"destination_path": "gncv://cli-mock/test.fastq.gz"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '96'
+      Gencove-cli-version:
+      - 2.1.5
+      User-Agent:
+      - python-requests/2.26.0
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/uploads-post-data/
+  response:
+    body:
+      string: '{"id": "7d43cede-5a48-445a-91c4-e9d4f3866588", "destination_path":
+        "gncv://cli-mock/test.fastq.gz", "s3": {"bucket": "mock_bucket", "object_name":
+        "organization/7d43cede-5a48-445a-91c4-e9d4f3866588/user/7d43cede-5a48-445a-91c4-e9d4f3866588/uploads/7d43cede-5a48-445a-91c4-e9d4f3866588.fastq-r1"},
+        "last_status": {"id": "7d43cede-5a48-445a-91c4-e9d4f3866588", "status": "started",
+        "note": "", "created": "2021-09-03T21:39:10.816212Z"}}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '465'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 03 Sep 2021 21:39:10 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+- request:
+    body: !!python/object/new:_io.BytesIO
+      state: !!python/tuple
+      - !!binary |
+        QUFBQkJC
+      - 0
+      - null
+    headers:
+      Content-Length:
+      - '6'
+      Content-MD5:
+      - !!binary |
+        YmdJOWk0ZFkrUGdtRlMzbmVqekIyUT09
+      Expect:
+      - !!binary |
+        MTAwLWNvbnRpbnVl
+      User-Agent:
+      - !!binary |
+        Qm90bzMvMS4xOC4zNSBQeXRob24vMy43LjEwIERhcndpbi8yMC42LjAgQm90b2NvcmUvMS4yMS4z
+        NQ==
+      X-Amz-Content-SHA256:
+      - !!binary |
+        VU5TSUdORUQtUEFZTE9BRA==
+      X-Amz-Date:
+      - !!binary |
+        MjAyMTA5MDNUMjEzOTEwWg==
+    method: PUT
+    uri: https://s3.amazonaws.com/mock_bucket/organization/7d43cede-5a48-445a-91c4-e9d4f3866588/user/7d43cede-5a48-445a-91c4-e9d4f3866588/uploads/7d43cede-5a48-445a-91c4-e9d4f3866588.fastq-r1
+  response:
+    body:
+      string: ''
+    headers:
+      Content-Length:
+      - '0'
+      Date:
+      - Fri, 03 Sep 2021 21:39:12 GMT
+      ETag:
+      - '"6e023d8b8758f8f826152de77a3cc1d9"'
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - mock_x-amz-id-2
+      x-amz-request-id:
+      - mock_x-amz-request-id
+      x-amz-version-id:
+      - mock_x-amz-version-id
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -1,8 +1,9 @@
 """Tests upload command of Gencove CLI."""
-import copy
 import io
 import json
 import os
+
+import pytest
 import vcr
 import sys
 from uuid import uuid4
@@ -12,74 +13,49 @@ from click.testing import CliRunner
 
 from gencove.cli import upload
 from gencove.client import APIClient, APIClientError, APIClientTimeout
+from gencove.command.upload.utils import upload_file
 from gencove.constants import ApiEndpoints, UPLOAD_PREFIX
 from gencove.models import SampleSheet, UploadSamples, UploadsPostData
-from gencove.tests.decorators import parse_response_to_json
-from gencove.tests.utils import replace_gencove_url_vcr
-
-
-vcr = vcr.VCR(
-    cassette_library_dir="gencove/tests/upload/vcr",
-    path_transformer=vcr.VCR.ensure_suffix(".yaml"),
-    filter_headers=[
-        "authorization",
-        "X-Amz-Security-Token",
-    ],
+from gencove.tests.upload.vcr.filters import (
+    filter_upload_credentials_response,
+    filter_upload_post_data_response,
+    filter_aws_put,
+    filter_volatile_dates,
+    filter_upload_request,
 )
+from gencove.tests.utils import replace_gencove_url_vcr
+from gencove.utils import get_s3_client_refreshable
 
 
-def filter_upload_request(request):
-    request = copy.deepcopy(request)
-    if "uploads-post-data" in request.path:
-        request.body = '{"destination_path": "gncv://cli-mock/test.fastq.gz"}'
-    if "s3.amazonaws.com" in request.uri:
-        request.uri = "https://s3.amazonaws.com/mock_bucket/organization/7d43cede-5a48-445a-91c4-e9d4f3866588/user/7d43cede-5a48-445a-91c4-e9d4f3866588/uploads/7d43cede-5a48-445a-91c4-e9d4f3866588.fastq-r1"
-    return request
+@pytest.fixture(scope="module")
+def vcr_config():
+    return {
+        "cassette_library_dir": "gencove/tests/upload/vcr",
+        "filter_headers": [
+            "Authorization",
+            "Content-Length",
+            "User-Agent",
+            "X-Amz-Security-Token",
+            "X-Amz-Date",
+        ],
+        "match_on": ["method", "scheme", "port", "path", "query"],
+        "path_transformer": vcr.VCR.ensure_suffix(".yaml"),
+    }
 
 
-@parse_response_to_json
-def filter_upload_credentials_response(response, json_response):
-    for key in ["access_key", "secret_key", "token"]:
-        if key in json_response:
-            json_response[key] = f"mock_{key}"
-    return response, json_response
-
-
-@parse_response_to_json
-def filter_upload_post_data_response(response, json_response):
-    mock_id = "7d43cede-5a48-445a-91c4-e9d4f3866588"
-    if "id" in json_response:
-        json_response["id"] = mock_id
-    if "destination_path" in json_response:
-        json_response["destination_path"] = "gncv://cli-mock/test.fastq.gz"
-    if "s3" in json_response:
-        json_response["s3"] = {
-            "bucket": "mock_bucket",
-            "object_name": f"organization/{mock_id}/user/{mock_id}/uploads/{mock_id}.fastq-r1",
-        }
-    if "last_status" in json_response:
-        json_response["last_status"]["id"] = mock_id
-    return response, json_response
-
-
-def filter_aws_put(response):
-    for key in ["x-amz-id-2", "x-amz-request-id", "x-amz-version-id"]:
-        if key in response["headers"]:
-            response["headers"][key] = [f"mock_{key}"]
-    return response
-
-
-@vcr.use_cassette(
+@pytest.mark.vcr(
     before_record_response=[
         filter_upload_credentials_response,
         filter_upload_post_data_response,
         filter_aws_put,
+        filter_volatile_dates,
     ],
     before_record_request=[replace_gencove_url_vcr, filter_upload_request],
 )
-def test_upload():
+def test_upload(vcr, record_mode, mocker):
     """Sanity check that upload is ok."""
     runner = CliRunner()
+    not_recording = record_mode == "none"
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
         with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
@@ -87,36 +63,47 @@ def test_upload():
         # mocked_login = mocker.patch.object(
         #     APIClient, "login", return_value=None
         # )
-        # mocked_get_credentials = mocker.patch(
-        #     "gencove.command.upload.main.get_s3_client_refreshable"
-        # )
-        upload_id = str(uuid4())
-        # mocked_get_upload_details = mocker.patch.object(
-        #     APIClient,
-        #     "get_upload_details",
-        #     return_value=UploadsPostData(
-        #         **{
-        #             "id": upload_id,
-        #             "last_status": {"id": str(uuid4()), "status": ""},
-        #             "s3": {"bucket": "test", "object_name": "test"},
-        #         }
-        #     ),
-        # )
-        # mocked_upload_file = mocker.patch(
-        #     "gencove.command.upload.main.upload_file"
-        # )
-        # TODO: ENSURE API KEY
+        mocked_get_credentials = mocker.patch(
+            "gencove.command.upload.main.get_s3_client_refreshable",
+            side_effect=get_s3_client_refreshable,
+        )
+        if not_recording:
+            upload_details_request = next(
+                request
+                for request in vcr.requests
+                if request.path == "/api/v2/uploads-post-data/"
+            )
+            upload_details_response = vcr.responses_of(
+                upload_details_request
+            )[0]
+            upload_details_response = json.loads(
+                upload_details_response["body"]["string"]
+            )
+            mocked_get_upload_details = mocker.patch.object(
+                APIClient,
+                "get_upload_details",
+                return_value=UploadsPostData(**upload_details_response),
+            )
+        mocked_upload_file = mocker.patch(
+            "gencove.command.upload.main.upload_file", side_effect=upload_file
+        )
+
         res = runner.invoke(
             upload,
             ["cli_test_data"],
         )
-
+        assert not res.exception
         assert res.exit_code == 0
+        assert (
+            "Uploading cli_test_data/test.fastq.gz to gncv://" in res.output
+        )
+        assert "All files were successfully uploaded." in res.output
         # mocked_login.assert_called_once()
-        # mocked_get_credentials.assert_called_once()
-        # mocked_get_upload_details.assert_called_once()
-        # mocked_upload_file.assert_called_once()
-        # assert not mocked_upload_file.call_args[1]["no_progress"]
+        mocked_get_credentials.assert_called_once()
+        if not_recording:
+            mocked_get_upload_details.assert_called_once()
+        mocked_upload_file.assert_called_once()
+        assert not mocked_upload_file.call_args[1]["no_progress"]
 
 
 def test_upload_no_files_found(mocker):

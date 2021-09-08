@@ -16,6 +16,8 @@ from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.upload.utils import upload_file
 from gencove.constants import ApiEndpoints, UPLOAD_PREFIX
 from gencove.models import SampleSheet, UploadSamples, UploadsPostData
+from gencove.tests.decorators import assert_authorization
+from gencove.tests.filters import filter_jwt
 from gencove.tests.upload.vcr.filters import (
     filter_upload_credentials_response,
     filter_upload_post_data_response,
@@ -38,6 +40,10 @@ def vcr_config():
             "X-Amz-Security-Token",
             "X-Amz-Date",
         ],
+        "filter_post_data_parameters": [
+            ("email", "email@example.com"),
+            ("password", "mock_password"),
+        ],
         "match_on": ["method", "scheme", "port", "path", "query"],
         "path_transformer": vcr.VCR.ensure_suffix(".yaml"),
     }
@@ -45,13 +51,15 @@ def vcr_config():
 
 @pytest.mark.vcr(
     before_record_response=[
+        filter_aws_put,
+        filter_jwt,
+        filter_volatile_dates,
         filter_upload_credentials_response,
         filter_upload_post_data_response,
-        filter_aws_put,
-        filter_volatile_dates,
     ],
     before_record_request=[replace_gencove_url_vcr, filter_upload_request],
 )
+@assert_authorization
 def test_upload(vcr, record_mode, mocker):
     """Sanity check that upload is ok."""
     runner = CliRunner()
@@ -60,14 +68,13 @@ def test_upload(vcr, record_mode, mocker):
         os.mkdir("cli_test_data")
         with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
             fastq_file.write("AAABBB")
-        # mocked_login = mocker.patch.object(
-        #     APIClient, "login", return_value=None
-        # )
         mocked_get_credentials = mocker.patch(
             "gencove.command.upload.main.get_s3_client_refreshable",
             side_effect=get_s3_client_refreshable,
         )
         if not_recording:
+            # Mock get_upload credentials only if using the cassettes, since
+            # we mock the return value.
             upload_details_request = next(
                 request
                 for request in vcr.requests
@@ -98,7 +105,6 @@ def test_upload(vcr, record_mode, mocker):
             "Uploading cli_test_data/test.fastq.gz to gncv://" in res.output
         )
         assert "All files were successfully uploaded." in res.output
-        # mocked_login.assert_called_once()
         mocked_get_credentials.assert_called_once()
         if not_recording:
             mocked_get_upload_details.assert_called_once()

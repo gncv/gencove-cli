@@ -1,5 +1,8 @@
 import json
+import os
 from functools import wraps
+
+import requests
 
 
 def parse_response_to_json(func):
@@ -17,5 +20,54 @@ def parse_response_to_json(func):
         if response is not None and json_response:
             response["body"]["string"] = json.dumps(json_response).encode()
         return response
+
+    return wrapper
+
+
+def assert_authorization(func):
+    """Decorator that ensures that the API key is being passed to our
+    endpoints, and the login endpoint is called if email/password is provided.
+    """
+
+    @wraps(func)
+    def wrapper(*args, mocker, **kwargs):
+        host = os.getenv("GENCOVE_HOST")
+        api_key = os.getenv("GENCOVE_API_KEY")
+        email = os.getenv("GENCOVE_EMAIL")
+        password = os.getenv("GENCOVE_PASSWORD")
+
+        def mock_get_auth(url, *args, headers, **kwargs):
+            if host in url and api_key:
+                assert (
+                    headers["Authorization"] == f"Api-Key {api_key}"
+                ), f"No valid authorization header provided for GET-{url}"
+            kwargs["headers"] = headers
+            return requests.get(url, *args, **kwargs)
+
+        mocker.patch("gencove.client.get", side_effect=mock_get_auth)
+        login_called = False
+
+        def mock_post_auth(url, data, *args, headers, **kwargs):
+            nonlocal login_called
+            if host in url and api_key:
+                assert (
+                    headers["Authorization"] == f"Api-Key {api_key}"
+                ), f"No valid authorization header provided for POST-{url}"
+            elif host in url:
+                if url.endswith("jwt-create/"):
+                    login_called = True
+                    data_json = json.loads(data)
+                    assert data_json["email"] == email
+                    assert data_json["password"] == password
+                else:
+                    assert "Bearer " in headers["Authorization"]
+            kwargs["headers"] = headers
+            return requests.post(url, data, *args, **kwargs)
+
+        mocker.patch("gencove.client.post", side_effect=mock_post_auth)
+        kwargs["mocker"] = mocker
+        func(*args, **kwargs)
+        if password:
+            assert login_called, "jwt-create endpoint was not called"
 
     return wrapper

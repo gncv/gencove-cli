@@ -46,6 +46,8 @@ def vcr_config():
         ],
         "match_on": ["method", "scheme", "port", "path", "query"],
         "path_transformer": vcr.VCR.ensure_suffix(".yaml"),
+        "before_record_response": [filter_jwt],
+        "before_record_request": [replace_gencove_url_vcr],
     }
 
 
@@ -112,24 +114,28 @@ def test_upload(vcr, record_mode, mocker):
         assert not mocked_upload_file.call_args[1]["no_progress"]
 
 
-def test_upload_no_files_found(mocker):
+@pytest.mark.vcr
+@assert_authorization
+def test_upload_no_files_found(
+    mocker, record_mode, using_api_key, vcr
+):  # pylint: disable=unused-argument
     """Test that no fastq files found exits upload."""
     runner = CliRunner()
+    not_recording = record_mode == "none"
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
-
-        mocked_login = mocker.patch.object(
-            APIClient, "login", return_value=None
-        )
         res = runner.invoke(
             upload,
             ["cli_test_data"],
-            input="\n".join(["foo@bar.com", "123456"]),
         )
-
         assert res.exit_code == 1
         assert "No FASTQ files found in the path" in res.output
-        mocked_login.assert_called_once()
+        if using_api_key:
+            assert vcr.play_count == 0
+        elif not_recording:
+            # Check that we are making just one request (to the login) if we
+            # are not recording the cassette
+            assert vcr.play_count == 1
 
 
 def test_upload_invalid_destination(mocker):

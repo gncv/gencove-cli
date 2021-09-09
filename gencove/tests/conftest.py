@@ -10,3 +10,11 @@ import pytest
 def using_api_key():
     api_key = os.getenv("GENCOVE_API_KEY")
     return api_key is not None
+
+
+@pytest.fixture(scope="session")
+def recording(record_mode):
+    """Returns True if VCR cassettes are being recorded.
+    False if being played.
+    """
+    return record_mode != "none"

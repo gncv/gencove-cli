@@ -1,3 +1,5 @@
+"""Test decorators."""
+
 import json
 import os
 from functools import wraps

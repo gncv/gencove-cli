@@ -1,15 +1,19 @@
 """Tests upload command of Gencove CLI."""
+
+# pylint: disable=too-many-lines, import-error
+
 import io
 import json
 import os
-
-import pytest
-import vcr
 import sys
 from uuid import uuid4
 
 from click import echo
 from click.testing import CliRunner
+
+import pytest
+
+from vcr import VCR
 
 from gencove.cli import upload
 from gencove.client import APIClient, APIClientError, APIClientTimeout
@@ -17,23 +21,23 @@ from gencove.command.upload.utils import upload_file
 from gencove.constants import ApiEndpoints, UPLOAD_PREFIX
 from gencove.models import SampleSheet, UploadSamples, UploadsPostData
 from gencove.tests.decorators import assert_authorization
-from gencove.tests.filters import filter_jwt
+from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.upload.vcr.filters import (
-    filter_upload_credentials_response,
-    filter_upload_post_data_response,
     filter_aws_put,
-    filter_volatile_dates,
-    filter_upload_request,
-    filter_sample_sheet_response,
     filter_project_samples_request,
     filter_project_samples_response,
+    filter_sample_sheet_response,
+    filter_upload_credentials_response,
+    filter_upload_post_data_response,
+    filter_upload_request,
+    filter_volatile_dates,
 )
-from gencove.tests.utils import replace_gencove_url_vcr
-from gencove.utils import get_s3_client_refreshable, get_regular_progress_bar
+from gencove.utils import get_regular_progress_bar, get_s3_client_refreshable
 
 
 @pytest.fixture(scope="module")
 def vcr_config():
+    """VCR configuration."""
     return {
         "cassette_library_dir": "gencove/tests/upload/vcr",
         "filter_headers": [
@@ -48,7 +52,7 @@ def vcr_config():
             ("password", "mock_password"),
         ],
         "match_on": ["method", "scheme", "port", "path", "query"],
-        "path_transformer": vcr.VCR.ensure_suffix(".yaml"),
+        "path_transformer": VCR.ensure_suffix(".yaml"),
         "before_record_response": [filter_jwt],
         "before_record_request": [replace_gencove_url_vcr],
     }
@@ -219,6 +223,7 @@ def test_upload_project_id_not_uuid(
 @assert_authorization
 def test_upload_and_run_immediately(mocker, project_id, recording, vcr):
     """Upload and assign right away."""
+    # pylint: disable=too-many-locals
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")

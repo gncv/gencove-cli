@@ -11,9 +11,6 @@ from uuid import uuid4
 from click import echo
 from click.testing import CliRunner
 
-import pytest
-
-from vcr import VCR
 
 from gencove.cli import upload
 from gencove.client import APIClient, APIClientError, APIClientTimeout
@@ -33,6 +30,10 @@ from gencove.tests.upload.vcr.filters import (
     filter_volatile_dates,
 )
 from gencove.utils import get_regular_progress_bar, get_s3_client_refreshable
+
+import pytest  # pylint: disable=wrong-import-order
+
+from vcr import VCR  # pylint: disable=wrong-import-order
 
 
 @pytest.fixture(scope="module")

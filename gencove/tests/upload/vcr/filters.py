@@ -9,7 +9,7 @@ def filter_upload_request(request):
     if "uploads-post-data" in request.path:
         request.body = '{"destination_path": "gncv://cli-mock/test.fastq.gz"}'
     if "s3.amazonaws.com" in request.uri:
-        request.uri = "https://s3.amazonaws.com/mock_bucket/organization/7d43cede-5a48-445a-91c4-e9d4f3866588/user/7d43cede-5a48-445a-91c4-e9d4f3866588/uploads/7d43cede-5a48-445a-91c4-e9d4f3866588.fastq-r1"
+        request.uri = "https://s3.amazonaws.com/mock_bucket/organization/7d43cede-5a48-445a-91c4-e9d4f3866588/user/7d43cede-5a48-445a-91c4-e9d4f3866588/uploads/7d43cede-5a48-445a-91c4-e9d4f3866588.fastq-r1"  # noqa: E501
     return request
 
 
@@ -32,7 +32,7 @@ def filter_upload_post_data_response(response, json_response):
     if "s3" in json_response:
         json_response["s3"] = {
             "bucket": "mock_bucket",
-            "object_name": f"organization/{mock_id}/user/{mock_id}/uploads/{mock_id}.fastq-r1",
+            "object_name": f"organization/{mock_id}/user/{mock_id}/uploads/{mock_id}.fastq-r1",  # noqa: E501
         }
     if "last_status" in json_response:
         json_response["last_status"]["id"] = mock_id

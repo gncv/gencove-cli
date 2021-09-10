@@ -18,3 +18,8 @@ def recording(record_mode):
     False if being played.
     """
     return record_mode != "none"
+
+
+@pytest.fixture(scope="session")
+def project_id(record_mode):
+    return os.getenv("GENCOVE_PROJECT_ID")

@@ -1,4 +1,5 @@
 import copy
+import json
 
 from gencove.tests.decorators import parse_response_to_json
 
@@ -54,3 +55,55 @@ def filter_aws_put(response):
         if key in response["headers"]:
             response["headers"][key] = [f"mock_{key}"]
     return response
+
+
+def _filter_sample_sheet(result):
+    mock_id = "7d43cede-5a48-445a-91c4-e9d4f3866588"
+    if "client_id" in result:
+        result["client_id"] = "mock_client_id"
+    if "fastq" in result and "r1" in result["fastq"]:
+        r1 = result["fastq"]["r1"]
+        if "upload" in r1:
+            r1["upload"] = mock_id
+        if "destination_path" in r1:
+            r1["destination_path"] = "gncv://cli-mock/test.fastq.gz"
+        if "last_status" in r1:
+            r1["last_status"]["id"] = mock_id
+        if "last_status" in r1:
+            r1["last_status"]["id"] = mock_id
+    if "sample" in result:
+        result["sample"] = mock_id
+
+
+@parse_response_to_json
+def filter_sample_sheet_response(response, json_response):
+    if "results" in json_response:
+        result = json_response["results"][0]
+        _filter_sample_sheet(result)
+    return response, json_response
+
+
+def filter_project_samples_request(request):
+    request = copy.deepcopy(request)
+    if "project-samples" in request.path:
+        try:
+            body = json.loads(request.body)
+            upload = body["uploads"][0]
+            _filter_sample_sheet(upload)
+            request.body = json.dumps(body).encode()
+        except json.decoder.JSONDecodeError:
+            pass
+        # remove the project id from the url
+        base_uri = request.uri.split("project-samples")[0]
+        request.uri = (
+            base_uri + "project-samples/7d43cede-5a48-445a-91c4-e9d4f3866588"
+        )
+    return request
+
+
+@parse_response_to_json
+def filter_project_samples_response(response, json_response):
+    if "uploads" in json_response:
+        result = json_response["uploads"][0]
+        _filter_sample_sheet(result)
+    return response, json_response

@@ -418,7 +418,9 @@ def test_upload_and_run_immediately__invalid_metadata(
         assert "--metadata is not valid JSON" in res.output
 
 
-def test_upload__with_metadata_without_project_id(mocker):
+@pytest.mark.vcr
+@assert_authorization
+def test_upload__with_metadata_without_project_id(credentials, mocker):
     """Test that project id is present if attaching metadata when
     uploading."""
     runner = CliRunner()
@@ -427,18 +429,14 @@ def test_upload__with_metadata_without_project_id(mocker):
         with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
             fastq_file.write("AAABBB")
 
-        mocked_login = mocker.patch.object(
-            APIClient, "login", return_value=None
+        mocked_get_credentials = mocker.patch(
+            "gencove.command.upload.main.get_s3_client_refreshable"
         )
-
         res = runner.invoke(
             upload,
             [
                 "cli_test_data",
-                "--email",
-                "foo@bar.com",
-                "--password",
-                "123456",
+                *credentials,
                 "--metadata",
                 "[1,2]",
             ],
@@ -448,7 +446,7 @@ def test_upload__with_metadata_without_project_id(mocker):
         assert (
             "--metadata cannot be used without --run-project-id" in res.output
         )
-        mocked_login.assert_called_once()
+        mocked_get_credentials.assert_not_called()
 
 
 def test_upload_and_run_immediately_something_went_wrong(mocker):

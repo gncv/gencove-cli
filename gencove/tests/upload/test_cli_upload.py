@@ -72,7 +72,7 @@ def vcr_config():
     before_record_request=[replace_gencove_url_vcr, filter_upload_request],
 )
 @assert_authorization
-def test_upload(vcr, recording, mocker):
+def test_upload(credentials, vcr, recording, mocker):
     """Sanity check that upload is ok."""
     runner = CliRunner()
     with runner.isolated_filesystem():
@@ -98,7 +98,7 @@ def test_upload(vcr, recording, mocker):
 
         res = runner.invoke(
             upload,
-            ["cli_test_data"],
+            ["cli_test_data", *credentials],
         )
         assert not res.exception
         assert res.exit_code == 0
@@ -116,7 +116,7 @@ def test_upload(vcr, recording, mocker):
 @pytest.mark.vcr
 @assert_authorization
 def test_upload_no_files_found(
-    mocker, recording, using_api_key, vcr
+    credentials, mocker, recording, using_api_key, vcr
 ):  # pylint: disable=unused-argument
     """Test that no fastq files found exits upload."""
     runner = CliRunner()
@@ -124,7 +124,7 @@ def test_upload_no_files_found(
         os.mkdir("cli_test_data")
         res = runner.invoke(
             upload,
-            ["cli_test_data"],
+            ["cli_test_data", *credentials],
         )
         assert res.exit_code == 1
         assert "No FASTQ files found in the path" in res.output
@@ -139,7 +139,7 @@ def test_upload_no_files_found(
 @pytest.mark.vcr
 @assert_authorization
 def test_upload_invalid_destination(
-    mocker, recording, using_api_key, vcr
+    credentials, mocker, recording, using_api_key, vcr
 ):  # pylint: disable=unused-argument
     """Test that invalid destination exists upload."""
     runner = CliRunner()
@@ -149,7 +149,7 @@ def test_upload_invalid_destination(
             fastq_file.write("AAABBB")
         res = runner.invoke(
             upload,
-            ["cli_test_data", "foobar_dir"],
+            ["cli_test_data", "foobar_dir", *credentials],
         )
         assert res.exit_code == 1
         assert (
@@ -169,7 +169,7 @@ def test_upload_invalid_destination(
 @pytest.mark.vcr
 @assert_authorization
 def test_upload_project_id_not_uuid(
-    mocker, recording, using_api_key, vcr
+    credentials, mocker, recording, using_api_key, vcr
 ):  # pylint: disable=unused-argument
     """Test that project id is valid UUID when uploading."""
     runner = CliRunner()
@@ -179,11 +179,7 @@ def test_upload_project_id_not_uuid(
             fastq_file.write("AAABBB")
         res = runner.invoke(
             upload,
-            [
-                "cli_test_data",
-                "--run-project-id",
-                "1234",
-            ],
+            ["cli_test_data", "--run-project-id", "1234", *credentials],
         )
 
         assert res.exit_code == 1
@@ -214,7 +210,9 @@ def test_upload_project_id_not_uuid(
     ],
 )
 @assert_authorization
-def test_upload_and_run_immediately(mocker, project_id, recording, vcr):
+def test_upload_and_run_immediately(
+    credentials, mocker, project_id, recording, vcr
+):
     """Upload and assign right away."""
     # pylint: disable=too-many-locals
     runner = CliRunner()
@@ -263,11 +261,7 @@ def test_upload_and_run_immediately(mocker, project_id, recording, vcr):
         )
         res = runner.invoke(
             upload,
-            [
-                "cli_test_data",
-                "--run-project-id",
-                project_id,
-            ],
+            ["cli_test_data", "--run-project-id", project_id, *credentials],
         )
 
         assert not res.exception

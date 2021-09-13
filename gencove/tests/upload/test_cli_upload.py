@@ -4,6 +4,7 @@
 
 import io
 import json
+import operator
 import os
 import sys
 from uuid import uuid4
@@ -29,6 +30,7 @@ from gencove.tests.upload.vcr.filters import (
     filter_upload_request,
     filter_volatile_dates,
 )
+from gencove.tests.utils import get_vcr_response
 from gencove.utils import get_regular_progress_bar, get_s3_client_refreshable
 
 import pytest  # pylint: disable=wrong-import-order
@@ -84,21 +86,11 @@ def test_upload(vcr, recording, mocker):
         if not recording:
             # Mock get_upload credentials only if using the cassettes, since
             # we mock the return value.
-            upload_details_request = next(
-                request
-                for request in vcr.requests
-                if request.path == "/api/v2/uploads-post-data/"
-            )
-            upload_details_response = vcr.responses_of(
-                upload_details_request
-            )[0]
-            upload_details_response = json.loads(
-                upload_details_response["body"]["string"]
-            )
+            response = get_vcr_response("/api/v2/uploads-post-data/", vcr)
             mocked_get_upload_details = mocker.patch.object(
                 APIClient,
                 "get_upload_details",
-                return_value=UploadsPostData(**upload_details_response),
+                return_value=UploadsPostData(**response),
             )
         mocked_upload_file = mocker.patch(
             "gencove.command.upload.main.upload_file", side_effect=upload_file
@@ -241,46 +233,24 @@ def test_upload_and_run_immediately(mocker, project_id, recording, vcr):
         if not recording:
             # Mock get_upload credentials only if using the cassettes, since
             # we mock the return value.
-            upload_details_request = next(
-                request
-                for request in vcr.requests
-                if request.path == "/api/v2/uploads-post-data/"
-            )
-            upload_details_response = vcr.responses_of(
-                upload_details_request
-            )[0]
-            upload_details_response = json.loads(
-                upload_details_response["body"]["string"]
+            upload_details_response = get_vcr_response(
+                "/api/v2/uploads-post-data/", vcr
             )
             mocked_get_upload_details = mocker.patch.object(
                 APIClient,
                 "get_upload_details",
                 return_value=UploadsPostData(**upload_details_response),
             )
-            sample_sheet_request = next(
-                request
-                for request in vcr.requests
-                if request.path == "/api/v2/sample-sheet/"
-            )
-            sample_sheet_response = vcr.responses_of(sample_sheet_request)[0]
-            sample_sheet_response = json.loads(
-                sample_sheet_response["body"]["string"]
+            sample_sheet_response = get_vcr_response(
+                "/api/v2/sample-sheet/", vcr
             )
             mocked_get_sample_sheet = mocker.patch.object(
                 APIClient,
                 "get_sample_sheet",
                 return_value=SampleSheet(**sample_sheet_response),
             )
-            project_sample_request = next(
-                request
-                for request in vcr.requests
-                if "/api/v2/project-samples/" in request.path
-            )
-            project_sample_response = vcr.responses_of(
-                project_sample_request
-            )[0]
-            project_sample_response = json.loads(
-                project_sample_response["body"]["string"]
+            project_sample_response = get_vcr_response(
+                "/api/v2/project-samples/", vcr, operator.contains
             )
             mocked_assign_sample = mocker.patch.object(
                 APIClient,

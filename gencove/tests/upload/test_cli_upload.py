@@ -297,6 +297,7 @@ def test_upload_and_run_immediately__with_metadata(
     credentials, mocker, project_id, recording, vcr
 ):
     """Upload and assign right away."""
+    # pylint: disable=too-many-locals
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")

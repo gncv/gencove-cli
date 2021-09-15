@@ -1,3 +1,5 @@
+"""VCR filters for upload tests."""
+
 import copy
 import json
 
@@ -5,11 +7,12 @@ from gencove.tests.decorators import parse_response_to_json
 
 
 def filter_upload_request(request):
+    """Removes destination path and aws url from request."""
     request = copy.deepcopy(request)
     if "uploads-post-data" in request.path:
         request.body = '{"destination_path": "gncv://cli-mock/test.fastq.gz"}'
     if "s3.amazonaws.com" in request.uri:
-        request.uri = "https://s3.amazonaws.com/mock_bucket/organization/7d43cede-5a48-445a-91c4-e9d4f3866588/user/7d43cede-5a48-445a-91c4-e9d4f3866588/uploads/7d43cede-5a48-445a-91c4-e9d4f3866588.fastq-r1"  # noqa: E501
+        request.uri = "https://s3.amazonaws.com/mock_bucket/organization/7d43cede-5a48-445a-91c4-e9d4f3866588/user/7d43cede-5a48-445a-91c4-e9d4f3866588/uploads/7d43cede-5a48-445a-91c4-e9d4f3866588.fastq-r1"  # noqa: E501 pylint: disable=line-too-long
     return request
 
 
@@ -24,6 +27,7 @@ def filter_upload_credentials_response(response, json_response):
 
 @parse_response_to_json
 def filter_upload_post_data_response(response, json_response):
+    """Removes sensitive data from POST to uploads-post-data."""
     mock_id = "7d43cede-5a48-445a-91c4-e9d4f3866588"
     if "id" in json_response:
         json_response["id"] = mock_id
@@ -32,7 +36,7 @@ def filter_upload_post_data_response(response, json_response):
     if "s3" in json_response:
         json_response["s3"] = {
             "bucket": "mock_bucket",
-            "object_name": f"organization/{mock_id}/user/{mock_id}/uploads/{mock_id}.fastq-r1",  # noqa: E501
+            "object_name": f"organization/{mock_id}/user/{mock_id}/uploads/{mock_id}.fastq-r1",  # noqa: E501 pylint: disable=line-too-long
         }
     if "last_status" in json_response:
         json_response["last_status"]["id"] = mock_id
@@ -58,11 +62,12 @@ def filter_aws_put(response):
 
 
 def _filter_sample_sheet(result):
+    """Common function that filters sample sheet sensitive data."""
     mock_id = "7d43cede-5a48-445a-91c4-e9d4f3866588"
     if "client_id" in result:
         result["client_id"] = "mock_client_id"
     if "fastq" in result and "r1" in result["fastq"]:
-        r1 = result["fastq"]["r1"]
+        r1 = result["fastq"]["r1"]  # pylint: disable=invalid-name
         if "upload" in r1:
             r1["upload"] = mock_id
         if "destination_path" in r1:
@@ -77,6 +82,7 @@ def _filter_sample_sheet(result):
 
 @parse_response_to_json
 def filter_sample_sheet_response(response, json_response):
+    """Filter sample sheet sensitive data from response."""
     if "results" in json_response:
         result = json_response["results"][0]
         _filter_sample_sheet(result)
@@ -84,6 +90,7 @@ def filter_sample_sheet_response(response, json_response):
 
 
 def filter_project_samples_request(request):
+    """Filter sample sheet sensitive data from request."""
     request = copy.deepcopy(request)
     if "project-samples" in request.path:
         try:
@@ -103,6 +110,7 @@ def filter_project_samples_request(request):
 
 @parse_response_to_json
 def filter_project_samples_response(response, json_response):
+    """Filter sample sheet sensitive data from upload response."""
     if "uploads" in json_response:
         result = json_response["uploads"][0]
         _filter_sample_sheet(result)

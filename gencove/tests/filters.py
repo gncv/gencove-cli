@@ -15,7 +15,7 @@ def filter_jwt(respose, response_json):
 
 
 def replace_gencove_url_vcr(request):
-    """Replace urls with 'genconve' in it."""
+    """Replace urls with 'gencove' in it."""
     request = copy.deepcopy(request)
     if "gencove" in request.uri:
         request.uri = urlunparse(

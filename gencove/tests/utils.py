@@ -2,6 +2,8 @@
 import json
 import operator
 
+MOCK_UUID = "11111111-1111-1111-1111-111111111111"
+
 
 def get_vcr_response(url, vcr, matches=operator.eq):
     """Returns the VCR response of the first request that matches the url.

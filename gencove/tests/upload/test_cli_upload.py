@@ -56,21 +56,24 @@ def vcr_config():
         ],
         "match_on": ["method", "scheme", "port", "path", "query"],
         "path_transformer": VCR.ensure_suffix(".yaml"),
-        "before_record_response": [filter_jwt],
-        "before_record_request": [replace_gencove_url_vcr],
+        "before_record_request": [
+            replace_gencove_url_vcr,
+            filter_upload_request,
+            filter_project_samples_request,
+        ],
+        "before_record_response": [
+            filter_jwt,
+            filter_upload_credentials_response,
+            filter_upload_post_data_response,
+            filter_volatile_dates,
+            filter_aws_put,
+            filter_sample_sheet_response,
+            filter_project_samples_response,
+        ],
     }
 
 
-@pytest.mark.vcr(
-    before_record_response=[
-        filter_aws_put,
-        filter_jwt,
-        filter_volatile_dates,
-        filter_upload_credentials_response,
-        filter_upload_post_data_response,
-    ],
-    before_record_request=[replace_gencove_url_vcr, filter_upload_request],
-)
+@pytest.mark.vcr
 @assert_authorization
 def test_upload(credentials, vcr, recording, mocker):
     """Sanity check that upload is ok."""
@@ -194,20 +197,6 @@ def test_upload_project_id_not_uuid(
 
 @pytest.mark.vcr(
     filter_query_parameters=[("search", "gncv://cli-mock/test.fastq.gz")],
-    before_record_response=[
-        filter_aws_put,
-        filter_jwt,
-        filter_volatile_dates,
-        filter_upload_credentials_response,
-        filter_upload_post_data_response,
-        filter_sample_sheet_response,
-        filter_project_samples_response,
-    ],
-    before_record_request=[
-        replace_gencove_url_vcr,
-        filter_upload_request,
-        filter_project_samples_request,
-    ],
 )
 @assert_authorization
 def test_upload_and_run_immediately(
@@ -277,20 +266,6 @@ def test_upload_and_run_immediately(
 
 @pytest.mark.vcr(
     filter_query_parameters=[("search", "gncv://cli-mock/test.fastq.gz")],
-    before_record_response=[
-        filter_aws_put,
-        filter_jwt,
-        filter_volatile_dates,
-        filter_upload_credentials_response,
-        filter_upload_post_data_response,
-        filter_sample_sheet_response,
-        filter_project_samples_response,
-    ],
-    before_record_request=[
-        replace_gencove_url_vcr,
-        filter_upload_request,
-        filter_project_samples_request,
-    ],
 )
 @assert_authorization
 def test_upload_and_run_immediately__with_metadata(

@@ -4,6 +4,7 @@ import copy
 import json
 
 from gencove.tests.decorators import parse_response_to_json
+from gencove.tests.utils import MOCK_UUID
 
 
 def filter_upload_request(request):
@@ -12,7 +13,24 @@ def filter_upload_request(request):
     if "uploads-post-data" in request.path:
         request.body = '{"destination_path": "gncv://cli-mock/test.fastq.gz"}'
     if "s3.amazonaws.com" in request.uri:
-        request.uri = "https://s3.amazonaws.com/mock_bucket/organization/7d43cede-5a48-445a-91c4-e9d4f3866588/user/7d43cede-5a48-445a-91c4-e9d4f3866588/uploads/7d43cede-5a48-445a-91c4-e9d4f3866588.fastq-r1"  # noqa: E501 pylint: disable=line-too-long
+        request.uri = f"https://s3.amazonaws.com/mock_bucket/organization/{MOCK_UUID}/user/{MOCK_UUID}/uploads/{MOCK_UUID}.fastq-r1"  # noqa: E501 line too long pylint: disable=line-too-long
+    return request
+
+
+def filter_project_samples_request(request):
+    """Filter sample sheet sensitive data from request."""
+    request = copy.deepcopy(request)
+    if "project-samples" in request.path:
+        try:
+            body = json.loads(request.body)
+            for upload in body["uploads"]:
+                _filter_sample_sheet(upload)
+            request.body = json.dumps(body).encode()
+        except json.decoder.JSONDecodeError:
+            pass
+        # remove the project id from the url
+        base_uri = request.uri.split("project-samples")[0]
+        request.uri = base_uri + f"project-samples/{MOCK_UUID}"
     return request
 
 
@@ -28,18 +46,17 @@ def filter_upload_credentials_response(response, json_response):
 @parse_response_to_json
 def filter_upload_post_data_response(response, json_response):
     """Removes sensitive data from POST to uploads-post-data."""
-    mock_id = "7d43cede-5a48-445a-91c4-e9d4f3866588"
     if "id" in json_response:
-        json_response["id"] = mock_id
+        json_response["id"] = MOCK_UUID
     if "destination_path" in json_response:
         json_response["destination_path"] = "gncv://cli-mock/test.fastq.gz"
     if "s3" in json_response:
         json_response["s3"] = {
             "bucket": "mock_bucket",
-            "object_name": f"organization/{mock_id}/user/{mock_id}/uploads/{mock_id}.fastq-r1",  # noqa: E501 pylint: disable=line-too-long
+            "object_name": f"organization/{MOCK_UUID}/user/{MOCK_UUID}/uploads/{MOCK_UUID}.fastq-r1",  # noqa: E501 pylint: disable=line-too-long
         }
     if "last_status" in json_response:
-        json_response["last_status"]["id"] = mock_id
+        json_response["last_status"]["id"] = MOCK_UUID
     return response, json_response
 
 
@@ -54,7 +71,9 @@ def filter_volatile_dates(response, json_response):
 
 
 def filter_aws_put(response):
-    """Removes the amz id, request-id and version-id from the response."""
+    """Removes the amz id, request-id and version-id from the response.
+    This can't be done in filter_headers.
+    """
     for key in ["x-amz-id-2", "x-amz-request-id", "x-amz-version-id"]:
         if key in response["headers"]:
             response["headers"][key] = [f"mock_{key}"]
@@ -63,55 +82,35 @@ def filter_aws_put(response):
 
 def _filter_sample_sheet(result):
     """Common function that filters sample sheet sensitive data."""
-    mock_id = "7d43cede-5a48-445a-91c4-e9d4f3866588"
     if "client_id" in result:
         result["client_id"] = "mock_client_id"
     if "fastq" in result and "r1" in result["fastq"]:
         r1 = result["fastq"]["r1"]  # pylint: disable=invalid-name
         if "upload" in r1:
-            r1["upload"] = mock_id
+            r1["upload"] = MOCK_UUID
         if "destination_path" in r1:
             r1["destination_path"] = "gncv://cli-mock/test.fastq.gz"
         if "last_status" in r1:
-            r1["last_status"]["id"] = mock_id
+            r1["last_status"]["id"] = MOCK_UUID
         if "last_status" in r1:
-            r1["last_status"]["id"] = mock_id
+            r1["last_status"]["id"] = MOCK_UUID
     if "sample" in result:
-        result["sample"] = mock_id
+        result["sample"] = MOCK_UUID
 
 
 @parse_response_to_json
 def filter_sample_sheet_response(response, json_response):
     """Filter sample sheet sensitive data from response."""
     if "results" in json_response:
-        result = json_response["results"][0]
-        _filter_sample_sheet(result)
+        for result in json_response["results"]:
+            _filter_sample_sheet(result)
     return response, json_response
-
-
-def filter_project_samples_request(request):
-    """Filter sample sheet sensitive data from request."""
-    request = copy.deepcopy(request)
-    if "project-samples" in request.path:
-        try:
-            body = json.loads(request.body)
-            upload = body["uploads"][0]
-            _filter_sample_sheet(upload)
-            request.body = json.dumps(body).encode()
-        except json.decoder.JSONDecodeError:
-            pass
-        # remove the project id from the url
-        base_uri = request.uri.split("project-samples")[0]
-        request.uri = (
-            base_uri + "project-samples/7d43cede-5a48-445a-91c4-e9d4f3866588"
-        )
-    return request
 
 
 @parse_response_to_json
 def filter_project_samples_response(response, json_response):
     """Filter sample sheet sensitive data from upload response."""
     if "uploads" in json_response:
-        result = json_response["uploads"][0]
-        _filter_sample_sheet(result)
+        for upload in json_response["uploads"]:
+            _filter_sample_sheet(upload)
     return response, json_response

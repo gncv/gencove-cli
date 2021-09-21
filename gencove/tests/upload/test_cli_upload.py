@@ -865,7 +865,11 @@ def test_upload_and_run_immediately_without_progressbar(
             mocked_assign_sample.assert_called_once()
 
 
-def test_upload_and_run_immediately_slow_response_retry(mocker):
+@pytest.mark.vcr
+@assert_authorization
+def test_upload_and_run_immediately_slow_response_retry(
+    credentials, mocker, project_id, recording, vcr
+):
     """Upload and assign right away and retry on slow response."""
     runner = CliRunner()
     with runner.isolated_filesystem():
@@ -873,27 +877,24 @@ def test_upload_and_run_immediately_slow_response_retry(mocker):
         with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
             fastq_file.write("AAABBB")
 
-        mocked_login = mocker.patch.object(
-            APIClient, "login", return_value=None
-        )
         mocked_get_credentials = mocker.patch(
-            "gencove.command.upload.main.get_s3_client_refreshable"
-        )
-        upload_id = str(uuid4())
-        mocked_get_upload_details = mocker.patch.object(
-            APIClient,
-            "get_upload_details",
-            return_value=UploadsPostData(
-                **{
-                    "id": upload_id,
-                    "last_status": {"id": str(uuid4()), "status": ""},
-                    "s3": {"bucket": "test", "object_name": "test"},
-                }
-            ),
+            "gencove.command.upload.main.get_s3_client_refreshable",
+            side_effect=get_s3_client_refreshable,
         )
         mocked_upload_file = mocker.patch(
-            "gencove.command.upload.main.upload_file"
+            "gencove.command.upload.main.upload_file", side_effect=upload_file
         )
+        if not recording:
+            # Mock get_upload credentials only if using the cassettes, since
+            # we mock the return value.
+            upload_details_response = get_vcr_response(
+                "/api/v2/uploads-post-data/", vcr
+            )
+            mocked_get_upload_details = mocker.patch.object(
+                APIClient,
+                "get_upload_details",
+                return_value=UploadsPostData(**upload_details_response),
+            )
         mocked_get_sample_sheet = mocker.patch.object(
             APIClient,
             "get_sample_sheet",
@@ -906,21 +907,18 @@ def test_upload_and_run_immediately_slow_response_retry(mocker):
             upload,
             [
                 "cli_test_data",
-                "--email",
-                "foo@bar.com",
-                "--password",
-                "123456",
+                *credentials,
                 "--run-project-id",
-                "11111111-1111-1111-1111-111111111111",
+                project_id,
                 "--no-progress",
             ],
         )
 
         assert res.exit_code == 0
-        mocked_login.assert_called_once()
         mocked_get_credentials.assert_called_once()
-        mocked_get_upload_details.assert_called_once()
         mocked_upload_file.assert_called_once()
+        if not recording:
+            mocked_get_upload_details.assert_called_once()
         assert mocked_get_sample_sheet.call_count == 5
         assert "there was an error automatically running them" in res.output
 

@@ -17,30 +17,57 @@ before_script:
   # For AWS
   - pip install awscli
 
-python36:
+python36_api_key:
   image: python:3.6-buster
   stage: test
-  script: tox -e py36
+  script: tox -e py36-api_key
   except:
     - tags
 
-python37:
+python36_user_pass:
+  image: python:3.6-buster
   stage: test
-  script: tox -e py37
+  script: tox -e py36-user_pass
   except:
     - tags
 
-python38:
+python37_api_key:
+  stage: test
+  script: tox -e py37-api_key
+  except:
+    - tags
+
+python37_user_pass:
+  stage: test
+  script: tox -e py37-user_pass
+  except:
+    - tags
+
+python38_api_key:
   image: python:3.8-buster
   stage: test
-  script: tox -e py38
+  script: tox -e py38-api_key
   except:
     - tags
 
-python39:
+python38_user_pass:
+  image: python:3.8-buster
+  stage: test
+  script: tox -e py38-user_pass
+  except:
+    - tags
+
+python39_api_key:
   image: python:3.9-buster
   stage: test
-  script: tox -e py39
+  script: tox -e py39-api_key
+  except:
+    - tags
+
+python39_user_pass:
+  image: python:3.9-buster
+  stage: test
+  script: tox -e py39-user_pass
   except:
     - tags
 

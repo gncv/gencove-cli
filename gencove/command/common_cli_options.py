@@ -20,19 +20,23 @@ common_options = [  # pylint: disable=invalid-name
         "--email",
         default=lambda: os.environ.get("GENCOVE_EMAIL", ""),
         help="Gencove user email to be used in login. "
-        "Can be passed as GENCOVE_EMAIL environment variable",
+        "Can be passed as GENCOVE_EMAIL environment variable.",
     ),
     click.option(
         "--password",
         default=lambda: os.environ.get("GENCOVE_PASSWORD", ""),
         help="Gencove user password to be used in login. "
-        "Can be passed as GENCOVE_PASSWORD environment variable",
+        "Can be passed as GENCOVE_PASSWORD environment variable. "
+        "If Multi Factor is enabled the token will be prompt after the "
+        "command is sent.",
     ),
     click.option(
         "--api-key",
         default=lambda: os.environ.get("GENCOVE_API_KEY", ""),
         help="Gencove api key. "
-        "Can be passed as GENCOVE_API_KEY environment variable",
+        "Can be passed as GENCOVE_API_KEY environment variable. "
+        "No matter if Multi Factor is enabled, using api key does not "
+        "require a token.",
     ),
 ]
 

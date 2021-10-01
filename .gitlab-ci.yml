@@ -1,4 +1,4 @@
-image: python:3.7-buster
+image: python:3.7
 
 stages:
   - test
@@ -18,14 +18,14 @@ before_script:
   - pip install awscli
 
 python36_api_key:
-  image: python:3.6-buster
+  image: python:3.6
   stage: test
   script: tox -e py36-api_key
   except:
     - tags
 
 python36_user_pass:
-  image: python:3.6-buster
+  image: python:3.6
   stage: test
   script: tox -e py36-user_pass
   except:
@@ -44,28 +44,28 @@ python37_user_pass:
     - tags
 
 python38_api_key:
-  image: python:3.8-buster
+  image: python:3.8
   stage: test
   script: tox -e py38-api_key
   except:
     - tags
 
 python38_user_pass:
-  image: python:3.8-buster
+  image: python:3.8
   stage: test
   script: tox -e py38-user_pass
   except:
     - tags
 
 python39_api_key:
-  image: python:3.9-buster
+  image: python:3.9
   stage: test
   script: tox -e py39-api_key
   except:
     - tags
 
 python39_user_pass:
-  image: python:3.9-buster
+  image: python:3.9
   stage: test
   script: tox -e py39-user_pass
   except:

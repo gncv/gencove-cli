@@ -48,3 +48,41 @@ def filter_pipeline_capabilities_response(response, json_response):
     if "name" in json_response:
         json_response["name"] = "mock name"
     return response, json_response
+
+
+def filter_get_project_samples_request(request):
+    """Filter project samples sensitive data from request."""
+    request = copy.deepcopy(request)
+    if "project-samples" in request.path:
+        # remove the project id from the url
+        base_uri = request.uri.split("project-samples")[0]
+        request.uri = base_uri + f"project-samples/{MOCK_UUID}"
+    return request
+
+
+@parse_response_to_json
+def filter_get_project_samples_response(response, json_response):
+    """Filter list project samples sensitive data from response."""
+    if "results" in json_response:
+        for result in json_response["results"]:
+            if "id" in result:
+                result["id"] = MOCK_UUID
+            if "client_id" in result:
+                result["client_id"] = "mock client_id"
+            if "physical_id" in result and result["physical_id"]:
+                result["physical_id"] = "mock physical_id"
+            if "legacy_id" in result and result["legacy_id"]:
+                result["legacy_id"] = "mock legacy_id"
+            if "last_status" in result:
+                result["last_status"]["id"] = MOCK_UUID
+                result["last_status"]["status"] = "mock status"
+                if result["last_status"]["note"]:
+                    result["last_status"]["note"] = "mock note"
+            if "archive_last_status" in result:
+                result["archive_last_status"]["id"] = MOCK_UUID
+                result["archive_last_status"]["status"] = "mock status"
+                if result["archive_last_status"]["transition_cutoff"]:
+                    result["archive_last_status"][
+                        "transition_cutoff"
+                    ] = "mock transition_cutoff"
+    return response, json_response

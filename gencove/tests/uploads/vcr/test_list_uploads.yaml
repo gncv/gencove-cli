@@ -1,0 +1,167 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.1.5
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '537'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 29 Sep 2021 15:05:17 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.1.5
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/sample-sheet/?limit=200&offset=0&sort_by=created&sort_order=desc&status=all
+  response:
+    body:
+      string: '{"meta": {"count": 23, "next": null, "previous": null}, "results":
+        [{"client_id": "mock_client_id", "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111",
+        "destination_path": "gncv://cli-mock/test.fastq.gz", "last_status": {"id":
+        "11111111-1111-1111-1111-111111111111", "status": "succeeded", "note": "",
+        "created": "2021-09-21T18:30:36.500805Z"}}}}, {"client_id": "mock_client_id",
+        "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111", "destination_path":
+        "gncv://cli-mock/test.fastq.gz", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "succeeded", "note": "", "created": "2021-09-21T17:53:01.761000Z"}}}},
+        {"client_id": "mock_client_id", "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111",
+        "destination_path": "gncv://cli-mock/test.fastq.gz", "last_status": {"id":
+        "11111111-1111-1111-1111-111111111111", "status": "succeeded", "note": "",
+        "created": "2021-09-20T20:45:54.452606Z"}}}}, {"client_id": "mock_client_id",
+        "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111", "destination_path":
+        "gncv://cli-mock/test.fastq.gz", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "succeeded", "note": "", "created": "2021-09-20T20:44:25.178327Z"}}}},
+        {"client_id": "mock_client_id", "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111",
+        "destination_path": "gncv://cli-mock/test.fastq.gz", "last_status": {"id":
+        "11111111-1111-1111-1111-111111111111", "status": "succeeded", "note": "",
+        "created": "2021-09-20T20:08:48.358977Z"}}}}, {"client_id": "mock_client_id",
+        "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111", "destination_path":
+        "gncv://cli-mock/test.fastq.gz", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "succeeded", "note": "", "created": "2021-09-20T19:26:47.409579Z"}}}},
+        {"client_id": "mock_client_id", "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111",
+        "destination_path": "gncv://cli-mock/test.fastq.gz", "last_status": {"id":
+        "11111111-1111-1111-1111-111111111111", "status": "succeeded", "note": "",
+        "created": "2021-09-20T19:19:06.815054Z"}}}}, {"client_id": "mock_client_id",
+        "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111", "destination_path":
+        "gncv://cli-mock/test.fastq.gz", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "succeeded", "note": "", "created": "2021-09-20T19:12:17.174870Z"}}}},
+        {"client_id": "mock_client_id", "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111",
+        "destination_path": "gncv://cli-mock/test.fastq.gz", "last_status": {"id":
+        "11111111-1111-1111-1111-111111111111", "status": "succeeded", "note": "",
+        "created": "2021-09-20T18:35:26.184176Z"}}}}, {"client_id": "mock_client_id",
+        "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111", "destination_path":
+        "gncv://cli-mock/test.fastq.gz", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "succeeded", "note": "", "created": "2021-09-20T17:40:54.270560Z"}}}},
+        {"client_id": "mock_client_id", "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111",
+        "destination_path": "gncv://cli-mock/test.fastq.gz", "last_status": {"id":
+        "11111111-1111-1111-1111-111111111111", "status": "succeeded", "note": "",
+        "created": "2021-09-16T16:03:26.318268Z"}}}}, {"client_id": "mock_client_id",
+        "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111", "destination_path":
+        "gncv://cli-mock/test.fastq.gz", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "succeeded", "note": "", "created": "2021-09-16T16:03:26.544050Z"}}}},
+        {"client_id": "mock_client_id", "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111",
+        "destination_path": "gncv://cli-mock/test.fastq.gz", "last_status": {"id":
+        "11111111-1111-1111-1111-111111111111", "status": "succeeded", "note": "",
+        "created": "2021-09-16T15:55:59.466448Z"}}}}, {"client_id": "mock_client_id",
+        "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111", "destination_path":
+        "gncv://cli-mock/test.fastq.gz", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "succeeded", "note": "", "created": "2021-09-16T15:55:59.642815Z"}}}},
+        {"client_id": "mock_client_id", "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111",
+        "destination_path": "gncv://cli-mock/test.fastq.gz", "last_status": {"id":
+        "11111111-1111-1111-1111-111111111111", "status": "succeeded", "note": "",
+        "created": "2021-09-16T15:51:48.628073Z"}}}}, {"client_id": "mock_client_id",
+        "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111", "destination_path":
+        "gncv://cli-mock/test.fastq.gz", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "succeeded", "note": "", "created": "2021-09-16T15:51:48.540104Z"}}}},
+        {"client_id": "mock_client_id", "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111",
+        "destination_path": "gncv://cli-mock/test.fastq.gz", "last_status": {"id":
+        "11111111-1111-1111-1111-111111111111", "status": "succeeded", "note": "",
+        "created": "2021-09-15T18:57:32.990517Z"}}}}, {"client_id": "mock_client_id",
+        "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111", "destination_path":
+        "gncv://cli-mock/test.fastq.gz", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "succeeded", "note": "", "created": "2021-09-15T18:54:51.108895Z"}}}},
+        {"client_id": "mock_client_id", "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111",
+        "destination_path": "gncv://cli-mock/test.fastq.gz", "last_status": {"id":
+        "11111111-1111-1111-1111-111111111111", "status": "succeeded", "note": "",
+        "created": "2021-09-15T18:28:47.536779Z"}}}}, {"client_id": "mock_client_id",
+        "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111", "destination_path":
+        "gncv://cli-mock/test.fastq.gz", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "succeeded", "note": "", "created": "2021-09-15T18:14:38.645217Z"}}}},
+        {"client_id": "mock_client_id", "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111",
+        "destination_path": "gncv://cli-mock/test.fastq.gz", "last_status": {"id":
+        "11111111-1111-1111-1111-111111111111", "status": "succeeded", "note": "",
+        "created": "2021-09-13T18:43:52.579709Z"}}}}, {"client_id": "mock_client_id",
+        "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111", "destination_path":
+        "gncv://cli-mock/test.fastq.gz", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "succeeded", "note": "", "created": "2021-09-09T19:45:14.176448Z"}}}},
+        {"client_id": "mock_client_id", "fastq": {"r1": {"upload": "11111111-1111-1111-1111-111111111111",
+        "destination_path": "gncv://cli-mock/test.fastq.gz", "last_status": {"id":
+        "11111111-1111-1111-1111-111111111111", "status": "succeeded", "note": "",
+        "created": "2021-09-09T19:31:44.280360Z"}}}}]}'
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '7214'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 29 Sep 2021 15:05:18 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

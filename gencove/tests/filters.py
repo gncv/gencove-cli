@@ -3,6 +3,7 @@ import copy
 from urllib.parse import urlparse, urlunparse
 
 from gencove.tests.decorators import parse_response_to_json
+from gencove.tests.utils import MOCK_UUID
 
 
 @parse_response_to_json
@@ -21,4 +22,13 @@ def replace_gencove_url_vcr(request):
         request.uri = urlunparse(
             urlparse(request.uri)._replace(netloc="www.example.com")
         )
+    return request
+
+
+def _replace_uuid_from_url(request, endpoint):
+    """Removes the id from the last part of the URL."""
+    request = copy.deepcopy(request)
+    if endpoint in request.path:
+        base_uri = request.uri.split(endpoint)[0]
+        request.uri = base_uri + f"{endpoint}/{MOCK_UUID}"
     return request

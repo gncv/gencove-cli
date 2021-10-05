@@ -1,8 +1,7 @@
 """VCR filters for projects tests."""
 
-import copy
-
 from gencove.tests.decorators import parse_response_to_json
+from gencove.tests.filters import _replace_uuid_from_url
 from gencove.tests.utils import MOCK_UUID
 
 
@@ -32,12 +31,7 @@ def filter_list_projects_response(response, json_response):
 
 def filter_pipeline_capabilities_request(request):
     """Filter pipeline capabilities sensitive data from request."""
-    request = copy.deepcopy(request)
-    if "pipeline-capabilities" in request.path:
-        # remove the project id from the url
-        base_uri = request.uri.split("pipeline-capabilities")[0]
-        request.uri = base_uri + f"pipeline-capabilities/{MOCK_UUID}"
-    return request
+    return _replace_uuid_from_url(request, "pipeline-capabilities")
 
 
 @parse_response_to_json
@@ -52,12 +46,7 @@ def filter_pipeline_capabilities_response(response, json_response):
 
 def filter_get_project_samples_request(request):
     """Filter project samples sensitive data from request."""
-    request = copy.deepcopy(request)
-    if "project-samples" in request.path:
-        # remove the project id from the url
-        base_uri = request.uri.split("project-samples")[0]
-        request.uri = base_uri + f"project-samples/{MOCK_UUID}"
-    return request
+    return _replace_uuid_from_url(request, "project-samples")
 
 
 @parse_response_to_json
@@ -86,3 +75,8 @@ def filter_get_project_samples_response(response, json_response):
                         "transition_cutoff"
                     ] = "mock transition_cutoff"
     return response, json_response
+
+
+def filter_get_project_batch_types_request(request):
+    """Filter project samples sensitive data from request."""
+    return _replace_uuid_from_url(request, "project-batch-types")

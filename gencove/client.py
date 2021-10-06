@@ -34,6 +34,7 @@ from gencove.models import (
     AccessJWT,
     BaseSpaceBioSample,
     BaseSpaceProject,
+    BaseSpaceProjectImport,
     BatchDetail,
     CreateJWT,
     PipelineCapabilities,
@@ -749,4 +750,60 @@ class APIClient:
             self.endpoints.S3_URI_IMPORT.value,
             payload,
             authorized=True,
+        )
+
+    def autoimport_from_basespace(
+        self,
+        project_id,
+        identifier,
+        metadata=None,
+    ):
+        """Make a request to create a periodic import job of BaseSpace projects'
+        BioSamples to a given Gencove project.
+
+        Args:
+            project_id (str): project to which to assign the samples
+            identifier (str): identifier that is contained in BaseSpace
+                projects' name
+            metadata (str): JSON metadata to be applied to all samples
+        """
+
+        payload = {
+            "project_id": project_id,
+            "identifier": identifier,
+            "metadata": metadata,
+        }
+
+        return self._post(
+            self.endpoints.BASESPACE_PROJECTS_AUTOIMPORT.value,
+            payload,
+            authorized=True,
+        )
+
+    def list_basespace_autoimport_jobs(self, next_link=None):
+        """Make a request to list periodic import jobs of BaseSpace projects'
+        BioSamples.
+
+        Args:
+            next_link (str, optional): url from previous
+                response['meta']['next'].
+
+        Returns:
+            api response (dict):
+                {
+                    "meta": {
+                        "count": int,
+                        "next": str,
+                        "previous": optional[str],
+                    },
+                    "results": [...]
+                }
+        """
+
+        params = self._add_query_params(next_link)
+        return self._get(
+            self.endpoints.BASESPACE_PROJECTS_AUTOIMPORT.value,
+            query_params=params,
+            authorized=True,
+            model=BaseSpaceProjectImport,
         )

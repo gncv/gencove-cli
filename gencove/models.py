@@ -281,3 +281,18 @@ class BaseSpaceBioSample(BaseModel):
 
     meta: ResponseMeta
     results: Optional[List[BaseSpaceBioSampleDetail]]
+
+
+class BaseSpaceProjectImportDetail(GencoveBaseModel):
+    """BaseSpace project import detail model"""
+
+    project_id: UUID
+    identifier: str
+    metadata: Optional[Any]
+
+
+class BaseSpaceProjectImport(BaseModel):
+    """BaseSpace project import model"""
+
+    meta: ResponseMeta
+    results: Optional[List[BaseSpaceProjectImportDetail]]

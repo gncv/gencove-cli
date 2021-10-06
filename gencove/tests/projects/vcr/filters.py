@@ -1,4 +1,5 @@
 """VCR filters for projects tests."""
+import json
 
 from gencove.tests.decorators import parse_response_to_json
 from gencove.tests.filters import _replace_uuid_from_url
@@ -80,3 +81,17 @@ def filter_get_project_samples_response(response, json_response):
 def filter_get_project_batch_types_request(request):
     """Filter project samples sensitive data from request."""
     return _replace_uuid_from_url(request, "project-batch-types")
+
+
+def filter_post_project_restore_samples(request):
+    """Filter project restore samples sensitive data from request."""
+    if "project-restore-samples" in request.path:
+        request = _replace_uuid_from_url(request, "project-restore-samples")
+        try:
+            body = json.loads(request.body)
+            samples = [MOCK_UUID for _ in body["sample_ids"]]
+            body["sample_ids"] = samples
+            request.body = json.dumps(body).encode()
+        except json.decoder.JSONDecodeError:
+            pass
+    return request

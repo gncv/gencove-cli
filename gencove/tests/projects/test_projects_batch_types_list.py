@@ -47,8 +47,6 @@ def vcr_config():
         "before_record_response": [
             filter_jwt,
             filter_volatile_dates,
-            # filter_list_projects_response,
-            # filter_pipeline_capabilities_response,
         ],
     }
 

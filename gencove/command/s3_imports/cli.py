@@ -7,7 +7,9 @@ from .s3_import.cli import s3_import
 
 @click.group()
 def s3():  # pylint: disable=C0103
-    """S3 imports managements commands."""
+    """S3 imports managements commands.
+    Setup guide: https://docs.gencove.com/main/s3-imports/
+    """
 
 
 s3.add_command(s3_import)

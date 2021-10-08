@@ -55,7 +55,7 @@ interactions:
       content-type:
       - application/json
     method: GET
-    uri: https://www.example.com/api/v2/project-samples/11111111-1111-1111-1111-111111111111
+    uri: https://www.example.com/api/v2/project-samples/11111111-1111-1111-1111-111111111111?sort_by=modified&sort_order=desc&status=all&archive_status=all&offset=0&limit=200
   response:
     body:
       string: '{"meta": {"count": 23, "next": null, "previous": null}, "results":
@@ -64,7 +64,7 @@ interactions:
         "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
         "status": "mock status", "note": "", "created": "2021-09-21T18:38:57.735776Z"},
         "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
-        "mock status", "created": "2021-09-21 18:30:44.840053+00:00", "transition_cutoff":
+        "mock status", "created": "2050-10-05 18:12:32+00:00", "transition_cutoff":
         null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-21T17:53:10.453116Z",
         "modified": "2021-09-21T18:02:09.191053Z", "client_id": "mock client_id",
         "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
@@ -204,7 +204,7 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '10825'
+      - '10817'
       Content-Type:
       - application/json
       Date:

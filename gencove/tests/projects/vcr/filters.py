@@ -95,3 +95,34 @@ def filter_post_project_restore_samples(request):
         except json.decoder.JSONDecodeError:
             pass
     return request
+
+
+def filter_post_project_batches_request(request):
+    """Filter project batches sensitive data from request."""
+    if "project-batches" in request.path:
+        request = _replace_uuid_from_url(request, "project-batches")
+        try:
+            body = json.loads(request.body)
+            body["name"] = "Mock name"
+            body["batch_type"] = "Mock batch_type"
+            body["sample_ids"] = [MOCK_UUID for _ in body["sample_ids"]]
+            request.body = json.dumps(body).encode()
+        except json.decoder.JSONDecodeError:
+            pass
+    return request
+
+
+@parse_response_to_json
+def filter_post_project_batches_response(response, json_response):
+    """Filter project batches sensitive data from response."""
+    if "results" in json_response:
+        for result in json_response["results"]:
+            if "id" in result:
+                result["id"] = MOCK_UUID
+            if "name" in result:
+                result["name"] = "Mock name"
+            if "batch_type" in result:
+                result["batch_type"] = "Mock batch_type"
+            if "last_status" in result:
+                result["last_status"]["id"] = MOCK_UUID
+    return response, json_response

@@ -1,6 +1,7 @@
 """Test project's batches create command."""
-
+# pylint: disable=wrong-import-order, import-error
 import io
+import operator
 import sys
 from uuid import uuid4
 
@@ -9,82 +10,112 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient, APIClientError  # noqa: I100
 from gencove.command.projects.cli import create_project_batch
-from gencove.models import BatchDetail, ProjectBatches
+from gencove.models import ProjectBatches
+from gencove.tests.decorators import assert_authorization
+from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
+from gencove.tests.projects.vcr.filters import (
+    filter_post_project_batches_request,
+    filter_post_project_batches_response,
+)
+from gencove.tests.upload.vcr.filters import filter_volatile_dates
+from gencove.tests.utils import get_vcr_response
+
+import pytest
+
+from vcr import VCR
 
 
-def test_create_project_batches__missing_batch_type(mocker):
+@pytest.fixture(scope="module")
+def vcr_config():
+    """VCR configuration."""
+    return {
+        "cassette_library_dir": "gencove/tests/projects/vcr",
+        "filter_headers": [
+            "Authorization",
+            "Content-Length",
+            "User-Agent",
+        ],
+        "filter_post_data_parameters": [
+            ("email", "email@example.com"),
+            ("password", "mock_password"),
+        ],
+        "match_on": ["method", "scheme", "port", "path", "query"],
+        "path_transformer": VCR.ensure_suffix(".yaml"),
+        "before_record_request": [
+            replace_gencove_url_vcr,
+            filter_post_project_batches_request,
+        ],
+        "before_record_response": [
+            filter_jwt,
+            filter_volatile_dates,
+            filter_post_project_batches_response,
+        ],
+    }
+
+
+@pytest.mark.default_cassette("jwt-create.yaml")
+@pytest.mark.vcr
+@assert_authorization
+def test_create_project_batches__missing_batch_type(credentials, mocker):
     """Test batch creation failure when batch type is not sent."""
     runner = CliRunner()
-    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_project_batch = mocker.patch.object(
-        APIClient,
-        "create_project_batch",
-        return_value=BatchDetail(id=str(uuid4())),
+        APIClient, "create_project_batch"
     )
     res = runner.invoke(
         create_project_batch,
         [
             str(uuid4()),
-            "--email",
-            "foo@bar.com",
-            "--password",
-            "123",
+            *credentials,
             "--batch-name",
             "foo bar",
         ],
     )
     assert res.exit_code == 1
-    mocked_login.assert_called_once()
     mocked_create_project_batch.assert_not_called()
     assert "You must provide value for --batch-type" in res.output
 
 
-def test_create_project_batches__missing_batch_name(mocker):
+@pytest.mark.default_cassette("jwt-create.yaml")
+@pytest.mark.vcr
+@assert_authorization
+def test_create_project_batches__missing_batch_name(credentials, mocker):
     """Test batch creation failure when batch name is not sent."""
     runner = CliRunner()
-    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_project_batch = mocker.patch.object(
-        APIClient,
-        "create_project_batch",
-        return_value=BatchDetail(id=str(uuid4())),
+        APIClient, "create_project_batch"
     )
     res = runner.invoke(
         create_project_batch,
         [
             str(uuid4()),
-            "--email",
-            "foo@bar.com",
-            "--password",
-            "123",
+            *credentials,
             "--batch-type",
             "hd777k",
         ],
     )
     assert res.exit_code == 1
-    mocked_login.assert_called_once()
     mocked_create_project_batch.assert_not_called()
     assert "You must provide value for --batch-name" in res.output
 
 
-def test_create_project_batches__bad_project_id(mocker):
+@pytest.mark.default_cassette("jwt-create.yaml")
+@pytest.mark.vcr
+@assert_authorization
+def test_create_project_batches__bad_project_id(credentials, mocker):
     """Test batch creation failure when non-uuid string is used as project
     id.
     """
     runner = CliRunner()
-    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_create_project_batch = mocker.patch.object(
         APIClient,
         "create_project_batch",
-        return_value=BatchDetail(id=str(uuid4())),
     )
     res = runner.invoke(
         create_project_batch,
         [
             "1111111",
-            "--email",
-            "foo@bar.com",
-            "--password",
-            "123",
+            *credentials,
             "--batch-type",
             "hd777k",
             "--batch-name",
@@ -92,23 +123,16 @@ def test_create_project_batches__bad_project_id(mocker):
         ],
     )
     assert res.exit_code == 1
-    mocked_login.assert_called_once()
     mocked_create_project_batch.assert_not_called()
     assert "Project ID is not valid" in res.output
 
 
-def test_create_project_batches__not_owned_project(mocker):
+@pytest.mark.default_cassette("jwt-create.yaml")
+@pytest.mark.vcr
+@assert_authorization
+def test_create_project_batches__not_owned_project(credentials, mocker):
     """Test batch creation failure when project is not owned."""
-    mocked_response = {"detail": "Not found."}
-
     runner = CliRunner()
-    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
-    mocked_create_project_batch = mocker.patch.object(
-        APIClient,
-        "create_project_batch",
-        return_value=mocked_response,
-    )
-
     mocked_create_project_batch = mocker.patch.object(
         APIClient,
         "create_project_batch",
@@ -119,10 +143,7 @@ def test_create_project_batches__not_owned_project(mocker):
         create_project_batch,
         [
             str(uuid4()),
-            "--email",
-            "foo@bar.com",
-            "--password",
-            "123",
+            *credentials,
             "--batch-type",
             "hd777k",
             "--batch-name",
@@ -130,33 +151,18 @@ def test_create_project_batches__not_owned_project(mocker):
         ],
     )
     assert res.exit_code == 1
-    mocked_login.assert_called_once()
     mocked_create_project_batch.assert_called_once()
     assert "You do not have the sufficient permission" in res.output
 
 
-def test_create_project_batches__duplicate_client_ids(mocker):
+@pytest.mark.default_cassette("jwt-create.yaml")
+@pytest.mark.vcr
+@assert_authorization
+def test_create_project_batches__duplicate_client_ids(credentials, mocker):
     """Test batch creation failure when there are samples that share same
     client id.
     """
-    mocked_response = {
-        "sample_ids": ["All samples must have unique client_id attribute."],
-        "duplicate_client_ids": {
-            "cow1": [
-                "85b3d2c4-7215-4fb0-9cc6-5731bae71ea2",
-                "01dc9ad3-f05d-40bb-967f-715e03cb2108",
-            ]
-        },
-    }
-
     runner = CliRunner()
-    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
-    mocked_create_project_batch = mocker.patch.object(
-        APIClient,
-        "create_project_batch",
-        return_value=mocked_response,
-    )
-
     mocked_create_project_batch = mocker.patch.object(
         APIClient,
         "create_project_batch",
@@ -167,10 +173,7 @@ def test_create_project_batches__duplicate_client_ids(mocker):
         create_project_batch,
         [
             str(uuid4()),
-            "--email",
-            "foo@bar.com",
-            "--password",
-            "123",
+            *credentials,
             "--batch-type",
             "hd777k",
             "--batch-name",
@@ -178,130 +181,126 @@ def test_create_project_batches__duplicate_client_ids(mocker):
         ],
     )
     assert res.exit_code == 0
-    mocked_login.assert_called_once()
     mocked_create_project_batch.assert_called_once()
     assert "There was an error creating project batches" in res.output
 
 
-def test_create_project_batches__success__with_sample_ids(mocker):
+@pytest.mark.vcr
+@assert_authorization
+def test_create_project_batches__success__with_sample_ids(
+    batch_name,
+    batch_type,
+    credentials,
+    mocker,
+    project_id_batches,
+    recording,
+    sample_id_batches,
+    vcr,
+):  # pylint: disable=too-many-arguments
     """Test batch creation success when when sample ids are explicitly sent."""
-    mocked_response = {
-        "meta": {"count": 1},
-        "results": [
-            {
-                "id": str(uuid4()),
-                "name": "foo bar",
-                "batch_type": "hd777k",
-                "last_status": {
-                    "created": "2020-07-28T12:46:22.719862",
-                    "id": str(uuid4()),
-                    "status": "running",
-                },
-            }
-        ],
-    }
-
     runner = CliRunner()
-    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
-    mocked_create_project_batch = mocker.patch.object(
-        APIClient,
-        "create_project_batch",
-        return_value=ProjectBatches(**mocked_response),
-    )
-
+    if not recording:
+        # Mock restore_project_samples only if using the cassettes, since we
+        # mock the return value.
+        create_project_batch_response = get_vcr_response(
+            "/api/v2/project-batches/", vcr, operator.contains
+        )
+        mocked_create_project_batch = mocker.patch.object(
+            APIClient,
+            "create_project_batch",
+            return_value=ProjectBatches(**create_project_batch_response),
+        )
     res = runner.invoke(
         create_project_batch,
         [
-            str(uuid4()),
-            "--email",
-            "foo@bar.com",
-            "--password",
-            "123",
+            project_id_batches,
+            *credentials,
             "--batch-type",
-            "hd777k",
+            batch_type,
             "--batch-name",
-            "foo bar",
+            batch_name,
             "--sample-ids",
-            "11111111-1111-1111-1111-111111111111,22222222-2222-2222-2222-222222222222",  # noqa
+            sample_id_batches,
         ],
     )
     assert res.exit_code == 0
-    mocked_login.assert_called_once()
-    mocked_create_project_batch.assert_called_once()
+    if not recording:
+        mocked_create_project_batch.assert_called_once()
 
-    output_line = io.BytesIO()
-    sys.stdout = output_line
-    echo(
-        "\t".join(
-            [
-                mocked_response["results"][0]["id"],
-                mocked_response["results"][0]["last_status"]["created"],
-                mocked_response["results"][0]["last_status"]["status"],
-                mocked_response["results"][0]["batch_type"],
-                mocked_response["results"][0]["name"],
-            ]
-        )
-    )
-    assert output_line.getvalue() == res.output.encode()
+        output_line = io.BytesIO()
+        sys.stdout = output_line
+        for response in ProjectBatches(
+            **create_project_batch_response
+        ).results:
+            echo(
+                "\t".join(
+                    [
+                        str(response.id),
+                        response.last_status.created.isoformat(),
+                        response.last_status.status,
+                        response.batch_type,
+                        response.name,
+                    ]
+                )
+            )
+        assert output_line.getvalue() == res.output.encode()
 
 
-def test_create_project_batches__success__without_sample_ids(mocker):
+@pytest.mark.vcr
+@assert_authorization
+def test_create_project_batches__success__without_sample_ids(
+    batch_name,
+    batch_type,
+    credentials,
+    mocker,
+    project_id_batches,
+    recording,
+    vcr,
+):  # pylint: disable=too-many-arguments
     """Test batch creation success when when sample ids are not explicitly
     sent.
     """
-    mocked_response = {
-        "meta": {"count": 1},
-        "results": [
-            {
-                "id": str(uuid4()),
-                "name": "foo bar",
-                "batch_type": "hd777k",
-                "last_status": {
-                    "created": "2020-07-28T12:46:22.719862",
-                    "id": str(uuid4()),
-                    "status": "running",
-                },
-            }
-        ],
-    }
-
     runner = CliRunner()
-    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
-    mocked_create_project_batch = mocker.patch.object(
-        APIClient,
-        "create_project_batch",
-        return_value=ProjectBatches(**mocked_response),
-    )
-
+    if not recording:
+        # Mock restore_project_samples only if using the cassettes, since we
+        # mock the return value.
+        create_project_batch_response = get_vcr_response(
+            "/api/v2/project-batches/", vcr, operator.contains
+        )
+        mocked_create_project_batch = mocker.patch.object(
+            APIClient,
+            "create_project_batch",
+            return_value=ProjectBatches(**create_project_batch_response),
+        )
     res = runner.invoke(
         create_project_batch,
         [
-            str(uuid4()),
-            "--email",
-            "foo@bar.com",
-            "--password",
-            "123",
+            project_id_batches,
+            *credentials,
             "--batch-type",
-            "hd777k",
+            batch_type,
             "--batch-name",
-            "foo bar",
+            batch_name,
         ],
     )
     assert res.exit_code == 0
-    mocked_login.assert_called_once()
-    mocked_create_project_batch.assert_called_once()
+    if not recording:
+        mocked_create_project_batch.assert_called_once()
 
-    output_line = io.BytesIO()
-    sys.stdout = output_line
-    echo(
-        "\t".join(
-            [
-                mocked_response["results"][0]["id"],
-                mocked_response["results"][0]["last_status"]["created"],
-                mocked_response["results"][0]["last_status"]["status"],
-                mocked_response["results"][0]["batch_type"],
-                mocked_response["results"][0]["name"],
-            ]
-        )
-    )
-    assert output_line.getvalue() == res.output.encode()
+        output_line = io.BytesIO()
+        sys.stdout = output_line
+        for response in ProjectBatches(
+            **create_project_batch_response
+        ).results:
+            echo(
+                "\t".join(
+                    [
+                        str(response.id),
+                        response.last_status.created.isoformat(),
+                        response.last_status.status,
+                        response.batch_type,
+                        response.name,
+                    ]
+                )
+            )
+        assert output_line.getvalue() == res.output.encode()

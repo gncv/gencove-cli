@@ -1,0 +1,225 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.1.5
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '537'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 01 Oct 2021 14:23:51 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.1.5
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/project-samples/11111111-1111-1111-1111-111111111111
+  response:
+    body:
+      string: '{"meta": {"count": 23, "next": null, "previous": null}, "results":
+        [{"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-21T18:30:44.799519Z",
+        "modified": "2021-09-21T18:38:57.735776Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-21T18:38:57.735776Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-21 18:30:44.840053+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-21T17:53:10.453116Z",
+        "modified": "2021-09-21T18:02:09.191053Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-21T18:02:09.191053Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-21 17:53:10.498487+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-20T20:46:05.110760Z",
+        "modified": "2021-09-20T20:53:34.381562Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-20T20:53:34.381562Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-20 20:46:05.152867+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-20T20:44:34.348484Z",
+        "modified": "2021-09-20T20:53:29.792439Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-20T20:53:29.792439Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-20 20:44:34.394423+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-20T20:08:57.856291Z",
+        "modified": "2021-09-20T20:18:36.115559Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-20T20:18:36.115559Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-20 20:08:57.925852+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-20T19:26:57.935424Z",
+        "modified": "2021-09-20T19:37:32.699298Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-20T19:37:32.699298Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-20 19:26:57.983481+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-20T19:19:17.169084Z",
+        "modified": "2021-09-20T19:28:06.138843Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-20T19:28:06.138843Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-20 19:19:17.212514+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-20T19:12:26.588883Z",
+        "modified": "2021-09-20T19:21:53.627079Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-20T19:21:53.627079Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-20 19:12:26.631280+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-20T18:35:34.669197Z",
+        "modified": "2021-09-20T18:44:14.172851Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-20T18:44:14.172851Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-20 18:35:34.715336+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-20T17:41:03.279320Z",
+        "modified": "2021-09-20T17:49:56.295330Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-20T17:49:56.295330Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-20 17:41:03.315225+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-16T16:03:36.328514Z",
+        "modified": "2021-09-16T16:11:59.546857Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-16T16:11:59.546857Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-16 16:03:36.432310+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-16T16:03:36.328514Z",
+        "modified": "2021-09-16T16:11:54.609821Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-16T16:11:54.609821Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-16 16:03:36.525388+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-16T15:56:09.815346Z",
+        "modified": "2021-09-16T16:07:11.067604Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-16T16:07:11.067604Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-16 15:56:09.991095+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-16T15:56:09.813499Z",
+        "modified": "2021-09-16T16:06:08.788074Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-16T16:06:08.788074Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-16 15:56:09.989933+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-16T15:51:57.680110Z",
+        "modified": "2021-09-16T16:01:00.642192Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-16T16:01:00.642192Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-16 15:51:57.812772+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-16T15:51:57.762092Z",
+        "modified": "2021-09-16T16:00:17.161598Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-16T16:00:17.161598Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-16 15:51:57.918867+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-15T18:57:43.641182Z",
+        "modified": "2021-09-15T19:04:33.361645Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-15T19:04:33.361645Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-15 18:57:43.675976+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-15T18:55:00.338144Z",
+        "modified": "2021-09-15T19:03:28.952999Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-15T19:03:28.952999Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-15 18:55:00.379254+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-15T18:28:58.019825Z",
+        "modified": "2021-09-15T18:37:36.782262Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-15T18:37:36.782262Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-15 18:28:58.061695+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-15T18:14:50.172910Z",
+        "modified": "2021-09-15T18:23:16.978048Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-15T18:23:16.978048Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-15 18:14:50.243402+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-13T18:44:02.113244Z",
+        "modified": "2021-09-13T18:52:48.886308Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-13T18:52:48.886308Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-13 18:44:02.165372+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-09T19:45:23.788965Z",
+        "modified": "2021-09-09T19:54:11.408566Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-09T19:54:11.408566Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-09 19:45:23.829193+00:00", "transition_cutoff":
+        null}}, {"id": "11111111-1111-1111-1111-111111111111", "created": "2021-09-09T19:31:53.101809Z",
+        "modified": "2021-09-09T19:40:18.740810Z", "client_id": "mock client_id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "mock status", "note": "", "created": "2021-09-09T19:40:18.740810Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "mock status", "created": "2021-09-09 19:31:53.144445+00:00", "transition_cutoff":
+        null}}]}'
+    headers:
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '10825'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 01 Oct 2021 14:23:51 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

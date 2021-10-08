@@ -1,7 +1,8 @@
 """Test project list samples command."""
+# pylint: disable=wrong-import-order, import-error
 import io
+import operator
 import sys
-from datetime import datetime, timedelta
 from uuid import uuid4
 
 from click.testing import CliRunner
@@ -9,13 +10,53 @@ from click.testing import CliRunner
 from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.projects.cli import list_project_samples
 from gencove.logger import echo_data
-from gencove.models import ProjectSamples
+from gencove.models import ProjectSamples, SampleDetails
+from gencove.tests.decorators import assert_authorization
+from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
+from gencove.tests.projects.vcr.filters import (
+    filter_get_project_samples_request,
+    filter_get_project_samples_response,
+)
+from gencove.tests.utils import get_vcr_response
+
+import pytest
+
+from vcr import VCR
 
 
-def test_list_empty(mocker):
+@pytest.fixture(scope="module")
+def vcr_config():
+    """VCR configuration."""
+    return {
+        "cassette_library_dir": "gencove/tests/projects/vcr",
+        "filter_headers": [
+            "Authorization",
+            "Content-Length",
+            "User-Agent",
+        ],
+        "filter_post_data_parameters": [
+            ("email", "email@example.com"),
+            ("password", "mock_password"),
+        ],
+        "match_on": ["method", "scheme", "port", "path", "query"],
+        "path_transformer": VCR.ensure_suffix(".yaml"),
+        "before_record_request": [
+            replace_gencove_url_vcr,
+            filter_get_project_samples_request,
+        ],
+        "before_record_response": [
+            filter_jwt,
+            filter_get_project_samples_response,
+        ],
+    }
+
+
+@pytest.mark.default_cassette("jwt-create.yaml")
+@pytest.mark.vcr
+@assert_authorization
+def test_list_empty(mocker, credentials, project_id):
     """Test project has no samples."""
     runner = CliRunner()
-    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
@@ -23,27 +64,29 @@ def test_list_empty(mocker):
     )
     res = runner.invoke(
         list_project_samples,
-        [str(uuid4()), "--email", "foo@bar.com", "--password", "123"],
+        [project_id, *credentials],
     )
     assert res.exit_code == 0
-    mocked_login.assert_called_once()
     mocked_get_project_samples.assert_called_once()
     assert res.output == ""
 
 
-def test_list_projects_bad_project_id(mocker):
+@pytest.mark.default_cassette("jwt-create.yaml")
+@pytest.mark.vcr
+@assert_authorization
+def test_list_projects_bad_project_id(
+    mocker, credentials
+):  # pylint: disable=unused-argument
     """Test project samples throw an error if project id is not uuid."""
     runner = CliRunner()
-    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
 
     project_id = "123456"
 
     res = runner.invoke(
         list_project_samples,
-        [project_id, "--email", "foo@bar.com", "--password", "123"],
+        [project_id, *credentials],
     )
     assert res.exit_code == 1
-    mocked_login.assert_called_once()
     output_line = io.BytesIO()
     sys.stdout = output_line
     echo_data(
@@ -57,10 +100,12 @@ def test_list_projects_bad_project_id(mocker):
     assert output_line.getvalue() == res.output.encode()
 
 
-def test_list_projects_no_project(mocker):
+@pytest.mark.default_cassette("jwt-create.yaml")
+@pytest.mark.vcr
+@assert_authorization
+def test_list_projects_no_project(mocker, credentials):
     """Test project samples throw an error if no project available."""
     runner = CliRunner()
-    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
@@ -74,10 +119,9 @@ def test_list_projects_no_project(mocker):
 
     res = runner.invoke(
         list_project_samples,
-        [project_id, "--email", "foo@bar.com", "--password", "123"],
+        [project_id, *credentials],
     )
     assert res.exit_code == 1
-    mocked_login.assert_called_once()
     mocked_get_project_samples.assert_called_once()
 
     output_line = io.BytesIO()
@@ -94,10 +138,12 @@ def test_list_projects_no_project(mocker):
     assert output_line.getvalue() == res.output.encode()
 
 
-def test_list_project_samples_slow_response_retry(mocker):
+@pytest.mark.default_cassette("jwt-create.yaml")
+@pytest.mark.vcr
+@assert_authorization
+def test_list_project_samples_slow_response_retry(mocker, credentials):
     """Test project samples slow response retry."""
     runner = CliRunner()
-    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
@@ -106,68 +152,51 @@ def test_list_project_samples_slow_response_retry(mocker):
 
     res = runner.invoke(
         list_project_samples,
-        [str(uuid4()), "--email", "foo@bar.com", "--password", "123"],
+        [str(uuid4()), *credentials],
     )
     assert res.exit_code == 1
-    mocked_login.assert_called_once()
     assert mocked_get_project_samples.call_count == 2
 
 
-def test_list_project_samples(mocker):
+@pytest.mark.vcr
+@assert_authorization
+def test_list_project_samples(
+    mocker, credentials, project_id, recording, vcr
+):  # pylint: disable=unused-argument
     """Test project samples being outputed to the shell."""
-    mocked_samples = dict(
-        meta=dict(count=1, next=None),
-        results=[
-            {
-                "id": str(uuid4()),
-                "client_id": "tester client id",
-                "last_status": {
-                    "id": str(uuid4()),
-                    "created": (
-                        datetime.utcnow() - timedelta(days=3)
-                    ).isoformat(),
-                    "status": "succeeded",
-                },
-                "archive_last_status": {
-                    "id": str(uuid4()),
-                    "status": "available",
-                    "created": (
-                        datetime.utcnow() - timedelta(days=1)
-                    ).isoformat(),
-                    "transition_cutoff": (
-                        datetime.utcnow() + timedelta(days=6)
-                    ).isoformat(),
-                },
-            }
-        ],
-    )
     runner = CliRunner()
-    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
-    mocked_get_project_samples = mocker.patch.object(
-        APIClient,
-        "get_project_samples",
-        return_value=ProjectSamples(**mocked_samples),
-    )
 
+    if not recording:
+        # Mock get_project_samples only if using the cassettes,
+        # since we mock the return value.
+        mocked_samples = get_vcr_response(
+            "/api/v2/project-samples/", vcr, operator.contains
+        )
+        mocked_get_project_samples = mocker.patch.object(
+            APIClient,
+            "get_project_samples",
+            return_value=ProjectSamples(**mocked_samples),
+        )
     res = runner.invoke(
         list_project_samples,
-        [str(uuid4()), "--email", "foo@bar.com", "--password", "123"],
+        [project_id, *credentials],
     )
     assert res.exit_code == 0
-    mocked_login.assert_called_once()
-    mocked_get_project_samples.assert_called_once()
-
-    output_line = io.BytesIO()
-    sys.stdout = output_line
-    echo_data(
-        "\t".join(
-            [
-                mocked_samples["results"][0]["last_status"]["created"],
-                mocked_samples["results"][0]["id"],
-                mocked_samples["results"][0]["client_id"],
-                mocked_samples["results"][0]["last_status"]["status"],
-                mocked_samples["results"][0]["archive_last_status"]["status"],
-            ]
-        )
-    )
-    assert output_line.getvalue() == res.output.encode()
+    if not recording:
+        mocked_get_project_samples.assert_called_once()
+        output_line = io.BytesIO()
+        sys.stdout = output_line
+        for mocked_sample in mocked_samples["results"]:
+            mocked_sample = SampleDetails(**mocked_sample)
+            echo_data(
+                "\t".join(
+                    [
+                        str(mocked_sample.last_status.created.isoformat()),
+                        str(mocked_sample.id),
+                        mocked_sample.client_id,
+                        mocked_sample.last_status.status,
+                        mocked_sample.archive_last_status.status,
+                    ]
+                )
+            )
+        assert output_line.getvalue() == res.output.encode()

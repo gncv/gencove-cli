@@ -14,8 +14,8 @@ from gencove.models import ProjectBatches
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.projects.vcr.filters import (
-    filter_post_project_batches_request,
-    filter_post_project_batches_response,
+    filter_project_batches_request,
+    filter_project_batches_response,
 )
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
 from gencove.tests.utils import get_vcr_response
@@ -43,12 +43,12 @@ def vcr_config():
         "path_transformer": VCR.ensure_suffix(".yaml"),
         "before_record_request": [
             replace_gencove_url_vcr,
-            filter_post_project_batches_request,
+            filter_project_batches_request,
         ],
         "before_record_response": [
             filter_jwt,
             filter_volatile_dates,
-            filter_post_project_batches_response,
+            filter_project_batches_response,
         ],
     }
 
@@ -200,7 +200,7 @@ def test_create_project_batches__success__with_sample_ids(
     """Test batch creation success when when sample ids are explicitly sent."""
     runner = CliRunner()
     if not recording:
-        # Mock restore_project_samples only if using the cassettes, since we
+        # Mock create_project_batch only if using the cassettes, since we
         # mock the return value.
         create_project_batch_response = get_vcr_response(
             "/api/v2/project-batches/", vcr, operator.contains
@@ -262,7 +262,7 @@ def test_create_project_batches__success__without_sample_ids(
     """
     runner = CliRunner()
     if not recording:
-        # Mock restore_project_samples only if using the cassettes, since we
+        # Mock create_project_batch only if using the cassettes, since we
         # mock the return value.
         create_project_batch_response = get_vcr_response(
             "/api/v2/project-batches/", vcr, operator.contains

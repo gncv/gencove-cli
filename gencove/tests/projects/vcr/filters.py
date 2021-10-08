@@ -97,7 +97,7 @@ def filter_post_project_restore_samples(request):
     return request
 
 
-def filter_post_project_batches_request(request):
+def filter_project_batches_request(request):
     """Filter project batches sensitive data from request."""
     if "project-batches" in request.path:
         request = _replace_uuid_from_url(request, "project-batches")
@@ -107,13 +107,13 @@ def filter_post_project_batches_request(request):
             body["batch_type"] = "Mock batch_type"
             body["sample_ids"] = [MOCK_UUID for _ in body["sample_ids"]]
             request.body = json.dumps(body).encode()
-        except json.decoder.JSONDecodeError:
+        except (json.decoder.JSONDecodeError, TypeError):
             pass
     return request
 
 
 @parse_response_to_json
-def filter_post_project_batches_response(response, json_response):
+def filter_project_batches_response(response, json_response):
     """Filter project batches sensitive data from response."""
     if "results" in json_response:
         for result in json_response["results"]:
@@ -125,4 +125,13 @@ def filter_post_project_batches_response(response, json_response):
                 result["batch_type"] = "Mock batch_type"
             if "last_status" in result:
                 result["last_status"]["id"] = MOCK_UUID
+            for file in result.get("files", []):
+                if "id" in file:
+                    file["id"] = MOCK_UUID
+                if "s3_path" in file:
+                    file["s3_path"] = "mock/file.zip"
+                if "size" in file and file["size"]:
+                    file["size"] = "1"
+                if "download_url" in file:
+                    file["download_url"] = "https://example.com/file.zip"
     return response, json_response

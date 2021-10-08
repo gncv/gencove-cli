@@ -1,5 +1,6 @@
 """General filters for VCR cassettes."""
 import copy
+import re
 from urllib.parse import urlparse, urlunparse
 
 from gencove.tests.decorators import parse_response_to_json
@@ -29,6 +30,9 @@ def _replace_uuid_from_url(request, endpoint):
     """Removes the id from the last part of the URL."""
     request = copy.deepcopy(request)
     if endpoint in request.path:
-        base_uri = request.uri.split(endpoint)[0]
-        request.uri = base_uri + f"{endpoint}/{MOCK_UUID}"
+        uuid = re.compile(
+            r"[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}",  # noqa: E501 pylint: disable=line-too-long
+            re.IGNORECASE,
+        )
+        request.uri = uuid.sub(MOCK_UUID, request.uri)
     return request

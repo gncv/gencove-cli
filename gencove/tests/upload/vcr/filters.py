@@ -70,16 +70,6 @@ def filter_volatile_dates(response, json_response):
     return response, json_response
 
 
-def filter_aws_put(response):
-    """Removes the amz id, request-id and version-id from the response.
-    This can't be done in filter_headers.
-    """
-    for key in ["x-amz-id-2", "x-amz-request-id", "x-amz-version-id"]:
-        if key in response["headers"]:
-            response["headers"][key] = [f"mock_{key}"]
-    return response
-
-
 def _filter_sample_sheet(result):
     """Common function that filters sample sheet sensitive data."""
     if "client_id" in result:

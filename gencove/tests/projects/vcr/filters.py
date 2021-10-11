@@ -1,5 +1,6 @@
 """VCR filters for projects tests."""
 import json
+from urllib.parse import urlparse
 
 from gencove.tests.decorators import parse_response_to_json
 from gencove.tests.filters import _replace_uuid_from_url
@@ -134,4 +135,37 @@ def filter_project_batches_response(response, json_response):
                     file["size"] = "1"
                 if "download_url" in file:
                     file["download_url"] = "https://example.com/file.zip"
+    return response, json_response
+
+
+def filter_batches_request(request):
+    """Filter batches sensitive data from request."""
+    return _replace_uuid_from_url(request, "batches")
+
+
+@parse_response_to_json
+def filter_batches_response(response, json_response):
+    """Filter batches sensitive data from response."""
+    if "id" in json_response:
+        json_response["id"] = MOCK_UUID
+    if "name" in json_response:
+        json_response["name"] = "mock name"
+    if "batch_type" in json_response:
+        json_response["batch_type"] = "Mock batch_type"
+    if "sample_ids" in json_response:
+        json_response["sample_ids"] = [
+            MOCK_UUID for _ in json_response["sample_ids"]
+        ]
+    if "last_status" in json_response:
+        json_response["last_status"]["id"] = MOCK_UUID
+    for file in json_response.get("files", []):
+        if "id" in file:
+            file["id"] = MOCK_UUID
+        if "s3_path" in file:
+            file["s3_path"] = f"mock/{file['s3_path'].split('/')[-1]}"
+        if "size" in file and file["size"]:
+            file["size"] = "1"
+        if "download_url" in file:
+            filename = urlparse(file["download_url"]).path.split("/")[-1]
+            file["download_url"] = f"https://example.com/{filename}"
     return response, json_response

@@ -1,0 +1,133 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.1.5
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '537'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 11 Oct 2021 20:44:53 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.1.5
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/batches/11111111-1111-1111-1111-111111111111
+  response:
+    body:
+      string: '{"id": "11111111-1111-1111-1111-111111111111", "name": "mock name",
+        "batch_type": "Mock batch_type", "sample_ids": ["11111111-1111-1111-1111-111111111111"],
+        "last_status": {"id": "11111111-1111-1111-1111-111111111111", "status": "succeeded",
+        "created": "2021-10-08T15:18:24.449665Z"}, "files": [{"id": "11111111-1111-1111-1111-111111111111",
+        "s3_path": "mock/report.zip", "size": null, "download_url": "https://example.com/report.zip",
+        "file_type": "report-zip"}]}'
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '879'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 11 Oct 2021 20:44:54 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+    method: GET
+    uri: https://s3.amazonaws.com/report.zip
+  response:
+    body:
+      string: QUFBQkJC
+    headers:
+      Accept-Ranges:
+      - bytes
+      Content-Disposition:
+      - attachment;
+      Content-Length:
+      - '123'
+      Content-Type:
+      - binary/octet-stream
+      Date:
+      - Mon, 11 Oct 2021 20:44:55 GMT
+      ETag:
+      - '"dbdf72820600cc09b9e76798e9842426"'
+      Last-Modified:
+      - Fri, 08 Oct 2021 15:18:24 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - mock_x-amz-id-2
+      x-amz-request-id:
+      - mock_x-amz-request-id
+      x-amz-server-side-encryption:
+      - AES256
+      x-amz-version-id:
+      - mock_x-amz-version-id
+    status:
+      code: 200
+      message: OK
+version: 1

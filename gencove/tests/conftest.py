@@ -69,3 +69,9 @@ def batch_type():
 def batch_name():
     """Returns the batch name to create batches."""
     return os.getenv("GENCOVE_BATCH_NAME_TEST")
+
+
+@pytest.fixture(scope="session")
+def batch_id():
+    """Returns a batch id."""
+    return os.getenv("GENCOVE_BATCH_ID_TEST")

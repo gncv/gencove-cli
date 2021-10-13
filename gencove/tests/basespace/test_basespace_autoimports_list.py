@@ -124,7 +124,7 @@ def test_autoimport_list_uploads_slow_response_retry(mocker, credentials):
 
 @pytest.mark.vcr
 @assert_authorization
-def test_autoimport_list(mocker, credentials, recording):
+def test_autoimport_list(mocker, credentials):
     """Test list autoimport jobs being outputed to the shell."""
     runner = CliRunner()
     autoimport_response = {
@@ -153,19 +153,18 @@ def test_autoimport_list(mocker, credentials, recording):
 
     assert res.exit_code == 0
 
-    if not recording:
-        mocked_list_basespace_autoimport_jobs.assert_called()
-        autoimport_jobs = autoimport_response["results"]
-        jobs = "\n".join(
-            [
-                "\t".join(
-                    [
-                        job["id"],
-                        job["project_id"],
-                        job["name"],
-                    ]
-                )
-                for job in autoimport_jobs
-            ]
-        )
-        assert f"{jobs}\n" == res.output
+    mocked_list_basespace_autoimport_jobs.assert_called()
+    autoimport_jobs = autoimport_response["results"]
+    jobs = "\n".join(
+        [
+            "\t".join(
+                [
+                    job["id"],
+                    job["project_id"],
+                    job["identifier"],
+                ]
+            )
+            for job in autoimport_jobs
+        ]
+    )
+    assert f"{jobs}\n" == res.output

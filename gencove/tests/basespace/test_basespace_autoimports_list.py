@@ -1,7 +1,5 @@
 """Test basespace autoimports list command."""
-
-import os
-import pytest
+# pylint: disable=wrong-import-order, import-error
 
 from click.testing import CliRunner
 
@@ -11,16 +9,15 @@ from gencove.command.basespace.autoimports.autoimport_list.cli import (
 )
 from gencove.models import (
     BaseSpaceProjectImport,
-    BaseSpaceProjectImportDetail,
 )
-from gencove.tests.decorators import assert_authorization
-from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
-from gencove.tests.upload.vcr.filters import (
+from gencove.tests.basespace.vcr.filters import (
     filter_basespace_autoimport_list_response,
     filter_volatile_dates,
 )
-from gencove.tests.utils import get_vcr_response
+from gencove.tests.decorators import assert_authorization
+from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 
+import pytest
 
 from vcr import VCR
 
@@ -54,7 +51,7 @@ def vcr_config():
 
 @pytest.mark.vcr
 @assert_authorization
-def test_list_does_not_exist(mocker, credentials):
+def test_autoimport_list_does_not_exist(mocker, credentials):
     """Test user cannot get to jobs."""
     runner = CliRunner()
     mocked_list_basespace_autoimport_jobs = mocker.patch.object(
@@ -66,18 +63,109 @@ def test_list_does_not_exist(mocker, credentials):
         return_value={"detail": "Not found"},
     )
     res = runner.invoke(autoimport_list, credentials)
-    print(credentials)
-    print(os.environ["GENCOVE_HOST"])
     assert isinstance(res.exception, SystemExit)
     assert res.exit_code == 1
     mocked_list_basespace_autoimport_jobs.assert_called_once()
     assert (
         "\n".join(
             [
-                "ERROR: Uploads do not exist.",
+                "ERROR: No BaseSpace autoimport jobs were found.",
+                "ERROR: There was an error listing autoimport jobs of "
+                "BaseSpace projects.",
                 "ERROR: API Client Error: Not Found: Not found.",
                 "Aborted!\n",
             ]
         )
         == res.output
     )
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_autoimport_list_empty(mocker, credentials):
+    """Test user has no jobs."""
+    runner = CliRunner()
+    mocked_list_basespace_autoimport_jobs = mocker.patch.object(
+        APIClient,
+        "list_basespace_autoimport_jobs",
+        return_value=BaseSpaceProjectImport(results=[], meta=dict(next=None)),
+    )
+    res = runner.invoke(autoimport_list, credentials)
+    assert res.exit_code == 0
+    mocked_list_basespace_autoimport_jobs.assert_called_once()
+    assert "" in res.output
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_autoimport_list_uploads_slow_response_retry(mocker, credentials):
+    """Test list jobs slow response retry."""
+    runner = CliRunner()
+    mocked_list_basespace_autoimport_jobs = mocker.patch.object(
+        APIClient,
+        "list_basespace_autoimport_jobs",
+        side_effect=APIClientTimeout("Could not connect to the api server"),
+    )
+    res = runner.invoke(autoimport_list, credentials)
+    assert res.exit_code == 1
+    assert mocked_list_basespace_autoimport_jobs.call_count == 2
+    assert (
+        "\n".join(
+            [
+                "ERROR: There was an error listing autoimport jobs of "
+                "BaseSpace projects.",
+                "ERROR: Could not connect to the api server",
+                "Aborted!\n",
+            ]
+        )
+        == res.output
+    )
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_autoimport_list(mocker, credentials, recording):
+    """Test list autoimport jobs being outputed to the shell."""
+    runner = CliRunner()
+    autoimport_response = {
+        "meta": {"count": 2, "next": None, "previous": None},
+        "results": [
+            {
+                "id": "41fd0397-62b0-4ef9-992f-423435b5d5ef",
+                "project_id": "290e0c5a-c87e-474e-8b32-fe56fc54cc4d",
+                "identifier": "identifier-in-basespace-project-name",
+                "metadata": None,
+            },
+            {
+                "id": "0f60ab5e-a34f-4afc-a428-66f81890565f",
+                "project_id": "290e0c5a-c87e-474e-8b32-fe56fc54cc4d",
+                "identifier": "Dummy",
+                "metadata": {},
+            },
+        ],
+    }
+    mocked_list_basespace_autoimport_jobs = mocker.patch.object(
+        APIClient,
+        "list_basespace_autoimport_jobs",
+        return_value=BaseSpaceProjectImport(**autoimport_response),
+    )
+    res = runner.invoke(autoimport_list, credentials)
+
+    assert res.exit_code == 0
+
+    if not recording:
+        mocked_list_basespace_autoimport_jobs.assert_called()
+        autoimport_jobs = autoimport_response["results"]
+        jobs = "\n".join(
+            [
+                "\t".join(
+                    [
+                        job["id"],
+                        job["project_id"],
+                        job["name"],
+                    ]
+                )
+                for job in autoimport_jobs
+            ]
+        )
+        assert f"{jobs}\n" == res.output

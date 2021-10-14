@@ -36,3 +36,35 @@ def _replace_uuid_from_url(request, endpoint):
         )
         request.uri = uuid.sub(MOCK_UUID, request.uri)
     return request
+
+
+def filter_aws_headers(response):
+    """Removes the amz id, request-id and version-id from the response.
+    This can't be done in filter_headers.
+    """
+    for key in ["x-amz-id-2", "x-amz-request-id", "x-amz-version-id"]:
+        if key in response["headers"]:
+            response["headers"][key] = [f"mock_{key}"]
+    return response
+
+
+def replace_s3_from_url(request):
+    """Mock the S3 URLS."""
+    request = copy.deepcopy(request)
+    if "s3.amazonaws.com" in request.uri:
+        filename = urlparse(request.uri).path.split("/")[-1]
+        request.uri = f"https://s3.amazonaws.com/{filename}"
+    return request
+
+
+def mock_binary_response(response):
+    """Replace binary responses with a placeholder"""
+    try:
+        response["body"]["string"].decode()
+    except UnicodeDecodeError:
+        response["body"]["string"] = b"""QUFBQkJC"""
+        if "Content-Disposition" in response["headers"]:
+            response["headers"]["Content-Disposition"] = ["attachment;"]
+        if "Content-Length" in response["headers"]:
+            response["headers"]["Content-Length"] = ["123"]
+    return response

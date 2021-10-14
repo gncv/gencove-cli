@@ -51,3 +51,27 @@ def credentials():
 def archived_sample():
     """Returns the archived sample id.."""
     return os.getenv("GENCOVE_ARCHIVED_SAMPLE_TEST")
+
+
+@pytest.fixture(scope="session")
+def sample_id_batches():
+    """Returns the sample id to create batches."""
+    return os.getenv("GENCOVE_SAMPLE_ID_BATCHES_TEST")
+
+
+@pytest.fixture(scope="session")
+def batch_type():
+    """Returns the batch type to create batches."""
+    return os.getenv("GENCOVE_BATCH_TYPE_TEST")
+
+
+@pytest.fixture(scope="session")
+def batch_name():
+    """Returns the batch name to create batches."""
+    return os.getenv("GENCOVE_BATCH_NAME_TEST")
+
+
+@pytest.fixture(scope="session")
+def batch_id():
+    """Returns a batch id."""
+    return os.getenv("GENCOVE_BATCH_ID_TEST")

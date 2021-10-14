@@ -16,7 +16,7 @@ def parse_response_to_json(func):
     def wrapper(response):
         try:
             json_response = json.loads(response["body"]["string"])
-        except json.decoder.JSONDecodeError:
+        except (json.decoder.JSONDecodeError, UnicodeDecodeError):
             json_response = {}
         response, json_response = func(response, json_response)
         if response is not None and json_response:

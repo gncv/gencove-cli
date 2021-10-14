@@ -16,9 +16,12 @@ from gencove.command.upload.utils import upload_file
 from gencove.constants import ApiEndpoints, UPLOAD_PREFIX
 from gencove.models import SampleSheet, UploadSamples, UploadsPostData
 from gencove.tests.decorators import assert_authorization
-from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
+from gencove.tests.filters import (
+    filter_aws_headers,
+    filter_jwt,
+    replace_gencove_url_vcr,
+)
 from gencove.tests.upload.vcr.filters import (
-    filter_aws_put,
     filter_project_samples_request,
     filter_project_samples_response,
     filter_sample_sheet_response,
@@ -66,7 +69,7 @@ def vcr_config():
             filter_upload_credentials_response,
             filter_upload_post_data_response,
             filter_volatile_dates,
-            filter_aws_put,
+            filter_aws_headers,
             filter_sample_sheet_response,
             filter_project_samples_response,
         ],

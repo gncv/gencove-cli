@@ -10,10 +10,6 @@ from gencove.command.basespace.autoimports.autoimport_list.cli import (
 from gencove.models import (
     BaseSpaceProjectImport,
 )
-from gencove.tests.basespace.vcr.filters import (
-    filter_basespace_autoimport_list_response,
-    filter_volatile_dates,
-)
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 
@@ -43,12 +39,11 @@ def vcr_config():
         ],
         "before_record_response": [
             filter_jwt,
-            filter_volatile_dates,
-            filter_basespace_autoimport_list_response,
         ],
     }
 
 
+@pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
 def test_autoimport_list_does_not_exist(mocker, credentials):
@@ -80,6 +75,7 @@ def test_autoimport_list_does_not_exist(mocker, credentials):
     )
 
 
+@pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
 def test_autoimport_list_empty(mocker, credentials):
@@ -96,6 +92,7 @@ def test_autoimport_list_empty(mocker, credentials):
     assert "" in res.output
 
 
+@pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
 def test_autoimport_list_uploads_slow_response_retry(mocker, credentials):
@@ -122,6 +119,7 @@ def test_autoimport_list_uploads_slow_response_retry(mocker, credentials):
     )
 
 
+@pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
 def test_autoimport_list(mocker, credentials):

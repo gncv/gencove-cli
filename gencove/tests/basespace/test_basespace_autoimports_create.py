@@ -7,10 +7,6 @@ from gencove.client import APIClient, APIClientError
 from gencove.command.basespace.autoimports.create.cli import (
     create,
 )
-from gencove.tests.basespace.vcr.filters import (
-    filter_basespace_autoimport_list_response,
-    filter_volatile_dates,
-)
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 
@@ -40,12 +36,11 @@ def vcr_config():
         ],
         "before_record_response": [
             filter_jwt,
-            filter_volatile_dates,
-            filter_basespace_autoimport_list_response,
         ],
     }
 
 
+@pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
 def test_basespace_autoimport_create_project_id_not_uuid(
@@ -73,6 +68,7 @@ def test_basespace_autoimport_create_project_id_not_uuid(
     assert "ERROR: Project ID is not valid. Exiting." in res.output
 
 
+@pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
 def test_basespace_autoimport_create_invalid_metadata(
@@ -103,6 +99,7 @@ def test_basespace_autoimport_create_invalid_metadata(
     assert "ERROR: Metadata JSON is not valid. Exiting." in res.output
 
 
+@pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
 def test_basespace_autoimport_create_no_permission(
@@ -130,6 +127,7 @@ def test_basespace_autoimport_create_no_permission(
     assert "There was an error creating a periodic import job" in res.output
 
 
+@pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
 def test_basespace_autoimport_create_with_empty_metadata(
@@ -160,6 +158,7 @@ def test_basespace_autoimport_create_with_empty_metadata(
     mocked_autoimport_from_basespace.assert_called_once()
 
 
+@pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
 def test_basespace_autoimport_create_with_metadata(
@@ -190,6 +189,7 @@ def test_basespace_autoimport_create_with_metadata(
     mocked_autoimport_from_basespace.assert_called_once()
 
 
+@pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
 def test_basespace_autoimport_create_without_metadata(

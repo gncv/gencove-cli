@@ -76,7 +76,7 @@ def filter_samples_request(request):
     return _replace_uuid_from_url(request, "samples")
 
 
-def _filter_sample_sheet(result):
+def _filter_sample(result):
     """Common function that filters sample sheet sensitive data."""
     if "id" in result:
         result["id"] = MOCK_UUID
@@ -108,12 +108,12 @@ def _filter_sample_sheet(result):
 def filter_project_samples_response(response, response_json):
     """Filter project samples sensitive data from response."""
     for result in response_json.get("results", []):
-        _filter_sample_sheet(result)
+        _filter_sample(result)
     return response, response_json
 
 
 @parse_response_to_json
 def filter_samples_response(response, response_json):
     """Filter samples sensitive data from response."""
-    _filter_sample_sheet(response_json)
+    _filter_sample(response_json)
     return response, response_json

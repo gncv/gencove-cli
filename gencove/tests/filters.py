@@ -77,7 +77,7 @@ def filter_samples_request(request):
 
 
 def _filter_sample(result):
-    """Common function that filters sample sheet sensitive data."""
+    """Common function that filters sample sensitive data."""
     if "id" in result:
         result["id"] = MOCK_UUID
     if "client_id" in result:

@@ -1,4 +1,4 @@
-"""Project autoimport BioSamples from BaseSpace projects shell command
+"""Project autoimport Biosamples from BaseSpace projects shell command
 definition.
 """
 import click
@@ -17,7 +17,7 @@ def autoimport_list(
     password,
     api_key,
 ):  # pylint: disable=line-too-long
-    """Lists periodic import of BaseSpace projects (their BioSamples) jobs.
+    """Lists periodic import of BaseSpace projects (their Biosamples) jobs.
 
     Examples:
 

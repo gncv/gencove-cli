@@ -1,4 +1,4 @@
-"""Project autoimport BioSamples from BaseSpace projects shell command
+"""Project autoimport Biosamples from BaseSpace projects shell command
 definition.
 """
 import click
@@ -32,7 +32,7 @@ def create(  # pylint: disable=too-many-arguments
     password,
     api_key,
 ):  # pylint: disable=line-too-long
-    """Sets up periodic import of BaseSpace projects (their BioSamples) whose name contain the identifer
+    """Sets up periodic import of BaseSpace projects (their Biosamples) whose name contain the identifer
     to a project in Gencove. Optionally assign metadata to the samples to be added when the automatic
     import job runs.
 

@@ -759,7 +759,7 @@ class APIClient:
         metadata=None,
     ):
         """Make a request to create a periodic import job of BaseSpace projects'
-        BioSamples to a given Gencove project.
+        Biosamples to a given Gencove project.
 
         Args:
             project_id (str): project to which to assign the samples
@@ -782,7 +782,7 @@ class APIClient:
 
     def list_basespace_autoimport_jobs(self, next_link=None):
         """Make a request to list periodic import jobs of BaseSpace projects'
-        BioSamples.
+        Biosamples.
 
         Args:
             next_link (str, optional): url from previous

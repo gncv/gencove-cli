@@ -1,4 +1,4 @@
-"""AutoImport BioSamples from BaseSpace projects to a project subcommand."""
+"""AutoImport Biosamples from BaseSpace projects to a project subcommand."""
 
 import json
 
@@ -35,7 +35,7 @@ class BaseSpaceAutoImport(Command):
     # no retry for timeouts in order to avoid duplicate heavy operations on
     # the backend
     def execute(self):
-        """Make a request to create a job to periodically import BioSamples
+        """Make a request to create a job to periodically import Biosamples
         from BaseSpace projects whose name contain the identifier to a
         Gencove project.
         """

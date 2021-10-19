@@ -1,4 +1,6 @@
 """Test download command."""
+# pylint: disable=wrong-import-order, import-error
+import operator
 from uuid import uuid4
 
 from click.testing import CliRunner
@@ -6,181 +8,133 @@ from click.testing import CliRunner
 from gencove.client import APIClient
 from gencove.command.samples.cli import download_file
 from gencove.models import SampleDetails
+from gencove.tests.decorators import assert_authorization
+from gencove.tests.filters import (
+    filter_aws_headers,
+    filter_jwt,
+    filter_samples_request,
+    filter_samples_response,
+    mock_binary_response,
+    replace_gencove_url_vcr,
+    replace_s3_from_url,
+)
+from gencove.tests.utils import get_vcr_response
 
-import requests  # pylint: disable=wrong-import-order
+import pytest
 
-
-class BasicRequestMock:
-    """Basic mock for request object"""
-
-    def __init__(self, headers, content):
-        self.headers = dict(headers, **{"content-length": len(content)})
-        self.content = content
-
-    def iter_content(self, **kwargs):
-        """Return iterable of content"""
-        chunk_size = kwargs["chunk_size"] if "chunk_size" in kwargs else 0
-        if chunk_size <= 0:
-            chunk_size = len(self.content)
-        if chunk_size >= len(self.content):
-            return [self.content]
-        chunk_count = len(self.content) / chunk_size
-        if len(self.content) % chunk_size != 0:
-            chunk_count += 1
-        return (
-            self.content[
-                (i * chunk_size) : min(  # noqa: E203
-                    (i + 1) * chunk_size, len(self.content)
-                )
-            ]
-            for i in range(chunk_count)
-        )
-
-    def raise_for_status(self):
-        """Not implemented"""
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, value_type, value, trace):
-        """Not implemented"""
+from vcr import VCR
 
 
-def test_samples_download_file_local(mocker):
+@pytest.fixture(scope="module")
+def vcr_config():
+    """VCR configuration."""
+    return {
+        "cassette_library_dir": "gencove/tests/samples/vcr",
+        "filter_headers": [
+            "Authorization",
+            "Content-Length",
+            "User-Agent",
+        ],
+        "filter_post_data_parameters": [
+            ("email", "email@example.com"),
+            ("password", "mock_password"),
+        ],
+        "match_on": ["method", "scheme", "port", "path", "query"],
+        "path_transformer": VCR.ensure_suffix(".yaml"),
+        "before_record_request": [
+            replace_gencove_url_vcr,
+            replace_s3_from_url,
+            filter_samples_request,
+        ],
+        "before_record_response": [
+            filter_jwt,
+            filter_aws_headers,
+            mock_binary_response,
+            filter_samples_response,
+        ],
+    }
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_samples_download_file_local(
+    credentials, mocker, recording, sample_id_download, vcr
+):
     """Test command outputs to local destination."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        mocked_login = mocker.patch.object(
-            APIClient, "login", return_value=None
-        )
-        sample_id = str(uuid4())
-        file_type = "txt"
-        last_status_id = str(uuid4())
-        archive_last_status_id = str(uuid4())
-        file_id = str(uuid4())
-        file_content = bytes(b"\0" * 1024)
-        file_path = "bar.txt"
-        response_headers = dict()
-        mocked_sample_details = mocker.patch.object(
-            APIClient,
-            "get_sample_details",
-            return_value=SampleDetails(
-                **{
-                    "id": sample_id,
-                    "client_id": "1",
-                    "last_status": {
-                        "id": last_status_id,
-                        "status": "succeeded",
-                        "created": "2020-07-28T12:46:22.719862Z",
-                    },
-                    "archive_last_status": {
-                        "id": archive_last_status_id,
-                        "status": "available",
-                        "created": "2020-07-28T12:46:22.719862Z",
-                        "transition_cutoff": "2020-08-28T12:46:22.719862Z",
-                    },
-                    "files": [
-                        {
-                            "id": file_id,
-                            "file_type": file_type,
-                            "download_url": "https://foo.com/bar.txt",
-                        }
-                    ],
-                }
-            ),
-        )
-        mocked_request = mocker.patch.object(
-            requests,
-            "get",
-            return_value=BasicRequestMock(response_headers, file_content),
-        )
+        file_type = "fastq-r1"
+        file_path = "r1.fastq.gz"
+        if not recording:
+            # Mock only if using the cassettes, since we mock the return value.
+            get_sample_details_response = get_vcr_response(
+                "/api/v2/samples/", vcr, operator.contains
+            )
+            mocked_sample_details = mocker.patch.object(
+                APIClient,
+                "get_sample_details",
+                return_value=SampleDetails(**get_sample_details_response),
+            )
+            file_content = get_vcr_response(f"/{file_path}", vcr)
+            file_content = file_content["body"]["string"]
         res = runner.invoke(
             download_file,
             [
-                sample_id,
+                sample_id_download,
                 file_type,
                 file_path,
-                "--email",
-                "foo@bar.com",
-                "--password",
-                "12345",
+                *credentials,
             ],
         )
         assert res.exit_code == 0
-        mocked_login.assert_called_once()
-        mocked_sample_details.assert_called_once()
-        mocked_request.assert_called_once()
-        with open(file_path, "rb") as local_file:
-            assert file_content == local_file.read()
+        if not recording:
+            mocked_sample_details.assert_called_once()
+            with open(file_path, "rb") as local_file:
+                assert file_content == local_file.read()
 
 
-def test_samples_download_file_stdout(mocker):
+@pytest.mark.vcr
+@assert_authorization
+def test_samples_download_file_stdout(
+    credentials, mocker, recording, sample_id_download, vcr
+):
     """Test command outputs to stdout."""
     runner = CliRunner()
-    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
-    sample_id = str(uuid4())
-    file_type = "txt"
-    last_status_id = str(uuid4())
-    archive_last_status_id = str(uuid4())
-    file_id = str(uuid4())
-    file_content = bytes(b"\0" * 1024)
-    response_headers = dict()
-    mocked_sample_details = mocker.patch.object(
-        APIClient,
-        "get_sample_details",
-        return_value=SampleDetails(
-            **{
-                "id": sample_id,
-                "client_id": "1",
-                "last_status": {
-                    "id": last_status_id,
-                    "status": "succeeded",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                },
-                "archive_last_status": {
-                    "id": archive_last_status_id,
-                    "status": "available",
-                    "created": "2020-07-28T12:46:22.719862Z",
-                    "transition_cutoff": "2020-08-28T12:46:22.719862Z",
-                },
-                "files": [
-                    {
-                        "id": file_id,
-                        "file_type": file_type,
-                        "download_url": "https://foo.com/bar.txt",
-                    }
-                ],
-            }
-        ),
-    )
-    mocked_request = mocker.patch.object(
-        requests,
-        "get",
-        return_value=BasicRequestMock(response_headers, file_content),
-    )
+    file_type = "fastq-r1"
+    if not recording:
+        # Mock only if using the cassettes, since we mock the return value.
+        get_sample_details_response = get_vcr_response(
+            "/api/v2/samples/", vcr, operator.contains
+        )
+        mocked_sample_details = mocker.patch.object(
+            APIClient,
+            "get_sample_details",
+            return_value=SampleDetails(**get_sample_details_response),
+        )
+        file_content = get_vcr_response("/r1.fastq.gz", vcr)
+        file_content = file_content["body"]["string"]
+
     res = runner.invoke(
         download_file,
         [
-            sample_id,
+            sample_id_download,
             file_type,
             "-",
-            "--email",
-            "foo@bar.com",
-            "--password",
-            "12345",
+            *credentials,
         ],
     )
     assert res.exit_code == 0
-    mocked_login.assert_called_once()
-    mocked_sample_details.assert_called_once()
-    mocked_request.assert_called_once()
-    assert file_content == res.output.encode()
+    if not recording:
+        mocked_sample_details.assert_called_once()
+        assert file_content == res.output.encode()
 
 
-def test_samples_download_file_directory():
+@pytest.mark.vcr
+def test_samples_download_file_directory(mocker):
     """Test command fails when writing to directory."""
     runner = CliRunner()
     with runner.isolated_filesystem():
+        mocked_login = mocker.patch.object(APIClient, "login")
         res = runner.invoke(
             download_file,
             [
@@ -194,4 +148,8 @@ def test_samples_download_file_directory():
             ],
         )
         assert res.exit_code == 1
-        assert "ERROR" in res.output
+        mocked_login.assert_not_called()
+        assert (
+            "ERROR: Please specify a file path (not directory path) for DESTINATION"  # noqa: E501 line too long pylint: disable=line-too-long
+            in res.output
+        )

@@ -1,0 +1,138 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.1.5
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '537'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 15 Oct 2021 19:30:15 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.1.5
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/samples/11111111-1111-1111-1111-111111111111
+  response:
+    body:
+      string: '{"id": "11111111-1111-1111-1111-111111111111", "project": "11111111-1111-1111-1111-111111111111",
+        "created": "2021-10-12T19:47:15.332776Z", "modified": "2021-10-12T19:55:46.498353Z",
+        "client_id": "mock_client_id", "physical_id": "", "legacy_id": "", "last_status":
+        {"id": "11111111-1111-1111-1111-111111111111", "status": "failed qc", "note":
+        "", "created": "2021-10-12T19:55:46.498353Z"}, "archive_last_status": {"id":
+        "11111111-1111-1111-1111-111111111111", "status": "available", "created":
+        "2021-10-12 19:47:15.394485+00:00", "transition_cutoff": null}, "files": [{"id":
+        "11111111-1111-1111-1111-111111111111", "s3_path": "mock/r1.fastq.gz", "size":
+        null, "download_url": "https://example.com/r1.fastq.gz", "file_type": "fastq-r1"}]}'
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1177'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 15 Oct 2021 19:30:16 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+    method: GET
+    uri: https://s3.amazonaws.com/r1.fastq.gz
+  response:
+    body:
+      string: QUFBQkJC
+    headers:
+      Accept-Ranges:
+      - bytes
+      Content-Disposition:
+      - attachment;
+      Content-Length:
+      - '123'
+      Content-Type:
+      - binary/octet-stream
+      Date:
+      - Fri, 15 Oct 2021 19:30:18 GMT
+      ETag:
+      - '"6e023d8b8758f8f826152de77a3cc1d9"'
+      Last-Modified:
+      - Tue, 12 Oct 2021 19:55:35 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - mock_x-amz-id-2
+      x-amz-replication-status:
+      - COMPLETED
+      x-amz-request-id:
+      - mock_x-amz-request-id
+      x-amz-server-side-encryption:
+      - AES256
+      x-amz-version-id:
+      - mock_x-amz-version-id
+    status:
+      code: 200
+      message: OK
+version: 1

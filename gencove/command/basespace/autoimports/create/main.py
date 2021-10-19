@@ -52,7 +52,7 @@ class BaseSpaceAutoImport(Command):
             if self.metadata_json is not None:
                 metadata = json.loads(self.metadata_json)
                 self.echo_info(
-                    "Assigning metadata to the imported BioSamples."
+                    "Metadata will be assigned to the imported Biosamples."
                 )
             autoimport_from_basespace = (
                 self.api_client.autoimport_from_basespace(

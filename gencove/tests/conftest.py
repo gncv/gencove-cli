@@ -37,6 +37,12 @@ def project_id_batches():
 
 
 @pytest.fixture(scope="session")
+def project_id_download():
+    """Returns the project id that contains batches."""
+    return os.getenv("GENCOVE_PROJECT_ID_DOWNLOAD_TEST")
+
+
+@pytest.fixture(scope="session")
 def credentials():
     """Fixture to have the appropriate credentials."""
     api_key = os.getenv("GENCOVE_API_KEY_TEST")
@@ -57,6 +63,12 @@ def archived_sample():
 def sample_id_batches():
     """Returns the sample id to create batches."""
     return os.getenv("GENCOVE_SAMPLE_ID_BATCHES_TEST")
+
+
+@pytest.fixture(scope="session")
+def sample_id_download():
+    """Returns the sample id to download."""
+    return os.getenv("GENCOVE_SAMPLE_ID_DOWNLOAD_TEST")
 
 
 @pytest.fixture(scope="session")

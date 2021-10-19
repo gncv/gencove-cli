@@ -1,0 +1,94 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.1.5
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '537'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 13 Oct 2021 18:28:43 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.1.5
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/samples/11111111-1111-1111-1111-111111111111
+  response:
+    body:
+      string: '{"id": "11111111-1111-1111-1111-111111111111", "project": "11111111-1111-1111-1111-111111111111",
+        "created": "2021-09-21T18:30:44.799519Z", "modified": "2021-09-21T18:38:57.735776Z",
+        "client_id": "mock_client_id", "physical_id": "", "legacy_id": "", "last_status":
+        {"id": "11111111-1111-1111-1111-111111111111", "status": "failed qc", "note":
+        "", "created": "2021-09-21T18:38:57.735776Z"}, "archive_last_status": {"id":
+        "11111111-1111-1111-1111-111111111111", "status": "archived", "created": "2050-10-05
+        18:12:32+00:00", "transition_cutoff": null}, "files": [{"id": "11111111-1111-1111-1111-111111111111",
+        "s3_path": "mock/r1.fastq.gz", "size": null, "download_url": null, "file_type":
+        "fastq-r1"}]}'
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '779'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 13 Oct 2021 18:28:44 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

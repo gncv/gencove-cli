@@ -3,7 +3,7 @@
 
 from click.testing import CliRunner
 
-from gencove.client import APIClient, APIClientError, APIClientTimeout
+from gencove.client import APIClient, APIClientTimeout
 from gencove.command.basespace.autoimports.autoimport_list.cli import (
     autoimport_list,
 )
@@ -41,38 +41,6 @@ def vcr_config():
             filter_jwt,
         ],
     }
-
-
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
-def test_autoimport_list_does_not_exist(mocker, credentials):
-    """Test user cannot get to jobs."""
-    runner = CliRunner()
-    mocked_list_basespace_autoimport_jobs = mocker.patch.object(
-        APIClient,
-        "list_basespace_autoimport_jobs",
-        side_effect=APIClientError(
-            message="API Client Error: Not Found: Not found.", status_code=404
-        ),
-        return_value={"detail": "Not found"},
-    )
-    res = runner.invoke(autoimport_list, credentials)
-    assert isinstance(res.exception, SystemExit)
-    assert res.exit_code == 1
-    mocked_list_basespace_autoimport_jobs.assert_called_once()
-    assert (
-        "\n".join(
-            [
-                "ERROR: No BaseSpace autoimport jobs were found.",
-                "ERROR: There was an error listing autoimport jobs of "
-                "BaseSpace projects.",
-                "ERROR: API Client Error: Not Found: Not found.",
-                "Aborted!\n",
-            ]
-        )
-        == res.output
-    )
 
 
 @pytest.mark.default_cassette("jwt-create.yaml")

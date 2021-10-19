@@ -33,9 +33,7 @@ class BaseSpaceAutoImportList(Command):
                     return
                 for basespace_autoimport in basespace_autoimports:
                     self.echo_data(get_line(basespace_autoimport))
-        except client.APIClientError as err:
-            if err.status_code == 404:
-                self.echo_error("No BaseSpace autoimport jobs were found.")
+        except client.APIClientError:
             self.echo_error(
                 "There was an error listing autoimport jobs of BaseSpace "
                 "projects."

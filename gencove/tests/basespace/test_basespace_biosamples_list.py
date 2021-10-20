@@ -14,19 +14,19 @@ from gencove.client import (
 )  # noqa: I100
 from gencove.command.basespace.biosamples.cli import biosamples_list
 from gencove.models import (
-    BaseSpaceBioSample,
-    BaseSpaceBioSampleDetail,
+    BaseSpaceBiosample,
+    BaseSpaceBiosampleDetail,
 )
 
 
 def test_biosamples_list__empty(mocker):
-    """Test user has no BaseSpace BioSamples."""
+    """Test user has no BaseSpace Biosamples."""
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_list_biosamples = mocker.patch.object(
         APIClient,
         "list_biosamples",
-        return_value=BaseSpaceBioSample(results=[], meta=dict(next=None)),
+        return_value=BaseSpaceBiosample(results=[], meta=dict(next=None)),
     )
     res = runner.invoke(
         biosamples_list,
@@ -68,7 +68,7 @@ MOCKED_BASESPACE_BIOSAMPLES_WITH_UNEXPECTED_KEYS = dict(
 
 
 def test_biosamples_list__no_permission(mocker):
-    """Test BaseSpace BioSamples no permission available to show them."""
+    """Test BaseSpace Biosamples no permission available to show them."""
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_list_biosamples = mocker.patch.object(
@@ -92,7 +92,7 @@ def test_biosamples_list__no_permission(mocker):
     echo(
         "\n".join(
             [
-                "ERROR: There was an error listing BioSamples.",
+                "ERROR: There was an error listing Biosamples.",
                 "ERROR: You do not have the sufficient permission "
                 "level required to perform this operation.",
                 "ERROR: API Client Error: Not Found: Not found.",
@@ -104,7 +104,7 @@ def test_biosamples_list__no_permission(mocker):
 
 
 def test_biosamples_list__slow_response_retry_list(mocker):
-    """Test BaseSpace BioSamples slow response retry on the list."""
+    """Test BaseSpace Biosamples slow response retry on the list."""
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_list_biosamples = mocker.patch.object(
@@ -122,7 +122,7 @@ def test_biosamples_list__slow_response_retry_list(mocker):
 
 
 def test_biosamples_list__multiple(mocker):
-    """Test BaseSpace BioSamples from multiple projects
+    """Test BaseSpace Biosamples from multiple projects
     being outputed to the shell.
     """
     runner = CliRunner()
@@ -130,7 +130,7 @@ def test_biosamples_list__multiple(mocker):
     mocked_list_biosamples = mocker.patch.object(
         APIClient,
         "list_biosamples",
-        return_value=BaseSpaceBioSample(**MOCKED_BASESPACE_BIOSAMPLES),
+        return_value=BaseSpaceBiosample(**MOCKED_BASESPACE_BIOSAMPLES),
     )
     res = runner.invoke(
         biosamples_list,
@@ -140,7 +140,7 @@ def test_biosamples_list__multiple(mocker):
     mocked_login.assert_called_once()
     mocked_list_biosamples.assert_called_once()
 
-    basespace_project = BaseSpaceBioSampleDetail(
+    basespace_project = BaseSpaceBiosampleDetail(
         **MOCKED_BASESPACE_BIOSAMPLES["results"][0]
     )
 
@@ -161,13 +161,13 @@ def test_biosamples_list__multiple(mocker):
 
 
 def test_biosamples_list(mocker):
-    """Test BaseSpace BioSamples being outputed to the shell."""
+    """Test BaseSpace Biosamples being outputed to the shell."""
     runner = CliRunner()
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_list_biosamples = mocker.patch.object(
         APIClient,
         "list_biosamples",
-        return_value=BaseSpaceBioSample(**MOCKED_BASESPACE_BIOSAMPLES),
+        return_value=BaseSpaceBiosample(**MOCKED_BASESPACE_BIOSAMPLES),
     )
     res = runner.invoke(
         biosamples_list,
@@ -177,7 +177,7 @@ def test_biosamples_list(mocker):
     mocked_login.assert_called_once()
     mocked_list_biosamples.assert_called_once()
 
-    basespace_project = BaseSpaceBioSampleDetail(
+    basespace_project = BaseSpaceBiosampleDetail(
         **MOCKED_BASESPACE_BIOSAMPLES["results"][0]
     )
 
@@ -198,7 +198,7 @@ def test_biosamples_list(mocker):
 
 
 def test_biosamples_list__with_unexpected_keys(mocker):
-    """Test BaseSpace BioSamples being outputed to the shell with
+    """Test BaseSpace Biosamples being outputed to the shell with
     an unexpected key as a part of the response.
     """
 
@@ -207,7 +207,7 @@ def test_biosamples_list__with_unexpected_keys(mocker):
     mocked_list_biosamples = mocker.patch.object(
         APIClient,
         "list_biosamples",
-        return_value=BaseSpaceBioSample(
+        return_value=BaseSpaceBiosample(
             **MOCKED_BASESPACE_BIOSAMPLES_WITH_UNEXPECTED_KEYS
         ),
     )
@@ -219,7 +219,7 @@ def test_biosamples_list__with_unexpected_keys(mocker):
     mocked_login.assert_called_once()
     mocked_list_biosamples.assert_called_once()
 
-    basespace_project = BaseSpaceBioSampleDetail(
+    basespace_project = BaseSpaceBiosampleDetail(
         **MOCKED_BASESPACE_BIOSAMPLES_WITH_UNEXPECTED_KEYS["results"][0]
     )
 

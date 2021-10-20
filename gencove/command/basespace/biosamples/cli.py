@@ -7,7 +7,7 @@ from .biosamples_list.cli import biosamples_list
 
 @click.group()
 def biosamples():
-    """BaseSpace BioSamples management commands."""
+    """BaseSpace Biosamples management commands."""
 
 
 biosamples.add_command(biosamples_list)

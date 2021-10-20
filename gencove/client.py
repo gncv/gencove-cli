@@ -32,7 +32,7 @@ from gencove.constants import (
 from gencove.logger import echo_debug
 from gencove.models import (
     AccessJWT,
-    BaseSpaceBioSample,
+    BaseSpaceBiosample,
     BaseSpaceProject,
     BaseSpaceProjectImport,
     BatchDetail,
@@ -653,7 +653,7 @@ class APIClient:
     def import_basespace_projects(
         self, basespace_project_ids, project_id, metadata=None
     ):
-        """Make a request to import BioSamples from BaseSpace projects to a given
+        """Make a request to import Biosamples from BaseSpace projects to a given
         project.
 
         Args:
@@ -701,11 +701,11 @@ class APIClient:
         )
 
     def list_biosamples(self, basespace_project_id, next_link=None):
-        """Make a request to list BioSamples from a BaseSpace project.
+        """Make a request to list Biosamples from a BaseSpace project.
 
         Args:
             basespace_project_id (str): what BaseSpace project to request
-                BioSamples from
+                Biosamples from
             next_link (str, optional): url from previous
                 response['meta']['next'].
 
@@ -727,7 +727,7 @@ class APIClient:
             ),
             query_params=params,
             authorized=True,
-            model=BaseSpaceBioSample,
+            model=BaseSpaceBiosample,
         )
 
     def s3_uri_import(self, s3_uri, project_id, metadata=None):

@@ -1,4 +1,4 @@
-"""Project import BioSamples from BaseSpace projects shell command definition.
+"""Project import Biosamples from BaseSpace projects shell command definition.
 """
 import click
 
@@ -32,20 +32,20 @@ def basespace_import(  # pylint: disable=too-many-arguments
     password,
     api_key,
 ):  # pylint: disable=line-too-long
-    """Import all BioSamples from BaseSpace projects to a project. Optionally add
+    """Import all Biosamples from BaseSpace projects to a project. Optionally add
     metadata to the samples.
 
     Examples:
 
-        Import BioSamples to a project:
+        Import Biosamples to a project:
 
             gencove basespace projects import 12345678 06a5d04b-526a-4471-83ba-fb54e0941758
 
-        Import BioSamples from multiple BaseSpace projects to a project:
+        Import Biosamples from multiple BaseSpace projects to a project:
 
             gencove basespace projects import 12345678,87654321 06a5d04b-526a-4471-83ba-fb54e0941758
 
-        Import BioSamples to a project with metadata:
+        Import Biosamples to a project with metadata:
 
             gencove basespace projects import 12345678 06a5d04b-526a-4471-83ba-fb54e0941758 --metadata-json='{"batch": "batch1"}'
     """  # noqa: E501

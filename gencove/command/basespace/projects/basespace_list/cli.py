@@ -20,7 +20,7 @@ def basespace_list(
 
     Examples:
 
-        Import BioSamples to a project:
+        Import Biosamples to a project:
 
             gencove basespace projects list
 

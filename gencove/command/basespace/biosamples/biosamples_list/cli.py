@@ -1,11 +1,11 @@
-"""List BioSamples from BaseSpace project shell command definition.
+"""List Biosamples from BaseSpace project shell command definition.
 """
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
 from gencove.constants import Credentials, Optionals
 
-from .main import BioSamplesList
+from .main import BiosamplesList
 
 
 @click.command("list")
@@ -18,20 +18,20 @@ def biosamples_list(
     password,
     api_key,
 ):
-    """List all BioSamples from BaseSpace project.
+    """List all Biosamples from BaseSpace project.
 
     Examples:
 
-        List BioSamples of a BaseSpace project:
+        List Biosamples of a BaseSpace project:
 
             gencove basespace biosamples list 12345678
 
-        List BioSamples of a BaseSpace projects:
+        List Biosamples of a BaseSpace projects:
 
             gencove basespace biosamples list 12345678,87654321
 
     """
-    BioSamplesList(
+    BiosamplesList(
         basespace_project_id,
         Credentials(email=email, password=password, api_key=api_key),
         Optionals(host=host),

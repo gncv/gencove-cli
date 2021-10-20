@@ -17,7 +17,7 @@ class BaseSpaceAutoImportList(Command):
         """Validate command input."""
 
     def execute(self):
-        """Make a request to list jobs to periodically import BioSamples from
+        """Make a request to list jobs to periodically import Biosamples from
         BaseSpace projects.
         """
         self.echo_debug("List AutoImport jobs.")

@@ -69,3 +69,51 @@ def mock_binary_response(response):
         if "Content-Length" in response["headers"]:
             response["headers"]["Content-Length"] = ["123"]
     return response
+
+
+def filter_samples_request(request):
+    """Filter samples sensitive data from request."""
+    return _replace_uuid_from_url(request, "samples")
+
+
+def _filter_sample(result):
+    """Common function that filters sample sensitive data."""
+    if "id" in result:
+        result["id"] = MOCK_UUID
+    if "client_id" in result:
+        result["client_id"] = "mock_client_id"
+    if "project" in result:
+        result["project"] = MOCK_UUID
+    if "physical_id" in result and result["physical_id"]:
+        result["physical_id"] = "mock_physical_id"
+    if "legacy_id" in result and result["legacy_id"]:
+        result["legacy_id"] = "mock_legacy_id"
+    if "last_status" in result:
+        result["last_status"]["id"] = MOCK_UUID
+    if "archive_last_status" in result:
+        result["archive_last_status"]["id"] = MOCK_UUID
+    for file in result.get("files", []):
+        if "id" in file:
+            file["id"] = MOCK_UUID
+        if "s3_path" in file:
+            file["s3_path"] = f"mock/{file['s3_path'].split('/')[-1]}"
+        if "size" in file and file["size"]:
+            file["size"] = "1"
+        if "download_url" in file and file["download_url"]:
+            filename = urlparse(file["download_url"]).path.split("/")[-1]
+            file["download_url"] = f"https://example.com/{filename}"
+
+
+@parse_response_to_json
+def filter_project_samples_response(response, response_json):
+    """Filter project samples sensitive data from response."""
+    for result in response_json.get("results", []):
+        _filter_sample(result)
+    return response, response_json
+
+
+@parse_response_to_json
+def filter_samples_response(response, response_json):
+    """Filter samples sensitive data from response."""
+    _filter_sample(response_json)
+    return response, response_json

@@ -1,2 +1,2 @@
-"""BaseSpace BioSamples management commands."""
+"""BaseSpace Biosamples management commands."""
 from .cli import biosamples  # noqa: F401

@@ -1,4 +1,4 @@
-"""List BioSamples from BaseSpace project subcommand."""
+"""List Biosamples from BaseSpace project subcommand."""
 import backoff
 
 from .utils import get_line
@@ -6,8 +6,8 @@ from ....base import Command
 from ..... import client
 
 
-class BioSamplesList(Command):
-    """BioSamples list command executor."""
+class BiosamplesList(Command):
+    """Biosamples list command executor."""
 
     def __init__(self, basespace_project_id, credentials, options):
         super().__init__(credentials, options)
@@ -22,36 +22,36 @@ class BioSamplesList(Command):
         pass  # pylint: disable=unnecessary-pass
 
     def execute(self):
-        """Make a request to list BioSamples from a BaseSpace project."""
+        """Make a request to list Biosamples from a BaseSpace project."""
         self.echo_debug(
-            "Listing BioSamples from a BaseSpace project {}.".format(
+            "Listing Biosamples from a BaseSpace project {}.".format(
                 self.basespace_project_id
             )
         )
         try:
             for biosamples in self.get_paginated_biosamples():
                 if not biosamples:
-                    self.echo_debug("No BaseSpace BioSamples were found.")
+                    self.echo_debug("No BaseSpace Biosamples were found.")
                     return
 
                 for biosample in biosamples:
                     self.echo_data(get_line(biosample))
         except client.APIClientError as err:
-            self.echo_error("There was an error listing BioSamples.")
+            self.echo_error("There was an error listing Biosamples.")
             if err.status_code == 404:
-                self.echo_error("No BaseSpace BioSamples found.")
+                self.echo_error("No BaseSpace Biosamples found.")
             raise
 
     def get_paginated_biosamples(self):
-        """Paginate over all BioSamples returned.
+        """Paginate over all Biosamples returned.
 
         Yields:
-            paginated lists of BaseSpace BioSamples
+            paginated lists of BaseSpace Biosamples
         """
         more = True
         next_link = None
         while more:
-            self.echo_debug("Get BaseSpace BioSamples page")
+            self.echo_debug("Get BaseSpace Biosamples page")
             resp = self.get_biosamples(next_link)
 
             yield resp.results
@@ -65,7 +65,7 @@ class BioSamplesList(Command):
         max_time=30,
     )
     def get_biosamples(self, next_link=None):
-        """Get BaseSpace BioSamples page."""
+        """Get BaseSpace Biosamples page."""
         return self.api_client.list_biosamples(
             self.basespace_project_id, next_link
         )

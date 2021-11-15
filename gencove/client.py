@@ -32,8 +32,9 @@ from gencove.constants import (
 from gencove.logger import echo_debug
 from gencove.models import (
     AccessJWT,
-    BaseSpaceBioSample,
+    BaseSpaceBiosample,
     BaseSpaceProject,
+    BaseSpaceProjectImport,
     BatchDetail,
     CreateJWT,
     PipelineCapabilities,
@@ -652,7 +653,7 @@ class APIClient:
     def import_basespace_projects(
         self, basespace_project_ids, project_id, metadata=None
     ):
-        """Make a request to import BioSamples from BaseSpace projects to a given
+        """Make a request to import Biosamples from BaseSpace projects to a given
         project.
 
         Args:
@@ -700,11 +701,11 @@ class APIClient:
         )
 
     def list_biosamples(self, basespace_project_id, next_link=None):
-        """Make a request to list BioSamples from a BaseSpace project.
+        """Make a request to list Biosamples from a BaseSpace project.
 
         Args:
             basespace_project_id (str): what BaseSpace project to request
-                BioSamples from
+                Biosamples from
             next_link (str, optional): url from previous
                 response['meta']['next'].
 
@@ -726,7 +727,7 @@ class APIClient:
             ),
             query_params=params,
             authorized=True,
-            model=BaseSpaceBioSample,
+            model=BaseSpaceBiosample,
         )
 
     def s3_uri_import(self, s3_uri, project_id, metadata=None):
@@ -749,4 +750,60 @@ class APIClient:
             self.endpoints.S3_URI_IMPORT.value,
             payload,
             authorized=True,
+        )
+
+    def autoimport_from_basespace(
+        self,
+        project_id,
+        identifier,
+        metadata=None,
+    ):
+        """Make a request to create a periodic import job of BaseSpace projects'
+        Biosamples to a given Gencove project.
+
+        Args:
+            project_id (str): project to which to assign the samples
+            identifier (str): identifier that is contained in BaseSpace
+                projects' name
+            metadata (str): JSON metadata to be applied to all samples
+        """
+
+        payload = {
+            "project_id": project_id,
+            "identifier": identifier,
+            "metadata": metadata,
+        }
+
+        return self._post(
+            self.endpoints.BASESPACE_PROJECTS_AUTOIMPORT.value,
+            payload,
+            authorized=True,
+        )
+
+    def list_basespace_autoimport_jobs(self, next_link=None):
+        """Make a request to list periodic import jobs of BaseSpace projects'
+        Biosamples.
+
+        Args:
+            next_link (str, optional): url from previous
+                response['meta']['next'].
+
+        Returns:
+            api response (dict):
+                {
+                    "meta": {
+                        "count": int,
+                        "next": str,
+                        "previous": optional[str],
+                    },
+                    "results": [...]
+                }
+        """
+
+        params = self._add_query_params(next_link)
+        return self._get(
+            self.endpoints.BASESPACE_PROJECTS_AUTOIMPORT.value,
+            query_params=params,
+            authorized=True,
+            model=BaseSpaceProjectImport,
         )

@@ -268,16 +268,31 @@ class BaseSpaceProject(BaseModel):
     results: Optional[List[BaseSpaceProjectDetail]]
 
 
-class BaseSpaceBioSampleDetail(BaseModel):
-    """BaseSpace BioSample detail model"""
+class BaseSpaceBiosampleDetail(BaseModel):
+    """BaseSpace Biosample detail model"""
 
     basespace_id: Optional[str]
     basespace_bio_sample_name: Optional[str]
     basespace_date_created: Optional[datetime]
 
 
-class BaseSpaceBioSample(BaseModel):
-    """BaseSpace BioSample model"""
+class BaseSpaceBiosample(BaseModel):
+    """BaseSpace Biosample model"""
 
     meta: ResponseMeta
-    results: Optional[List[BaseSpaceBioSampleDetail]]
+    results: Optional[List[BaseSpaceBiosampleDetail]]
+
+
+class BaseSpaceProjectImportDetail(GencoveBaseModel):
+    """BaseSpace project import detail model"""
+
+    project_id: UUID
+    identifier: str
+    metadata: Optional[Any]
+
+
+class BaseSpaceProjectImport(BaseModel):
+    """BaseSpace project import model"""
+
+    meta: ResponseMeta
+    results: Optional[List[BaseSpaceProjectImportDetail]]

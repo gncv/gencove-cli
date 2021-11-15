@@ -1,4 +1,4 @@
-"""Import BioSamples from BaseSpace projects to a project subcommand."""
+"""Import Biosamples from BaseSpace projects to a project subcommand."""
 
 import json
 
@@ -37,11 +37,11 @@ class BaseSpaceImport(Command):
     # no retry for timeouts in order to avoid duplicate heavy operations on
     # the backend
     def execute(self):
-        """Make a request to import BioSamples from BaseSpace to a given
+        """Make a request to import Biosamples from BaseSpace to a given
         project.
         """
         self.echo_debug(
-            "Import BioSamples of the projects {} to a project {}".format(
+            "Import Biosamples of the projects {} to a project {}".format(
                 self.basespace_project_ids, self.project_id
             )
         )
@@ -52,7 +52,7 @@ class BaseSpaceImport(Command):
             if self.metadata_json is not None:
                 metadata = json.loads(self.metadata_json)
                 self.echo_info(
-                    "Assigning metadata to the imported BioSamples."
+                    "Assigning metadata to the imported Biosamples."
                 )
             import_basespace_projects = (
                 self.api_client.import_basespace_projects(
@@ -65,6 +65,6 @@ class BaseSpaceImport(Command):
             self.echo_info("Request to import BaseSpace projects accepted.")
         except client.APIClientError:
             self.echo_error(
-                "There was an error importing BioSamples from BaseSpace."
+                "There was an error importing Biosamples from BaseSpace."
             )
             raise

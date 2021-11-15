@@ -51,10 +51,10 @@ tox
 
 This will run tests, black formatter and linters.
 
-To run only a specific job from tox (i.e. only the tests for python 3.7):
+To run only a specific job from tox (i.e. only the tests for python 3.7 using API key):
 
 ```bash
-tox -e py37
+tox -e py37-api_key
 ```
 
 To create docs:

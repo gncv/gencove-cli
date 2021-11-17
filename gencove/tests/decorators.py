@@ -37,9 +37,10 @@ def assert_authorization(func):
         api_key = os.getenv("GENCOVE_API_KEY_TEST")
         email = os.getenv("GENCOVE_EMAIL_TEST")
         password = os.getenv("GENCOVE_PASSWORD_TEST")
+        using_api_key = os.getenv("USING_API_KEY")
 
         def mock_get_auth(url, *args, headers, **kwargs):
-            if host in url and api_key:
+            if host in url and using_api_key:
                 assert (
                     headers["Authorization"] == f"Api-Key {api_key}"
                 ), f"No valid authorization header provided for GET-{url}"
@@ -51,7 +52,7 @@ def assert_authorization(func):
 
         def mock_post_auth(url, data, *args, headers, **kwargs):
             nonlocal login_called
-            if host in url and api_key:
+            if host in url and using_api_key:
                 assert (
                     headers["Authorization"] == f"Api-Key {api_key}"
                 ), f"No valid authorization header provided for POST-{url}"
@@ -62,14 +63,14 @@ def assert_authorization(func):
                     assert data_json["email"] == email
                     assert data_json["password"] == password
                 else:
-                    assert "Bearer " in headers["Authorization"]
+                    assert "Bearer " in headers.get("Authorization")
             kwargs["headers"] = headers
             return requests.post(url, data, *args, **kwargs)
 
         mocker.patch("gencove.client.post", side_effect=mock_post_auth)
         kwargs["mocker"] = mocker
         func(*args, **kwargs)
-        if password:
+        if not using_api_key:
             assert login_called, "jwt-create endpoint was not called"
 
     return wrapper

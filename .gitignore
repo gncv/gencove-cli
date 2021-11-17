@@ -35,3 +35,7 @@ venv*
 .vscode
 .coverage
 .coverage.*
+
+
+# dotenv file
+.env

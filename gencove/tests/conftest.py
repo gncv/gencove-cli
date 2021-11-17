@@ -12,8 +12,8 @@ import pytest
 @pytest.fixture(scope="session")
 def using_api_key():
     """Returns True if API Key is being used."""
-    api_key = os.getenv("GENCOVE_API_KEY_TEST")
-    return api_key is not None
+    use_api_key = os.getenv("USING_API_KEY")
+    return use_api_key is not None
 
 
 @pytest.fixture(scope="session")
@@ -43,12 +43,12 @@ def project_id_download():
 
 
 @pytest.fixture(scope="session")
-def credentials():
+def credentials(using_api_key):  # pylint: disable=redefined-outer-name
     """Fixture to have the appropriate credentials."""
     api_key = os.getenv("GENCOVE_API_KEY_TEST")
     email = os.getenv("GENCOVE_EMAIL_TEST")
     password = os.getenv("GENCOVE_PASSWORD_TEST")
-    if api_key:
+    if using_api_key:
         return ["--api-key", api_key]
     return ["--email", email, "--password", password]
 

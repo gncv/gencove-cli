@@ -1,9 +1,9 @@
 """List S3 AutoImport jobs subcommand."""
 import backoff
 
-from ..... import client
-from ....base import Command
 from .utils import get_line
+from ....base import Command
+from ..... import client
 
 
 class S3AutoImportList(Command):

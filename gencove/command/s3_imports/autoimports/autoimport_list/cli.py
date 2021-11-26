@@ -1,6 +1,7 @@
 """Project autoimport from S3 URI shell command definition.
 """
 import click
+
 from gencove.command.common_cli_options import add_options, common_options
 from gencove.constants import Credentials, Optionals
 

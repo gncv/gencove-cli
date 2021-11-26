@@ -11,8 +11,8 @@ from urllib.parse import parse_qs, urljoin, urlparse
 from uuid import UUID
 
 from pydantic import BaseModel
-from requests import ConnectTimeout  # pylint: disable=W0622
-from requests import ConnectionError, ReadTimeout, get, post
+from requests import ConnectTimeout  # pylint: disable=W0622  # noqa
+from requests import ReadTimeout, get, post
 
 from gencove import constants  # noqa: I100
 from gencove.constants import (
@@ -24,7 +24,7 @@ from gencove.constants import (
     SortOrder,
 )
 from gencove.logger import echo_debug
-from gencove.models import (
+from gencove.models import (  # noqa
     AccessJWT,
     BaseSpaceBiosample,
     BaseSpaceProject,
@@ -49,6 +49,8 @@ from gencove.models import (
     UploadsPostData,
 )
 from gencove.version import version as cli_version
+
+# from requests import ConnectionError, ReadTimeout, get, post
 
 
 class CustomEncoder(json.JSONEncoder):

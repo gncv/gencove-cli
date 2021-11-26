@@ -2,10 +2,10 @@
 
 import json
 
-from ..... import client
-from .....exceptions import ValidationError
 from ....base import Command
 from ....utils import is_valid_json, is_valid_uuid
+from ..... import client
+from .....exceptions import ValidationError
 
 
 class S3AutoImport(Command):
@@ -57,12 +57,15 @@ class S3AutoImport(Command):
                 metadata=metadata,
             )
             self.echo_info(
-                "Request to create a periodic import job from S3 URI to project accepted."
+                "Request to create a periodic import job from"
+                "S3 URI to project accepted."
             )
             self.echo_data(
                 "\t".join(
-                    autoimport_from_s3.id,
-                    autoimport_from_s3.topic_arn,
+                    [
+                        autoimport_from_s3.id,
+                        autoimport_from_s3.topic_arn,
+                    ]
                 )
             )
         except client.APIClientError:

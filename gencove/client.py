@@ -6,19 +6,13 @@ Exclude imports from linters due to install aliases breaking the rules.
 import datetime
 import json
 import time
-from uuid import UUID
 from builtins import str as text  # noqa
 from urllib.parse import parse_qs, urljoin, urlparse
+from uuid import UUID
 
 from pydantic import BaseModel
-
-from requests import (  # pylint: disable=W0622
-    ConnectTimeout,
-    ConnectionError,
-    ReadTimeout,
-    get,
-    post,
-)
+from requests import ConnectTimeout  # pylint: disable=W0622
+from requests import ConnectionError, ReadTimeout, get, post
 
 from gencove import constants  # noqa: I100
 from gencove.constants import (
@@ -39,11 +33,13 @@ from gencove.models import (
     CreateJWT,
     PipelineCapabilities,
     Project,
-    ProjectBatchTypes,
     ProjectBatches,
+    ProjectBatchTypes,
     ProjectMergeVCFs,
-    ProjectSamples,
     Projects,
+    ProjectSamples,
+    S3AutoimportTopic,
+    S3ProjectImport,
     SampleDetails,
     SampleMetadata,
     SampleQC,
@@ -806,4 +802,59 @@ class APIClient:
             query_params=params,
             authorized=True,
             model=BaseSpaceProjectImport,
+        )
+
+    def autoimport_from_s3(
+        self,
+        project_id,
+        s3_uri,
+        metadata=None,
+    ):
+        """Make a request to create a periodic import job of BaseSpace projects'
+        Biosamples to a given Gencove project.
+
+        Args:
+            s3_uri (str): s3 path formated as s3://<bucket-name>/prefix
+            project_id (str): project to which to assign the samples
+            metadata (str): JSON metadata to be applied to all samples
+        """
+
+        payload = {
+            "project_id": project_id,
+            "s3_uri": s3_uri,
+            "metadata": metadata,
+        }
+
+        return self._post(
+            self.endpoints.S3_URI_AUTOIMPORT.value,
+            payload,
+            authorized=True,
+            model=S3AutoimportTopic,
+        )
+
+    def list_s3_autoimport_jobs(self, next_link=None):
+        """Make a request to list S3 import jobs.
+
+        Args:
+            next_link (str, optional): url from previous
+                response['meta']['next'].
+
+        Returns:
+            api response (dict):
+                {
+                    "meta": {
+                        "count": int,
+                        "next": str,
+                        "previous": optional[str],
+                    },
+                    "results": [...]
+                }
+        """
+
+        params = self._add_query_params(next_link)
+        return self._get(
+            self.endpoints.S3_URI_AUTOIMPORT.value,
+            query_params=params,
+            authorized=True,
+            model=S3ProjectImport,
         )

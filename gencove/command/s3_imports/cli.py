@@ -2,6 +2,7 @@
 # pylint: disable=E0012,C0330,R0913
 import click
 
+from .autoimports.cli import autoimports
 from .s3_import.cli import s3_import
 
 
@@ -12,4 +13,5 @@ def s3():  # pylint: disable=C0103
     """
 
 
+s3.add_command(autoimports)
 s3.add_command(s3_import)

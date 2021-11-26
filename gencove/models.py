@@ -296,3 +296,24 @@ class BaseSpaceProjectImport(BaseModel):
 
     meta: ResponseMeta
     results: Optional[List[BaseSpaceProjectImportDetail]]
+
+
+class S3AutoimportTopic(GencoveBaseModel):
+    """S3 autoimport topic"""
+
+    topic_arn: str
+
+
+class S3ProjectImportDetail(GencoveBaseModel):
+    """S3 project import detail model"""
+
+    project_id: UUID
+    s3_uri: str
+    metadata: Optional[Any]
+
+
+class S3ProjectImport(BaseModel):
+    """S3 project import model"""
+
+    meta: ResponseMeta
+    results: Optional[List[S3ProjectImportDetail]]

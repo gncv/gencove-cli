@@ -10,6 +10,7 @@ from gencove.command.s3_imports.autoimports.autoimport_list.cli import (
 from gencove.models import S3ProjectImport
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
+
 from vcr import VCR
 
 
@@ -72,8 +73,7 @@ def test_autoimport_list_uploads_slow_response_retry(mocker, credentials):
     assert (
         "\n".join(
             [
-                "ERROR: There was an error listing autoimport jobs of "
-                "S3 projects.",
+                "ERROR: There was an error listing S3 autoimport jobs.",
                 "ERROR: Could not connect to the api server",
                 "Aborted!\n",
             ]
@@ -94,13 +94,13 @@ def test_autoimport_list(mocker, credentials):
             {
                 "id": "41fd0397-62b0-4ef9-992f-423435b5d5ef",
                 "project_id": "290e0c5a-c87e-474e-8b32-fe56fc54cc4d",
-                "identifier": "identifier-in-s3_imports-project-name",
+                "s3_uri": "s3://bucket/project-1/samples-1/",
                 "metadata": None,
             },
             {
                 "id": "0f60ab5e-a34f-4afc-a428-66f81890565f",
                 "project_id": "290e0c5a-c87e-474e-8b32-fe56fc54cc4d",
-                "identifier": "Dummy",
+                "s3_uri": "s3://bucket/project-1/samples-2/",
                 "metadata": {},
             },
         ],
@@ -122,7 +122,7 @@ def test_autoimport_list(mocker, credentials):
                 [
                     job["id"],
                     job["project_id"],
-                    job["identifier"],
+                    job["s3_uri"],
                 ]
             )
             for job in autoimport_jobs

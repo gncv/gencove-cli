@@ -1,12 +1,16 @@
 """Tests upload command of Gencove CLI."""
 # pylint: disable=wrong-import-order, import-error
 
+from uuid import uuid4
+
 import pytest
 from click.testing import CliRunner
 from gencove.client import APIClient, APIClientError
 from gencove.command.s3_imports.autoimports.create.cli import create
+from gencove.models import S3AutoimportTopic
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
+
 from vcr import VCR
 
 
@@ -131,16 +135,20 @@ def test_s3_autoimport_create_with_empty_metadata(
     """
     runner = CliRunner()
 
+    autoimport_from_s3 = S3AutoimportTopic(
+        id=uuid4(), topic_arn="arn:aws:sns:us-east-1:123456789012:MyTopic"
+    )
+
     mocked_autoimport_from_s3 = mocker.patch.object(
         APIClient,
         "autoimport_from_s3",
-        return_value="",
+        return_value=autoimport_from_s3,
     )
     res = runner.invoke(
         create,
         [
             project_id,
-            "identifier",
+            "s3://bucket/path/to/project/",
             "--metadata-json",
             None,
             *credentials,
@@ -148,6 +156,12 @@ def test_s3_autoimport_create_with_empty_metadata(
     )
 
     assert res.exit_code == 0
+    assert res.output == "\t".join(
+        [
+            autoimport_from_s3.id,
+            autoimport_from_s3.topic_arn,
+        ]
+    )
     mocked_autoimport_from_s3.assert_called_once()
 
 
@@ -160,16 +174,20 @@ def test_s3_autoimport_create_with_metadata(credentials, mocker, project_id):
     """
     runner = CliRunner()
 
+    autoimport_from_s3 = S3AutoimportTopic(
+        id=uuid4(), topic_arn="arn:aws:sns:us-east-1:123456789012:MyTopic"
+    )
+
     mocked_autoimport_from_s3 = mocker.patch.object(
         APIClient,
         "autoimport_from_s3",
-        return_value="",
+        return_value=autoimport_from_s3,
     )
     res = runner.invoke(
         create,
         [
             project_id,
-            "identifier",
+            "s3://bucket/path/to/project/",
             "--metadata-json",
             "[1,2,3]",
             *credentials,
@@ -177,6 +195,12 @@ def test_s3_autoimport_create_with_metadata(credentials, mocker, project_id):
     )
 
     assert res.exit_code == 0
+    assert res.output == "\t".join(
+        [
+            autoimport_from_s3.id,
+            autoimport_from_s3.topic_arn,
+        ]
+    )
     mocked_autoimport_from_s3.assert_called_once()
 
 
@@ -189,19 +213,29 @@ def test_s3_autoimport_create_without_metadata(
     """Test that user can create an import job without passing metadata."""
     runner = CliRunner()
 
+    autoimport_from_s3 = S3AutoimportTopic(
+        id=uuid4(), topic_arn="arn:aws:sns:us-east-1:123456789012:MyTopic"
+    )
+
     mocked_autoimport_from_s3 = mocker.patch.object(
         APIClient,
         "autoimport_from_s3",
-        return_value="",
+        return_value=autoimport_from_s3,
     )
     res = runner.invoke(
         create,
         [
             project_id,
-            "identifier",
+            "s3://bucket/path/to/project/",
             *credentials,
         ],
     )
 
     assert res.exit_code == 0
+    assert res.output == "\t".join(
+        [
+            autoimport_from_s3.id,
+            autoimport_from_s3.topic_arn,
+        ]
+    )
     mocked_autoimport_from_s3.assert_called_once()

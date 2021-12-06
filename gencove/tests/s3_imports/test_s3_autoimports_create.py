@@ -4,8 +4,8 @@
 from uuid import uuid4
 
 import pytest
-from click.testing import CliRunner
-from gencove.client import APIClient, APIClientError
+from click.testing import CliRunner  # noqa: I100,I201
+from gencove.client import APIClient, APIClientError  # noqa: I201
 from gencove.command.s3_imports.autoimports.create.cli import create
 from gencove.models import S3AutoimportTopic
 from gencove.tests.decorators import assert_authorization

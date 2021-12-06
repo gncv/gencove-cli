@@ -2,8 +2,8 @@
 # pylint: disable=wrong-import-order, import-error
 
 import pytest
-from click.testing import CliRunner
-from gencove.client import APIClient, APIClientTimeout
+from click.testing import CliRunner  # noqa: I100,I201
+from gencove.client import APIClient, APIClientTimeout  # noqa: I201
 from gencove.command.s3_imports.autoimports.autoimport_list.cli import (
     autoimport_list,
 )

@@ -156,11 +156,14 @@ def test_s3_autoimport_create_with_empty_metadata(
     )
 
     assert res.exit_code == 0
-    assert res.output == "\t".join(
-        [
-            str(autoimport_from_s3.id),
-            autoimport_from_s3.topic_arn,
-        ]
+    assert (
+        "\t".join(
+            [
+                str(autoimport_from_s3.id),
+                autoimport_from_s3.topic_arn,
+            ]
+        )
+        in res.output
     )
     mocked_autoimport_from_s3.assert_called_once()
 
@@ -195,11 +198,14 @@ def test_s3_autoimport_create_with_metadata(credentials, mocker, project_id):
     )
 
     assert res.exit_code == 0
-    assert res.output == "\t".join(
-        [
-            str(autoimport_from_s3.id),
-            autoimport_from_s3.topic_arn,
-        ]
+    assert (
+        "\t".join(
+            [
+                str(autoimport_from_s3.id),
+                autoimport_from_s3.topic_arn,
+            ]
+        )
+        in res.output
     )
     mocked_autoimport_from_s3.assert_called_once()
 
@@ -232,10 +238,13 @@ def test_s3_autoimport_create_without_metadata(
     )
 
     assert res.exit_code == 0
-    assert res.output == "\t".join(
-        [
-            str(autoimport_from_s3.id),
-            autoimport_from_s3.topic_arn,
-        ]
+    assert (
+        "\t".join(
+            [
+                str(autoimport_from_s3.id),
+                autoimport_from_s3.topic_arn,
+            ]
+        )
+        in res.output
     )
     mocked_autoimport_from_s3.assert_called_once()

@@ -63,7 +63,7 @@ class S3AutoImport(Command):
             self.echo_data(
                 "\t".join(
                     [
-                        autoimport_from_s3.id,
+                        str(autoimport_from_s3.id),
                         autoimport_from_s3.topic_arn,
                     ]
                 )

@@ -11,7 +11,7 @@ from urllib.parse import parse_qs, urljoin, urlparse
 from uuid import UUID
 
 from pydantic import BaseModel
-from requests import ConnectTimeout, ReadTimeout, get, post
+from requests import ConnectTimeout, ReadTimeout, get, post  # noqa: I201
 
 from gencove import constants  # noqa: I100
 from gencove.constants import (
@@ -24,7 +24,7 @@ from gencove.constants import (
 )
 from gencove.logger import echo_debug
 from gencove.models import BaseSpaceBiosample  # noqa
-from gencove.models import (
+from gencove.models import (  # noqa: I101, I100
     AccessJWT,
     BaseSpaceProject,
     BaseSpaceProjectImport,

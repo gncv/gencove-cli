@@ -23,7 +23,7 @@ from gencove.constants import (
     SortOrder,
 )
 from gencove.logger import echo_debug
-from gencove.models import (
+from gencove.models import (  # noqa: I101
     AccessJWT,
     BaseSpaceBiosample,
     BaseSpaceProject,

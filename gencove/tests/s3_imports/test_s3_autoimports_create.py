@@ -121,7 +121,7 @@ def test_s3_autoimport_create_no_permission(credentials, mocker, project_id):
 
     assert res.exit_code == 1
     mocked_autoimport_from_s3.assert_called_once()
-    assert "There was an error creating a periodic import job" in res.output
+    assert "There was an error creating an import job" in res.output
 
 
 @pytest.mark.default_cassette("jwt-create.yaml")

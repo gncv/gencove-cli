@@ -2,10 +2,10 @@
 
 import json
 
-from ....base import Command
-from ....utils import is_valid_json, is_valid_uuid
 from ..... import client
 from .....exceptions import ValidationError
+from ....base import Command
+from ....utils import is_valid_json, is_valid_uuid
 
 
 class S3AutoImport(Command):
@@ -70,6 +70,6 @@ class S3AutoImport(Command):
             )
         except client.APIClientError:
             self.echo_error(
-                "There was an error creating a periodic import job of S3 URI."
+                "There was an error creating an import job of S3 URI."
             )
             raise

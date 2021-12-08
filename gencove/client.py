@@ -23,9 +23,9 @@ from gencove.constants import (
     SortOrder,
 )
 from gencove.logger import echo_debug
-from gencove.models import BaseSpaceBiosample  # noqa
-from gencove.models import (  # noqa: I101, I100
+from gencove.models import (
     AccessJWT,
+    BaseSpaceBiosample,
     BaseSpaceProject,
     BaseSpaceProjectImport,
     BatchDetail,
@@ -809,8 +809,8 @@ class APIClient:
         s3_uri,
         metadata=None,
     ):
-        """Make a request to create a periodic import job of BaseSpace projects'
-        Biosamples to a given Gencove project.
+        """Make a request to create an import job of S3 URI to a given
+        Gencove project.
 
         Args:
             s3_uri (str): s3 path formated as s3://<bucket-name>/prefix

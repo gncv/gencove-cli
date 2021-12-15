@@ -32,6 +32,7 @@ class ApiEndpoints(Enum):
     BASESPACE_BIOSAMPLES_LIST = "/api/v2/basespace-project-biosamples/{id}"
     S3_URI_IMPORT = "/api/v2/s3-uri-import/"
     BASESPACE_PROJECTS_AUTOIMPORT = "/api/v2/basespace-projects-autoimport/"
+    S3_URI_AUTOIMPORT = "/api/v2/s3-uri-autoimport/"
 
 
 @unique

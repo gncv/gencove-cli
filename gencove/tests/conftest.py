@@ -5,6 +5,8 @@
 # pylint: disable=import-error
 
 import os
+import uuid
+from datetime import datetime
 
 import pytest
 
@@ -87,3 +89,28 @@ def batch_name():
 def batch_id():
     """Returns a batch id."""
     return os.getenv("GENCOVE_BATCH_ID_TEST")
+
+
+@pytest.fixture(scope="function", autouse=True)
+def dont_save_dump_log():
+    """Sets the environment variable to disable dumping the log file."""
+    os.environ["GENCOVE_SAVE_DUMP_LOG"] = "FALSE"
+
+
+@pytest.fixture(scope="function")
+def dump_filename(mocker):
+    """Fixtures that returns the log filename and creates the folder."""
+    random_id = str(uuid.uuid4())
+    now = datetime.utcnow()
+    folder = f".logs/{now:%Y_%m}"
+    filename = f"{folder}/{now:%Y_%m_%d_%H_%M_%S}_{random_id[:8]}.log"
+
+    def get_debug_file_name_patch():
+        os.makedirs(folder)
+        return filename
+
+    mocker.patch(
+        "gencove.logger.get_debug_file_name",
+        side_effect=get_debug_file_name_patch,
+    )
+    return filename

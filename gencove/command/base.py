@@ -2,6 +2,8 @@
 
 All commands must implement this interface.
 """
+import traceback
+
 import click
 
 from gencove.client import APIClient, APIClientError
@@ -9,6 +11,7 @@ from gencove.exceptions import ValidationError
 from gencove.logger import (
     DEBUG,
     LOG_LEVEL,
+    dump_debug_log,
     echo_data,
     echo_debug,
     echo_error,
@@ -59,6 +62,7 @@ class Command(object):  # pylint: disable=R0205
             self.execute()
         except ValidationError as err:
             self.echo_error(err.message)
+            dump_debug_log()
             raise click.Abort()
         except APIClientError as err:
             if err.status_code == 403:
@@ -67,6 +71,13 @@ class Command(object):  # pylint: disable=R0205
                     "level required to perform this operation."
                 )
             self.echo_error(err.message)
+            dump_debug_log()
+            if LOG_LEVEL == DEBUG:
+                raise err
+            raise click.Abort()
+        except Exception as err:
+            self.echo_error(traceback.format_exc())
+            dump_debug_log()
             if LOG_LEVEL == DEBUG:
                 raise err
             raise click.Abort()

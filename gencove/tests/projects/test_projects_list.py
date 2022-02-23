@@ -2,9 +2,13 @@
 # pylint: disable=wrong-import-order, import-error
 import io
 import operator
+import os
 import sys
 from datetime import datetime, timedelta
+from platform import platform
 from uuid import uuid4
+
+import boto3
 
 from click import echo
 from click.testing import CliRunner
@@ -29,6 +33,7 @@ from gencove.tests.projects.vcr.filters import (
 )
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
 from gencove.tests.utils import get_vcr_response
+from gencove.version import version
 
 import pytest
 
@@ -144,6 +149,43 @@ def test_list_projects_slow_response_retry_list(mocker, credentials):
     assert res.exit_code == 1
     assert mocked_get_projects.call_count == 2
     mocked_get_pipeline_capabilities.assert_not_called()
+
+
+@pytest.mark.default_cassette("jwt-create.yaml")
+@pytest.mark.vcr
+@assert_authorization
+def test_list_projects_slow_response_dump_log(
+    mocker, credentials, dump_filename
+):
+    """Test projects slow response dumps a log filet."""
+    del os.environ["GENCOVE_SAVE_DUMP_LOG"]
+    runner = CliRunner()
+    mocker.patch.object(
+        APIClient,
+        "list_projects",
+        side_effect=APIClientTimeout("Could not connect to the api server"),
+    )
+    python_version = sys.version_info
+    logs = [
+        f"Python version: {python_version.major}.{python_version.minor}.{python_version.micro}",  # noqa: E501  # pylint: disable=line-too-long
+        f"CLI version: {version()}",
+        f"OS details: {platform()}",
+        f"boto3 version: {boto3.__version__}",
+        "Retrieving projects",
+        "Get projects page",
+        "Could not connect to the api server",
+    ]
+    with runner.isolated_filesystem():
+        res = runner.invoke(list_projects, credentials)
+        assert res.exit_code == 1
+        assert (
+            f"Please attach the debug log file located in {dump_filename} to a bug report."  # noqa: E501  # pylint: disable=line-too-long
+            in res.output
+        )
+        with open(dump_filename, encoding="utf8") as log_file:
+            log_content = log_file.read()
+            for log in logs:
+                assert log in log_content
 
 
 @pytest.mark.vcr

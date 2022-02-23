@@ -35,6 +35,8 @@ venv*
 .vscode
 .coverage
 .coverage.*
+.logs
+
 
 
 # dotenv file

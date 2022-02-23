@@ -108,10 +108,15 @@ def get_debug_file_name():
 def dump_debug_log():
     """Saves the logs into a file."""
     if os.environ.get("GENCOVE_SAVE_DUMP_LOG") != "FALSE":
-        debug_filename = get_debug_file_name()
-        log = "\n".join(DEBUG_LOG)
-        with open(debug_filename, "w") as dump_file:
-            dump_file.write(log)
-        _echo(
-            f"Please attach the debug log file located in {debug_filename} to a bug report."  # noqa: E501  # pylint: disable=line-too-long
-        )
+        try:
+            debug_filename = get_debug_file_name()
+            log = "\n".join(DEBUG_LOG)
+            with open(debug_filename, "w") as dump_file:
+                dump_file.write(log)
+            _echo(
+                f"Please attach the debug log file located in {debug_filename} to a bug report."  # noqa: E501  # pylint: disable=line-too-long
+            )
+        except PermissionError:
+            echo_warning(
+                "An error occurred, but we couldn't write a debug log file to disk."  # noqa: E501  # pylint: disable=line-too-long
+            )

@@ -57,6 +57,14 @@ To run only a specific job from tox (i.e. only the tests for python 3.7 using AP
 tox -e py37-api_key
 ```
 
+Tests Configuration:
+
+If you need to interact with the API (for instance to record new VCR cassettes) you need to set up environment variables, this way, the tests will have the credentials to have access.
+In order to do that, just run `cp gencove/tests/.env.dist gencove/tests/.env` and change the desired values from the `.env` file.
+
+For more details, read internal `CLI testing` document.
+
+
 To create docs:
 
 ```bash

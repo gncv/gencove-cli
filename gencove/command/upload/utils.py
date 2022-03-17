@@ -204,7 +204,9 @@ def _validate_fastq(fastq):
 
 
 def _validate_header(header):
-    header_columns = header.values()
+    header_columns = [
+        header_item.strip().lower() for header_item in header.values()
+    ]
     for column in FastQ.__fields__:
         if column not in header_columns:
             raise ValidationError(

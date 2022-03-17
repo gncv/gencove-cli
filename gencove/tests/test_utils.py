@@ -275,34 +275,19 @@ def test__validate_header():
     except ValidationError:
         pass
 
+    # expected
     header_row = dict(
         client_id="client_id", r_notation="r_notation", path="path"
     )
     assert _validate_header(header_row) is None
 
-
-def test__validate_header__with_spacing():
-    """Test that header is validated properly."""
-    header_row = dict(foo="foo", bar="bar")
-    try:
-        _validate_header(header_row)
-    except ValidationError:
-        pass
-
+    # with spacing
     header_row = dict(
         client_id="client_id", r_notation=" r_notation", path="path  "
     )
     assert _validate_header(header_row) is None
 
-
-def test__validate_header__mixed_case():
-    """Test that header is validated properly."""
-    header_row = dict(foo="foo", bar="bar")
-    try:
-        _validate_header(header_row)
-    except ValidationError:
-        pass
-
+    # with uppercase
     header_row = dict(
         client_id="client_id", r_notation="R_notation", path="path"
     )

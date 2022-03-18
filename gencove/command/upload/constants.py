@@ -38,7 +38,7 @@ class UploadOptions(Optionals):
 ASSIGN_ERROR = (
     "Your files were successfully uploaded, "
     "but there was an error automatically running them "
-    "and assigning them to project id {}."
+    "and assigning them to project id {}. "
     "You can try to assign without upload using following gncv path: {}"
 )
 

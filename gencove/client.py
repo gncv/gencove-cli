@@ -458,6 +458,12 @@ class APIClient:
             self.endpoints.SAMPLE_QC_METRICS.value.format(id=sample_id),
             authorized=True,
             model=SampleQC,
+            # get max number of items on a single page; a quick fix that avoids
+            # paginating through the results for the time being
+            query_params={
+                "offset": 0,
+                "limit": 200,
+            },
         )
 
     def get_sample_sheet(

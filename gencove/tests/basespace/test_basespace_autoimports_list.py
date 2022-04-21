@@ -43,21 +43,21 @@ def vcr_config():
     }
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
-def test_autoimport_list_empty(mocker, credentials):
-    """Test user has no jobs."""
-    runner = CliRunner()
-    mocked_list_basespace_autoimport_jobs = mocker.patch.object(
-        APIClient,
-        "list_basespace_autoimport_jobs",
-        return_value=BaseSpaceProjectImport(results=[], meta=dict(next=None)),
-    )
-    res = runner.invoke(autoimport_list, credentials)
-    assert res.exit_code == 0
-    mocked_list_basespace_autoimport_jobs.assert_called_once()
-    assert "" in res.output
+# @pytest.mark.default_cassette("jwt-create.yaml")
+# @pytest.mark.vcr
+# @assert_authorization
+# def test_autoimport_list_empty(mocker, credentials):
+#     """Test user has no jobs."""
+#     runner = CliRunner()
+#     mocked_list_basespace_autoimport_jobs = mocker.patch.object(
+#         APIClient,
+#         "list_basespace_autoimport_jobs",
+#         return_value=BaseSpaceProjectImport(results=[], meta=dict(next=None)),
+#     )
+#     res = runner.invoke(autoimport_list, credentials)
+#     assert res.exit_code == 0
+#     mocked_list_basespace_autoimport_jobs.assert_called_once()
+#     assert "" in res.output
 
 
 @pytest.mark.default_cassette("jwt-create.yaml")

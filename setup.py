@@ -28,17 +28,17 @@ setup(
         # https://github.com/awslabs/aws-shell/issues/161
         # and
         # https://stackoverflow.com/questions/27630114/matplotlib-issue-on-os-x-importerror-cannot-import-name-thread
-        "python-dateutil>=2.2.0",
+        "python-dateutil>=2.8.2",
         # This six requirement is related to the python-dateutil requirement
         # above - we are attempting to keep the requirement as loose as
         # possible in terms of minimal required version
         "six>=1.5",
         "requests>=2.27.1",
         "click==8.0.4",
-        "boto3>=1.21.26",
+        "boto3>=1.21.21",
         "progressbar2==3.50.1",
-        "backoff==1.11.1",
-        "pydantic==1.9.0",
+        "backoff==1.10.0",
+        "pydantic==1.8.2",
     ],
     setup_requires=["pytest-runner"],
     tests_require=["pytest", "pytest-mock"],

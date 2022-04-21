@@ -34,7 +34,7 @@ setup(
         # possible in terms of minimal required version
         "six>=1.5",
         "requests>=2.27.1",
-        "Click==8.1.0",
+        "Click==8.1.2",
         "boto3>=1.21.26",
         "progressbar2==3.50.1",
         "backoff==1.11.1",

@@ -33,12 +33,12 @@ setup(
         # above - we are attempting to keep the requirement as loose as
         # possible in terms of minimal required version
         "six>=1.5",
-        "Click>=7.0",
-        "requests>=2.19.1",
-        "boto3>=1.17.97",
+        "requests>=2.27.1",
+        "Click==8.1.0",
+        "boto3>=1.21.26",
         "progressbar2==3.50.1",
-        "backoff==1.10.0",
-        "pydantic==1.8.2",
+        "backoff==1.11.1",
+        "pydantic==1.9.0",
     ],
     setup_requires=["pytest-runner"],
     tests_require=["pytest", "pytest-mock"],

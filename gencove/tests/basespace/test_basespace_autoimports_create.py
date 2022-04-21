@@ -40,32 +40,32 @@ def vcr_config():
     }
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
-def test_basespace_autoimport_create_project_id_not_uuid(
-    credentials,
-    mocker,
-):
-    """Test that project id is valid UUID when creating an automated import."""
-    runner = CliRunner()
+# @pytest.mark.default_cassette("jwt-create.yaml")
+# @pytest.mark.vcr
+# @assert_authorization
+# def test_basespace_autoimport_create_project_id_not_uuid(
+#     credentials,
+#     mocker,
+# ):
+#     """Test that project id is valid UUID when creating an automated import."""
+#     runner = CliRunner()
 
-    mocked_autoimport_from_basespace = mocker.patch.object(
-        APIClient,
-        "autoimport_from_basespace",
-    )
-    res = runner.invoke(
-        create,
-        [
-            "1234",
-            "identifier",
-            *credentials,
-        ],
-    )
+#     mocked_autoimport_from_basespace = mocker.patch.object(
+#         APIClient,
+#         "autoimport_from_basespace",
+#     )
+#     res = runner.invoke(
+#         create,
+#         [
+#             "1234",
+#             "identifier",
+#             *credentials,
+#         ],
+#     )
 
-    assert res.exit_code == 1
-    mocked_autoimport_from_basespace.assert_not_called()
-    assert "ERROR: Project ID is not valid. Exiting." in res.output
+#     assert res.exit_code == 1
+#     mocked_autoimport_from_basespace.assert_not_called()
+#     assert "ERROR: Project ID is not valid. Exiting." in res.output
 
 
 @pytest.mark.default_cassette("jwt-create.yaml")

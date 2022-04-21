@@ -78,25 +78,25 @@ def vcr_config():
     }
 
 
-@pytest.mark.vcr
-@assert_authorization
-def test_no_required_options(
-    credentials, mocker
-):  # pylint: disable=unused-argument
-    """Test that command exits without project id or sample id provided."""
-    runner = CliRunner()
-    with runner.isolated_filesystem():
-        os.mkdir("cli_test_data")
-        res = runner.invoke(
-            download,
-            [
-                "cli_test_data",
-                "--project-id",
-                "11111111-1111-1111-1111-111111111111",
-                *credentials,
-            ],
-        )
-        assert res.exit_code == 1
+# @pytest.mark.vcr
+# @assert_authorization
+# def test_no_required_options(
+#     credentials, mocker
+# ):  # pylint: disable=unused-argument
+#     """Test that command exits without project id or sample id provided."""
+#     runner = CliRunner()
+#     with runner.isolated_filesystem():
+#         os.mkdir("cli_test_data")
+#         res = runner.invoke(
+#             download,
+#             [
+#                 "cli_test_data",
+#                 "--project-id",
+#                 "11111111-1111-1111-1111-111111111111",
+#                 *credentials,
+#             ],
+#         )
+#         assert res.exit_code == 1
 
 
 @pytest.mark.vcr

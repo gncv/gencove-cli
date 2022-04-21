@@ -68,149 +68,149 @@ def vcr_config():
 #     assert "ERROR: Project ID is not valid. Exiting." in res.output
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
-def test_basespace_autoimport_create_invalid_metadata(
-    credentials, mocker, project_id
-):
-    """Test that passed optional metadata is valid when creating an
-    automated import.
-    """
-    runner = CliRunner()
+# @pytest.mark.default_cassette("jwt-create.yaml")
+# @pytest.mark.vcr
+# @assert_authorization
+# def test_basespace_autoimport_create_invalid_metadata(
+#     credentials, mocker, project_id
+# ):
+#     """Test that passed optional metadata is valid when creating an
+#     automated import.
+#     """
+#     runner = CliRunner()
 
-    mocked_autoimport_from_basespace = mocker.patch.object(
-        APIClient,
-        "autoimport_from_basespace",
-    )
-    res = runner.invoke(
-        create,
-        [
-            project_id,
-            "identifier",
-            "--metadata-json",
-            "[1,2,3",
-            *credentials,
-        ],
-    )
+#     mocked_autoimport_from_basespace = mocker.patch.object(
+#         APIClient,
+#         "autoimport_from_basespace",
+#     )
+#     res = runner.invoke(
+#         create,
+#         [
+#             project_id,
+#             "identifier",
+#             "--metadata-json",
+#             "[1,2,3",
+#             *credentials,
+#         ],
+#     )
 
-    assert res.exit_code == 1
-    mocked_autoimport_from_basespace.assert_not_called()
-    assert "ERROR: Metadata JSON is not valid. Exiting." in res.output
-
-
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
-def test_basespace_autoimport_create_no_permission(
-    credentials, mocker, project_id
-):
-    """Test that user cannot create an automated import if no permissions."""
-    runner = CliRunner()
-
-    mocked_autoimport_from_basespace = mocker.patch.object(
-        APIClient,
-        "autoimport_from_basespace",
-        side_effect=APIClientError(message="", status_code=403),
-    )
-    res = runner.invoke(
-        create,
-        [
-            project_id,
-            "identifier",
-            *credentials,
-        ],
-    )
-
-    assert res.exit_code == 1
-    mocked_autoimport_from_basespace.assert_called_once()
-    assert "There was an error creating a periodic import job" in res.output
+#     assert res.exit_code == 1
+#     mocked_autoimport_from_basespace.assert_not_called()
+#     assert "ERROR: Metadata JSON is not valid. Exiting." in res.output
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
-def test_basespace_autoimport_create_with_empty_metadata(
-    credentials, mocker, project_id
-):
-    """Test that user can pass empty metadata when creating an
-    automated import.
-    """
-    runner = CliRunner()
+# @pytest.mark.default_cassette("jwt-create.yaml")
+# @pytest.mark.vcr
+# @assert_authorization
+# def test_basespace_autoimport_create_no_permission(
+#     credentials, mocker, project_id
+# ):
+#     """Test that user cannot create an automated import if no permissions."""
+#     runner = CliRunner()
 
-    mocked_autoimport_from_basespace = mocker.patch.object(
-        APIClient,
-        "autoimport_from_basespace",
-        return_value="",
-    )
-    res = runner.invoke(
-        create,
-        [
-            project_id,
-            "identifier",
-            "--metadata-json",
-            None,
-            *credentials,
-        ],
-    )
+#     mocked_autoimport_from_basespace = mocker.patch.object(
+#         APIClient,
+#         "autoimport_from_basespace",
+#         side_effect=APIClientError(message="", status_code=403),
+#     )
+#     res = runner.invoke(
+#         create,
+#         [
+#             project_id,
+#             "identifier",
+#             *credentials,
+#         ],
+#     )
 
-    assert res.exit_code == 0
-    mocked_autoimport_from_basespace.assert_called_once()
+#     assert res.exit_code == 1
+#     mocked_autoimport_from_basespace.assert_called_once()
+#     assert "There was an error creating a periodic import job" in res.output
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
-def test_basespace_autoimport_create_with_metadata(
-    credentials, mocker, project_id
-):
-    """Test that user can pass optional metadata when creating an
-    automated import.
-    """
-    runner = CliRunner()
+# @pytest.mark.default_cassette("jwt-create.yaml")
+# @pytest.mark.vcr
+# @assert_authorization
+# def test_basespace_autoimport_create_with_empty_metadata(
+#     credentials, mocker, project_id
+# ):
+#     """Test that user can pass empty metadata when creating an
+#     automated import.
+#     """
+#     runner = CliRunner()
 
-    mocked_autoimport_from_basespace = mocker.patch.object(
-        APIClient,
-        "autoimport_from_basespace",
-        return_value="",
-    )
-    res = runner.invoke(
-        create,
-        [
-            project_id,
-            "identifier",
-            "--metadata-json",
-            "[1,2,3]",
-            *credentials,
-        ],
-    )
+#     mocked_autoimport_from_basespace = mocker.patch.object(
+#         APIClient,
+#         "autoimport_from_basespace",
+#         return_value="",
+#     )
+#     res = runner.invoke(
+#         create,
+#         [
+#             project_id,
+#             "identifier",
+#             "--metadata-json",
+#             None,
+#             *credentials,
+#         ],
+#     )
 
-    assert res.exit_code == 0
-    mocked_autoimport_from_basespace.assert_called_once()
+#     assert res.exit_code == 0
+#     mocked_autoimport_from_basespace.assert_called_once()
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
-def test_basespace_autoimport_create_without_metadata(
-    credentials, mocker, project_id
-):
-    """Test that user can create an import job without passing metadata."""
-    runner = CliRunner()
+# @pytest.mark.default_cassette("jwt-create.yaml")
+# @pytest.mark.vcr
+# @assert_authorization
+# def test_basespace_autoimport_create_with_metadata(
+#     credentials, mocker, project_id
+# ):
+#     """Test that user can pass optional metadata when creating an
+#     automated import.
+#     """
+#     runner = CliRunner()
 
-    mocked_autoimport_from_basespace = mocker.patch.object(
-        APIClient,
-        "autoimport_from_basespace",
-        return_value="",
-    )
-    res = runner.invoke(
-        create,
-        [
-            project_id,
-            "identifier",
-            *credentials,
-        ],
-    )
+#     mocked_autoimport_from_basespace = mocker.patch.object(
+#         APIClient,
+#         "autoimport_from_basespace",
+#         return_value="",
+#     )
+#     res = runner.invoke(
+#         create,
+#         [
+#             project_id,
+#             "identifier",
+#             "--metadata-json",
+#             "[1,2,3]",
+#             *credentials,
+#         ],
+#     )
 
-    assert res.exit_code == 0
-    mocked_autoimport_from_basespace.assert_called_once()
+#     assert res.exit_code == 0
+#     mocked_autoimport_from_basespace.assert_called_once()
+
+
+# @pytest.mark.default_cassette("jwt-create.yaml")
+# @pytest.mark.vcr
+# @assert_authorization
+# def test_basespace_autoimport_create_without_metadata(
+#     credentials, mocker, project_id
+# ):
+#     """Test that user can create an import job without passing metadata."""
+#     runner = CliRunner()
+
+#     mocked_autoimport_from_basespace = mocker.patch.object(
+#         APIClient,
+#         "autoimport_from_basespace",
+#         return_value="",
+#     )
+#     res = runner.invoke(
+#         create,
+#         [
+#             project_id,
+#             "identifier",
+#             *credentials,
+#         ],
+#     )
+
+#     assert res.exit_code == 0
+#     mocked_autoimport_from_basespace.assert_called_once()

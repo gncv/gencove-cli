@@ -1,4 +1,4 @@
-image: python:3.7.12
+image: python@sha256:0be3b793ab2ececc5ffc11e91a53360d5f2c2903f09f7c860656cbc8b02c30d2
 
 stages:
   - test

@@ -1,4 +1,4 @@
-image: python:3.7
+image: python:3.7.12
 
 stages:
   - test
@@ -43,33 +43,33 @@ python37_user_pass:
   except:
     - tags
 
-python38_api_key:
-  image: python:3.8
-  stage: test
-  script: tox -e py38-api_key
-  except:
-    - tags
+# python38_api_key:
+#   image: python:3.8
+#   stage: test
+#   script: tox -e py38-api_key
+#   except:
+#     - tags
 
-python38_user_pass:
-  image: python:3.8
-  stage: test
-  script: tox -e py38-user_pass
-  except:
-    - tags
+# python38_user_pass:
+#   image: python:3.8
+#   stage: test
+#   script: tox -e py38-user_pass
+#   except:
+#     - tags
 
-python39_api_key:
-  image: python:3.9
-  stage: test
-  script: tox -e py39-api_key
-  except:
-    - tags
+# python39_api_key:
+#   image: python:3.9
+#   stage: test
+#   script: tox -e py39-api_key
+#   except:
+#     - tags
 
-python39_user_pass:
-  image: python:3.9
-  stage: test
-  script: tox -e py39-user_pass
-  except:
-    - tags
+# python39_user_pass:
+#   image: python:3.9
+#   stage: test
+#   script: tox -e py39-user_pass
+#   except:
+#     - tags
 
 black:
   stage: test

@@ -54,6 +54,8 @@ def test_basespace_autoimport_create_project_id_not_uuid(
         APIClient,
         "autoimport_from_basespace",
     )
+    print(credentials)
+    assert False
     res = runner.invoke(
         create,
         [

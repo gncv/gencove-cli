@@ -134,6 +134,9 @@ class Download(Command):
         giveup=fatal_process_sample_error,
         max_tries=10,
     )
+    @backoff.on_exception(
+        backoff.expo, client.APIClientTooManyRequestsError, max_tries=20
+    )
     def process_sample(self, sample_id):
         """Process sample.
 
@@ -145,6 +148,11 @@ class Download(Command):
         """
         try:
             sample = self.api_client.get_sample_details(sample_id)
+        except client.APIClientTooManyRequestsError:
+            self.echo_warning(
+                f"Request was throttled for sample {sample_id}, trying again"
+            )
+            raise
         except client.APIClientError:
             self.echo_warning(
                 "Sample with id {} not found. "

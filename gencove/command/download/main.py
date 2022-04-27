@@ -149,7 +149,7 @@ class Download(Command):
         try:
             sample = self.api_client.get_sample_details(sample_id)
         except client.APIClientTooManyRequestsError:
-            self.echo_warning(
+            self.echo_debug(
                 f"Request was throttled for sample {sample_id}, trying again"
             )
             raise

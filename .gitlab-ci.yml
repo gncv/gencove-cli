@@ -71,6 +71,20 @@ python39_user_pass:
   except:
     - tags
 
+python310_api_key:
+  image: python:3.10
+  stage: test
+  script: tox -e py310-api_key
+  except:
+    - tags
+
+python310_user_pass:
+  image: python:3.10
+  stage: test
+  script: tox -e py310-user_pass
+  except:
+    - tags
+
 black:
   stage: test
   script: tox -e black_checker

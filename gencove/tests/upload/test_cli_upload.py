@@ -174,6 +174,32 @@ def test_upload_invalid_destination(
 
 @pytest.mark.vcr
 @assert_authorization
+def test_upload_invalid_source(
+    credentials, mocker, recording, using_api_key, vcr
+):  # pylint: disable=unused-argument
+    """Test source raises error if not a map file/directory"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("cli_test_data")
+        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+            fastq_file.write("ACTG")
+        res = runner.invoke(
+            upload,
+            ["cli_test_data/test.fastq.gz", *credentials],
+        )
+        assert res.exit_code == 1
+        assert "must be a directory or a map file" in res.output
+
+        if using_api_key:
+            assert vcr.play_count == 0
+        elif not recording:
+            # Check that we are making just one request (to the login) if we
+            # are playing the cassette
+            assert vcr.play_count == 1
+
+
+@pytest.mark.vcr
+@assert_authorization
 def test_upload_project_id_not_uuid(
     credentials, mocker, recording, using_api_key, vcr
 ):  # pylint: disable=unused-argument

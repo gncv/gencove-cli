@@ -123,6 +123,15 @@ class Upload(Command):
             raise ValidationError("Bad configuration. Exiting.")
         # fmt: on
 
+        if os.path.isfile(self.source) and not self.source.endswith(
+            FASTQ_MAP_EXTENSION
+        ):
+            raise ValidationError(
+                f"Source input ('{self.source}') is a file, "
+                f"but must be a directory or a map file "
+                f"('*{FASTQ_MAP_EXTENSION}'). Exiting."
+            )
+
         if not self.fastqs and not self.fastqs_map:
             self.echo_error(
                 "No FASTQ files found in the path. "

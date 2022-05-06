@@ -112,7 +112,10 @@ bandit:
 docs:
   image: python:3.10
   stage: build
-  script: cd docs && make html
+  script:
+    - cd docs
+    - make html
+    - cd ..
   except:
     - tags
 

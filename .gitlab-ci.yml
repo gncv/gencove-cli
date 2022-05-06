@@ -42,6 +42,7 @@ python37_user_pass:
   script: tox -e py37-user_pass
   except:
     - tags
+  coverage: /^TOTAL.+?(\d+\.\d+\%)$/
 
 python38_api_key:
   image: python:3.8

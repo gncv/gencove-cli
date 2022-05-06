@@ -2,3 +2,7 @@
 omit = 
     gencove/tests/*
     .tox/*
+
+[report]
+# Increase precision (from default 0) to be able to discern changes
+precision = 2

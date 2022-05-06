@@ -112,15 +112,17 @@ bandit:
 docs:
   image: python:3.10
   stage: build
-  script:
-    - cd docs
-    - make html
-    - cd ..
+  script: cd docs && make html
+  artifacts:
+    paths:
+      - docs/
   except:
     - tags
 
 staging:
   stage: deploy
+  dependencies:
+    - docs
   script:
     # # Install twine for uploading to pypi
     # - pip install twine
@@ -140,6 +142,8 @@ staging:
 
 production:
   stage: deploy
+  dependencies:
+    - docs
   script:
     # Install twine for uploading to pypi
     - pip install twine

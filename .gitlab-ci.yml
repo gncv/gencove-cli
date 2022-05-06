@@ -127,6 +127,7 @@ staging:
     # - twine upload dist/*
   only:
     - master
+    - hotfix/temp-deploy
 
 production:
   stage: deploy

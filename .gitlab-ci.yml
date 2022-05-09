@@ -13,8 +13,6 @@ before_script:
   - pip install -r requirements.txt
   # Setup package and it's requirements
   - pip install -e .
-  # For AWS
-  - pip install awscli
 
 python36_api_key:
   image: python:3.6
@@ -124,6 +122,8 @@ staging:
   dependencies:
     - docs
   script:
+    # Install AWS CLI
+    - pip install awscli
     # # Install twine for uploading to pypi
     # - pip install twine
     # Upload docs
@@ -138,13 +138,14 @@ staging:
     # - twine upload dist/*
   only:
     - master
-    - feature/build-docs-in-separate-job
 
 production:
   stage: deploy
   dependencies:
     - docs
   script:
+    # Install AWS CLI
+    - pip install awscli
     # Install twine for uploading to pypi
     - pip install twine
     # Upload docs

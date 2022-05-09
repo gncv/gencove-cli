@@ -138,7 +138,6 @@ staging:
     # - twine upload dist/*
   only:
     - master
-    - feature/build-docs-in-separate-job
 
 production:
   stage: deploy

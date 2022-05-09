@@ -2,6 +2,7 @@ image: python:3.7
 
 stages:
   - test
+  - build
   - deploy
 
 before_script:
@@ -12,10 +13,6 @@ before_script:
   - pip install -r requirements.txt
   # Setup package and it's requirements
   - pip install -e .
-  # Generate documentation
-  - cd docs && make html && cd ..
-  # For AWS
-  - pip install awscli
 
 python36_api_key:
   image: python:3.6
@@ -110,9 +107,23 @@ bandit:
   except:
     - tags
 
+docs:
+  image: python:3.10
+  stage: build
+  script: cd docs && make html
+  artifacts:
+    paths:
+      - docs/
+  except:
+    - tags
+
 staging:
   stage: deploy
+  dependencies:
+    - docs
   script:
+    # Install AWS CLI
+    - pip install awscli
     # # Install twine for uploading to pypi
     # - pip install twine
     # Upload docs
@@ -130,7 +141,11 @@ staging:
 
 production:
   stage: deploy
+  dependencies:
+    - docs
   script:
+    # Install AWS CLI
+    - pip install awscli
     # Install twine for uploading to pypi
     - pip install twine
     # Upload docs

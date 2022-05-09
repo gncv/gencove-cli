@@ -244,6 +244,48 @@ class APIClient:
             return {"Authorization": "Api-Key {}".format(self._api_key)}
         return {"Authorization": "Bearer {}".format(self._jwt_token)}
 
+    def _delete(
+        self,
+        endpoint,
+        payload=None,
+        timeout=120,
+        authorized=False,
+        sensitive=False,
+        refreshed=False,
+        model=None,
+    ):
+        headers = {} if not authorized else self._get_authorization()
+        try:
+            response = self._request(
+                endpoint,
+                params=payload,
+                method="delete",
+                timeout=timeout,
+                custom_headers=headers,
+                sensitive=sensitive,
+            )
+            if model:
+                return model(**response)
+            return response
+        except APIClientError as err:
+            if (
+                not refreshed
+                and self._jwt_refresh_token
+                and err.status_code == 401
+            ):
+                self._refresh_authentication()
+                return self._delete(
+                    endpoint,
+                    payload,
+                    timeout,
+                    authorized,
+                    sensitive,
+                    True,
+                    model,
+                )
+
+            raise err
+
     def _post(
         self,
         endpoint,
@@ -862,4 +904,16 @@ class APIClient:
             query_params=params,
             authorized=True,
             model=S3ProjectImport,
+        )
+
+    def delete_project_samples(self, project_id, sample_ids):
+        """Make a request to delete samples in given project."""
+        delete_project_samples_endpoint = (
+            self.endpoints.PROJECT_DELETE_SAMPLES.value.format(id=project_id)
+        )
+
+        payload = {"sample_ids": sample_ids}
+
+        return self._delete(
+            delete_project_samples_endpoint, payload, authorized=True
         )

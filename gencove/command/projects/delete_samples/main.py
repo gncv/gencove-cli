@@ -42,7 +42,8 @@ class DeleteSamples(Command):
     def execute(self):
         """Make a request to request samples delete for given project."""
         self.echo_debug(
-            f"Requesting to delete samples in project {self.project_id} for samples {self.sample_ids}"
+            f"Requesting to delete samples in project {self.project_id} for "
+            f"samples {self.sample_ids}"
         )
 
         try:
@@ -56,12 +57,13 @@ class DeleteSamples(Command):
             self.echo_info(
                 "The following samples have been deleted successfully:"
             )
-            [self.echo_info(f"\t{sample}") for sample in self.sample_ids]
+            for sample in self.sample_ids:
+                self.echo_info(f"\t{sample}")
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 400:
                 self.echo_warning(
-                    "There was an error requesting project samples delete."
+                    "There was an error requesting delete project samples."
                 )
                 self.echo_info("The following error was returned:")
                 self.echo_info(err.message)

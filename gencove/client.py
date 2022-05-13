@@ -11,12 +11,13 @@ from urllib.parse import parse_qs, urljoin, urlparse
 from uuid import UUID
 
 from pydantic import BaseModel
+
 from requests import (
     ConnectTimeout,
     ReadTimeout,
+    delete,
     get,
     post,
-    delete,
 )  # noqa: I201
 
 from gencove import constants  # noqa: I100

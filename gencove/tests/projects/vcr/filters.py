@@ -98,6 +98,20 @@ def filter_post_project_restore_samples(request):
     return request
 
 
+def filter_project_delete_samples(request):
+    """Filter sensitive data from project-delete-samples request."""
+    if "project-delete-samples" in request.path:
+        request = _replace_uuid_from_url(request, "project-delete-samples")
+        try:
+            body = json.loads(request.body)
+            samples = [MOCK_UUID for _ in body["sample_ids"]]
+            body["sample_ids"] = samples
+            request.body = json.dumps(body).encode()
+        except json.decoder.JSONDecodeError:
+            pass
+    return request
+
+
 def filter_project_batches_request(request):
     """Filter project batches sensitive data from request."""
     if "project-batches" in request.path:

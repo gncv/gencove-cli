@@ -11,7 +11,13 @@ from urllib.parse import parse_qs, urljoin, urlparse
 from uuid import UUID
 
 from pydantic import BaseModel
-from requests import ConnectTimeout, ReadTimeout, get, post  # noqa: I201
+from requests import (
+    ConnectTimeout,
+    ReadTimeout,
+    get,
+    post,
+    delete,
+)  # noqa: I201
 
 from gencove import constants  # noqa: I100
 from gencove.constants import (
@@ -162,6 +168,14 @@ class APIClient:
             if method == "get":
                 response = get(
                     url=url, params=params, headers=headers, timeout=timeout
+                )
+            elif method == "delete":
+                post_payload = APIClient._serialize_post_payload(params)
+                response = delete(
+                    url=url,
+                    data=post_payload,
+                    headers=headers,
+                    timeout=timeout,
                 )
             else:
                 post_payload = APIClient._serialize_post_payload(params)

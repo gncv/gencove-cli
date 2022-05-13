@@ -39,8 +39,6 @@ class DeleteSamples(Command):
                     "Not all sample IDs are valid. Exiting."
                 )
 
-    # no retry for timeouts in order to avoid duplicate heavy operations on
-    # the backend
     def execute(self):
         """Make a request to request samples delete for given project."""
         self.echo_debug(
@@ -55,7 +53,10 @@ class DeleteSamples(Command):
                 )
             )
             self.echo_debug(deleted_project_samples_details)
-            self.echo_info("Request to delete samples accepted.")
+            self.echo_info(
+                "The following samples have been deleted successfully:"
+            )
+            [self.echo_info(f"\t{sample}") for sample in self.sample_ids]
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 400:

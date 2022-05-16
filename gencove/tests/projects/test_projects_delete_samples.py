@@ -50,7 +50,9 @@ def vcr_config():
     }
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
+@pytest.mark.default_cassette(
+    "test_delete_project_samples__bad_project_id.yaml"
+)
 @pytest.mark.vcr
 @assert_authorization
 def test_delete_project_samples__bad_project_id(mocker, credentials):
@@ -75,7 +77,9 @@ def test_delete_project_samples__bad_project_id(mocker, credentials):
     # assert "Project ID is not valid" in res.output
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
+@pytest.mark.default_cassette(
+    "test_delete_project_samples__not_owned_project.yaml"
+)
 @pytest.mark.vcr
 @assert_authorization
 def test_delete_project_samples__not_owned_project(credentials, mocker):
@@ -101,6 +105,9 @@ def test_delete_project_samples__not_owned_project(credentials, mocker):
     assert "You do not have the sufficient permission" in res.output
 
 
+@pytest.mark.default_cassette(
+    "test_delete_project_samples__success__empty_sample_ids.yaml"
+)
 @pytest.mark.vcr
 @assert_authorization
 def test_delete_project_samples__success__empty_sample_ids(
@@ -108,6 +115,7 @@ def test_delete_project_samples__success__empty_sample_ids(
 ):
     """Test delete project samples success when an empty list of sample ids
     is sent."""
+
     runner = CliRunner()
     if not recording:
         # Mock delete_project_samples only if using the cassettes, since we
@@ -135,7 +143,9 @@ def test_delete_project_samples__success__empty_sample_ids(
         mocked_delete_project_samples.assert_called_once()
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
+@pytest.mark.default_cassette(
+    "test_delete_project_samples__invalid_sample_ids.yaml"
+)
 @pytest.mark.vcr
 @assert_authorization
 def test_delete_project_samples__invalid_sample_ids(credentials, mocker):
@@ -161,6 +171,9 @@ def test_delete_project_samples__invalid_sample_ids(credentials, mocker):
     assert "Not all sample IDs are valid" in res.output
 
 
+@pytest.mark.default_cassette(
+    "test_delete_project_samples__sample_not_in_project.yaml"
+)
 @pytest.mark.vcr
 @assert_authorization
 def test_delete_project_samples__sample_not_in_project(
@@ -203,6 +216,7 @@ def test_delete_project_samples__sample_not_in_project(
     )
 
 
+@pytest.mark.default_cassette("test_delete_project_samples__success.yaml")
 @pytest.mark.vcr
 @assert_authorization
 def test_delete_project_samples__success(

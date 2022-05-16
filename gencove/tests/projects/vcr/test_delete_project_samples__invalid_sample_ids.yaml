@@ -1,0 +1,47 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.2.5
+      content-type:
+      - application/json
+    method: POST
+    uri: http://localhost:8200/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Content-Length:
+      - '537'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 16 May 2022 15:10:29 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - WSGIServer/0.2 CPython/3.10.4
+      Server-Timing:
+      - TimerPanel_utime;dur=125.37899999999524;desc="User CPU time", TimerPanel_stime;dur=13.245999999995206;desc="System
+        CPU time", TimerPanel_total;dur=138.62499999999045;desc="Total CPU time",
+        TimerPanel_total_time;dur=179.41951751708984;desc="Elapsed time", SQLPanel_sql_time;dur=12.92109489440918;desc="SQL
+        6 queries", CachePanel_total_time;dur=0;desc="Cache 0 Calls"
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

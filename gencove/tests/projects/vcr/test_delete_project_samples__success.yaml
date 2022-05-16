@@ -9,29 +9,32 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.1.5
+      - 2.2.5
       content-type:
       - application/json
     method: POST
-    uri: https://www.example.com/api/v2/jwt-create/
+    uri: http://localhost:8200/api/v2/jwt-create/
   response:
     body:
       string: '{"refresh": "mock_refresh", "access": "mock_access"}'
     headers:
       Allow:
       - POST, OPTIONS
-      Connection:
-      - keep-alive
       Content-Length:
       - '537'
       Content-Type:
       - application/json
       Date:
-      - Wed, 06 Oct 2021 13:48:39 GMT
+      - Mon, 16 May 2022 19:27:55 GMT
       Referrer-Policy:
       - same-origin
       Server:
-      - gunicorn
+      - WSGIServer/0.2 CPython/3.10.4
+      Server-Timing:
+      - TimerPanel_utime;dur=1853.123;desc="User CPU time", TimerPanel_stime;dur=547.7600000000002;desc="System
+        CPU time", TimerPanel_total;dur=2400.8830000000003;desc="Total CPU time",
+        TimerPanel_total_time;dur=2347.5916385650635;desc="Elapsed time", SQLPanel_sql_time;dur=288.61403465270996;desc="SQL
+        8 queries", CachePanel_total_time;dur=0;desc="Cache 0 Calls"
       Vary:
       - Accept, Cookie, Origin
       X-Content-Type-Options:
@@ -51,27 +54,30 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.1.5
+      - 2.2.5
       content-type:
       - application/json
     method: DELETE
-    uri: https://www.example.com/api/v2/project-delete-samples/11111111-1111-1111-1111-111111111111
+    uri: http://localhost:8200/api/v2/project-delete-samples/11111111-1111-1111-1111-111111111111
   response:
     body:
       string: ''
     headers:
       Allow:
       - DELETE
-      Connection:
-      - keep-alive
       Content-Length:
       - '0'
       Date:
-      - Wed, 06 Oct 2021 13:48:41 GMT
+      - Mon, 16 May 2022 19:27:56 GMT
       Referrer-Policy:
       - same-origin
       Server:
-      - gunicorn
+      - WSGIServer/0.2 CPython/3.10.4
+      Server-Timing:
+      - TimerPanel_utime;dur=258.1019999999992;desc="User CPU time", TimerPanel_stime;dur=54.58699999999972;desc="System
+        CPU time", TimerPanel_total;dur=312.6889999999989;desc="Total CPU time", TimerPanel_total_time;dur=544.0781116485596;desc="Elapsed
+        time", SQLPanel_sql_time;dur=110.24618148803711;desc="SQL 14 queries", CachePanel_total_time;dur=0;desc="Cache
+        0 Calls"
       Vary:
       - Accept, Cookie, Origin
       X-Content-Type-Options:
@@ -79,6 +85,6 @@ interactions:
       X-Frame-Options:
       - DENY
     status:
-      code: 202
-      message: Accepted
+      code: 204
+      message: No Content
 version: 1

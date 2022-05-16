@@ -9,29 +9,32 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.1.5
+      - 2.2.5
       content-type:
       - application/json
     method: POST
-    uri: https://www.example.com/api/v2/jwt-create/
+    uri: http://localhost:8200/api/v2/jwt-create/
   response:
     body:
       string: '{"refresh": "mock_refresh", "access": "mock_access"}'
     headers:
       Allow:
       - POST, OPTIONS
-      Connection:
-      - keep-alive
       Content-Length:
       - '537'
       Content-Type:
       - application/json
       Date:
-      - Tue, 05 Oct 2021 18:54:59 GMT
+      - Mon, 16 May 2022 15:11:24 GMT
       Referrer-Policy:
       - same-origin
       Server:
-      - gunicorn
+      - WSGIServer/0.2 CPython/3.10.4
+      Server-Timing:
+      - TimerPanel_utime;dur=420.45299999999486;desc="User CPU time", TimerPanel_stime;dur=183.4660000000099;desc="System
+        CPU time", TimerPanel_total;dur=603.9190000000048;desc="Total CPU time", TimerPanel_total_time;dur=651.2942314147949;desc="Elapsed
+        time", SQLPanel_sql_time;dur=29.079675674438477;desc="SQL 7 queries", CachePanel_total_time;dur=0;desc="Cache
+        0 Calls"
       Vary:
       - Accept, Cookie, Origin
       X-Content-Type-Options:
@@ -51,29 +54,32 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.1.5
+      - 2.2.5
       content-type:
       - application/json
     method: DELETE
-    uri: https://www.example.com/api/v2/project-delete-samples/11111111-1111-1111-1111-111111111111
+    uri: http://localhost:8200/api/v2/project-delete-samples/11111111-1111-1111-1111-111111111111
   response:
     body:
       string: '{"sample_ids": ["All sample ids must be part of the current project."]}'
     headers:
       Allow:
       - DELETE
-      Connection:
-      - keep-alive
       Content-Length:
-      - '93'
+      - '70'
       Content-Type:
       - application/json
       Date:
-      - Tue, 05 Oct 2021 18:55:00 GMT
+      - Mon, 16 May 2022 15:11:24 GMT
       Referrer-Policy:
       - same-origin
       Server:
-      - gunicorn
+      - WSGIServer/0.2 CPython/3.10.4
+      Server-Timing:
+      - TimerPanel_utime;dur=98.88999999999726;desc="User CPU time", TimerPanel_stime;dur=26.56900000000917;desc="System
+        CPU time", TimerPanel_total;dur=125.45900000000643;desc="Total CPU time",
+        TimerPanel_total_time;dur=182.25574493408203;desc="Elapsed time", SQLPanel_sql_time;dur=25.94923973083496;desc="SQL
+        4 queries", CachePanel_total_time;dur=0;desc="Cache 0 Calls"
       Vary:
       - Accept, Cookie, Origin
       X-Content-Type-Options:

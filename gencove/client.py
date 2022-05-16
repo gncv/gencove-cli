@@ -922,7 +922,12 @@ class APIClient:
         )
 
     def delete_project_samples(self, project_id, sample_ids):
-        """Make a request to delete samples in given project."""
+        """Make a request to delete samples in given project.
+
+        Args:
+            project_id (str): project to which to assign the samples
+            sample_ids (list of strings): sample_ids to soft delete
+        """
         delete_project_samples_endpoint = (
             self.endpoints.PROJECT_DELETE_SAMPLES.value.format(id=project_id)
         )

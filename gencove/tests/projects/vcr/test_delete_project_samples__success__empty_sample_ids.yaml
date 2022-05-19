@@ -1,50 +1,5 @@
 interactions:
 - request:
-    body: '{"email": "email@example.com", "password": "mock_password"}'
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Gencove-cli-version:
-      - 2.2.5
-      content-type:
-      - application/json
-    method: POST
-    uri: http://localhost:8200/api/v2/jwt-create/
-  response:
-    body:
-      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
-    headers:
-      Allow:
-      - POST, OPTIONS
-      Content-Length:
-      - '537'
-      Content-Type:
-      - application/json
-      Date:
-      - Mon, 16 May 2022 15:09:05 GMT
-      Referrer-Policy:
-      - same-origin
-      Server:
-      - WSGIServer/0.2 CPython/3.10.4
-      Server-Timing:
-      - TimerPanel_utime;dur=159.34000000000026;desc="User CPU time", TimerPanel_stime;dur=47.07100000000253;desc="System
-        CPU time", TimerPanel_total;dur=206.4110000000028;desc="Total CPU time", TimerPanel_total_time;dur=208.65988731384277;desc="Elapsed
-        time", SQLPanel_sql_time;dur=22.757530212402344;desc="SQL 7 queries", CachePanel_total_time;dur=0;desc="Cache
-        0 Calls"
-      Vary:
-      - Accept, Cookie, Origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: OK
-- request:
     body: '{"sample_ids": []}'
     headers:
       Accept:
@@ -70,16 +25,16 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Mon, 16 May 2022 15:09:05 GMT
+      - Thu, 19 May 2022 13:52:53 GMT
       Referrer-Policy:
       - same-origin
       Server:
       - WSGIServer/0.2 CPython/3.10.4
       Server-Timing:
-      - TimerPanel_utime;dur=59.37099999999873;desc="User CPU time", TimerPanel_stime;dur=12.412000000011858;desc="System
-        CPU time", TimerPanel_total;dur=71.78300000001059;desc="Total CPU time", TimerPanel_total_time;dur=118.95251274108887;desc="Elapsed
-        time", SQLPanel_sql_time;dur=8.064508438110352;desc="SQL 7 queries", CachePanel_total_time;dur=0;desc="Cache
-        0 Calls"
+      - TimerPanel_utime;dur=120.74600000000002;desc="User CPU time", TimerPanel_stime;dur=17.364000000000157;desc="System
+        CPU time", TimerPanel_total;dur=138.11000000000018;desc="Total CPU time",
+        TimerPanel_total_time;dur=188.19737434387207;desc="Elapsed time", SQLPanel_sql_time;dur=8.925914764404297;desc="SQL
+        6 queries", CachePanel_total_time;dur=0;desc="Cache 0 Calls"
       Vary:
       - Accept, Cookie, Origin
       X-Content-Type-Options:

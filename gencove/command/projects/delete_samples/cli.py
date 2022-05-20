@@ -1,4 +1,4 @@
-"""Project restore samples shell command definition."""
+"""Project delete samples shell command definition."""
 import click
 
 from gencove.command.common_cli_options import add_options, common_options

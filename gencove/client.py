@@ -11,7 +11,14 @@ from urllib.parse import parse_qs, urljoin, urlparse
 from uuid import UUID
 
 from pydantic import BaseModel
-from requests import ConnectTimeout, ReadTimeout, get, post  # noqa: I201
+
+from requests import (
+    ConnectTimeout,
+    ReadTimeout,
+    delete,
+    get,
+    post,
+)  # noqa: I201
 
 from gencove import constants  # noqa: I100
 from gencove.constants import (
@@ -163,6 +170,14 @@ class APIClient:
                 response = get(
                     url=url, params=params, headers=headers, timeout=timeout
                 )
+            elif method == "delete":
+                post_payload = APIClient._serialize_post_payload(params)
+                response = delete(
+                    url=url,
+                    data=post_payload,
+                    headers=headers,
+                    timeout=timeout,
+                )
             else:
                 post_payload = APIClient._serialize_post_payload(params)
                 response = post(
@@ -243,6 +258,48 @@ class APIClient:
         if self._api_key:
             return {"Authorization": "Api-Key {}".format(self._api_key)}
         return {"Authorization": "Bearer {}".format(self._jwt_token)}
+
+    def _delete(
+        self,
+        endpoint,
+        payload=None,
+        timeout=120,
+        authorized=False,
+        sensitive=False,
+        refreshed=False,
+        model=None,
+    ):
+        headers = {} if not authorized else self._get_authorization()
+        try:
+            response = self._request(
+                endpoint,
+                params=payload,
+                method="delete",
+                timeout=timeout,
+                custom_headers=headers,
+                sensitive=sensitive,
+            )
+            if model:
+                return model(**response)
+            return response
+        except APIClientError as err:
+            if (
+                not refreshed
+                and self._jwt_refresh_token
+                and err.status_code == 401
+            ):
+                self._refresh_authentication()
+                return self._delete(
+                    endpoint,
+                    payload,
+                    timeout,
+                    authorized,
+                    sensitive,
+                    True,
+                    model,
+                )
+
+            raise err
 
     def _post(
         self,
@@ -862,4 +919,21 @@ class APIClient:
             query_params=params,
             authorized=True,
             model=S3ProjectImport,
+        )
+
+    def delete_project_samples(self, project_id, sample_ids):
+        """Make a request to delete samples in given project.
+
+        Args:
+            project_id (str): project to which to assign the samples
+            sample_ids (list of strings): sample_ids to soft delete
+        """
+        delete_project_samples_endpoint = (
+            self.endpoints.PROJECT_DELETE_SAMPLES.value.format(id=project_id)
+        )
+
+        payload = {"sample_ids": sample_ids}
+
+        return self._delete(
+            delete_project_samples_endpoint, payload, authorized=True
         )

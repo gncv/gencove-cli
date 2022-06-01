@@ -4,6 +4,7 @@ import click
 
 from .create_batch.cli import create_project_batch
 from .create_merged_vcf.cli import create_merged_vcf
+from .delete_samples.cli import delete_project_samples
 from .get_batch.cli import get_batch
 from .get_merged_vcf.cli import get_merged_vcf
 from .list.cli import list_projects
@@ -26,6 +27,7 @@ projects.add_command(list_project_samples)
 projects.add_command(list_project_batch_types)
 projects.add_command(list_project_batches)
 projects.add_command(get_batch)
+projects.add_command(delete_project_samples)
 projects.add_command(restore_project_samples)
 projects.add_command(run_prefix)
 projects.add_command(create_merged_vcf)

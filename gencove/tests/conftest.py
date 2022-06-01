@@ -62,6 +62,12 @@ def archived_sample():
 
 
 @pytest.fixture(scope="session")
+def deleted_sample():
+    """Returns deleted sample id"""
+    return os.getenv("GENCOVE_DELETED_SAMPLE_TEST")
+
+
+@pytest.fixture(scope="session")
 def sample_id_batches():
     """Returns the sample id to create batches."""
     return os.getenv("GENCOVE_SAMPLE_ID_BATCHES_TEST")

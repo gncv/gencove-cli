@@ -41,6 +41,7 @@ class Download(Command):
         options,
         download_urls,
         no_progress,
+        checksums,
     ):
         super().__init__(credentials, options)
         self.download_to = download_to
@@ -51,6 +52,7 @@ class Download(Command):
         self.download_urls = download_urls
         self.download_files = []
         self.no_progress = no_progress
+        self.checksums = checksums
 
     def initialize(self):
         """Initialize download command."""
@@ -253,10 +255,37 @@ class Download(Command):
                     self.options.skip_existing,
                     self.no_progress,
                 )
+                if self.checksums:
+                    self.create_checksum_file(
+                        file_path, sample_file.checksum_sha256
+                    )
             self.download_files[-1]["files"][sample_file.file_type] = {
                 "id": sample_file.id,
                 "download_url": sample_file.download_url,
+                "checksum_sha256": sample_file.checksum_sha256,
             }
+
+    def create_checksum_file(self, file_path, checksum_sha256):
+        """Create checksum file.
+
+        Args:
+            file_path (str): system file path to download to
+            checksum_sha256 (str): Checksum (sha256) value for the file
+
+        Returns:
+            None
+
+        Raises:
+            ValidationError: if checksum is not available
+        """
+        if not checksum_sha256:
+            raise ValidationError(
+                "File {} does not contain checksum.".format(file_path)
+            )
+        checksum_path = "{}.sha256".format(file_path)
+        self.echo_debug("Adding checksum file: {}".format(checksum_path))
+        with open(checksum_path, "w") as checksum_file:
+            checksum_file.write(checksum_sha256)
 
     def validate_and_download(
         self, download_to_path, download_func, *args, **kwargs

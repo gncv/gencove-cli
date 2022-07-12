@@ -73,6 +73,7 @@ class SampleFile(GencoveBaseModel):
     size: Optional[int]
     download_url: Optional[HttpUrl]
     file_type: Optional[str]
+    checksum_sha256: Optional[str]
 
 
 # pylint: disable=too-few-public-methods

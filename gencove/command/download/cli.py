@@ -58,6 +58,11 @@ from .main import Download
     is_flag=True,
     help="If specified, no progress bar is shown.",
 )
+@click.option(
+    "--checksums",
+    is_flag=True,
+    help="If specified it will download a checksum file.",
+)
 def download(  # pylint: disable=E0012,C0330,R0913
     destination,
     project_id,
@@ -71,6 +76,7 @@ def download(  # pylint: disable=E0012,C0330,R0913
     password,
     api_key,
     no_progress,
+    checksums,
 ):  # noqa: D413,D301,D412 # pylint: disable=C0301
     """Download deliverables of a project.
 
@@ -135,4 +141,5 @@ def download(  # pylint: disable=E0012,C0330,R0913
         ),
         download_urls,
         no_progress,
+        checksums,
     ).run()

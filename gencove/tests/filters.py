@@ -4,7 +4,7 @@ import re
 from urllib.parse import urlparse, urlunparse
 
 from gencove.tests.decorators import parse_response_to_json
-from gencove.tests.utils import MOCK_UUID, MOCK_CHECKSUM
+from gencove.tests.utils import MOCK_CHECKSUM, MOCK_UUID
 
 
 @parse_response_to_json
@@ -78,6 +78,7 @@ def filter_samples_request(request):
 
 def _filter_sample(result):
     """Common function that filters sample sensitive data."""
+    # pylint: disable=too-many-branches
     if "id" in result:
         result["id"] = MOCK_UUID
     if "client_id" in result:

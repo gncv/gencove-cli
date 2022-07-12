@@ -4,7 +4,7 @@ import re
 from urllib.parse import urlparse, urlunparse
 
 from gencove.tests.decorators import parse_response_to_json
-from gencove.tests.utils import MOCK_UUID
+from gencove.tests.utils import MOCK_UUID, MOCK_CHECKSUM
 
 
 @parse_response_to_json
@@ -102,6 +102,8 @@ def _filter_sample(result):
         if "download_url" in file and file["download_url"]:
             filename = urlparse(file["download_url"]).path.split("/")[-1]
             file["download_url"] = f"https://example.com/{filename}"
+        if "checksum_sha256" in file and file["checksum_sha256"]:
+            file["checksum_sha256"] = MOCK_CHECKSUM
 
 
 @parse_response_to_json

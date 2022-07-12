@@ -3,6 +3,9 @@ import json
 import operator
 
 MOCK_UUID = "11111111-1111-1111-1111-111111111111"
+MOCK_CHECKSUM = (
+    "111111111111111111111111111111111111111111111111111111111111111a"
+)
 
 
 def get_vcr_response(url, vcr, matches=operator.eq, just_body=True):

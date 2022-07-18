@@ -27,7 +27,7 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Fri, 08 Jul 2022 17:22:42 GMT
+      - Mon, 18 Jul 2022 18:18:18 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -80,7 +80,7 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Fri, 08 Jul 2022 17:22:44 GMT
+      - Mon, 18 Jul 2022 18:18:19 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -118,7 +118,7 @@ interactions:
       Content-Type:
       - binary/octet-stream
       Date:
-      - Fri, 08 Jul 2022 17:22:46 GMT
+      - Mon, 18 Jul 2022 18:18:21 GMT
       ETag:
       - '"6e023d8b8758f8f826152de77a3cc1d9"'
       Last-Modified:
@@ -135,6 +135,52 @@ interactions:
       - AES256
       x-amz-version-id:
       - mock_x-amz-version-id
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.3.0
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/files/11111111-1111-1111-1111-111111111111.sha256
+  response:
+    body:
+      string: '111111111111111111111111111111111111111111111111111111111111111a *11111111-1111-1111-1111-111111111111_R2.fastq.gz
+
+        '
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Disposition:
+      - attachment; filename="11111111-1111-1111-1111-111111111111_R2.fastq.gz.sha256"
+      Content-Length:
+      - '115'
+      Content-Type:
+      - text/html; charset=utf-8
+      Date:
+      - Mon, 18 Jul 2022 18:18:21 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
     status:
       code: 200
       message: OK

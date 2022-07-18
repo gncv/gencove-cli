@@ -256,9 +256,17 @@ class Download(Command):
                     self.no_progress,
                 )
                 if self.checksums:
-                    self.create_checksum_file(
-                        file_path, sample_file.checksum_sha256
-                    )
+                    try:
+                        checksum = self.api_client.get_file_checksum(
+                            sample_file.id
+                        )
+                        self.create_checksum_file(file_path, checksum)
+                    except client.APIClientTooManyRequestsError:
+                        self.echo_debug(
+                            f"Request was throttled for file {sample_file}, "
+                            f"trying again"
+                        )
+                        raise
             self.download_files[-1]["files"][sample_file.file_type] = {
                 "id": sample_file.id,
                 "download_url": sample_file.download_url,
@@ -269,19 +277,13 @@ class Download(Command):
         """Create checksum file.
 
         Args:
-            file_path (str): system file path to download to
+            file_path (str): File path of the original file,
+                will append .sha256
             checksum_sha256 (str): Checksum (sha256) value for the file
 
         Returns:
             None
-
-        Raises:
-            ValidationError: if checksum is not available
         """
-        if not checksum_sha256:
-            raise ValidationError(
-                "File {} does not contain checksum.".format(file_path)
-            )
         checksum_path = "{}.sha256".format(file_path)
         self.echo_debug("Adding checksum file: {}".format(checksum_path))
         with open(checksum_path, "w") as checksum_file:

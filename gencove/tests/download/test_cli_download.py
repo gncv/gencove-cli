@@ -6,7 +6,7 @@ import operator
 import os
 import sys
 from unittest.mock import call
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from click import echo
 from click.testing import CliRunner
@@ -22,6 +22,8 @@ from gencove.models import (
 )
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.download.vcr.filters import (
+    filter_files_request,
+    filter_files_response,
     filter_project_samples_request,
     filter_sample_metadata_request,
     filter_sample_quality_controls_request,
@@ -63,6 +65,7 @@ def vcr_config():
         "path_transformer": VCR.ensure_suffix(".yaml"),
         "before_record_request": [
             replace_gencove_url_vcr,
+            filter_files_request,
             filter_project_samples_request,
             filter_samples_request,
             filter_sample_quality_controls_request,
@@ -70,6 +73,7 @@ def vcr_config():
             replace_s3_from_url,
         ],
         "before_record_response": [
+            filter_files_response,
             filter_jwt,
             filter_project_samples_response,
             filter_samples_response,
@@ -355,6 +359,14 @@ def test_create_checksum_file(
                 "gencove.command.download.main.download_file",
                 side_effect=download_file,
             )
+            get_file_checksum_response = get_vcr_response(
+                "/api/v2/files/", vcr, operator.contains
+            )
+            mocked_get_file_checksum = mocker.patch.object(
+                APIClient,
+                "get_file_checksum",
+                return_value=get_file_checksum_response.decode(),
+            )
         res = runner.invoke(
             download,
             [
@@ -380,12 +392,16 @@ def test_create_checksum_file(
                 True,
                 False,
             )
+            mocked_get_file_checksum.assert_called_once_with(UUID(MOCK_UUID))
             checksum_path = (
                 f"cli_test_data/mock_client_id/{MOCK_UUID}/r2.fastq.gz.sha256"
             )
             assert os.path.exists(checksum_path)
             with open(checksum_path, "r") as checksum_file:
-                assert checksum_file.read() == MOCK_CHECKSUM
+                assert (
+                    checksum_file.read()
+                    == f"{MOCK_CHECKSUM} *{MOCK_UUID}_R2.fastq.gz\n"
+                )
 
 
 @pytest.mark.vcr
@@ -425,6 +441,10 @@ def test_create_checksum_file_exception(
             ],
         )
         assert res.exit_code == 1
+        assert (
+            "ERROR: API Client Error: Bad Request: File does not have checksum."  # noqa: E501 pylint: disable=line-too-long
+            in res.stdout
+        )
         if not recording:
             mocked_sample_details.assert_called_once()
             mocked_download_file.assert_called_once_with(
@@ -439,10 +459,6 @@ def test_create_checksum_file_exception(
             )
             file_path = (
                 f"cli_test_data/mock_client_id/{MOCK_UUID}/r1.fastq.gz"
-            )
-            assert (
-                f"File {file_path} does not contain checksum.\nAborted!"
-                in res.stdout
             )
             checksum_path = f"{file_path}.sha256"
             assert not os.path.exists(checksum_path)

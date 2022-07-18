@@ -136,7 +136,7 @@ class APIClient:
         return json.dumps(payload, cls=CustomEncoder)
 
     # pylint: disable=bad-option-value,bad-continuation,too-many-arguments
-    # pylint: disable=too-many-branches
+    # pylint: disable=too-many-branches,too-many-locals
     def _request(
         self,
         endpoint="",
@@ -145,6 +145,7 @@ class APIClient:
         custom_headers=None,
         timeout=60,
         sensitive=False,
+        raw_response=False,
     ):
         url = urljoin(text(self.host), text(endpoint))
         headers = {
@@ -211,7 +212,10 @@ class APIClient:
 
         # pylint: disable=no-member
         if response.status_code >= 200 and response.status_code < 300:
-            return response.json() if response.text else {}
+            content = response.text
+            if not raw_response:
+                content = response.json() if content else {}
+            return content
 
         http_error_msg = ""
         if 400 <= response.status_code < 500:
@@ -352,6 +356,7 @@ class APIClient:
         sensitive=False,
         refreshed=False,
         model=None,
+        raw_response=False,
     ):
         headers = {} if not authorized else self._get_authorization()
         try:
@@ -362,6 +367,7 @@ class APIClient:
                 timeout=timeout,
                 custom_headers=headers,
                 sensitive=sensitive,
+                raw_response=raw_response,
             )
             if model:
                 return model(**response)
@@ -936,4 +942,14 @@ class APIClient:
 
         return self._delete(
             delete_project_samples_endpoint, payload, authorized=True
+        )
+
+    def get_file_checksum(self, file_id):
+        """Fetch file checksum, using the client because need to be
+        authenticated.
+        """
+        return self._get(
+            self.endpoints.FILE_CHECKSUM.value.format(id=file_id),
+            authorized=True,
+            raw_response=True,
         )

@@ -61,7 +61,7 @@ from .main import Download
 @click.option(
     "--checksums",
     is_flag=True,
-    help="If specified it will download a checksum file.",
+    help="If specified, an additional checksum file will be downloaded for each deliverable.",  # noqa: E501 line too long pylint: disable=line-too-long
 )
 def download(  # pylint: disable=E0012,C0330,R0913
     destination,

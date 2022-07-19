@@ -117,6 +117,8 @@ def download(  # pylint: disable=E0012,C0330,R0913
             stdout.
         no_progress (bool, optional, default False): do not show progress
             bar.
+        checksums (bool, optional, default False): download additonal checksum
+            files for each deliverable.
     """  # noqa: E501
     s_ids = tuple()
     if sample_ids:

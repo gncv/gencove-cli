@@ -76,7 +76,6 @@ def test_samples_download_file_local(
                 return_value=SampleDetails(**get_sample_details_response),
             )
             file_content = get_vcr_response(f"/{file_path}", vcr)
-            file_content = file_content["body"]["string"]
         res = runner.invoke(
             download_file,
             [
@@ -112,7 +111,6 @@ def test_samples_download_file_stdout(
             return_value=SampleDetails(**get_sample_details_response),
         )
         file_content = get_vcr_response("/r1.fastq.gz", vcr)
-        file_content = file_content["body"]["string"]
 
     res = runner.invoke(
         download_file,

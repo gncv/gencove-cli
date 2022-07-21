@@ -3,6 +3,9 @@ import json
 import operator
 
 MOCK_UUID = "11111111-1111-1111-1111-111111111111"
+MOCK_CHECKSUM = (
+    "111111111111111111111111111111111111111111111111111111111111111a"
+)
 
 
 def get_vcr_response(url, vcr, matches=operator.eq, just_body=True):
@@ -22,8 +25,9 @@ def get_vcr_response(url, vcr, matches=operator.eq, just_body=True):
     )
     response = vcr.responses_of(request)[0]
     if just_body:
+        response = response["body"]["string"]
         try:
-            response = json.loads(response["body"]["string"])
+            response = json.loads(response)
         except json.decoder.JSONDecodeError:
             pass
     return response

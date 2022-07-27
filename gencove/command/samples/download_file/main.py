@@ -27,12 +27,14 @@ class DownloadFile(Command):
         credentials,
         options,
         no_progress,
+        checksums,
     ):
         super().__init__(credentials, options)
         self.sample_id = sample_id
         self.file_type = file_type
         self.destination = destination
         self.no_progress = no_progress
+        self.checksums = checksums
 
     def initialize(self):
         """Initialize download-file subcommand."""
@@ -117,3 +119,35 @@ class DownloadFile(Command):
                 file_to_download.download_url,
                 self.no_progress,
             )
+            writing_to_stdout = self.destination.isatty()
+            if not writing_to_stdout and self.checksums:
+                try:
+                    checksum = self.api_client.get_file_checksum(
+                        file_to_download.id,
+                        filename=self.destination.name,
+                    )
+                    self.create_checksum_file(self.destination.name, checksum)
+                except client.APIClientTooManyRequestsError:
+                    self.echo_debug(
+                        "Request was throttled for checksum file, "
+                        "trying again"
+                    )
+                    raise
+
+    def create_checksum_file(self, file_path, checksum_sha256):
+        """Create checksum file.
+
+        Args:
+            file_path (str): File path of the original file,
+                will append .sha256
+            checksum_sha256 (str): Checksum (sha256) value for the file
+
+        Returns:
+            None
+        """
+        # lala
+
+        checksum_path = "{}.sha256".format(file_path)
+        self.echo_debug("Adding checksum file: {}".format(checksum_path))
+        with open(checksum_path, "w") as checksum_file:
+            checksum_file.write(checksum_sha256)

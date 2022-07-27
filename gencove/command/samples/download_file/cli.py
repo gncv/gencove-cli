@@ -20,6 +20,11 @@ from .main import DownloadFile
     is_flag=True,
     help="If specified, no progress bar is shown.",
 )
+@click.option(
+    "--checksums",
+    is_flag=True,
+    help="If specified, an additional checksum file will be downloaded.",
+)
 # pylint: disable=too-many-arguments
 def download_file(
     sample_id,
@@ -30,6 +35,7 @@ def download_file(
     password,
     api_key,
     no_progress,
+    checksums,
 ):  # noqa: D413,D301,D412 # pylint: disable=C0301
     """Download sample file metadata.
 
@@ -58,6 +64,8 @@ def download_file(
         destination (str): path/to/file.
         no_progress (bool, optional, default False): do not show progress
             bar.
+        checksums (bool, optional, default False): download additonal checksum
+            files for each deliverable.
     """  # noqa: E501
     if destination in ("-", "/dev/stdout"):
         DownloadFile(
@@ -67,6 +75,7 @@ def download_file(
             Credentials(email=email, password=password, api_key=api_key),
             Optionals(host=host),
             no_progress,
+            checksums,
         ).run()
     else:
         try:
@@ -80,6 +89,7 @@ def download_file(
                     ),
                     Optionals(host=host),
                     no_progress,
+                    checksums,
                 ).run()
         except IsADirectoryError:
             echo_error(

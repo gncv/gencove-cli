@@ -944,12 +944,16 @@ class APIClient:
             delete_project_samples_endpoint, payload, authorized=True
         )
 
-    def get_file_checksum(self, file_id):
+    def get_file_checksum(self, file_id, filename=None):
         """Fetch file checksum, using the client because need to be
         authenticated.
         """
+        params = {}
+        if filename:
+            params["filename"] = filename
         return self._get(
             self.endpoints.FILE_CHECKSUM.value.format(id=file_id),
+            query_params=params,
             authorized=True,
             raw_response=True,
         )

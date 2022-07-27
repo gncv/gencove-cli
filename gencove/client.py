@@ -37,6 +37,7 @@ from gencove.models import (  # noqa: I101
     BaseSpaceProjectImport,
     BatchDetail,
     CreateJWT,
+    ImportExistingSamplesModel,
     PipelineCapabilities,
     Project,
     ProjectBatches,
@@ -952,4 +953,19 @@ class APIClient:
             self.endpoints.FILE_CHECKSUM.value.format(id=file_id),
             authorized=True,
             raw_response=True,
+        )
+
+    def import_existing_samples(self, project_id, samples, metadata):
+        """Import existing samples to a project and pass metadata."""
+        payload = {
+            "project_id": project_id,
+            "samples": samples,
+        }
+        if metadata:
+            payload["metadata"] = metadata
+        return self._post(
+            self.endpoints.IMPORT_EXISTING_SAMPLES.value,
+            payload,
+            authorized=True,
+            model=ImportExistingSamplesModel,
         )

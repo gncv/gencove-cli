@@ -11,6 +11,7 @@ from .list.cli import list_projects
 from .list_batch_types.cli import list_project_batch_types
 from .list_batches.cli import list_project_batches
 from .restore_samples.cli import restore_project_samples
+from .import_existing_samples.cli import import_existing_project_samples
 from .run_prefix.cli import run_prefix
 from .samples.cli import list_project_samples
 from .status_merged_vcf.cli import status_merged_vcf
@@ -29,6 +30,7 @@ projects.add_command(list_project_batches)
 projects.add_command(get_batch)
 projects.add_command(delete_project_samples)
 projects.add_command(restore_project_samples)
+projects.add_command(import_existing_project_samples)
 projects.add_command(run_prefix)
 projects.add_command(create_merged_vcf)
 projects.add_command(status_merged_vcf)

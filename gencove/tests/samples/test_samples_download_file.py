@@ -139,7 +139,7 @@ def test_samples_download_file_local_checksum(
                 file_type,
                 file_path,
                 *credentials,
-                "--checksums",
+                "--checksum",
             ],
         )
         assert res.output == ""
@@ -164,7 +164,7 @@ def test_samples_download_file_local_checksum(
 def test_samples_download_file_local_checksum_exception(
     credentials, mocker, recording, sample_id_download, vcr
 ):
-    """Check that checksums flag fails if file doesn't have checksum
+    """Check that checksum flag fails if file doesn't have checksum
     (r1 file).
     """
     runner = CliRunner()
@@ -192,7 +192,7 @@ def test_samples_download_file_local_checksum_exception(
                 file_type,
                 file_path,
                 *credentials,
-                "--checksums",
+                "--checksum",
             ],
         )
         assert res.exit_code == 1

@@ -27,14 +27,14 @@ class DownloadFile(Command):
         credentials,
         options,
         no_progress,
-        checksums,
+        checksum,
     ):
         super().__init__(credentials, options)
         self.sample_id = sample_id
         self.file_type = file_type
         self.destination = destination
         self.no_progress = no_progress
-        self.checksums = checksums
+        self.checksum = checksum
 
     def initialize(self):
         """Initialize download-file subcommand."""
@@ -120,7 +120,7 @@ class DownloadFile(Command):
                 self.no_progress,
             )
             writing_to_stdout = self.destination.isatty()
-            if not writing_to_stdout and self.checksums:
+            if not writing_to_stdout and self.checksum:
                 try:
                     checksum = self.api_client.get_file_checksum(
                         file_to_download.id,
@@ -145,8 +145,6 @@ class DownloadFile(Command):
         Returns:
             None
         """
-        # lala
-
         checksum_path = "{}.sha256".format(file_path)
         self.echo_debug("Adding checksum file: {}".format(checksum_path))
         with open(checksum_path, "w") as checksum_file:

@@ -41,6 +41,7 @@ class Download(Command):
         options,
         download_urls,
         no_progress,
+        checksums,
     ):
         super().__init__(credentials, options)
         self.download_to = download_to
@@ -51,6 +52,7 @@ class Download(Command):
         self.download_urls = download_urls
         self.download_files = []
         self.no_progress = no_progress
+        self.checksums = checksums
 
     def initialize(self):
         """Initialize download command."""
@@ -253,10 +255,39 @@ class Download(Command):
                     self.options.skip_existing,
                     self.no_progress,
                 )
+                if self.checksums:
+                    try:
+                        checksum = self.api_client.get_file_checksum(
+                            sample_file.id
+                        )
+                        self.create_checksum_file(file_path, checksum)
+                    except client.APIClientTooManyRequestsError:
+                        self.echo_debug(
+                            f"Request was throttled for file {sample_file}, "
+                            f"trying again"
+                        )
+                        raise
             self.download_files[-1]["files"][sample_file.file_type] = {
                 "id": sample_file.id,
                 "download_url": sample_file.download_url,
+                "checksum_sha256": sample_file.checksum_sha256,
             }
+
+    def create_checksum_file(self, file_path, checksum_sha256):
+        """Create checksum file.
+
+        Args:
+            file_path (str): File path of the original file,
+                will append .sha256
+            checksum_sha256 (str): Checksum (sha256) value for the file
+
+        Returns:
+            None
+        """
+        checksum_path = "{}.sha256".format(file_path)
+        self.echo_debug("Adding checksum file: {}".format(checksum_path))
+        with open(checksum_path, "w") as checksum_file:
+            checksum_file.write(checksum_sha256)
 
     def validate_and_download(
         self, download_to_path, download_func, *args, **kwargs

@@ -5,7 +5,8 @@ import json
 import operator
 import os
 import sys
-from uuid import uuid4
+from unittest.mock import call
+from uuid import UUID, uuid4
 
 from click import echo
 from click.testing import CliRunner
@@ -21,6 +22,8 @@ from gencove.models import (
 )
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.download.vcr.filters import (
+    filter_files_request,
+    filter_files_response,
     filter_project_samples_request,
     filter_sample_metadata_request,
     filter_sample_quality_controls_request,
@@ -35,7 +38,7 @@ from gencove.tests.filters import (
     replace_gencove_url_vcr,
     replace_s3_from_url,
 )
-from gencove.tests.utils import MOCK_UUID, get_vcr_response
+from gencove.tests.utils import MOCK_CHECKSUM, MOCK_UUID, get_vcr_response
 
 from pydantic.networks import HttpUrl
 
@@ -62,6 +65,7 @@ def vcr_config():
         "path_transformer": VCR.ensure_suffix(".yaml"),
         "before_record_request": [
             replace_gencove_url_vcr,
+            filter_files_request,
             filter_project_samples_request,
             filter_samples_request,
             filter_sample_quality_controls_request,
@@ -69,6 +73,7 @@ def vcr_config():
             replace_s3_from_url,
         ],
         "before_record_response": [
+            filter_files_response,
             filter_jwt,
             filter_project_samples_response,
             filter_samples_response,
@@ -183,7 +188,7 @@ def test_project_id_provided(
             mocked_sample_details.assert_called_once()
             mocked_qc_metrics.assert_called_once()
             mocked_get_metadata.assert_called_once()
-        mocked_download_file.assert_called_once()
+        assert mocked_download_file.call_count == 2
 
 
 @pytest.mark.vcr
@@ -238,16 +243,29 @@ def test_sample_ids_provided(
             mocked_sample_details.assert_called_once()
             mocked_qc_metrics.assert_called_once()
             mocked_get_metadata.assert_called_once()
-            mocked_download_file.assert_called_once_with(
-                f"cli_test_data/mock_client_id/{MOCK_UUID}/r1.fastq.gz",
-                HttpUrl(
-                    url="https://example.com/r1.fastq.gz",
-                    scheme="https",
-                    host="example.com",
+            calls = [
+                call(
+                    f"cli_test_data/mock_client_id/{MOCK_UUID}/r1.fastq.gz",
+                    HttpUrl(
+                        url="https://example.com/r1.fastq.gz",
+                        scheme="https",
+                        host="example.com",
+                    ),
+                    True,
+                    False,
                 ),
-                True,
-                False,
-            )
+                call(
+                    f"cli_test_data/mock_client_id/{MOCK_UUID}/r2.fastq.gz",
+                    HttpUrl(
+                        url="https://example.com/r2.fastq.gz",
+                        scheme="https",
+                        host="example.com",
+                    ),
+                    True,
+                    False,
+                ),
+            ]
+            mocked_download_file.assert_has_calls(calls)
 
 
 @pytest.mark.vcr
@@ -317,6 +335,133 @@ def test_sample_ids_provided_no_qc_file(
             mocked_sample_details.assert_called_once()
             mocked_qc_metrics.assert_called_once()
             mocked_get_metadata.assert_called_once()
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_create_checksum_file(
+    credentials, mocker, recording, sample_id_download, vcr
+):
+    """Check checksums flag."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        if not recording:
+            # Mock only if using the cassettes, since we mock the return value.
+            get_sample_details_response = get_vcr_response(
+                "/api/v2/samples/", vcr, operator.contains
+            )
+            mocked_sample_details = mocker.patch.object(
+                APIClient,
+                "get_sample_details",
+                return_value=SampleDetails(**get_sample_details_response),
+            )
+            mocked_download_file = mocker.patch(
+                "gencove.command.download.main.download_file",
+                side_effect=download_file,
+            )
+            get_file_checksum_response = get_vcr_response(
+                "/api/v2/files/", vcr, operator.contains
+            )
+            mocked_get_file_checksum = mocker.patch.object(
+                APIClient,
+                "get_file_checksum",
+                return_value=get_file_checksum_response.decode(),
+            )
+        res = runner.invoke(
+            download,
+            [
+                "cli_test_data",
+                "--sample-ids",
+                sample_id_download,
+                *credentials,
+                "--file-types",
+                "fastq-r2",
+                "--checksums",
+            ],
+        )
+        assert res.exit_code == 0
+        if not recording:
+            mocked_sample_details.assert_called_once()
+            mocked_download_file.assert_called_once_with(
+                f"cli_test_data/mock_client_id/{MOCK_UUID}/r2.fastq.gz",
+                HttpUrl(
+                    url="https://example.com/r2.fastq.gz",
+                    scheme="https",
+                    host="example.com",
+                ),
+                True,
+                False,
+            )
+            mocked_get_file_checksum.assert_called_once_with(UUID(MOCK_UUID))
+            checksum_path = (
+                f"cli_test_data/mock_client_id/{MOCK_UUID}/r2.fastq.gz.sha256"
+            )
+            assert os.path.exists(checksum_path)
+            with open(checksum_path, "r") as checksum_file:
+                assert (
+                    checksum_file.read()
+                    == f"{MOCK_CHECKSUM} *{MOCK_UUID}_R2.fastq.gz\n"
+                )
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_create_checksum_file_exception(
+    credentials, mocker, recording, sample_id_download, vcr
+):
+    """Check that checksums flag fails if file doesn't have checksum
+    (r1 file).
+    """
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        if not recording:
+            # Mock only if using the cassettes, since we mock the return value.
+            get_sample_details_response = get_vcr_response(
+                "/api/v2/samples/", vcr, operator.contains
+            )
+            mocked_sample_details = mocker.patch.object(
+                APIClient,
+                "get_sample_details",
+                return_value=SampleDetails(**get_sample_details_response),
+            )
+            mocked_download_file = mocker.patch(
+                "gencove.command.download.main.download_file",
+                side_effect=download_file,
+            )
+        res = runner.invoke(
+            download,
+            [
+                "cli_test_data",
+                "--sample-ids",
+                sample_id_download,
+                *credentials,
+                "--file-types",
+                "fastq-r1",
+                "--checksums",
+            ],
+        )
+        assert res.exit_code == 1
+        assert (
+            "ERROR: API Client Error: Bad Request: File does not have checksum."  # noqa: E501 pylint: disable=line-too-long
+            in res.stdout
+        )
+        if not recording:
+            mocked_sample_details.assert_called_once()
+            mocked_download_file.assert_called_once_with(
+                f"cli_test_data/mock_client_id/{MOCK_UUID}/r1.fastq.gz",
+                HttpUrl(
+                    url="https://example.com/r1.fastq.gz",
+                    scheme="https",
+                    host="example.com",
+                ),
+                True,
+                False,
+            )
+            file_path = (
+                f"cli_test_data/mock_client_id/{MOCK_UUID}/r1.fastq.gz"
+            )
+            checksum_path = f"{file_path}.sha256"
+            assert not os.path.exists(checksum_path)
 
 
 def test_multiple_credentials_not_allowed(mocker):
@@ -424,7 +569,8 @@ def test_download_stdout_with_flag(
             archive_last_status_created = (
                 sample.archive_last_status.created.isoformat()
             )
-            download_url = "https://example.com/r1.fastq.gz"
+            download_url_1 = "https://example.com/r1.fastq.gz"
+            download_url_2 = "https://example.com/r2.fastq.gz"
             mocked_result = json.dumps(
                 [
                     {
@@ -444,8 +590,14 @@ def test_download_stdout_with_flag(
                         "files": {
                             "fastq-r1": {
                                 "id": MOCK_UUID,
-                                "download_url": download_url,
-                            }
+                                "download_url": download_url_1,
+                                "checksum_sha256": "",
+                            },
+                            "fastq-r2": {
+                                "id": MOCK_UUID,
+                                "download_url": download_url_2,
+                                "checksum_sha256": MOCK_CHECKSUM,
+                            },
                         },
                     }
                 ],
@@ -461,6 +613,7 @@ def test_download_urls_to_file(
     credentials, mocker, project_id_download, recording, vcr
 ):
     """Test saving downloaded urls output to a json file."""
+    # pylint: disable=too-many-locals
     runner = CliRunner()
     if not recording:
         # Mock only if using the cassettes, since we mock the return value.
@@ -481,9 +634,6 @@ def test_download_urls_to_file(
             "get_sample_details",
             return_value=sample,
         )
-    mocked_output_list = mocker.patch(
-        "gencove.command.download.main.Download.output_list"
-    )
     with runner.isolated_filesystem():
         res = runner.invoke(
             download,
@@ -496,8 +646,45 @@ def test_download_urls_to_file(
             ],
         )
         assert res.exit_code == 0
-        mocked_output_list.assert_called_once()
+        output_file = []
         if not recording:
+            for _ in get_project_samples_response["results"]:
+                archive_last_status_created = (
+                    sample.archive_last_status.created.isoformat()
+                )
+                download_url_1 = "https://example.com/r1.fastq.gz"
+                download_url_2 = "https://example.com/r2.fastq.gz"
+                output_file.append(
+                    {
+                        "gencove_id": MOCK_UUID,
+                        "client_id": "mock_client_id",
+                        "last_status": {
+                            "id": MOCK_UUID,
+                            "status": sample.last_status.status,
+                            "created": sample.last_status.created.isoformat(),
+                        },
+                        "archive_last_status": {
+                            "id": MOCK_UUID,
+                            "status": sample.archive_last_status.status,
+                            "created": archive_last_status_created,
+                            "transition_cutoff": None,
+                        },
+                        "files": {
+                            "fastq-r1": {
+                                "id": MOCK_UUID,
+                                "download_url": download_url_1,
+                                "checksum_sha256": "",
+                            },
+                            "fastq-r2": {
+                                "id": MOCK_UUID,
+                                "download_url": download_url_2,
+                                "checksum_sha256": MOCK_CHECKSUM,
+                            },
+                        },
+                    }
+                )
+            with open("output.json", "r") as json_file:
+                assert output_file == json.load(json_file)
             mocked_project_samples.assert_called_once()
             mocked_sample_details.assert_called_once()
 
@@ -552,15 +739,29 @@ def test_download_no_progress(
         )
         assert res.exit_code == 0
         if not recording:
-            mocked_download_file.assert_called_once_with(
-                f"cli_test_data/mock_client_id/{MOCK_UUID}/r1.fastq.gz",
-                HttpUrl(
-                    url="https://example.com/r1.fastq.gz",
-                    scheme="https",
-                    host="example.com",
-                ),
-                True,
-                True,
+            mocked_download_file.assert_has_calls(
+                [
+                    call(
+                        f"cli_test_data/mock_client_id/{MOCK_UUID}/r1.fastq.gz",  # noqa: E501 pylint: disable=line-too-long
+                        HttpUrl(
+                            url="https://example.com/r1.fastq.gz",
+                            scheme="https",
+                            host="example.com",
+                        ),
+                        True,
+                        True,
+                    ),
+                    call(
+                        f"cli_test_data/mock_client_id/{MOCK_UUID}/r2.fastq.gz",  # noqa: E501 pylint: disable=line-too-long
+                        HttpUrl(
+                            url="https://example.com/r2.fastq.gz",
+                            scheme="https",
+                            host="example.com",
+                        ),
+                        True,
+                        True,
+                    ),
+                ]
             )
             mocked_sample_details.assert_called_once()
             mocked_qc_metrics.assert_called_once()
@@ -630,7 +831,7 @@ def test_project_id_provided_skip_existing_qc_and_metadata(
             mocked_sample_details.assert_called_once()
             mocked_qc_metrics.assert_called_once()
             mocked_get_metadata.assert_called_once()
-        mocked_download_file.assert_called_once()
+        assert mocked_download_file.call_count == 2
 
         # call it the second time
         mocked_qc_metrics = mocker.patch.object(

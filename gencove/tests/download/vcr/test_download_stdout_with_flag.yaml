@@ -9,7 +9,7 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.1.5
+      - 2.3.0
       content-type:
       - application/json
     method: POST
@@ -27,7 +27,7 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Wed, 13 Oct 2021 14:46:15 GMT
+      - Fri, 08 Jul 2022 12:53:49 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -51,7 +51,7 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.1.5
+      - 2.3.0
       content-type:
       - application/json
     method: GET
@@ -76,7 +76,7 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Wed, 13 Oct 2021 14:46:16 GMT
+      - Fri, 08 Jul 2022 12:53:50 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -100,7 +100,7 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.1.5
+      - 2.3.0
       content-type:
       - application/json
     method: GET
@@ -115,18 +115,21 @@ interactions:
         "11111111-1111-1111-1111-111111111111", "status": "available", "created":
         "2021-10-12 19:47:15.394485+00:00", "transition_cutoff": null}, "files": [{"id":
         "11111111-1111-1111-1111-111111111111", "s3_path": "mock/r1.fastq.gz", "size":
-        null, "download_url": "https://example.com/r1.fastq.gz", "file_type": "fastq-r1"}]}'
+        null, "download_url": "https://example.com/r1.fastq.gz", "file_type": "fastq-r1",
+        "checksum_sha256": ""}, {"id": "11111111-1111-1111-1111-111111111111", "s3_path":
+        "mock/r2.fastq.gz", "size": null, "download_url": "https://example.com/r2.fastq.gz",
+        "file_type": "fastq-r2", "checksum_sha256": "111111111111111111111111111111111111111111111111111111111111111a"}]}'
     headers:
       Allow:
       - GET, HEAD, OPTIONS
       Connection:
       - keep-alive
       Content-Length:
-      - '1177'
+      - '2484'
       Content-Type:
       - application/json
       Date:
-      - Wed, 13 Oct 2021 14:46:17 GMT
+      - Fri, 08 Jul 2022 12:53:51 GMT
       Referrer-Policy:
       - same-origin
       Server:

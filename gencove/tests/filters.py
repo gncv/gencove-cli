@@ -4,7 +4,7 @@ import re
 from urllib.parse import urlparse, urlunparse
 
 from gencove.tests.decorators import parse_response_to_json
-from gencove.tests.utils import MOCK_UUID
+from gencove.tests.utils import MOCK_CHECKSUM, MOCK_UUID
 
 
 @parse_response_to_json
@@ -78,6 +78,7 @@ def filter_samples_request(request):
 
 def _filter_sample(result):
     """Common function that filters sample sensitive data."""
+    # pylint: disable=too-many-branches
     if "id" in result:
         result["id"] = MOCK_UUID
     if "client_id" in result:
@@ -102,6 +103,8 @@ def _filter_sample(result):
         if "download_url" in file and file["download_url"]:
             filename = urlparse(file["download_url"]).path.split("/")[-1]
             file["download_url"] = f"https://example.com/{filename}"
+        if "checksum_sha256" in file and file["checksum_sha256"]:
+            file["checksum_sha256"] = MOCK_CHECKSUM
 
 
 @parse_response_to_json

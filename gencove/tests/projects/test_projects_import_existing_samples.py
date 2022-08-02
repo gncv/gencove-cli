@@ -1,4 +1,4 @@
-"""Test samples set metadata command."""
+"""Test import existing project samples command."""
 
 from uuid import uuid4
 
@@ -6,6 +6,42 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient
 from gencove.command.projects.cli import import_existing_project_samples
+from gencove.tests.decorators import assert_authorization
+from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
+from gencove.tests.projects.vcr.filters import (
+    filter_import_existing_samples_request,
+    filter_import_existing_samples_response,
+)
+from gencove.tests.utils import MOCK_UUID
+import pytest
+from vcr import VCR
+
+
+@pytest.fixture(scope="module")
+def vcr_config():
+    """VCR configuration."""
+    return {
+        "cassette_library_dir": "gencove/tests/projects/vcr",
+        "filter_headers": [
+            "Authorization",
+            "Content-Length",
+            "User-Agent",
+        ],
+        "filter_post_data_parameters": [
+            ("email", "email@example.com"),
+            ("password", "mock_password"),
+        ],
+        "match_on": ["method", "scheme", "port", "path", "query"],
+        "path_transformer": VCR.ensure_suffix(".yaml"),
+        "before_record_request": [
+            replace_gencove_url_vcr,
+            filter_import_existing_samples_request,
+        ],
+        "before_record_response": [
+            filter_jwt,
+            filter_import_existing_samples_response,
+        ],
+    }
 
 
 def test_import_existing_project_samples__bad_project_id(mocker):
@@ -274,3 +310,26 @@ def test_import_existing_project_samples__bad_metadata(mocker):
     mocked_login.assert_called_once()
     mocked_import_existing_samples.assert_not_called()
     assert "Metadata JSON is not valid" in res.output
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_import_existing_project_samples__server_rejects(
+    mocker, credentials, project_id
+):
+    """Test import existing project samples failure when the validation
+    fails on server.
+    """
+    runner = CliRunner()
+
+    res = runner.invoke(
+        import_existing_project_samples,
+        [
+            project_id,
+            "--samples",
+            '[{"sample_id": "' + MOCK_UUID + '"}]',
+            *credentials,
+        ],
+    )
+    assert res.exit_code == 1
+    assert "There was an error importing" in res.output

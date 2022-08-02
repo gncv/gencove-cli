@@ -189,12 +189,15 @@ def filter_import_existing_samples_request(request):
     """Filter import_existing_samples sensitive data from request."""
     try:
         body = json.loads(request.body)
-        body["project_id"] = MOCK_UUID
-        body["samples"] = [
-            {"sample_id": MOCK_UUID, "client_id": "foo"}
-            for _ in body["samples"]
-        ]
-        body["metadata"] = {"foo": "bar"}
+        if "project_id" in body:
+            body["project_id"] = MOCK_UUID
+        if "samples" in body:
+            body["samples"] = [
+                {"sample_id": MOCK_UUID, "client_id": "foo"}
+                for _ in body["samples"]
+            ]
+        if "metadata" in body:
+            body["metadata"] = {"foo": "bar"}
         request.body = json.dumps(body).encode()
     except (json.decoder.JSONDecodeError, TypeError):
         pass
@@ -204,12 +207,14 @@ def filter_import_existing_samples_request(request):
 @parse_response_to_json
 def filter_import_existing_samples_response(response, json_response):
     """Filter import_existing_samples sensitive data from response."""
-    json_response["project_id"] = MOCK_UUID
+    if "project_id" in json_response:
+        json_response["project_id"] = MOCK_UUID
     if "metadata" in json_response:
         json_response["metadata"] = {"foo": "bar"}
-    for sample in json_response.get("samples", []):
-        if "sample_id" in sample:
-            sample["sample_id"] = MOCK_UUID
-        if "client_id" in sample:
-            sample["client_id"] = "foo"
+    if "samples" in json_response:
+        for sample in json_response["samples"]:
+            if "sample_id" in sample:
+                sample["sample_id"] = MOCK_UUID
+            if "client_id" in sample:
+                sample["client_id"] = "foo"
     return response, json_response

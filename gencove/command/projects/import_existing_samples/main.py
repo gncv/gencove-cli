@@ -1,9 +1,7 @@
 """Import existing samples to a project subcommand."""
-
-from distutils.command import clean
 import json
 
-from .utils import get_line
+from .utils import get_line, is_valid_client_id
 from ...base import Command
 from ...utils import is_valid_json, is_valid_uuid
 from .... import client
@@ -37,7 +35,8 @@ class ImportExistingSamples(Command):
         self.samples = json.loads(self.samples)
         if self.is_valid_samples_contents() is False:
             raise ValidationError(
-                "The samples JSON must be a JSON array of objects where each has sample_id and an optional client_id keys. Exiting."
+                "The samples JSON must be a JSON array of objects where "
+                "each has sample_id and an optional client_id keys. Exiting."
             )
         for sample in self.samples:
             if is_valid_uuid(sample["sample_id"]) is False:
@@ -46,9 +45,10 @@ class ImportExistingSamples(Command):
                         sample["sample_id"]
                     )
                 )
-            if self.is_valid_client_id(sample.get("client_id", "")) is False:
+            if is_valid_client_id(sample.get("client_id", "")) is False:
                 raise ValidationError(
-                    "Client ID: {} for the sample {} is not valid. It cannot contain an underscore. Exiting.".format(
+                    "Client ID: {} for the sample {} is not valid. "
+                    "It cannot contain an underscore. Exiting.".format(
                         sample["client_id"], sample["sample_id"]
                     )
                 )
@@ -68,7 +68,8 @@ class ImportExistingSamples(Command):
             )
         )
         try:
-            """Import existing samples to the project optionally passing metadata."""
+            # Import existing samples to the project optionally
+            # passing metadata.
             import_existing_samples_response = (
                 self.api_client.import_existing_samples(
                     self.project_id, clean_samples, metadata
@@ -99,25 +100,16 @@ class ImportExistingSamples(Command):
         for sample in self.samples:
             if not isinstance(sample, dict):
                 return False
-            if not "sample_id" in sample:
+            if "sample_id" not in sample:
                 return False
         return True
-
-    def is_valid_client_id(self, candidate):
-        """Test if provided string is a valid client id.
-
-        candidate (str): client id to check
-
-        Returns:
-            bool: True if is a valid client id, False if not
-        """
-        return "_" not in candidate
 
     def clean_samples(self):
         """Sanitize samples member so it sends only the required values.
 
         Returns:
-            list: items are dictionaries with sample_id key and an optional client_id key
+            list: items are dictionaries with sample_id key and an
+                optional client_id key
         """
         clean_samples = []
         for sample in self.samples:

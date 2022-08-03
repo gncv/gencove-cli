@@ -14,7 +14,8 @@ from .main import ImportExistingSamples
     "--samples",
     required=True,
     help=(
-        "JSON array of objects that each has key sample_id and value sample UUID and optional key client_id with value of a valid client_id."
+        "JSON array of objects that each has key sample_id and value sample "
+        "UUID and optional key client_id with value of a valid client_id."
     ),
 )
 @click.option(

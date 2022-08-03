@@ -7,11 +7,11 @@ from .create_merged_vcf.cli import create_merged_vcf
 from .delete_samples.cli import delete_project_samples
 from .get_batch.cli import get_batch
 from .get_merged_vcf.cli import get_merged_vcf
+from .import_existing_samples.cli import import_existing_project_samples
 from .list.cli import list_projects
 from .list_batch_types.cli import list_project_batch_types
 from .list_batches.cli import list_project_batches
 from .restore_samples.cli import restore_project_samples
-from .import_existing_samples.cli import import_existing_project_samples
 from .run_prefix.cli import run_prefix
 from .samples.cli import list_project_samples
 from .status_merged_vcf.cli import status_merged_vcf

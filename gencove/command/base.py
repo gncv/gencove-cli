@@ -76,12 +76,15 @@ def aws_cli_credentials():
     try:
         yield
     finally:
-        # Restore original state of env variables
+        # Remove all modified env variables
         for env_var in env_var_save_restore:
-            if env_var_saved[env_var] is not None:
-                os.environ[env_var] = env_var_saved[env_var]
-            elif env_var in os.environ:
+            if env_var in os.environ:
                 del os.environ[env_var]
+
+        # Restore original env variables
+        for env_var, env_var_value in env_var_saved.items():
+            if env_var_value is not None:
+                os.environ[env_var] = env_var_value
 
         # Remove tmp files
         os.remove(aws_config_file)

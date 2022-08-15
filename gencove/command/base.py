@@ -44,6 +44,10 @@ PROFILE_NAME = "gencove-cli-profile"
 
 @contextlib.contextmanager
 def aws_cli_credentials():
+    """Hides all AWS environment variables, creates new AWS_PROFILE and
+    associated config files. During context manager cleanup, restores all
+    the environment variables and deletes the temporary files.
+    """
     old_profile = os.getenv(AWS_PROFILE, default=None)
     os.environ[AWS_PROFILE] = PROFILE_NAME
     env_var_saved = {}
@@ -75,11 +79,17 @@ def aws_cli_credentials():
         os.remove(aws_shared_credentials_file)
 
 
-def aws_cli_decorator(f):
-    @wraps(f)
+def aws_cli_decorator(wrapped_func):
+    """Executes a function inside the aws_cli_credentials context manager.
+
+    Args:
+        wrapped_func (callable): Function to call.
+    """
+
+    @wraps(wrapped_func)
     def wrapper(*args, **kwargs):
         with aws_cli_credentials():
-            return f(*args, **kwargs)
+            return wrapped_func(*args, **kwargs)
 
     return wrapper
 

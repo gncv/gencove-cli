@@ -4,7 +4,6 @@ All commands must implement this interface.
 """
 import contextlib
 import os
-import tempfile
 import traceback
 from functools import wraps
 
@@ -24,9 +23,6 @@ from gencove.logger import (
 )
 from gencove.utils import login, validate_credentials
 
-AWS_PROFILE = "AWS_PROFILE"
-AWS_CONFIG_FILE = "AWS_CONFIG_FILE"
-AWS_SHARED_CREDENTIALS_FILE = "AWS_SHARED_CREDENTIALS_FILE"
 env_var_save_restore = [
     "AWS_ACCESS_KEY_ID",
     "AWS_SECRET_ACCESS_KEY",
@@ -35,48 +31,29 @@ env_var_save_restore = [
     "AWS_DEFAULT_REGION",
     "AWS_DEFAULT_PROFILE",
     "AWS_CA_BUNDLE",
-    AWS_SHARED_CREDENTIALS_FILE,
-    AWS_CONFIG_FILE,
+    "AWS_SHARED_CREDENTIALS_FILE" "AWS_CONFIG_FILE",
+    "AWS_PROFILE",
 ]
-
-PROFILE_NAME = "gencove-cli-profile"
 
 
 @contextlib.contextmanager
 def aws_cli_credentials():
-    """Hides all AWS environment variables, creates new AWS_PROFILE and
-    associated config files. During context manager cleanup, restores all
-    the environment variables and deletes the temporary files.
+    """Hides all AWS environment variables. During context manager cleanup,
+    restores all the environment variables.
     """
-    old_profile = os.getenv(AWS_PROFILE, default=None)
-    os.environ[AWS_PROFILE] = PROFILE_NAME
     env_var_saved = {}
     for env_var in env_var_save_restore:
         env_var_saved[env_var] = os.getenv(env_var, default=None)
         if env_var_saved[env_var] is not None:
             del os.environ[env_var]
-    with tempfile.NamedTemporaryFile(delete=False) as f:
-        f.write(b"[profile " + PROFILE_NAME.encode("utf") + b"]\n")
-        aws_config_file = f.name
-        os.environ[AWS_CONFIG_FILE] = aws_config_file
-    with tempfile.NamedTemporaryFile(delete=False) as f:
-        f.write(b"[profile " + PROFILE_NAME.encode("utf") + b"]\n")
-        aws_shared_credentials_file = f.name
-        os.environ[AWS_SHARED_CREDENTIALS_FILE] = aws_shared_credentials_file
     try:
         yield
     finally:
-        if old_profile is None:
-            del os.environ[AWS_PROFILE]
-        else:
-            os.environ[AWS_PROFILE] = old_profile
         for env_var in env_var_save_restore:
             if env_var_saved[env_var] is not None:
                 os.environ[env_var] = env_var_saved[env_var]
-            elif env_var_saved.get(env_var) is None and env_var in os.environ:
+            elif env_var in os.environ:
                 del os.environ[env_var]
-        os.remove(aws_config_file)
-        os.remove(aws_shared_credentials_file)
 
 
 def aws_cli_decorator(wrapped_func):

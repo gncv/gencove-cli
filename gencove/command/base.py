@@ -37,6 +37,7 @@ env_var_save_restore = [
     "AWS_CA_BUNDLE",
     AWS_SHARED_CREDENTIALS_FILE,
     AWS_CONFIG_FILE,
+    AWS_PROFILE,
 ]
 
 PROFILE_NAME = "gencove-cli-profile"
@@ -48,35 +49,41 @@ def aws_cli_credentials():
     associated config files. During context manager cleanup, restores all
     the environment variables and deletes the temporary files.
     """
-    old_profile = os.getenv(AWS_PROFILE, default=None)
-    os.environ[AWS_PROFILE] = PROFILE_NAME
+    # Saving initial state of env variables
     env_var_saved = {}
     for env_var in env_var_save_restore:
         env_var_saved[env_var] = os.getenv(env_var, default=None)
         if env_var_saved[env_var] is not None:
             del os.environ[env_var]
+
+    # Set AWS_PROFILE
+    os.environ[AWS_PROFILE] = PROFILE_NAME
+
+    # Set AWS_CONFIG_FILE
     with tempfile.NamedTemporaryFile(delete=False) as config_file:
         config_file.write(b"[profile " + PROFILE_NAME.encode("utf") + b"]\n")
         aws_config_file = config_file.name
         os.environ[AWS_CONFIG_FILE] = aws_config_file
+
+    # Set AWS_SHARED_CREDENTIALS_FILE
     with tempfile.NamedTemporaryFile(delete=False) as credentials_file:
         credentials_file.write(
             b"[profile " + PROFILE_NAME.encode("utf") + b"]\n"
         )
         aws_shared_credentials_file = credentials_file.name
         os.environ[AWS_SHARED_CREDENTIALS_FILE] = aws_shared_credentials_file
+
     try:
         yield
     finally:
-        if old_profile is None:
-            del os.environ[AWS_PROFILE]
-        else:
-            os.environ[AWS_PROFILE] = old_profile
+        # Restore original state of env variables
         for env_var in env_var_save_restore:
             if env_var_saved[env_var] is not None:
                 os.environ[env_var] = env_var_saved[env_var]
             elif env_var in os.environ:
                 del os.environ[env_var]
+
+        # Remove tmp files
         os.remove(aws_config_file)
         os.remove(aws_shared_credentials_file)
 

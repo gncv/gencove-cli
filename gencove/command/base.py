@@ -2,7 +2,11 @@
 
 All commands must implement this interface.
 """
+import contextlib
+import os
+import tempfile
 import traceback
+from functools import wraps
 
 import click
 
@@ -19,6 +23,65 @@ from gencove.logger import (
     echo_warning,
 )
 from gencove.utils import login, validate_credentials
+
+AWS_PROFILE = "AWS_PROFILE"
+AWS_CONFIG_FILE = "AWS_CONFIG_FILE"
+AWS_SHARED_CREDENTIALS_FILE = "AWS_SHARED_CREDENTIALS_FILE"
+env_var_save_restore = [
+    "AWS_ACCESS_KEY_ID",
+    "AWS_SECRET_ACCESS_KEY",
+    "AWS_SESSION_TOKEN",
+    "AWS_SECURITY_TOKEN",
+    "AWS_DEFAULT_REGION",
+    "AWS_DEFAULT_PROFILE",
+    "AWS_CA_BUNDLE",
+    AWS_SHARED_CREDENTIALS_FILE,
+    AWS_CONFIG_FILE,
+]
+
+PROFILE_NAME = "gencove-cli-profile"
+
+
+@contextlib.contextmanager
+def aws_cli_credentials():
+    old_profile = os.getenv(AWS_PROFILE, default=None)
+    os.environ[AWS_PROFILE] = PROFILE_NAME
+    env_var_saved = {}
+    for env_var in env_var_save_restore:
+        env_var_saved[env_var] = os.getenv(env_var, default=None)
+        if env_var_saved[env_var] is not None:
+            del os.environ[env_var]
+    with tempfile.NamedTemporaryFile(delete=False) as f:
+        f.write(b"[profile " + PROFILE_NAME.encode("utf") + b"]\n")
+        aws_config_file = f.name
+        os.environ[AWS_CONFIG_FILE] = aws_config_file
+    with tempfile.NamedTemporaryFile(delete=False) as f:
+        f.write(b"[profile " + PROFILE_NAME.encode("utf") + b"]\n")
+        aws_shared_credentials_file = f.name
+        os.environ[AWS_SHARED_CREDENTIALS_FILE] = aws_shared_credentials_file
+    try:
+        yield
+    finally:
+        if old_profile is None:
+            del os.environ[AWS_PROFILE]
+        else:
+            os.environ[AWS_PROFILE] = old_profile
+        for env_var in env_var_save_restore:
+            if env_var_saved[env_var] is not None:
+                os.environ[env_var] = env_var_saved[env_var]
+            elif env_var_saved.get(env_var) is None and env_var in os.environ:
+                del os.environ[env_var]
+        os.remove(aws_config_file)
+        os.remove(aws_shared_credentials_file)
+
+
+def aws_cli_decorator(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        with aws_cli_credentials():
+            return f(*args, **kwargs)
+
+    return wrapper
 
 
 class Command(object):  # pylint: disable=R0205
@@ -50,6 +113,7 @@ class Command(object):  # pylint: disable=R0205
                 "Please check your credentials and try again"
             )
 
+    @aws_cli_decorator
     def run(self):
         """Run the command.
 

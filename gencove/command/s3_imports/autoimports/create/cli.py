@@ -17,8 +17,7 @@ from .main import S3AutoImport
     required=False,
     default=None,
     help=(
-        "Add metadata to all samples that are to be imported from "
-        "S3 to a project."
+        "Add metadata to all samples that are to be imported from " "S3 to a project."
     ),
 )
 @add_options(common_options)

@@ -59,9 +59,7 @@ def vcr_config():
 def test_create_project_batches__missing_batch_type(credentials, mocker):
     """Test batch creation failure when batch type is not sent."""
     runner = CliRunner()
-    mocked_create_project_batch = mocker.patch.object(
-        APIClient, "create_project_batch"
-    )
+    mocked_create_project_batch = mocker.patch.object(APIClient, "create_project_batch")
     res = runner.invoke(
         create_project_batch,
         [
@@ -82,9 +80,7 @@ def test_create_project_batches__missing_batch_type(credentials, mocker):
 def test_create_project_batches__missing_batch_name(credentials, mocker):
     """Test batch creation failure when batch name is not sent."""
     runner = CliRunner()
-    mocked_create_project_batch = mocker.patch.object(
-        APIClient, "create_project_batch"
-    )
+    mocked_create_project_batch = mocker.patch.object(APIClient, "create_project_batch")
     res = runner.invoke(
         create_project_batch,
         [
@@ -229,9 +225,7 @@ def test_create_project_batches__success__with_sample_ids(
 
         output_line = io.BytesIO()
         sys.stdout = output_line
-        for response in ProjectBatches(
-            **create_project_batch_response
-        ).results:
+        for response in ProjectBatches(**create_project_batch_response).results:
             echo(
                 "\t".join(
                     [
@@ -289,9 +283,7 @@ def test_create_project_batches__success__without_sample_ids(
 
         output_line = io.BytesIO()
         sys.stdout = output_line
-        for response in ProjectBatches(
-            **create_project_batch_response
-        ).results:
+        for response in ProjectBatches(**create_project_batch_response).results:
             echo(
                 "\t".join(
                     [

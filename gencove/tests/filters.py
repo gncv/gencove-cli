@@ -59,9 +59,7 @@ def replace_s3_from_url(request):
 
 def mock_binary_response(response):
     """Replace binary responses with a placeholder"""
-    is_binary = "binary/octet-stream" in response["headers"].get(
-        "Content-Type", []
-    )
+    is_binary = "binary/octet-stream" in response["headers"].get("Content-Type", [])
     if is_binary:
         response["body"]["string"] = b"""QUFBQkJC"""
         if "Content-Disposition" in response["headers"]:

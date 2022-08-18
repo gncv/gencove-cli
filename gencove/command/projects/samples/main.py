@@ -32,11 +32,9 @@ class ListSamples(Command):
     def execute(self):
         self.echo_debug(
             "Retrieving sample sheet: "
-            "status={} archive_status={} search_term={}".format(
-                self.sample_status,
-                self.sample_archive_status,
-                self.search_term,
-            )
+            f"status={self.sample_status} "
+            f"archive_status={self.sample_archive_status} "
+            f"search_term={self.search_term}"
         )
         try:
             for samples in self.get_paginated_samples():
@@ -48,9 +46,7 @@ class ListSamples(Command):
                     self.echo_data(get_line(sample))
         except APIClientError as err:
             if err.status_code == 404:
-                self.echo_error(
-                    "Project {} does not exist.".format(self.project_id)
-                )
+                self.echo_error(f"Project {self.project_id} does not exist.")
             raise
 
     def get_paginated_samples(self):

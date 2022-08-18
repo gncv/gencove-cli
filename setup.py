@@ -11,7 +11,7 @@ def version():
     with open("gencove/version/C-patch", "rt") as f:
         patch = f.read().replace("\n", "")
 
-    return "{}.{}.{}".format(major, minor, patch)
+    return f"{major}.{minor}.{patch}"
 
 
 setup(
@@ -36,9 +36,9 @@ setup(
         "Click>=7.0",
         "requests>=2.19.1",
         "boto3>=1.17.97",
-        "progressbar2==3.50.1",
-        "backoff==1.10.0",
-        "pydantic==1.8.2",
+        "progressbar2==3.55.0",
+        "backoff==1.11.0",
+        "pydantic==1.9.2",
     ],
     setup_requires=["pytest-runner"],
     tests_require=["pytest", "pytest-mock"],

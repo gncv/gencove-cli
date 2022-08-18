@@ -17,9 +17,7 @@ from .main import RunPrefix
     "--metadata-json",
     required=False,
     default=None,
-    help=(
-        "Add metadata to all uploads that are to be assigned to a project."
-    ),
+    help=("Add metadata to all uploads that are to be assigned to a project."),
 )
 @click.option(
     "--status",
@@ -52,7 +50,5 @@ def run_prefix(  # pylint: disable=too-many-arguments
         project_id,
         prefix,
         Credentials(email=email, password=password, api_key=api_key),
-        RunPrefixOptionals(
-            host=host, metadata_json=metadata_json, status=status
-        ),
+        RunPrefixOptionals(host=host, metadata_json=metadata_json, status=status),
     ).run()

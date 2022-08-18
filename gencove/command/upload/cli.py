@@ -85,9 +85,7 @@ def upload(  # pylint: disable=E0012,C0330,R0913
         source,
         destination,
         Credentials(email=email, password=password, api_key=api_key),
-        UploadOptions(
-            host=host, project_id=run_project_id, metadata=metadata
-        ),
+        UploadOptions(host=host, project_id=run_project_id, metadata=metadata),
         output,
         no_progress,
     ).run()

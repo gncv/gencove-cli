@@ -54,9 +54,7 @@ def vcr_config():
             ("email", "email@example.com"),
             ("password", "mock_password"),
         ],
-        "filter_query_parameters": [
-            ("search", "gncv://cli-mock/test.fastq.gz")
-        ],
+        "filter_query_parameters": [("search", "gncv://cli-mock/test.fastq.gz")],
         "match_on": ["method", "scheme", "port", "path", "query"],
         "path_transformer": VCR.ensure_suffix(".yaml"),
         "before_record_request": [
@@ -83,7 +81,7 @@ def test_upload(credentials, vcr, recording, mocker):
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
-        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+        with open("cli_test_data/test.fastq.gz", "w", encoding="utf-8") as fastq_file:
             fastq_file.write("AAABBB")
         mocked_get_credentials = mocker.patch(
             "gencove.command.upload.main.get_s3_client_refreshable",
@@ -108,9 +106,7 @@ def test_upload(credentials, vcr, recording, mocker):
         )
         assert not res.exception
         assert res.exit_code == 0
-        assert (
-            "Uploading cli_test_data/test.fastq.gz to gncv://" in res.output
-        )
+        assert "Uploading cli_test_data/test.fastq.gz to gncv://" in res.output
         assert "All files were successfully uploaded." in res.output
         mocked_get_credentials.assert_called_once()
         if not recording:
@@ -151,7 +147,7 @@ def test_upload_invalid_destination(
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
-        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+        with open("cli_test_data/test.fastq.gz", "w", encoding="utf-8") as fastq_file:
             fastq_file.write("AAABBB")
         res = runner.invoke(
             upload,
@@ -159,10 +155,7 @@ def test_upload_invalid_destination(
         )
         assert res.exit_code == 1
         assert (
-            "Invalid destination path. Must start with '{}'".format(
-                UPLOAD_PREFIX
-            )
-            in res.output
+            f"Invalid destination path. Must start with '{UPLOAD_PREFIX}'" in res.output
         )
         if using_api_key:
             assert vcr.play_count == 0
@@ -181,7 +174,7 @@ def test_upload_invalid_source(
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
-        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+        with open("cli_test_data/test.fastq.gz", "w", encoding="utf-8") as fastq_file:
             fastq_file.write("ACTG")
         res = runner.invoke(
             upload,
@@ -207,7 +200,7 @@ def test_upload_project_id_not_uuid(
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
-        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+        with open("cli_test_data/test.fastq.gz", "w", encoding="utf-8") as fastq_file:
             fastq_file.write("AAABBB")
         res = runner.invoke(
             upload,
@@ -228,15 +221,13 @@ def test_upload_project_id_not_uuid(
     filter_query_parameters=[("search", "gncv://cli-mock/test.fastq.gz")],
 )
 @assert_authorization
-def test_upload_and_run_immediately(
-    credentials, mocker, project_id, recording, vcr
-):
+def test_upload_and_run_immediately(credentials, mocker, project_id, recording, vcr):
     """Upload and assign right away."""
     # pylint: disable=too-many-locals
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
-        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+        with open("cli_test_data/test.fastq.gz", "w", encoding="utf-8") as fastq_file:
             fastq_file.write("AAABBB")
 
         mocked_get_credentials = mocker.patch(
@@ -257,9 +248,7 @@ def test_upload_and_run_immediately(
                 "get_upload_details",
                 return_value=UploadsPostData(**upload_details_response),
             )
-            sample_sheet_response = get_vcr_response(
-                "/api/v2/sample-sheet/", vcr
-            )
+            sample_sheet_response = get_vcr_response("/api/v2/sample-sheet/", vcr)
             mocked_get_sample_sheet = mocker.patch.object(
                 APIClient,
                 "get_sample_sheet",
@@ -303,7 +292,7 @@ def test_upload_and_run_immediately__with_metadata(
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
-        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+        with open("cli_test_data/test.fastq.gz", "w", encoding="utf-8") as fastq_file:
             fastq_file.write("AAABBB")
 
         mocked_get_credentials = mocker.patch(
@@ -330,9 +319,7 @@ def test_upload_and_run_immediately__with_metadata(
                 "get_upload_details",
                 return_value=UploadsPostData(**upload_details_response),
             )
-            sample_sheet_response = get_vcr_response(
-                "/api/v2/sample-sheet/", vcr
-            )
+            sample_sheet_response = get_vcr_response("/api/v2/sample-sheet/", vcr)
             mocked_get_sample_sheet = mocker.patch.object(
                 APIClient,
                 "get_sample_sheet",
@@ -371,14 +358,12 @@ def test_upload_and_run_immediately__with_metadata(
 
 @pytest.mark.vcr
 @assert_authorization
-def test_upload_and_run_immediately__invalid_metadata(
-    credentials, mocker, project_id
-):
+def test_upload_and_run_immediately__invalid_metadata(credentials, mocker, project_id):
     """Upload and assign right away with invalid metadata."""
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
-        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+        with open("cli_test_data/test.fastq.gz", "w", encoding="utf-8") as fastq_file:
             fastq_file.write("AAABBB")
 
         mocked_get_credentials = mocker.patch(
@@ -389,16 +374,12 @@ def test_upload_and_run_immediately__invalid_metadata(
             APIClient,
             "get_upload_details",
         )
-        mocked_upload_file = mocker.patch(
-            "gencove.command.upload.main.upload_file"
-        )
+        mocked_upload_file = mocker.patch("gencove.command.upload.main.upload_file")
         mocked_get_sample_sheet = mocker.patch.object(
             APIClient,
             "get_sample_sheet",
         )
-        mocked_assign_sample = mocker.patch.object(
-            APIClient, "add_samples_to_project"
-        )
+        mocked_assign_sample = mocker.patch.object(APIClient, "add_samples_to_project")
 
         res = runner.invoke(
             upload,
@@ -429,7 +410,7 @@ def test_upload__with_metadata_without_project_id(credentials, mocker):
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
-        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+        with open("cli_test_data/test.fastq.gz", "w", encoding="utf-8") as fastq_file:
             fastq_file.write("AAABBB")
 
         mocked_get_credentials = mocker.patch(
@@ -446,9 +427,7 @@ def test_upload__with_metadata_without_project_id(credentials, mocker):
         )
 
         assert res.exit_code == 1
-        assert (
-            "--metadata cannot be used without --run-project-id" in res.output
-        )
+        assert "--metadata cannot be used without --run-project-id" in res.output
         mocked_get_credentials.assert_not_called()
 
 
@@ -461,7 +440,7 @@ def test_upload_and_run_immediately_something_went_wrong(
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
-        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+        with open("cli_test_data/test.fastq.gz", "w", encoding="utf-8") as fastq_file:
             fastq_file.write("AAABBB")
 
         mocked_get_credentials = mocker.patch(
@@ -485,13 +464,9 @@ def test_upload_and_run_immediately_something_went_wrong(
         mocked_get_sample_sheet = mocker.patch.object(
             APIClient,
             "get_sample_sheet",
-            return_value=SampleSheet(
-                **{"meta": {"next": None}, "results": []}
-            ),
+            return_value=SampleSheet(**{"meta": {"next": None}, "results": []}),
         )
-        mocked_assign_sample = mocker.patch.object(
-            APIClient, "add_samples_to_project"
-        )
+        mocked_assign_sample = mocker.patch.object(APIClient, "add_samples_to_project")
 
         res = runner.invoke(
             upload,
@@ -522,7 +497,7 @@ def test_upload_and_run_immediately_with_output_to_file(
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
-        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+        with open("cli_test_data/test.fastq.gz", "w", encoding="utf-8") as fastq_file:
             fastq_file.write("AAABBB")
 
         mocked_get_credentials = mocker.patch(
@@ -549,9 +524,7 @@ def test_upload_and_run_immediately_with_output_to_file(
                 "get_upload_details",
                 return_value=UploadsPostData(**upload_details_response),
             )
-            sample_sheet_response = get_vcr_response(
-                "/api/v2/sample-sheet/", vcr
-            )
+            sample_sheet_response = get_vcr_response("/api/v2/sample-sheet/", vcr)
             mocked_get_sample_sheet = mocker.patch.object(
                 APIClient,
                 "get_sample_sheet",
@@ -587,12 +560,10 @@ def test_upload_and_run_immediately_with_output_to_file(
             mocked_get_upload_details.assert_called_once()
             mocked_get_sample_sheet.assert_called()
             mocked_assign_sample.assert_called_once()
-            with open("samples.json", "r") as output_file:
+            with open("samples.json", "r", encoding="utf-8") as output_file:
                 output_content = output_file.read()
             # r2 fastq key is not present on the file
-            assert (
-                project_sample_response["uploads"][0]["fastq"]["r2"] is None
-            )
+            assert project_sample_response["uploads"][0]["fastq"]["r2"] is None
             del project_sample_response["uploads"][0]["fastq"]["r2"]
             assert (
                 json.dumps(project_sample_response["uploads"], indent=4)
@@ -610,7 +581,7 @@ def test_upload_and_run_immediately_with_output_to_nested_file(
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
-        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+        with open("cli_test_data/test.fastq.gz", "w", encoding="utf-8") as fastq_file:
             fastq_file.write("AAABBB")
 
         mocked_get_credentials = mocker.patch(
@@ -637,9 +608,7 @@ def test_upload_and_run_immediately_with_output_to_nested_file(
                 "get_upload_details",
                 return_value=UploadsPostData(**upload_details_response),
             )
-            sample_sheet_response = get_vcr_response(
-                "/api/v2/sample-sheet/", vcr
-            )
+            sample_sheet_response = get_vcr_response("/api/v2/sample-sheet/", vcr)
             mocked_get_sample_sheet = mocker.patch.object(
                 APIClient,
                 "get_sample_sheet",
@@ -674,12 +643,10 @@ def test_upload_and_run_immediately_with_output_to_nested_file(
             mocked_get_upload_details.assert_called_once()
             mocked_get_sample_sheet.assert_called()
             mocked_assign_sample.assert_called_once()
-            with open("somefolder/samples.json", "r") as output_file:
+            with open("somefolder/samples.json", "r", encoding="utf-8") as output_file:
                 output_content = output_file.read()
             # r2 fastq key is not present on the file
-            assert (
-                project_sample_response["uploads"][0]["fastq"]["r2"] is None
-            )
+            assert project_sample_response["uploads"][0]["fastq"]["r2"] is None
             del project_sample_response["uploads"][0]["fastq"]["r2"]
             assert (
                 json.dumps(project_sample_response["uploads"], indent=4)
@@ -697,7 +664,7 @@ def test_upload_and_run_immediately_with_stdout(
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
-        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+        with open("cli_test_data/test.fastq.gz", "w", encoding="utf-8") as fastq_file:
             fastq_file.write("AAABBB")
 
         mocked_get_credentials = mocker.patch(
@@ -716,9 +683,7 @@ def test_upload_and_run_immediately_with_stdout(
                 "get_upload_details",
                 return_value=UploadsPostData(**upload_details_response),
             )
-            sample_sheet_response = get_vcr_response(
-                "/api/v2/sample-sheet/", vcr
-            )
+            sample_sheet_response = get_vcr_response("/api/v2/sample-sheet/", vcr)
             mocked_get_sample_sheet = mocker.patch.object(
                 APIClient,
                 "get_sample_sheet",
@@ -734,9 +699,7 @@ def test_upload_and_run_immediately_with_stdout(
             )
             # These mocks needs to be here and without side effect otherwise
             # a weird behavior on the stdout will happend and the test fails.
-            mocked_upload_file = mocker.patch(
-                "gencove.command.upload.main.upload_file"
-            )
+            mocked_upload_file = mocker.patch("gencove.command.upload.main.upload_file")
 
             mocker.patch(
                 "gencove.command.upload.main.get_regular_progress_bar",
@@ -763,13 +726,10 @@ def test_upload_and_run_immediately_with_stdout(
             mocked_get_sample_sheet.assert_called()
             mocked_assign_sample.assert_called_once()
             # r2 fastq key is not present on the file
-            assert (
-                project_sample_response["uploads"][0]["fastq"]["r2"] is None
-            )
+            assert project_sample_response["uploads"][0]["fastq"]["r2"] is None
             del project_sample_response["uploads"][0]["fastq"]["r2"]
             assert (
-                json.dumps(project_sample_response["uploads"], indent=4)
-                in res.output
+                json.dumps(project_sample_response["uploads"], indent=4) in res.output
             )
 
 
@@ -780,16 +740,14 @@ def test_upload_without_progressbar(credentials, mocker, recording, vcr):
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
-        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+        with open("cli_test_data/test.fastq.gz", "w", encoding="utf-8") as fastq_file:
             fastq_file.write("AAABBB")
 
         mocked_get_credentials = mocker.patch(
             "gencove.command.upload.main.get_s3_client_refreshable",
             side_effect=get_s3_client_refreshable,
         )
-        mocked_upload_file = mocker.patch(
-            "gencove.command.upload.main.upload_file"
-        )
+        mocked_upload_file = mocker.patch("gencove.command.upload.main.upload_file")
         if not recording:
             # Mock get_upload_details only if using the cassettes, since
             # we mock the return value.
@@ -829,7 +787,7 @@ def test_upload_and_run_immediately_without_progressbar(
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
-        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+        with open("cli_test_data/test.fastq.gz", "w", encoding="utf-8") as fastq_file:
             fastq_file.write("AAABBB")
 
         mocked_get_credentials = mocker.patch(
@@ -855,9 +813,7 @@ def test_upload_and_run_immediately_without_progressbar(
                 "get_upload_details",
                 return_value=UploadsPostData(**upload_details_response),
             )
-            sample_sheet_response = get_vcr_response(
-                "/api/v2/sample-sheet/", vcr
-            )
+            sample_sheet_response = get_vcr_response("/api/v2/sample-sheet/", vcr)
             mocked_get_sample_sheet = mocker.patch.object(
                 APIClient,
                 "get_sample_sheet",
@@ -903,7 +859,7 @@ def test_upload_and_run_immediately_slow_response_retry(
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
-        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+        with open("cli_test_data/test.fastq.gz", "w", encoding="utf-8") as fastq_file:
             fastq_file.write("AAABBB")
 
         mocked_get_credentials = mocker.patch(
@@ -927,9 +883,7 @@ def test_upload_and_run_immediately_slow_response_retry(
         mocked_get_sample_sheet = mocker.patch.object(
             APIClient,
             "get_sample_sheet",
-            side_effect=APIClientTimeout(
-                "Could not connect to the api server"
-            ),
+            side_effect=APIClientTimeout("Could not connect to the api server"),
         )
 
         res = runner.invoke(
@@ -959,7 +913,7 @@ def test_upload_retry_after_unauthorized(mocker):
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
-        with open("cli_test_data/test.fastq.gz", "w") as fastq_file:
+        with open("cli_test_data/test.fastq.gz", "w", encoding="utf-8") as fastq_file:
             fastq_file.write("AAABBB")
 
         def _login(

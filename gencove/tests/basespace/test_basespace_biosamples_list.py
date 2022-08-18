@@ -151,9 +151,7 @@ def test_biosamples_list__multiple(mocker):
             [
                 str(basespace_project.basespace_date_created),
                 str(basespace_project.basespace_id),
-                basespace_project.basespace_bio_sample_name.replace(
-                    "\t", " "
-                ),
+                basespace_project.basespace_bio_sample_name.replace("\t", " "),
             ]
         )
     )
@@ -188,9 +186,7 @@ def test_biosamples_list(mocker):
             [
                 str(basespace_project.basespace_date_created),
                 str(basespace_project.basespace_id),
-                basespace_project.basespace_bio_sample_name.replace(
-                    "\t", " "
-                ),
+                basespace_project.basespace_bio_sample_name.replace("\t", " "),
             ]
         )
     )
@@ -230,9 +226,7 @@ def test_biosamples_list__with_unexpected_keys(mocker):
             [
                 str(basespace_project.basespace_date_created),
                 str(basespace_project.basespace_id),
-                basespace_project.basespace_bio_sample_name.replace(
-                    "\t", " "
-                ),
+                basespace_project.basespace_bio_sample_name.replace("\t", " "),
             ]
         )
     )

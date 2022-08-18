@@ -53,9 +53,7 @@ class Upload(Command):
     """Upload command executor."""
 
     # pylint: disable=too-many-arguments
-    def __init__(
-        self, source, destination, credentials, options, output, no_progress
-    ):
+    def __init__(self, source, destination, credentials, options, output, no_progress):
         super().__init__(credentials, options)
         self.source = source
         self.destination = destination
@@ -71,22 +69,22 @@ class Upload(Command):
     @staticmethod
     def generate_gncv_destination():
         """Autogenerate gencove destination path."""
-        return "{}cli-{}-{}".format(
-            UPLOAD_PREFIX,
-            datetime.utcnow().strftime("%Y%m%d%H%M%S"),
-            uuid.uuid4().hex,
+        return (
+            f"{UPLOAD_PREFIX}cli-"
+            f"{datetime.utcnow().strftime('%Y%m%d%H%M%S')}-"
+            f"{uuid.uuid4().hex}"
         )
 
     def initialize(self):
         """Initialize upload command parameters from provided arguments."""
-        self.echo_debug("Host is {}".format(self.options.host))
+        self.echo_debug(f"Host is {self.options.host}")
         self.echo_warning(TMP_UPLOADS_WARNING)
 
         # fmt: off
         if os.path.isfile(self.source) and self.source.endswith(FASTQ_MAP_EXTENSION):  # noqa: E501
             self.echo_debug("Scanning fastqs map file")
             self.fastqs_map = parse_fastqs_map_file(self.source)
-            self.echo_debug("got fastq pairs: {}".format(self.fastqs_map))
+            self.echo_debug(f"got fastq pairs: {self.fastqs_map}")
         else:
             self.echo_debug("Seeking files to upload")
             self.fastqs = list(seek_files_to_upload(self.source))
@@ -94,7 +92,7 @@ class Upload(Command):
         if not self.destination:
             self.destination = self.generate_gncv_destination()
             self.echo_info(
-                "Files will be uploaded to: {}".format(self.destination)
+                f"Files will be uploaded to: {self.destination}"
             )
         # fmt: on
 
@@ -116,9 +114,7 @@ class Upload(Command):
         # fmt: off
         if self.destination and not self.destination.startswith(UPLOAD_PREFIX):
             self.echo_error(
-                "Invalid destination path. Must start with '{}'".format(
-                    UPLOAD_PREFIX
-                )
+                f"Invalid destination path. Must start with '{UPLOAD_PREFIX}'"
             )
             raise ValidationError("Bad configuration. Exiting.")
         # fmt: on
@@ -135,21 +131,15 @@ class Upload(Command):
         if not self.fastqs and not self.fastqs_map:
             self.echo_error(
                 "No FASTQ files found in the path. "
-                "Only following files are accepted: {}".format(
-                    FASTQ_EXTENSIONS
-                )
+                f"Only following files are accepted: {FASTQ_EXTENSIONS}"
             )
             raise ValidationError("Bad configuration. Exiting.")
 
         if self.output and not self.project_id:
-            raise ValidationError(
-                "--output cannot be used without --run-project-id"
-            )
+            raise ValidationError("--output cannot be used without --run-project-id")
 
         if self.metadata and not self.project_id:
-            raise ValidationError(
-                "--metadata cannot be used without --run-project-id"
-            )
+            raise ValidationError("--metadata cannot be used without --run-project-id")
 
         if self.project_id and is_valid_uuid(self.project_id) is False:
             raise ValidationError("--run-project-id is not valid. Exiting.")
@@ -164,9 +154,7 @@ class Upload(Command):
         If project id was provided, all fastq files will
         be assigned to this project, after upload.
         """
-        s3_client = get_s3_client_refreshable(
-            self.api_client.get_upload_credentials
-        )
+        s3_client = get_s3_client_refreshable(self.api_client.get_upload_credentials)
         try:
             if self.fastqs:
                 self.upload_from_source(s3_client)
@@ -175,7 +163,7 @@ class Upload(Command):
         except UploadError:
             return
 
-        self.echo_debug("Upload ids are now: {}".format(self.upload_ids))
+        self.echo_debug(f"Upload ids are now: {self.upload_ids}")
         if self.project_id:
             self.echo_debug("Cooling down period.")
             sleep(10)
@@ -195,9 +183,7 @@ class Upload(Command):
     def upload_from_map_file(self, s3_client):
         """Upload fastq files from a csv file."""
         for key, fastqs in self.fastqs_map.items():
-            upload = self.concatenate_and_upload_fastqs(
-                key, fastqs, s3_client
-            )
+            upload = self.concatenate_and_upload_fastqs(key, fastqs, s3_client)
             if self.project_id and upload:
                 self.upload_ids.add(upload.id)
 
@@ -207,14 +193,12 @@ class Upload(Command):
         """Upload fastqs parts as one file."""
         client_id, r_notation = key
         self.echo_debug(
-            "Uploading fastq. client_id={} r_notation={}".format(
-                client_id, r_notation
-            )
+            f"Uploading fastq. client_id={client_id} r_notation={r_notation}"
         )
-        self.echo_debug("FASTQS: {}".format(fastqs))
+        self.echo_debug(f"FASTQS: {fastqs}")
 
         gncv_path = self.destination + get_gncv_path(client_id, r_notation)
-        self.echo_debug("Calculated gncv path: {}".format(gncv_path))
+        self.echo_debug(f"Calculated gncv path: {gncv_path}")
 
         upload_details = self.get_upload_details(gncv_path)
 
@@ -222,10 +206,10 @@ class Upload(Command):
             upload_details.last_status
             and upload_details.last_status.status == UploadStatuses.DONE.value
         ):
-            self.echo_info("File was already uploaded: {}".format(gncv_path))
+            self.echo_info(f"File was already uploaded: {gncv_path}")
             return upload_details
 
-        self.echo_info("Uploading to {}".format(gncv_path))
+        self.echo_info(f"Uploading to {gncv_path}")
         upload_multi_file(
             s3_client,
             MultiFileReader(fastqs),
@@ -246,16 +230,10 @@ class Upload(Command):
             dict representing upload details
         """
         clean_file_path = get_filename_from_path(file_path, self.source)
-        self.echo_debug(
-            "Uploading clean file path: {}".format(clean_file_path)
-        )
+        self.echo_debug(f"Uploading clean file path: {clean_file_path}")
         gncv_notated_path = self.destination + clean_file_path
 
-        self.echo_info(
-            "Checking if file was already uploaded: {}".format(
-                clean_file_path
-            )
-        )
+        self.echo_info(f"Checking if file was already uploaded: {clean_file_path}")
 
         try:
             upload_details = self.get_upload_details(gncv_notated_path)
@@ -269,14 +247,10 @@ class Upload(Command):
             upload_details.last_status
             and upload_details.last_status.status == UploadStatuses.DONE.value
         ):
-            self.echo_info(
-                "File was already uploaded: {}".format(clean_file_path)
-            )
+            self.echo_info(f"File was already uploaded: {clean_file_path}")
             return upload_details
 
-        self.echo_info(
-            "Uploading {} to {}".format(file_path, gncv_notated_path)
-        )
+        self.echo_info(f"Uploading {file_path} to {gncv_notated_path}")
         upload_file(
             s3_client=s3_client,
             file_name=file_path,
@@ -289,52 +263,38 @@ class Upload(Command):
     @backoff.on_predicate(
         backoff.expo, get_get_upload_details_retry_predicate, max_tries=10
     )
-    @backoff.on_exception(
-        backoff.expo, APIClientTooManyRequestsError, max_tries=20
-    )
+    @backoff.on_exception(backoff.expo, APIClientTooManyRequestsError, max_tries=20)
     def get_upload_details(self, gncv_path):
         """Get upload details with retry for last status update."""
         return self.api_client.get_upload_details(gncv_path)
 
     def assign_uploads_to_project(self):
         """Assign uploads to a project and trigger a run."""
-        self.echo_info(
-            "Assigning uploads to project {}".format(self.project_id)
-        )
+        self.echo_info(f"Assigning uploads to project {self.project_id}")
 
         try:
             samples = self.build_samples(self.upload_ids)
         except (UploadError, SampleSheetError, UploadNotFound):
-            self.echo_warning(
-                ASSIGN_ERROR.format(self.project_id, self.destination)
-            )
+            self.echo_warning(ASSIGN_ERROR.format(self.project_id, self.destination))
             return
 
         if not samples:
             self.echo_debug("No related samples were found")
-            self.echo_warning(
-                ASSIGN_ERROR.format(self.project_id, self.destination)
-            )
+            self.echo_warning(ASSIGN_ERROR.format(self.project_id, self.destination))
             return
 
-        self.echo_debug("Sample sheet now is: {}".format(samples))
+        self.echo_debug(f"Sample sheet now is: {samples}")
 
-        self.echo_debug(
-            "Assigning samples to project ({})".format(self.project_id)
-        )
+        self.echo_debug(f"Assigning samples to project ({self.project_id})")
 
         assigned_count = 0
         if not self.no_progress:
-            progress_bar = get_regular_progress_bar(
-                len(samples), "Assigning: "
-            )
+            progress_bar = get_regular_progress_bar(len(samples), "Assigning: ")
             progress_bar.start()
         for samples_batch in batchify(samples, batch_size=ASSIGN_BATCH_SIZE):
             try:
                 samples_batch_len = len(samples_batch)
-                self.echo_debug(
-                    "Assigning batch: {}".format(samples_batch_len)
-                )
+                self.echo_debug(f"Assigning batch: {samples_batch_len}")
                 metadata_api = None
                 if self.metadata is not None:
                     metadata_api = json.loads(self.metadata)
@@ -346,12 +306,10 @@ class Upload(Command):
                 assigned_count += samples_batch_len
                 if not self.no_progress:
                     progress_bar.update(samples_batch_len)
-                self.echo_debug("Total assigned: {}".format(assigned_count))
+                self.echo_debug(f"Total assigned: {assigned_count}")
             except APIClientError as err:
                 self.echo_debug(err)
-                self.echo_warning(
-                    "There was an error assigning/running samples."
-                )
+                self.echo_warning("There was an error assigning/running samples.")
                 if assigned_count > 0:
                     self.echo_warning(
                         "Some of the samples were assigned. "
@@ -387,22 +345,19 @@ class Upload(Command):
                 raise UploadError
 
             for sample in sample_sheet:
-                self.echo_debug("Checking sample: {}".format(sample))
+                self.echo_debug(f"Checking sample: {sample}")
                 add_it = False
                 if sample.fastq and sample.fastq.r1:
                     if sample.fastq.r1.upload in search_uploads:
                         add_it = True
                         search_uploads.remove(sample.fastq.r1.upload)
                         self.echo_debug(
-                            "Found sample for upload r1: {}".format(
-                                sample.fastq.r1.upload
-                            )
+                            f"Found sample for upload r1: {sample.fastq.r1.upload}"
                         )
                     else:
                         self.echo_debug(
-                            "R1 upload not found. sample {} uploads {}".format(
-                                sample, search_uploads
-                            )
+                            f"R1 upload not found. sample {sample} "
+                            f"uploads {search_uploads}"
                         )
                         raise UploadNotFound
                 if sample.fastq and sample.fastq.r2:
@@ -410,15 +365,12 @@ class Upload(Command):
                         add_it = True
                         search_uploads.remove(sample.fastq.r2.upload)
                         self.echo_debug(
-                            "Found sample for upload r2: {}".format(
-                                sample.fastq.r2.upload
-                            )
+                            f"Found sample for upload r2: {sample.fastq.r2.upload}"
                         )
                     else:
                         self.echo_debug(
-                            "R2 upload not found. sample {} uploads {}".format(
-                                sample, search_uploads
-                            )
+                            f"R2 upload not found. sample {sample} "
+                            f"uploads {search_uploads}"
                         )
                         raise UploadNotFound
 
@@ -426,9 +378,7 @@ class Upload(Command):
                     samples.append(sample)
 
         if search_uploads:
-            self.echo_debug(
-                "Have uploads without samples: {}".format(search_uploads)
-            )
+            self.echo_debug(f"Have uploads without samples: {search_uploads}")
             raise SampleSheetError
 
         return samples
@@ -478,14 +428,8 @@ class Upload(Command):
             dirname = os.path.dirname(self.output)
             if dirname and not os.path.exists(dirname):
                 os.makedirs(dirname)
-            with open(self.output, "w") as json_file:
+            with open(self.output, "w", encoding="utf-8") as json_file:
                 json_file.write(
-                    json.dumps(
-                        self.assigned_samples, indent=4, cls=CustomEncoder
-                    )
+                    json.dumps(self.assigned_samples, indent=4, cls=CustomEncoder)
                 )
-            self.echo_info(
-                "Assigned samples response outputted to {}".format(
-                    self.output
-                )
-            )
+            self.echo_info(f"Assigned samples response outputted to {self.output}")

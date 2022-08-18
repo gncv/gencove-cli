@@ -44,10 +44,7 @@ from .main import Download
         "\nAvailable tokens: \n{}".format(
             DOWNLOAD_TEMPLATE,
             "\n".join(
-                [
-                    "{{{}}}".format(v)
-                    for v in enum_as_dict(DownloadTemplateParts).values()
-                ]
+                [f"{{{v}}}" for v in enum_as_dict(DownloadTemplateParts).values()]
             ),
         )
     ),
@@ -123,18 +120,16 @@ def download(  # pylint: disable=E0012,C0330,R0913
     s_ids = tuple()
     if sample_ids:
         s_ids = tuple(s_id.strip() for s_id in sample_ids.split(","))
-        echo_debug("Sample ids translation: {}".format(s_ids))
+        echo_debug(f"Sample ids translation: {s_ids}")
 
     f_types = tuple()
     if file_types:
         f_types = tuple(f_type.strip() for f_type in file_types.split(","))
-        echo_debug("File types translation: {}".format(f_types))
+        echo_debug(f"File types translation: {f_types}")
 
     Download(
         destination,
-        DownloadFilters(
-            project_id=project_id, sample_ids=s_ids, file_types=f_types
-        ),
+        DownloadFilters(project_id=project_id, sample_ids=s_ids, file_types=f_types),
         Credentials(email=email, password=password, api_key=api_key),
         DownloadOptions(
             host=host,

@@ -59,10 +59,8 @@ class DownloadFile(Command):
             self.echo_debug(err)
             if err.status_code == 404:
                 self.echo_error(
-                    "Sample {} file {} does not exist or you do not have "
-                    "permission required to access it.".format(
-                        self.sample_id, self.file_type
-                    )
+                    f"Sample {self.sample_id} file {self.file_type} does not "
+                    "exist or you do not have permission required to access it."
                 )
             raise
 
@@ -78,25 +76,19 @@ class DownloadFile(Command):
             sample = self.api_client.get_sample_details(self.sample_id)
         except client.APIClientError:
             self.echo_warning(
-                "Sample with id {} not found. "
-                "Are you using client id instead of sample id?".format(
-                    self.sample_id
-                )
+                f"Sample with id {self.sample_id} not found. "
+                "Are you using client id instead of sample id?"
             )
             return
 
         self.echo_debug(
-            "Processing sample id {}, status {}".format(
-                sample.id, sample.last_status.status
-            )
+            f"Processing sample id {sample.id}, status {sample.last_status.status}"
         )
 
-        if not ALLOWED_ARCHIVE_STATUSES_RE.match(
-            sample.archive_last_status.status
-        ):
+        if not ALLOWED_ARCHIVE_STATUSES_RE.match(sample.archive_last_status.status):
             raise ValidationError(
-                "Sample with id {} is archived and cannot be downloaded - "
-                "please restore the sample and try again.".format(sample.id)
+                f"Sample with id {sample.id} is archived and cannot be downloaded - "
+                "please restore the sample and try again."
             )
 
         file_to_download = None
@@ -109,9 +101,8 @@ class DownloadFile(Command):
 
         if file_to_download is None or file_to_download.download_url is None:
             self.echo_warning(
-                "File not found for sample with id {} and file type {}".format(
-                    self.sample_id, self.file_type
-                )
+                f"File not found for sample with id {self.sample_id} "
+                f"and file type {self.file_type}"
             )
         else:
             download_file(
@@ -129,8 +120,7 @@ class DownloadFile(Command):
                     self.create_checksum_file(self.destination.name, checksum)
                 except client.APIClientTooManyRequestsError:
                     self.echo_debug(
-                        "Request was throttled for checksum file, "
-                        "trying again"
+                        "Request was throttled for checksum file, " "trying again"
                     )
                     raise
 
@@ -145,7 +135,7 @@ class DownloadFile(Command):
         Returns:
             None
         """
-        checksum_path = "{}.sha256".format(file_path)
-        self.echo_debug("Adding checksum file: {}".format(checksum_path))
-        with open(checksum_path, "w") as checksum_file:
+        checksum_path = f"{file_path}.sha256"
+        self.echo_debug(f"Adding checksum file: {checksum_path}")
+        with open(checksum_path, "w", encoding="utf-8") as checksum_file:
             checksum_file.write(checksum_sha256)

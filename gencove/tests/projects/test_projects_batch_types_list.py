@@ -67,9 +67,7 @@ def test_list_project_batch_types__empty(
         mocked_get_project_batch_types = mocker.patch.object(
             APIClient,
             "get_project_batch_types",
-            return_value=ProjectBatchTypes(
-                **get_project_batch_types_response
-            ),
+            return_value=ProjectBatchTypes(**get_project_batch_types_response),
         )
 
     res = runner.invoke(
@@ -85,9 +83,7 @@ def test_list_project_batch_types__empty(
 @pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
-def test_list_project_batch_types__not_empty_slow_response_retry(
-    mocker, credentials
-):
+def test_list_project_batch_types__not_empty_slow_response_retry(mocker, credentials):
     """Test project batch types being outputed to the shell."""
     runner = CliRunner()
     mocked_get_project_batch_types = mocker.patch.object(
@@ -120,9 +116,7 @@ def test_list_project_batch_types__not_empty(
         mocked_get_project_batch_types = mocker.patch.object(
             APIClient,
             "get_project_batch_types",
-            return_value=ProjectBatchTypes(
-                **get_project_batch_types_response
-            ),
+            return_value=ProjectBatchTypes(**get_project_batch_types_response),
         )
 
     res = runner.invoke(

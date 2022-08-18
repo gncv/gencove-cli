@@ -84,16 +84,13 @@ def download_file(
                     sample_id,
                     file_type,
                     destination_file,
-                    Credentials(
-                        email=email, password=password, api_key=api_key
-                    ),
+                    Credentials(email=email, password=password, api_key=api_key),
                     Optionals(host=host),
                     no_progress,
                     checksum,
                 ).run()
         except IsADirectoryError:
             echo_error(
-                "Please specify a file path (not directory path)"
-                " for DESTINATION"
+                "Please specify a file path (not directory path)" " for DESTINATION"
             )
             raise click.Abort()  # pylint: disable=raise-missing-from

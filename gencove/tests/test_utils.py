@@ -31,7 +31,7 @@ def test_upload_file(mocker):
     """Sanity check upload function."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        with open("foo.txt", "w") as fastq_file:
+        with open("foo.txt", "w", encoding="utf-8") as fastq_file:
             fastq_file.write("AAABBB")
         mocked_s3_client = mocker.Mock()
         assert upload_file(
@@ -67,11 +67,13 @@ def test_build_file_path():
     file_with_prefix0 = "{client_id}/{gencove_id}/{default_filename}".format(
         **get_download_template_format_params(client_id, gencove_id)
     )
-    file_with_prefix1 = "{client_id}".format(
+    file_with_prefix1 = "{client_id}".format(  # pylint: disable=consider-using-f-string
         **get_download_template_format_params(client_id, gencove_id)
     )
-    file_with_prefix2 = "{gencove_id}".format(
-        **get_download_template_format_params(client_id, gencove_id)
+    file_with_prefix2 = (
+        "{gencove_id}".format(  # pylint: disable=consider-using-f-string
+            **get_download_template_format_params(client_id, gencove_id)
+        )
     )
     file_with_prefix3 = "{file_type}"
     file_with_prefix4 = "{file_extension}"
@@ -91,27 +93,25 @@ def test_build_file_path():
     with runner.isolated_filesystem():
         result = build_file_path(deliverable, file_with_prefix0, download_to)
         # default_filename is always a full filename with any extensions
-        assert result == "./{}/{}/{}".format(
-            client_id, gencove_id, "file.txt"
-        )
+        assert result == f"./{client_id}/{gencove_id}/file.txt"
         result = build_file_path(deliverable, file_with_prefix1, download_to)
-        assert result == "./{}".format(client_id)
+        assert result == f"./{client_id}"
         result = build_file_path(deliverable, file_with_prefix2, download_to)
-        assert result == "./{}".format(gencove_id)
+        assert result == f"./{gencove_id}"
         result = build_file_path(deliverable, file_with_prefix3, download_to)
-        assert result == "./{}".format("txt")
+        assert result == "./txt"
         result = build_file_path(deliverable, file_with_prefix4, download_to)
-        assert result == "./{}".format("txt")
+        assert result == "./txt"
         result = build_file_path(deliverable, file_with_prefix5, download_to)
-        assert result == "./{}".format("file.txt")
+        assert result == "./file.txt"
         result = build_file_path(deliverable, file_with_prefix6, download_to)
-        assert result == "./{}.{}".format("file.txt", "txt")
+        assert result == "./file.txt.txt"
         result = build_file_path(deliverable, file_with_prefix7, download_to)
-        assert result == "./{}.{}".format("file.txt", client_id)
+        assert result == f"./file.txt.{client_id}"
         result = build_file_path(deliverable, file_with_prefix8, download_to)
-        assert result == "./{}.{}".format(client_id, "file.txt")
+        assert result == f"./{client_id}.file.txt"
         result = build_file_path(deliverable, file_with_prefix9, download_to)
-        assert result == "./{}_{}".format("txt", client_id)
+        assert result == f"./txt_{client_id}"
 
 
 def test___get_filename_dirs_prefix():
@@ -124,10 +124,8 @@ def test___get_filename_dirs_prefix():
 
     resp = _get_prefix_parts(template)
 
-    assert resp.dirs == "{}/{}".format(client_id, gencove_id)
-    assert resp.filename == "{{{}}}".format(
-        DownloadTemplateParts.DEFAULT_FILENAME.value
-    )
+    assert resp.dirs == f"{client_id}/{gencove_id}"
+    assert resp.filename == f"{{{DownloadTemplateParts.DEFAULT_FILENAME.value}}}"
     assert resp.file_extension == ""
 
     template2 = "{client_id}-{gencove_id}_{file_type}".format(
@@ -135,8 +133,9 @@ def test___get_filename_dirs_prefix():
     )
     resp = _get_prefix_parts(template2)
     assert resp.dirs == ""
-    assert resp.filename == "{}-{}_{{{}}}".format(
-        client_id, gencove_id, DownloadTemplateParts.FILE_TYPE.value
+    assert (
+        resp.filename
+        == f"{client_id}-{gencove_id}_{{{DownloadTemplateParts.FILE_TYPE.value}}}"
     )
     assert resp.file_extension == ""
 
@@ -145,8 +144,9 @@ def test___get_filename_dirs_prefix():
     )
     resp = _get_prefix_parts(template3)
     assert resp.dirs == ""
-    assert resp.filename == "{}-{}_{{{}}}".format(
-        client_id, gencove_id, DownloadTemplateParts.FILE_TYPE.value
+    assert (
+        resp.filename
+        == f"{client_id}-{gencove_id}_{{{DownloadTemplateParts.FILE_TYPE.value}}}"
     )
     assert resp.file_extension == "vcf.gz"
 
@@ -156,16 +156,16 @@ def test_parse_fastqs_map_file():
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("test_dir")
-        with open("test_dir/test.fastq.gz", "w") as fastq_file1:
+        with open("test_dir/test.fastq.gz", "w", encoding="utf-8") as fastq_file1:
             fastq_file1.write("AAABBB")
 
-        with open("test_dir/test_2.fastq.gz", "w") as fastq_file2:
+        with open("test_dir/test_2.fastq.gz", "w", encoding="utf-8") as fastq_file2:
             fastq_file2.write("AAABBB")
 
-        with open("test_dir/test_3.fastq.gz", "w") as fastq_file3:
+        with open("test_dir/test_3.fastq.gz", "w", encoding="utf-8") as fastq_file3:
             fastq_file3.write("AAABBB")
 
-        with open("test_map.csv", "w") as map_file:
+        with open("test_map.csv", "w", encoding="utf-8") as map_file:
             writer = csv.writer(map_file)
             writer.writerows(
                 [
@@ -190,16 +190,16 @@ def test_invalid_fastqs_map_file():
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("test_dir")
-        with open("test_dir/test.fastq.gz", "w") as fastq_file1:
+        with open("test_dir/test.fastq.gz", "w", encoding="utf-8") as fastq_file1:
             fastq_file1.write("AAABBB")
 
-        with open("test_dir/test_2.fastq.gz", "w") as fastq_file2:
+        with open("test_dir/test_2.fastq.gz", "w", encoding="utf-8") as fastq_file2:
             fastq_file2.write("AAABBB")
 
-        with open("test_dir/test_3.fastq.gz", "w") as fastq_file3:
+        with open("test_dir/test_3.fastq.gz", "w", encoding="utf-8") as fastq_file3:
             fastq_file3.write("AAABBB")
 
-        with open("test_map.csv", "w") as map_file:
+        with open("test_map.csv", "w", encoding="utf-8") as map_file:
             writer = csv.writer(map_file)
             writer.writerows(
                 [
@@ -220,16 +220,16 @@ def test_fastqs_map_file_path_does_not_exist():
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("test_dir")
-        with open("test_dir/test.fastq.gz", "w") as fastq_file1:
+        with open("test_dir/test.fastq.gz", "w", encoding="utf-8") as fastq_file1:
             fastq_file1.write("AAABBB")
 
-        with open("test_dir/test_2.fastq.gz", "w") as fastq_file2:
+        with open("test_dir/test_2.fastq.gz", "w", encoding="utf-8") as fastq_file2:
             fastq_file2.write("AAABBB")
 
-        with open("test_dir/test_3.fastq.gz", "w") as fastq_file3:
+        with open("test_dir/test_3.fastq.gz", "w", encoding="utf-8") as fastq_file3:
             fastq_file3.write("AAABBB")
 
-        with open("test_map.csv", "w") as map_file:
+        with open("test_map.csv", "w", encoding="utf-8") as map_file:
             writer = csv.writer(map_file)
             writer.writerows(
                 [
@@ -251,7 +251,7 @@ def test_fastqs_map_file_has_wrong_header():
     # This context manager is used to avoid unnecessarily creating a
     # test_map.csv file in the root of the project on every test run
     with runner.isolated_filesystem():
-        with open("test_map.csv", "w") as map_file:
+        with open("test_map.csv", "w", encoding="utf-8") as map_file:
             writer = csv.writer(map_file)
             writer.writerows(
                 [
@@ -276,21 +276,15 @@ def test__validate_header():
         pass
 
     # expected
-    header_row = dict(
-        client_id="client_id", r_notation="r_notation", path="path"
-    )
+    header_row = dict(client_id="client_id", r_notation="r_notation", path="path")
     assert _validate_header(header_row) is None
 
     # with spacing
-    header_row = dict(
-        client_id="client_id", r_notation=" r_notation", path="path  "
-    )
+    header_row = dict(client_id="client_id", r_notation=" r_notation", path="path  ")
     assert _validate_header(header_row) is None
 
     # with uppercase
-    header_row = dict(
-        client_id="client_id", r_notation="R_notation", path="path"
-    )
+    header_row = dict(client_id="client_id", r_notation="R_notation", path="path")
     assert _validate_header(header_row) is None
 
 
@@ -336,9 +330,7 @@ def test_login_mfa(mocker):
     password token.
     """
     api_client = APIClient()
-    credentials = Credentials(
-        email="foo@bar.com", password="123456", api_key=""
-    )
+    credentials = Credentials(email="foo@bar.com", password="123456", api_key="")
 
     def _request(
         endpoint,
@@ -354,15 +346,9 @@ def test_login_mfa(mocker):
             return {"access": "access", "refresh": "refresh"}
         return {}
 
-    mocked_request = mocker.patch.object(
-        APIClient, "_request", side_effect=_request
-    )
-    mocked_prompt = mocker.patch(
-        "gencove.utils.click.prompt", return_value="token"
-    )
+    mocked_request = mocker.patch.object(APIClient, "_request", side_effect=_request)
+    mocked_prompt = mocker.patch("gencove.utils.click.prompt", return_value="token")
 
     login(api_client, credentials)
     assert mocked_request.call_count == 2
-    mocked_prompt.assert_called_once_with(
-        "One time password", type=str, err=True
-    )
+    mocked_prompt.assert_called_once_with("One time password", type=str, err=True)

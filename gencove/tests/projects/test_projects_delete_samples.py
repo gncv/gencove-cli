@@ -134,9 +134,7 @@ def test_delete_project_samples__success__empty_sample_ids(
     assert res.exit_code == 0
     if not recording:
         mocked_delete_project_samples.assert_called_once()
-    assert (
-        "The following samples have been deleted successfully" in res.output
-    )
+    assert "The following samples have been deleted successfully" in res.output
 
 
 @pytest.mark.default_cassette("jwt-create.yaml")
@@ -236,6 +234,4 @@ def test_delete_project_samples__success(
     assert res.exit_code == 0
     if not recording:
         mocked_delete_project_samples.assert_called_once()
-    assert (
-        "The following samples have been deleted successfully" in res.output
-    )
+    assert "The following samples have been deleted successfully" in res.output

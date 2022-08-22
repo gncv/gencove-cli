@@ -50,23 +50,19 @@ def upload_file(
             max_concurrency=10,
         )
         if not no_progress:
-            progress_bar = get_progress_bar(
-                os.path.getsize(file_name), "Uploading: "
-            )
+            progress_bar = get_progress_bar(os.path.getsize(file_name), "Uploading: ")
             progress_bar.start()
         s3_client.upload_file(
             file_name,
             bucket,
             object_name,
             Config=config,
-            Callback=_progress_bar_update(progress_bar)
-            if not no_progress
-            else None,
+            Callback=_progress_bar_update(progress_bar) if not no_progress else None,
         )
         if not no_progress:
             progress_bar.finish()
     except ClientError as err:
-        echo_info("Failed to upload file {}: {}".format(file_name, err))
+        echo_info(f"Failed to upload file {file_name}: {err}")
         return False
     return True
 
@@ -106,23 +102,19 @@ def upload_multi_file(
         )
 
         if not no_progress:
-            progress_bar = get_progress_bar(
-                file_obj.get_size(), "Uploading: "
-            )
+            progress_bar = get_progress_bar(file_obj.get_size(), "Uploading: ")
             progress_bar.start()
         s3_client.upload_fileobj(
             file_obj,
             bucket,
             object_name,
             Config=config,
-            Callback=_progress_bar_update(progress_bar)
-            if not no_progress
-            else None,
+            Callback=_progress_bar_update(progress_bar) if not no_progress else None,
         )
         if not no_progress:
             progress_bar.finish()
     except ClientError as err:
-        echo_info("Failed to upload file {}: {}".format(file_obj.name, err))
+        echo_info(f"Failed to upload file {file_obj.name}: {err}")
         return False
     return True
 
@@ -155,7 +147,7 @@ def seek_files_to_upload(path, path_root=""):
             file_path = os.path.join(path_root, root, file)
 
             if file_path.lower().endswith(FASTQ_EXTENSIONS):
-                echo_debug("Found file to upload: {}".format(file_path))
+                echo_debug(f"Found file to upload: {file_path}")
                 yield file_path
 
         dirs.sort()
@@ -187,32 +179,26 @@ def _validate_fastq(fastq):
         ValidationError if fastq is not valid
     """
     if not fastq.path.lower().endswith(FASTQ_EXTENSIONS):
-        echo_info("Unsupported file type found: {}".format(fastq.path))
-        raise ValidationError(
-            "Bad file extension in path: {}".format(fastq.path)
-        )
+        echo_info(f"Unsupported file type found: {fastq.path}")
+        raise ValidationError(f"Bad file extension in path: {fastq.path}")
     if "_" in fastq.client_id:
         echo_info("Underscore is not allowed in client id")
         raise ValidationError("Underscore is not allowed in client id")
     if not os.path.exists(fastq.path):
-        echo_info("Path does not exist: {}".format(fastq.path))
-        raise ValidationError("Could not find: {}".format(fastq.path))
+        echo_info(f"Path does not exist: {fastq.path}")
+        raise ValidationError(f"Could not find: {fastq.path}")
     if fastq.r_notation not in R_NOTATION_MAP:
-        echo_info("Wrong R notation: {}".format(fastq.r_notation))
-        echo_info("Valid R notations are: {}".format(R_NOTATION_MAP.keys()))
-        raise ValidationError("Wrong R notation: {}".format(fastq.r_notation))
+        echo_info(f"Wrong R notation: {fastq.r_notation}")
+        echo_info(f"Valid R notations are: {R_NOTATION_MAP.keys()}")
+        raise ValidationError(f"Wrong R notation: {fastq.r_notation}")
 
 
 def _validate_header(header):
-    header_columns = [
-        header_item.strip().lower() for header_item in header.values()
-    ]
+    header_columns = [header_item.strip().lower() for header_item in header.values()]
     for column in FastQ.__fields__:
         if column not in header_columns:
             raise ValidationError(
-                "Unexpected CSV header. Expected: {}".format(
-                    ", ".join(FastQ.__fields__)
-                )
+                f"Unexpected CSV header. Expected: {', '.join(FastQ.__fields__)}"
             )
 
 
@@ -238,7 +224,7 @@ def parse_fastqs_map_file(fastqs_map_path):
             }
     """
     fastqs = defaultdict(list)
-    with open(fastqs_map_path) as fastqs_file:
+    with open(fastqs_map_path, encoding="utf-8") as fastqs_file:
         reader = csv.DictReader(fastqs_file, fieldnames=FastQ.__fields__)
         # read headers row
         header = next(reader)
@@ -246,9 +232,9 @@ def parse_fastqs_map_file(fastqs_map_path):
         for row in reader:
             fastq = FastQ(**row)
             _validate_fastq(fastq)
-            fastqs[
-                (fastq.client_id, R_NOTATION_MAP[fastq.r_notation])
-            ].append(fastq.path)
+            fastqs[(fastq.client_id, R_NOTATION_MAP[fastq.r_notation])].append(
+                fastq.path
+            )
     return fastqs
 
 

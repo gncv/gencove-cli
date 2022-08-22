@@ -153,10 +153,8 @@ def test_samples_download_file_local_checksum(
             )
             checksum_path = f"{file_path}.sha256"
             assert os.path.exists(checksum_path)
-            with open(checksum_path, "r") as checksum_file:
-                assert (
-                    checksum_file.read() == f"{MOCK_CHECKSUM} *{file_path}\n"
-                )
+            with open(checksum_path, "r", encoding="utf-8") as checksum_file:
+                assert checksum_file.read() == f"{MOCK_CHECKSUM} *{file_path}\n"
 
 
 @pytest.mark.vcr

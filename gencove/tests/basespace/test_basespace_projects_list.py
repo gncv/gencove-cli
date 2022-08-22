@@ -28,9 +28,7 @@ def test_basespace_list__empty(mocker):
         "list_basespace_projects",
         return_value=BaseSpaceProject(results=[], meta=dict(next=None)),
     )
-    res = runner.invoke(
-        basespace_list, ["--email", "foo@bar.com", "--password", "123"]
-    )
+    res = runner.invoke(basespace_list, ["--email", "foo@bar.com", "--password", "123"])
     assert res.exit_code == 0
     mocked_login.assert_called_once()
     mocked_list_basespace_projects.assert_called_once()
@@ -78,9 +76,7 @@ def test_basespace_list__no_permission(mocker):
         ),
         return_value={"detail": "Not found"},
     )
-    res = runner.invoke(
-        basespace_list, ["--email", "foo@bar.com", "--password", "123"]
-    )
+    res = runner.invoke(basespace_list, ["--email", "foo@bar.com", "--password", "123"])
     assert res.exit_code == 1
     mocked_login.assert_called_once()
     mocked_list_basespace_projects.assert_called_once()
@@ -110,9 +106,7 @@ def test_basespace_list__slow_response_retry_list(mocker):
         "list_basespace_projects",
         side_effect=APIClientTimeout("Could not connect to the api server"),
     )
-    res = runner.invoke(
-        basespace_list, ["--email", "foo@bar.com", "--password", "123"]
-    )
+    res = runner.invoke(basespace_list, ["--email", "foo@bar.com", "--password", "123"])
     assert res.exit_code == 1
     mocked_login.assert_called_once()
     assert mocked_list_basespace_projects.call_count == 2
@@ -127,9 +121,7 @@ def test_basespace_list(mocker):
         "list_basespace_projects",
         return_value=BaseSpaceProject(**MOCKED_BASESPACE_PROJECTS),
     )
-    res = runner.invoke(
-        basespace_list, ["--email", "foo@bar.com", "--password", "123"]
-    )
+    res = runner.invoke(basespace_list, ["--email", "foo@bar.com", "--password", "123"])
     assert res.exit_code == 0
     mocked_login.assert_called_once()
     mocked_list_basespace_projects.assert_called_once()
@@ -162,13 +154,9 @@ def test_basespace_list__with_unexpected_keys(mocker):
     mocked_list_basespace_projects = mocker.patch.object(
         APIClient,
         "list_basespace_projects",
-        return_value=BaseSpaceProject(
-            **MOCKED_BASESPACE_PROJECTS_WITH_UNEXPECTED_KEYS
-        ),
+        return_value=BaseSpaceProject(**MOCKED_BASESPACE_PROJECTS_WITH_UNEXPECTED_KEYS),
     )
-    res = runner.invoke(
-        basespace_list, ["--email", "foo@bar.com", "--password", "123"]
-    )
+    res = runner.invoke(basespace_list, ["--email", "foo@bar.com", "--password", "123"])
     assert res.exit_code == 0
     mocked_login.assert_called_once()
     mocked_list_basespace_projects.assert_called_once()

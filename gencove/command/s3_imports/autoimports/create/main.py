@@ -40,7 +40,7 @@ class S3AutoImport(Command):
         """
         self.echo_debug(
             "Create AutoImport job from "
-            "s3_uri {} to project {}".format(self.s3_uri, self.project_id)
+            f"s3_uri {self.s3_uri} to project {self.project_id}"
         )
 
         try:
@@ -48,9 +48,7 @@ class S3AutoImport(Command):
             metadata = None
             if self.metadata_json is not None:
                 metadata = json.loads(self.metadata_json)
-                self.echo_info(
-                    "Metadata will be assigned to the imported Biosamples."
-                )
+                self.echo_info("Metadata will be assigned to the imported Biosamples.")
             autoimport_from_s3 = self.api_client.autoimport_from_s3(
                 project_id=self.project_id,
                 s3_uri=self.s3_uri,
@@ -69,7 +67,5 @@ class S3AutoImport(Command):
                 )
             )
         except client.APIClientError:
-            self.echo_error(
-                "There was an error creating an import job of S3 URI."
-            )
+            self.echo_error("There was an error creating an import job of S3 URI.")
             raise

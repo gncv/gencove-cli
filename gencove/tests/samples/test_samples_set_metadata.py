@@ -128,7 +128,5 @@ def test_set_metadata__success(mocker):
     )
     assert res.exit_code == 0
     mocked_login.assert_called_once()
-    mocked_set_metadata.assert_called_once_with(
-        sample_id, json.loads(payload)
-    )
-    assert "Assigned metadata to a sample {}".format(sample_id) in res.output
+    mocked_set_metadata.assert_called_once_with(sample_id, json.loads(payload))
+    assert f"Assigned metadata to a sample {sample_id}" in res.output

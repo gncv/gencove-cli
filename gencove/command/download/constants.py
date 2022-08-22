@@ -29,16 +29,11 @@ class SampleArchiveStatuses(Enum):
 
 
 ALLOWED_STATUSES_RE = re.compile(
-    "{}|{}".format(
-        SampleStatuses.SUCCEEDED.value, SampleStatuses.FAILED.value
-    ),
+    f"{SampleStatuses.SUCCEEDED.value}|{SampleStatuses.FAILED.value}",
     re.IGNORECASE,
 )
 ALLOWED_ARCHIVE_STATUSES_RE = re.compile(
-    "{}|{}".format(
-        SampleArchiveStatuses.AVAILABLE.value,
-        SampleArchiveStatuses.RESTORED.value,
-    ),
+    f"{SampleArchiveStatuses.AVAILABLE.value}|{SampleArchiveStatuses.RESTORED.value}",
     re.IGNORECASE,
 )
 KILOBYTE = 1024
@@ -67,9 +62,7 @@ class DownloadOptions(Optionals):
     download_template: Optional[str]
 
 
-DEFAULT_FILENAME_TOKEN = "{{{}}}".format(
-    DownloadTemplateParts.DEFAULT_FILENAME.value
-)
+DEFAULT_FILENAME_TOKEN = f"{{{DownloadTemplateParts.DEFAULT_FILENAME.value}}}"
 
 
 # pylint: disable=too-few-public-methods

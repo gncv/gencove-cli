@@ -42,9 +42,7 @@ class RunPrefix(Command):
     def execute(self):
         """Assign samples to the project from the prefixed path."""
         try:
-            self.echo_debug(
-                "Retrieving sample sheet: search_term={}".format(self.prefix)
-            )
+            self.echo_debug(f"Retrieving sample sheet: search_term={self.prefix}")
             samples = []
             self.echo_info("Gathering uploads.")
             for sample_sheet in self._get_paginated_sample_sheet():
@@ -53,9 +51,8 @@ class RunPrefix(Command):
                 samples.extend(sample_sheet)
             self._assign_samples(samples)
             self.echo_info(
-                "Number of samples assigned to the project {}: {}".format(
-                    self.project_id, len(samples)
-                )
+                "Number of samples assigned to the project "
+                f"{self.project_id}: {len(samples)}"
             )
         except client.APIClientError:  # pylint: disable=try-except-raise
             raise
@@ -64,9 +61,7 @@ class RunPrefix(Command):
         """Validate if passed prefix starts with the correct sequence."""
         if not self.prefix.startswith(UPLOAD_PREFIX):
             self.echo_error(
-                "Invalid destination path. Must start with {}".format(
-                    UPLOAD_PREFIX
-                )
+                f"Invalid destination path. Must start with {UPLOAD_PREFIX}"
             )
             return False
         return True
@@ -110,26 +105,18 @@ class RunPrefix(Command):
                 metadata = json.loads(self.metadata_json)
                 self.echo_info("Assigning metadata to the uploaded samples.")
             assigned_count = 0
-            for samples_batch in batchify(
-                samples, batch_size=ASSIGN_BATCH_SIZE
-            ):
+            for samples_batch in batchify(samples, batch_size=ASSIGN_BATCH_SIZE):
                 try:
                     samples_batch_len = len(samples_batch)
-                    self.echo_info(
-                        "Assigning batch: {}".format(samples_batch_len)
-                    )
+                    self.echo_info(f"Assigning batch: {samples_batch_len}")
                     self.api_client.add_samples_to_project(
                         samples_batch, self.project_id, metadata
                     )
                     assigned_count += samples_batch_len
-                    self.echo_info(
-                        "Total assigned: {}".format(assigned_count)
-                    )
+                    self.echo_info(f"Total assigned: {assigned_count}")
                 except client.APIClientError as err:
                     self.echo_debug(err)
-                    self.echo_error(
-                        "There was an error assigning/running samples."
-                    )
+                    self.echo_error("There was an error assigning/running samples.")
                     if assigned_count > 0:
                         self.echo_warning(
                             "Some of the samples were assigned. "
@@ -137,9 +124,7 @@ class RunPrefix(Command):
                             "the rest of the samples."
                         )
                     else:
-                        self.echo_error(
-                            "There was an error assigning samples."
-                        )
+                        self.echo_error("There was an error assigning samples.")
                     raise
             self.echo_info("Assigned all samples to a project.")
 

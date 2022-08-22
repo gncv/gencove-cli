@@ -37,7 +37,7 @@ def create_project_batch(  # pylint: disable=too-many-arguments
     """Create a batch in a project."""
     if sample_ids:
         sample_ids = [s_id.strip() for s_id in sample_ids.split(",")]
-        echo_debug("Sample ids translation: {}".format(sample_ids))
+        echo_debug(f"Sample ids translation: {sample_ids}")
     else:
         sample_ids = []
 

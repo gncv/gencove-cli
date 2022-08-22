@@ -45,12 +45,10 @@ class StatusMergedVCF(Command):
         """Get a status of a request to merge VCF files for a given project."""
         self.echo_debug(
             "Retrieving the status of a merge VCF files operation for "
-            "project {}".format(self.project_id)
+            f"project {self.project_id}"
         )
         try:
-            merge_details_status = self.api_client.retrieve_merged_vcf(
-                self.project_id
-            )
+            merge_details_status = self.api_client.retrieve_merged_vcf(self.project_id)
             self.echo_debug(merge_details_status)
             if merge_details_status.last_status.status == "failed":
                 self.echo_warning("The job failed merging.")
@@ -59,12 +57,11 @@ class StatusMergedVCF(Command):
             self.echo_debug(err)
             if err.status_code == 400:
                 self.echo_error(
-                    "There was an error checking the status of "
-                    "a merged VCF."
+                    "There was an error checking the status of a merged VCF."
                 )
             elif err.status_code == 404:
                 self.echo_error(
-                    "Project {} does not exist or there are no "
-                    "running jobs associated with it.".format(self.project_id)
+                    f"Project {self.project_id} does not exist or there are no "
+                    "running jobs associated with it."
                 )
             raise

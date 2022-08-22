@@ -57,7 +57,7 @@ class StatusMergedVCF(Command):
             self.echo_debug(err)
             if err.status_code == 400:
                 self.echo_error(
-                    "There was an error checking the status of " "a merged VCF."
+                    "There was an error checking the status of a merged VCF."
                 )
             elif err.status_code == 404:
                 self.echo_error(

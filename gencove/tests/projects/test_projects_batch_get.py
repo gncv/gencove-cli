@@ -203,7 +203,7 @@ def test_get_batch__not_empty__slow_response_retry(credentials, mocker):
             side_effect=APIClientTimeout("Could not connect to the api server"),
         )
         mocked_download_file = mocker.patch(
-            "gencove.command.projects.get_batch.main.download.utils." "download_file"
+            "gencove.command.projects.get_batch.main.download.utils.download_file"
         )
         res = runner.invoke(
             get_batch,

@@ -91,6 +91,6 @@ def download_file(
                 ).run()
         except IsADirectoryError:
             echo_error(
-                "Please specify a file path (not directory path)" " for DESTINATION"
+                "Please specify a file path (not directory path) for DESTINATION"
             )
             raise click.Abort()  # pylint: disable=raise-missing-from

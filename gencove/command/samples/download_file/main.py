@@ -120,7 +120,7 @@ class DownloadFile(Command):
                     self.create_checksum_file(self.destination.name, checksum)
                 except client.APIClientTooManyRequestsError:
                     self.echo_debug(
-                        "Request was throttled for checksum file, " "trying again"
+                        "Request was throttled for checksum file, trying again"
                     )
                     raise
 

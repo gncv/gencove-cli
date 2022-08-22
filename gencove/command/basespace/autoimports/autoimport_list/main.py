@@ -31,7 +31,7 @@ class BaseSpaceAutoImportList(Command):
                     self.echo_data(get_line(basespace_autoimport))
         except client.APIClientError:
             self.echo_error(
-                "There was an error listing autoimport jobs of BaseSpace " "projects."
+                "There was an error listing autoimport jobs of BaseSpace projects."
             )
             raise
 

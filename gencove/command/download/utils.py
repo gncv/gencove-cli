@@ -54,7 +54,7 @@ def get_filename_from_download_url(url):
         )[0]
     except (KeyError, IndexError):
         echo_debug(
-            "URL didn't contain filename query argument. " "Assume filename from url"
+            "URL didn't contain filename query argument. Assume filename from url"
         )
         filename = urlparse(url).path.split("/")[-1]
 
@@ -221,7 +221,7 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
 
         # Cross-platform cross-python-version file overwriting
         if os.path.exists(file_path):
-            echo_debug(f"Found old file under same name: {file_path}. " "Removing it.")
+            echo_debug(f"Found old file under same name: {file_path}. Removing it.")
             os.remove(file_path)
         os.rename(file_path_tmp, file_path)
         echo_info(f"Finished downloading a file: {file_path}")

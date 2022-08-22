@@ -64,7 +64,7 @@ def get_filename_from_download_url(url):
 def deliverable_type_from_filename(filename):
     """Deduce deliverable type based on dot notation."""
     filetype = ".".join(filename.split(".")[1:])
-    echo_debug(f"Deduced filetype to be: {filetype} " f"from filename: {filename}")
+    echo_debug(f"Deduced filetype to be: {filetype} from filename: {filename}")
     return filetype
 
 

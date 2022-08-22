@@ -23,20 +23,15 @@ class BaseSpaceAutoImportList(Command):
         self.echo_debug("List AutoImport jobs.")
 
         try:
-            for (
-                basespace_autoimports
-            ) in self.get_paginated_basespace_autoimports():
+            for basespace_autoimports in self.get_paginated_basespace_autoimports():
                 if not basespace_autoimports:
-                    self.echo_debug(
-                        "No BaseSpace autoimport jobs were found."
-                    )
+                    self.echo_debug("No BaseSpace autoimport jobs were found.")
                     return
                 for basespace_autoimport in basespace_autoimports:
                     self.echo_data(get_line(basespace_autoimport))
         except client.APIClientError:
             self.echo_error(
-                "There was an error listing autoimport jobs of BaseSpace "
-                "projects."
+                "There was an error listing autoimport jobs of BaseSpace projects."
             )
             raise
 

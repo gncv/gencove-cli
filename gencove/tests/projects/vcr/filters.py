@@ -167,9 +167,7 @@ def filter_batches_response(response, json_response):
     if "batch_type" in json_response:
         json_response["batch_type"] = "Mock batch_type"
     if "sample_ids" in json_response:
-        json_response["sample_ids"] = [
-            MOCK_UUID for _ in json_response["sample_ids"]
-        ]
+        json_response["sample_ids"] = [MOCK_UUID for _ in json_response["sample_ids"]]
     if "last_status" in json_response:
         json_response["last_status"]["id"] = MOCK_UUID
     for file in json_response.get("files", []):

@@ -38,9 +38,7 @@ class SetMetadata(Command):
     def execute(self):
         """Make a request to assign given metadata to a specified sample."""
 
-        self.echo_debug(
-            "Assigning metadata to a sample {}".format(self.sample_id)
-        )
+        self.echo_debug(f"Assigning metadata to a sample {self.sample_id}")
 
         try:
             metadata_api = None
@@ -50,15 +48,11 @@ class SetMetadata(Command):
                 self.sample_id, metadata_api
             )
             self.echo_debug(assigned_metadata)
-            self.echo_info(
-                "Assigned metadata to a sample {}".format(self.sample_id)
-            )
+            self.echo_info(f"Assigned metadata to a sample {self.sample_id}")
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 400:
                 self.echo_error("There was an error assigning metadata.")
             elif err.status_code == 404:
-                self.echo_error(
-                    "Sample {} does not exist.".format(self.sample_id)
-                )
+                self.echo_error(f"Sample {self.sample_id} does not exist.")
             raise

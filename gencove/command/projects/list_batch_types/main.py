@@ -47,15 +47,11 @@ class ListBatchTypes(Command):
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 400:
-                self.echo_warning(
-                    "There was an error listing project batch types."
-                )
+                self.echo_warning("There was an error listing project batch types.")
                 self.echo_info("The following error was returned:")
                 self.echo_info(err.message)
             elif err.status_code == 404:
-                self.echo_warning(
-                    "Project {} does not exist.".format(self.project_id)
-                )
+                self.echo_warning(f"Project {self.project_id} does not exist.")
             else:
                 raise
 

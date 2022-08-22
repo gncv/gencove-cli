@@ -53,9 +53,7 @@ def basespace_import(  # pylint: disable=too-many-arguments
         basespace_project_id.strip()
         for basespace_project_id in basespace_project_ids.split(",")
     ]
-    echo_debug(
-        "BaseSpace project ids translation: {}".format(basespace_project_ids)
-    )
+    echo_debug(f"BaseSpace project ids translation: {basespace_project_ids}")
 
     BaseSpaceImport(
         basespace_project_ids,

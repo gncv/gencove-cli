@@ -136,7 +136,7 @@ def test_get_metadata__success_custom_filename(mocker):
         assert res.exit_code == 0
         mocked_login.assert_called_once()
         mocked_get_metadata.assert_called_once()
-        with open(custom_filename, "r") as output_file:
+        with open(custom_filename, "r", encoding="utf-8") as output_file:
             output_content = output_file.read()
         assert json.dumps(metadata, indent=4) == output_content
 
@@ -172,7 +172,7 @@ def test_get_metadata__success_nested_custom_filename(mocker):
         assert res.exit_code == 0
         mocked_login.assert_called_once()
         mocked_get_metadata.assert_called_once()
-        with open(custom_filename, "r") as output_file:
+        with open(custom_filename, "r", encoding="utf-8") as output_file:
             output_content = output_file.read()
         assert json.dumps(metadata, indent=4) == output_content
 

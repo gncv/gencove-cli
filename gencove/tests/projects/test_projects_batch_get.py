@@ -89,9 +89,9 @@ def test_get_batch__empty(credentials, mocker):
     res = runner.invoke(get_batch, [batch_id, *credentials])
     assert res.exit_code == 1
     mocked_get_batch.assert_called_once()
-    assert (
-        res.output == "ERROR: There are no deliverables available for batch"
-        " {}.\nAborted!\n".format(batch_id)
+    assert res.output == (
+        "ERROR: There are no deliverables available for batch"
+        f" {batch_id}.\nAborted!\n"
     )
 
 
@@ -200,13 +200,10 @@ def test_get_batch__not_empty__slow_response_retry(credentials, mocker):
         mocked_get_batch = mocker.patch.object(
             APIClient,
             "get_batch",
-            side_effect=APIClientTimeout(
-                "Could not connect to the api server"
-            ),
+            side_effect=APIClientTimeout("Could not connect to the api server"),
         )
         mocked_download_file = mocker.patch(
-            "gencove.command.projects.get_batch.main.download.utils."
-            "download_file"
+            "gencove.command.projects.get_batch.main.download.utils.download_file"
         )
         res = runner.invoke(
             get_batch,

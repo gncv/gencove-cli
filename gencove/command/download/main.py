@@ -63,9 +63,7 @@ class Download(Command):
 
         if self.filters.project_id:
             self.echo_debug(
-                "Retrieving sample ids for a project: {}".format(
-                    self.filters.project_id
-                )
+                f"Retrieving sample ids for a project: {self.filters.project_id}"
             )
 
             try:
@@ -74,7 +72,7 @@ class Download(Command):
                     self.sample_ids.add(sample.id)
             except client.APIClientError as err:
                 raise ValidationError(
-                    "Project id {} not found.".format(self.filters.project_id)
+                    f"Project id {self.filters.project_id} not found."
                 ) from err
         else:
             self.sample_ids = self.filters.sample_ids
@@ -86,14 +84,10 @@ class Download(Command):
             ValidationError : something is wrong with configuration
         """
         if not self.filters.project_id and not self.filters.sample_ids:
-            raise ValidationError(
-                "Must specify one of: project id or sample ids"
-            )
+            raise ValidationError("Must specify one of: project id or sample ids")
 
         if self.filters.project_id and self.filters.sample_ids:
-            raise ValidationError(
-                "Must specify only one of: project id or sample ids"
-            )
+            raise ValidationError("Must specify only one of: project id or sample ids")
 
         if not self.sample_ids:
             raise ValidationError("No samples to process. Exiting.")
@@ -113,11 +107,7 @@ class Download(Command):
         if self.download_to == "-":
             self.echo_debug("Will not download. Redirecting to STDOUT.")
         else:
-            self.echo_debug(
-                "Host is {} saving to {}".format(
-                    self.options.host, self.download_to
-                )
-            )
+            self.echo_debug(f"Host is {self.options.host} saving to {self.download_to}")
 
     def execute(self):
         if self.download_to != "-":
@@ -157,43 +147,31 @@ class Download(Command):
             raise
         except client.APIClientError:
             self.echo_warning(
-                "Sample with id {} not found. "
-                "Are you using client id instead of sample id?".format(
-                    sample_id
-                )
+                f"Sample with id {sample_id} not found. "
+                "Are you using client id instead of sample id?"
             )
             return
 
         self.echo_debug(
-            "Processing sample id {}, status {}".format(
-                sample.id, sample.last_status.status
-            )
+            f"Processing sample id {sample.id}, status {sample.last_status.status}"
         )
 
-        if not ALLOWED_ARCHIVE_STATUSES_RE.match(
-            sample.archive_last_status.status
-        ):
+        if not ALLOWED_ARCHIVE_STATUSES_RE.match(sample.archive_last_status.status):
             raise ValidationError(
-                "Sample with id {} is archived and cannot be downloaded - "
-                "please restore the sample and try again.".format(sample.id)
+                f"Sample with id {sample.id} is archived and cannot be downloaded - "
+                "please restore the sample and try again."
             )
 
         if not ALLOWED_STATUSES_RE.match(sample.last_status.status):
-            self.echo_warning(
-                "Sample #{} has no deliverable.".format(sample.id),
-            )
+            self.echo_warning(f"Sample #{sample.id} has no deliverable.")
             return
 
-        file_types_re = re.compile(
-            "|".join(self.filters.file_types), re.IGNORECASE
-        )
+        file_types_re = re.compile("|".join(self.filters.file_types), re.IGNORECASE)
 
         file_with_prefix = self.options.download_template.format(
             **get_download_template_format_params(sample.client_id, sample.id)
         )
-        self.echo_debug(
-            "file path with prefix is: {}".format(file_with_prefix)
-        )
+        self.echo_debug(f"file path with prefix is: {file_with_prefix}")
         if all(
             [
                 self.download_to != "-",
@@ -225,9 +203,7 @@ class Download(Command):
                     "id": sample.archive_last_status.id,
                     "status": sample.archive_last_status.status,
                     "created": sample.archive_last_status.created,
-                    "transition_cutoff": (
-                        sample.archive_last_status.transition_cutoff
-                    ),
+                    "transition_cutoff": (sample.archive_last_status.transition_cutoff),
                 },
                 "files": {},
             }
@@ -238,9 +214,7 @@ class Download(Command):
             if self.filters.file_types and not file_types_re.match(
                 sample_file.file_type
             ):
-                self.echo_debug(
-                    "Deliverable file type is not in desired file types"
-                )
+                self.echo_debug("Deliverable file type is not in desired file types")
                 continue
 
             if not self.download_urls:
@@ -257,9 +231,7 @@ class Download(Command):
                 )
                 if self.checksums:
                     try:
-                        checksum = self.api_client.get_file_checksum(
-                            sample_file.id
-                        )
+                        checksum = self.api_client.get_file_checksum(sample_file.id)
                         self.create_checksum_file(file_path, checksum)
                     except client.APIClientTooManyRequestsError:
                         self.echo_debug(
@@ -284,14 +256,12 @@ class Download(Command):
         Returns:
             None
         """
-        checksum_path = "{}.sha256".format(file_path)
-        self.echo_debug("Adding checksum file: {}".format(checksum_path))
-        with open(checksum_path, "w") as checksum_file:
+        checksum_path = f"{file_path}.sha256"
+        self.echo_debug(f"Adding checksum file: {checksum_path}")
+        with open(checksum_path, "w", encoding="utf-8") as checksum_file:
             checksum_file.write(checksum_sha256)
 
-    def validate_and_download(
-        self, download_to_path, download_func, *args, **kwargs
-    ):
+    def validate_and_download(self, download_to_path, download_func, *args, **kwargs):
         """Check if this file was already downloaded, if yes - exit.
 
         Args:
@@ -317,7 +287,7 @@ class Download(Command):
 
         download_func(*args, **kwargs)
 
-        self.echo_debug("Adding file path: {}".format(download_to_path))
+        self.echo_debug(f"Adding file path: {download_to_path}")
         self.downloaded_files.add(download_to_path)
 
     def download_sample_qc_metrics(self, file_with_prefix, sample_id):
@@ -335,7 +305,7 @@ class Download(Command):
             dict(file_type=QC_FILE_TYPE),
             file_with_prefix,
             self.download_to,
-            "{}_{}.json".format(sample_id, QC_FILE_TYPE),
+            f"{sample_id}_{QC_FILE_TYPE}.json",
         )
 
         self.validate_and_download(
@@ -362,7 +332,7 @@ class Download(Command):
             dict(file_type=METADATA_FILE_TYPE),
             file_with_prefix,
             self.download_to,
-            "{}_{}.json".format(sample_id, METADATA_FILE_TYPE),
+            f"{sample_id}_{METADATA_FILE_TYPE}.json",
         )
 
         self.validate_and_download(
@@ -379,7 +349,7 @@ class Download(Command):
         get_samples = True
         next_page = None
         while get_samples:
-            self.echo_debug("Getting page: {}".format(next_page or 1))
+            self.echo_debug(f"Getting page: {next_page or 1}")
             req = self.api_client.get_project_samples(
                 self.filters.project_id,
                 next_page,
@@ -395,12 +365,10 @@ class Download(Command):
         self.echo_debug("Outputting JSON.")
         if self.download_to == "-":
             self.echo_data(
-                json.dumps(
-                    self.download_files, indent=4, cls=client.CustomEncoder
-                )
+                json.dumps(self.download_files, indent=4, cls=client.CustomEncoder)
             )
         else:
-            with open(self.download_to, "w") as json_file:
+            with open(self.download_to, "w", encoding="utf-8") as json_file:
                 json_file.write(
                     json.dumps(
                         self.download_files,
@@ -410,5 +378,5 @@ class Download(Command):
                 )
             self.echo_info(
                 "Samples and their deliverables download URLs outputted to "
-                "{}".format(self.download_to)
+                f"{self.download_to}"
             )

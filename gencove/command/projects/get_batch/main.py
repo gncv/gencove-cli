@@ -15,9 +15,7 @@ class GetBatch(Command):
     """Get batch command executor."""
 
     # pylint: disable=too-many-arguments
-    def __init__(
-        self, batch_id, output_filename, credentials, options, no_progress
-    ):
+    def __init__(self, batch_id, output_filename, credentials, options, no_progress):
         super().__init__(credentials, options)
         self.batch_id = batch_id
         self.output_filename = output_filename
@@ -44,14 +42,12 @@ class GetBatch(Command):
             batch = self.get_batch()
             if not batch.files:
                 raise ValidationError(
-                    "There are no deliverables available for batch {}.".format(
-                        self.batch_id
-                    )
+                    f"There are no deliverables available for batch {self.batch_id}."
                 )
             if len(batch.files) > 1:
                 self.echo_warning(
                     "There is more than one deliverable available for "
-                    "batch {}.".format(self.batch_id)
+                    f"batch {self.batch_id}."
                 )
             deliverable = batch.files[0]
             download_path = (
@@ -75,7 +71,7 @@ class GetBatch(Command):
                 self.echo_info(err.message)
             elif err.status_code == 404:
                 self.echo_warning(
-                    "Batch {} does not exist.".format(self.batch_id),
+                    f"Batch {self.batch_id} does not exist.",
                 )
             else:
                 raise

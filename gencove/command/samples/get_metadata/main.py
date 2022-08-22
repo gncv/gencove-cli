@@ -43,11 +43,7 @@ class GetMetadata(Command):
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 404:
-                self.echo_error(
-                    "Sample metadata {} does not exist.".format(
-                        self.sample_id
-                    )
-                )
+                self.echo_error(f"Sample metadata {self.sample_id} does not exist.")
             raise
 
     @backoff.on_exception(
@@ -66,17 +62,13 @@ class GetMetadata(Command):
         """Output reformatted metadata JSON."""
         self.echo_debug("Outputting JSON.")
         if self.output_filename == "-":
-            self.echo_data(
-                json.dumps(metadata, indent=4, cls=client.CustomEncoder)
-            )
+            self.echo_data(json.dumps(metadata, indent=4, cls=client.CustomEncoder))
         else:
             dirname = os.path.dirname(self.output_filename)
             if dirname and not os.path.exists(dirname):
                 os.makedirs(dirname)
-            with open(self.output_filename, "w") as json_file:
+            with open(self.output_filename, "w", encoding="utf-8") as json_file:
                 json_file.write(
                     json.dumps(metadata, indent=4, cls=client.CustomEncoder)
                 )
-            self.echo_info(
-                "Sample metadata saved to {}".format(self.output_filename),
-            )
+            self.echo_info(f"Sample metadata saved to {self.output_filename}")

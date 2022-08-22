@@ -9,7 +9,7 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.1.5
+      - 2.3.0
       content-type:
       - application/json
     method: POST
@@ -27,7 +27,7 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Fri, 15 Oct 2021 19:59:44 GMT
+      - Thu, 21 Jul 2022 14:39:23 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -51,7 +51,7 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.1.5
+      - 2.3.0
       content-type:
       - application/json
     method: GET
@@ -66,18 +66,21 @@ interactions:
         "11111111-1111-1111-1111-111111111111", "status": "available", "created":
         "2021-10-12 19:47:15.394485+00:00", "transition_cutoff": null}, "files": [{"id":
         "11111111-1111-1111-1111-111111111111", "s3_path": "mock/r1.fastq.gz", "size":
-        null, "download_url": "https://example.com/r1.fastq.gz", "file_type": "fastq-r1"}]}'
+        null, "download_url": "https://example.com/r1.fastq.gz", "file_type": "fastq-r1",
+        "checksum_sha256": ""}, {"id": "11111111-1111-1111-1111-111111111111", "s3_path":
+        "mock/r2.fastq.gz", "size": null, "download_url": "https://example.com/r2.fastq.gz",
+        "file_type": "fastq-r2", "checksum_sha256": "111111111111111111111111111111111111111111111111111111111111111a"}]}'
     headers:
       Allow:
       - GET, HEAD, OPTIONS
       Connection:
       - keep-alive
       Content-Length:
-      - '1177'
+      - '2484'
       Content-Type:
       - application/json
       Date:
-      - Fri, 15 Oct 2021 19:59:45 GMT
+      - Thu, 21 Jul 2022 14:39:25 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -115,11 +118,11 @@ interactions:
       Content-Type:
       - binary/octet-stream
       Date:
-      - Fri, 15 Oct 2021 19:59:47 GMT
+      - Thu, 21 Jul 2022 14:39:26 GMT
       ETag:
       - '"6e023d8b8758f8f826152de77a3cc1d9"'
       Last-Modified:
-      - Tue, 12 Oct 2021 19:55:35 GMT
+      - Fri, 08 Jul 2022 13:38:34 GMT
       Server:
       - AmazonS3
       x-amz-id-2:

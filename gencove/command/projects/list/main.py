@@ -28,8 +28,10 @@ class List(Command):
                     self.echo_debug("No projects were found.")
                     return
 
-                augmented_projects = self.augment_projects_with_pipeline_capabilities(  # noqa: E501
-                    projects
+                augmented_projects = (
+                    self.augment_projects_with_pipeline_capabilities(  # noqa: E501
+                        projects
+                    )
                 )
 
                 for project in augmented_projects:

@@ -183,9 +183,7 @@ def test_restore_project_samples__sample_not_in_project(
             "restore_project_samples",
             side_effect=APIClientError(
                 message=restore_project_samples_response["body"]["string"],
-                status_code=restore_project_samples_response["status"][
-                    "code"
-                ],
+                status_code=restore_project_samples_response["status"]["code"],
             ),
         )
     res = runner.invoke(
@@ -200,9 +198,7 @@ def test_restore_project_samples__sample_not_in_project(
     assert res.exit_code == 0
     if not recording:
         mocked_restore_project_samples.assert_called_once()
-    assert (
-        "There was an error requesting project samples restore" in res.output
-    )
+    assert "There was an error requesting project samples restore" in res.output
 
 
 @pytest.mark.vcr

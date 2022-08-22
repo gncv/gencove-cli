@@ -81,9 +81,7 @@ def test_import_existing_project_samples__bad_project_id(mocker, credentials):
 @pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
-def test_import_existing_project_samples__bad_samples_json(
-    mocker, credentials
-):
+def test_import_existing_project_samples__bad_samples_json(mocker, credentials):
     """Test import existing project samples failure when samples
     is a bad JSON.
     """
@@ -230,10 +228,7 @@ def test_import_existing_project_samples__bad_samples_bad_key_value_in_dict_item
 
     assert res.exit_code == 1
     mocked_import_existing_samples.assert_not_called()
-    assert (
-        "Sample ID {} is not a valid UUID. Exiting.".format("somevalue")
-        in res.output
-    )
+    assert "Sample ID somevalue is not a valid UUID. Exiting." in res.output
 
 
 @pytest.mark.default_cassette("jwt-create.yaml")
@@ -271,11 +266,8 @@ def test_import_existing_project_samples__bad_samples_bad_optional_key_value_in_
     assert res.exit_code == 1
     mocked_import_existing_samples.assert_not_called()
     assert (
-        "Client ID: {} for the sample {} is not valid. "
-        "It cannot contain an underscore. Exiting.".format(
-            bad_client_id, bad_sample_id
-        )
-        in res.output
+        f"Client ID: {bad_client_id} for the sample {bad_sample_id} is not valid. "
+        "It cannot contain an underscore. Exiting." in res.output
     )
 
 
@@ -370,9 +362,7 @@ def test_import_existing_project_samples__success(
         mocked_import_existing_samples = mocker.patch.object(
             APIClient,
             "import_existing_samples",
-            return_value=ImportExistingSamplesModel(
-                **project_samples_import_response
-            ),
+            return_value=ImportExistingSamplesModel(**project_samples_import_response),
         )
 
     res = runner.invoke(

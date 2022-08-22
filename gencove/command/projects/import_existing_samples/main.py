@@ -41,16 +41,13 @@ class ImportExistingSamples(Command):
         for sample in self.samples:
             if is_valid_uuid(sample["sample_id"]) is False:
                 raise ValidationError(
-                    "Sample ID {} is not a valid UUID. Exiting.".format(
-                        sample["sample_id"]
-                    )
+                    f"Sample ID {sample['sample_id']} is not a valid UUID. Exiting."
                 )
             if is_valid_client_id(sample.get("client_id", "")) is False:
                 raise ValidationError(
-                    "Client ID: {} for the sample {} is not valid. "
-                    "It cannot contain an underscore. Exiting.".format(
-                        sample["client_id"], sample["sample_id"]
-                    )
+                    f"Client ID: {sample['client_id']} for the "
+                    f"sample {sample['sample_id']} is not valid. "
+                    "It cannot contain an underscore. Exiting."
                 )
         if self.metadata_json and is_valid_json(self.metadata_json) is False:
             raise ValidationError("Metadata JSON is not valid. Exiting.")
@@ -62,25 +59,18 @@ class ImportExistingSamples(Command):
         if self.metadata_json is not None:
             metadata = json.loads(self.metadata_json)
             self.echo_info("Assigning metadata to the importing samples.")
-        self.echo_info(
-            "Import existing samples to the project: {}".format(
-                self.project_id
-            )
-        )
+        self.echo_info(f"Import existing samples to the project: {self.project_id}")
         try:
             # Import existing samples to the project optionally
             # passing metadata.
-            import_existing_samples_response = (
-                self.api_client.import_existing_samples(
-                    self.project_id, clean_samples, metadata
-                )
+            import_existing_samples_response = self.api_client.import_existing_samples(
+                self.project_id, clean_samples, metadata
             )
             for imported_sample in import_existing_samples_response.samples:
                 self.echo_data(get_line(imported_sample))
             self.echo_info(
-                "Number of samples imported into the project {}: {}".format(
-                    self.project_id, len(clean_samples)
-                )
+                f"Number of samples imported into the project {self.project_id}: "
+                f"{len(clean_samples)}"
             )
             if metadata:
                 self.echo_info("Metadata attached to each sample.")

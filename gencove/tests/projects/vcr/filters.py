@@ -191,8 +191,7 @@ def filter_import_existing_samples_request(request):
             body["project_id"] = MOCK_UUID
         if "samples" in body:
             body["samples"] = [
-                {"sample_id": MOCK_UUID, "client_id": "foo"}
-                for _ in body["samples"]
+                {"sample_id": MOCK_UUID, "client_id": "foo"} for _ in body["samples"]
             ]
         if "metadata" in body:
             body["metadata"] = {"foo": "bar"}

@@ -22,9 +22,7 @@ from .main import ImportExistingSamples
     "--metadata-json",
     required=False,
     default=None,
-    help=(
-        "Add metadata to all samples that are to be imported into a project."
-    ),
+    help="Add metadata to all samples that are to be imported into a project.",
 )
 @add_options(common_options)
 def import_existing_project_samples(  # pylint: disable=too-many-arguments
@@ -41,7 +39,5 @@ def import_existing_project_samples(  # pylint: disable=too-many-arguments
         project_id,
         samples,
         Credentials(email=email, password=password, api_key=api_key),
-        ImportExistingSamplesOptionals(
-            host=host, metadata_json=metadata_json
-        ),
+        ImportExistingSamplesOptionals(host=host, metadata_json=metadata_json),
     ).run()

@@ -81,7 +81,7 @@ class Upload(Command):
         self.echo_warning(TMP_UPLOADS_WARNING)
 
         # fmt: off
-        if os.path.isfile(self.source) and self.source.endswith(FASTQ_MAP_EXTENSION):  # noqa: E501
+        if os.path.isfile(self.source) and self.source.endswith(FASTQ_MAP_EXTENSION):  # noqa: E501  # pylint: disable=line-too-long
             self.echo_debug("Scanning fastqs map file")
             self.fastqs_map = parse_fastqs_map_file(self.source)
             self.echo_debug(f"got fastq pairs: {self.fastqs_map}")

@@ -67,7 +67,8 @@ def test_restore_project_samples__bad_project_id(mocker, credentials):
             "1111111",
             *credentials,
             "--sample-ids",
-            "11111111-1111-1111-1111-111111111111,22222222-2222-2222-2222-222222222222",  # noqa
+            "11111111-1111-1111-1111-111111111111,"
+            "22222222-2222-2222-2222-222222222222",
         ],
     )
     assert res.exit_code == 1
@@ -93,7 +94,8 @@ def test_restore_project_samples__not_owned_project(credentials, mocker):
             str(uuid4()),
             *credentials,
             "--sample-ids",
-            "11111111-1111-1111-1111-111111111111,22222222-2222-2222-2222-222222222222",  # noqa
+            "11111111-1111-1111-1111-111111111111,"
+            "22222222-2222-2222-2222-222222222222",
         ],
     )
     assert res.exit_code == 1

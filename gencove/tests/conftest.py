@@ -97,6 +97,12 @@ def batch_id():
     return os.getenv("GENCOVE_BATCH_ID_TEST")
 
 
+@pytest.fixture(scope="session")
+def sample_id_import_existing():
+    """Returns a successful sample id."""
+    return os.getenv("GENCOVE_SAMPLE_ID_IMPORT_EXISTING_TEST")
+
+
 @pytest.fixture(scope="function", autouse=True)
 def dont_save_dump_log():
     """Sets the environment variable to disable dumping the log file."""

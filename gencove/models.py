@@ -318,3 +318,18 @@ class S3ProjectImport(BaseModel):
 
     meta: ResponseMeta
     results: Optional[List[S3ProjectImportDetail]]
+
+
+class SampleImport(BaseModel):
+    """Existing sample import model"""
+
+    sample_id: UUID
+    client_id: Optional[str]
+
+
+class ImportExistingSamplesModel(BaseModel):
+    """Import existing samples model"""
+
+    project_id: UUID
+    samples: List[SampleImport]
+    metadata: Optional[Any]

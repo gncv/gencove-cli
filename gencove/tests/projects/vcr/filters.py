@@ -181,3 +181,37 @@ def filter_batches_response(response, json_response):
             filename = urlparse(file["download_url"]).path.split("/")[-1]
             file["download_url"] = f"https://example.com/{filename}"
     return response, json_response
+
+
+def filter_import_existing_samples_request(request):
+    """Filter import_existing_samples sensitive data from request."""
+    try:
+        body = json.loads(request.body)
+        if "project_id" in body:
+            body["project_id"] = MOCK_UUID
+        if "samples" in body:
+            body["samples"] = [
+                {"sample_id": MOCK_UUID, "client_id": "foo"} for _ in body["samples"]
+            ]
+        if "metadata" in body:
+            body["metadata"] = {"foo": "bar"}
+        request.body = json.dumps(body).encode()
+    except (json.decoder.JSONDecodeError, TypeError):
+        pass
+    return request
+
+
+@parse_response_to_json
+def filter_import_existing_samples_response(response, json_response):
+    """Filter import_existing_samples sensitive data from response."""
+    if "project_id" in json_response:
+        json_response["project_id"] = MOCK_UUID
+    if "metadata" in json_response:
+        json_response["metadata"] = {"foo": "bar"}
+    if "samples" in json_response:
+        for sample in json_response["samples"]:
+            if "sample_id" in sample:
+                sample["sample_id"] = MOCK_UUID
+            if "client_id" in sample:
+                sample["client_id"] = "foo"
+    return response, json_response

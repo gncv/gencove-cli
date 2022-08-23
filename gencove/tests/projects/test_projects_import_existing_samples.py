@@ -67,8 +67,8 @@ def test_import_existing_project_samples__bad_project_id(mocker, credentials):
         import_existing_project_samples,
         [
             "1111111",
-            "--samples",
-            '[{"sample_id": "somevalue"}]',
+            "--sample-ids",
+            "1111111,2222222",
             *credentials,
         ],
     )
@@ -81,10 +81,8 @@ def test_import_existing_project_samples__bad_project_id(mocker, credentials):
 @pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
-def test_import_existing_project_samples__bad_samples_json(mocker, credentials):
-    """Test import existing project samples failure when samples
-    is a bad JSON.
-    """
+def test_import_existing_project_samples__bad_sample_ids(mocker, credentials):
+    """Test import existing project samples failure when sample_ids are bad."""
     runner = CliRunner()
 
     mocked_import_existing_samples = mocker.patch.object(
@@ -96,179 +94,15 @@ def test_import_existing_project_samples__bad_samples_json(mocker, credentials):
         import_existing_project_samples,
         [
             str(uuid4()),
-            "--samples",
-            '[{"sample_id": "somevalue"}',
+            "--sample-ids",
+            "1111111,2222222",
             *credentials,
         ],
     )
 
     assert res.exit_code == 1
     mocked_import_existing_samples.assert_not_called()
-    assert "Samples JSON is not valid" in res.output
-
-
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
-def test_import_existing_project_samples__bad_samples_content_not_list(
-    mocker, credentials
-):
-    """Test import existing project samples failure when samples JSON
-    is not a list.
-    """
-    runner = CliRunner()
-
-    mocked_import_existing_samples = mocker.patch.object(
-        APIClient,
-        "import_existing_samples",
-    )
-
-    res = runner.invoke(
-        import_existing_project_samples,
-        [
-            str(uuid4()),
-            "--samples",
-            '{"sample_id": "somevalue"}',
-            *credentials,
-        ],
-    )
-
-    assert res.exit_code == 1
-    mocked_import_existing_samples.assert_not_called()
-    assert "The samples JSON must be a JSON array of objects" in res.output
-
-
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
-def test_import_existing_project_samples__bad_samples_content_not_dict_item(
-    mocker, credentials
-):
-    """Test import existing project samples failure when samples JSON
-    is not a list of dicts.
-    """
-    runner = CliRunner()
-
-    mocked_import_existing_samples = mocker.patch.object(
-        APIClient,
-        "import_existing_samples",
-    )
-
-    res = runner.invoke(
-        import_existing_project_samples,
-        [
-            str(uuid4()),
-            "--samples",
-            "[1]",
-            *credentials,
-        ],
-    )
-
-    assert res.exit_code == 1
-    mocked_import_existing_samples.assert_not_called()
-    assert "The samples JSON must be a JSON array of objects" in res.output
-
-
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
-def test_import_existing_project_samples__bad_samples_content_no_key_in_dict_item(  # noqa: E501  # pylint: disable=line-too-long
-    mocker, credentials
-):
-    """Test import existing project samples failure when samples JSON
-    dict item in a list doesn't have the sample_id key.
-    """
-    runner = CliRunner()
-
-    mocked_import_existing_samples = mocker.patch.object(
-        APIClient,
-        "import_existing_samples",
-    )
-
-    res = runner.invoke(
-        import_existing_project_samples,
-        [
-            str(uuid4()),
-            "--samples",
-            '[{"foo": "somevalue"}]',
-            *credentials,
-        ],
-    )
-
-    assert res.exit_code == 1
-    mocked_import_existing_samples.assert_not_called()
-    assert "The samples JSON must be a JSON array of objects" in res.output
-
-
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
-def test_import_existing_project_samples__bad_samples_bad_key_value_in_dict_item(  # noqa: E501  # pylint: disable=line-too-long
-    mocker, credentials
-):
-    """Test import existing project samples failure when samples JSON
-    dict item in a list has the sample_id key with a bad value.
-    """
-    runner = CliRunner()
-
-    mocked_import_existing_samples = mocker.patch.object(
-        APIClient,
-        "import_existing_samples",
-    )
-
-    res = runner.invoke(
-        import_existing_project_samples,
-        [
-            str(uuid4()),
-            "--samples",
-            '[{"sample_id": "somevalue"}]',
-            *credentials,
-        ],
-    )
-
-    assert res.exit_code == 1
-    mocked_import_existing_samples.assert_not_called()
-    assert "Sample ID somevalue is not a valid UUID. Exiting." in res.output
-
-
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
-def test_import_existing_project_samples__bad_samples_bad_optional_key_value_in_dict_item(  # noqa: E501  # pylint: disable=line-too-long
-    mocker, credentials
-):
-    """Test import existing project samples failure when samples JSON dict item
-    in a list has the optional client_id key with a bad value.
-    """
-    runner = CliRunner()
-
-    mocked_import_existing_samples = mocker.patch.object(
-        APIClient,
-        "import_existing_samples",
-    )
-
-    bad_sample_id = str(uuid4())
-    bad_client_id = "foo_bar"
-    res = runner.invoke(
-        import_existing_project_samples,
-        [
-            str(uuid4()),
-            "--samples",
-            '[{"sample_id": "'
-            + bad_sample_id
-            + '", "client_id": "'
-            + bad_client_id
-            + '"}]',
-            *credentials,
-        ],
-    )
-
-    assert res.exit_code == 1
-    mocked_import_existing_samples.assert_not_called()
-    assert (
-        f"Client ID: {bad_client_id} for the sample {bad_sample_id} is not valid. "
-        "It cannot contain an underscore. Exiting." in res.output
-    )
+    assert "Not all sample IDs are valid" in res.output
 
 
 @pytest.mark.default_cassette("jwt-create.yaml")
@@ -289,8 +123,8 @@ def test_import_existing_project_samples__bad_metadata(mocker, credentials):
         import_existing_project_samples,
         [
             str(uuid4()),
-            "--samples",
-            '[{"sample_id": "' + str(uuid4()) + '"}]',
+            "--sample-ids",
+            f"{str(uuid4())},{str(uuid4())}",
             "--metadata-json",
             '[{"foo": "bar"}',
             *credentials,
@@ -334,8 +168,8 @@ def test_import_existing_project_samples__server_rejects(
         import_existing_project_samples,
         [
             project_id,
-            "--samples",
-            '[{"sample_id": "' + MOCK_UUID + '"}]',
+            "--sample-ids",
+            MOCK_UUID,
             *credentials,
         ],
     )
@@ -369,8 +203,8 @@ def test_import_existing_project_samples__success(
         import_existing_project_samples,
         [
             project_id,
-            "--samples",
-            '[{"sample_id": "' + sample_id_import_existing + '"}]',
+            "--sample-ids",
+            sample_id_import_existing,
             *credentials,
         ],
     )

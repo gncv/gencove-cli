@@ -923,11 +923,11 @@ class APIClient:
             raw_response=True,
         )
 
-    def import_existing_samples(self, project_id, samples, metadata):
+    def import_existing_samples(self, project_id, sample_ids, metadata):
         """Import existing samples to a project and pass metadata."""
         payload = {
             "project_id": project_id,
-            "samples": samples,
+            "samples": [{"sample_id": sample_id} for sample_id in sample_ids],
         }
         if metadata:
             payload["metadata"] = metadata

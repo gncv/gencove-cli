@@ -46,27 +46,17 @@ class GetMergedVCF(Command):
     )
     def execute(self):
         """Download merged VCF file for a given project."""
-        self.echo_debug(
-            "Downloading merged VCF file for project {}".format(
-                self.project_id
-            )
-        )
+        self.echo_debug(f"Downloading merged VCF file for project {self.project_id}")
         try:
             project = self.api_client.get_project(self.project_id)
             self.echo_debug(project)
             merged_vcf = next(
-                (
-                    f
-                    for f in project.files
-                    if f.file_type == "impute-vcf-merged"
-                ),
+                (f for f in project.files if f.file_type == "impute-vcf-merged"),
                 None,
             )
             if merged_vcf is None:
                 raise ValidationError(
-                    "No files to process for project {}".format(
-                        self.project_id
-                    )
+                    f"No files to process for project {self.project_id}"
                 )
             download_path = (
                 self.output_filename
@@ -83,7 +73,5 @@ class GetMergedVCF(Command):
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 404:
-                self.echo_error(
-                    "Project {} does not exist.".format(self.project_id)
-                )
+                self.echo_error(f"Project {self.project_id} does not exist.")
             raise

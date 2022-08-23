@@ -97,10 +97,7 @@ def test_basespace_import__no_pipeline_capabilities(mocker):
     assert res.exit_code == 1
     mocked_login.assert_called_once()
     mocked_import_basespace_projects.assert_called_once()
-    assert (
-        "There was an error importing Biosamples from BaseSpace."
-        in res.output
-    )
+    assert "There was an error importing Biosamples from BaseSpace." in res.output
     assert (
         "Project configuration must be set before adding samples to a project."
         in res.output

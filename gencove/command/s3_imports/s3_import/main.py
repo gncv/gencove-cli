@@ -39,9 +39,7 @@ class S3Import(Command):
         project.
         """
         self.echo_debug(
-            "Import samples from {} to project {}".format(
-                self.s3_uri, self.project_id
-            )
+            f"Import samples from {self.s3_uri} to project {self.project_id}"
         )
 
         try:

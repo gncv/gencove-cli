@@ -54,8 +54,7 @@ def get_filename_from_download_url(url):
         )[0]
     except (KeyError, IndexError):
         echo_debug(
-            "URL didn't contain filename query argument. "
-            "Assume filename from url"
+            "URL didn't contain filename query argument. Assume filename from url"
         )
         filename = urlparse(url).path.split("/")[-1]
 
@@ -65,10 +64,7 @@ def get_filename_from_download_url(url):
 def deliverable_type_from_filename(filename):
     """Deduce deliverable type based on dot notation."""
     filetype = ".".join(filename.split(".")[1:])
-    echo_debug(
-        "Deduced filetype to be: {} "
-        "from filename: {}".format(filetype, filename)
-    )
+    echo_debug(f"Deduced filetype to be: {filetype} from filename: {filename}")
     return filetype
 
 
@@ -82,23 +78,21 @@ def _create_filepath(download_to, prefix_dirs, filename):
         filename (str): name of the file inside download_to/file_prefix
             structure.
     """
-    echo_debug("_create_filepath Downloading to: {}".format(download_to))
-    echo_debug("_create_filepath file prefix is: {}".format(prefix_dirs))
+    echo_debug(f"_create_filepath Downloading to: {download_to}")
+    echo_debug(f"_create_filepath file prefix is: {prefix_dirs}")
 
     path = os.path.join(download_to, prefix_dirs)
     # Cross-platform cross-python-version directory creation
     if not os.path.exists(path):
-        echo_debug("creating path: {}".format(path))
+        echo_debug(f"creating path: {path}")
         os.makedirs(path)
 
     file_path = os.path.join(path, filename)
-    echo_debug("Deduced full file path is {}".format(file_path))
+    echo_debug(f"Deduced full file path is {file_path}")
     return file_path
 
 
-def build_file_path(
-    deliverable, file_with_prefix, download_to, filename=None
-):
+def build_file_path(deliverable, file_with_prefix, download_to, filename=None):
     """Create and return file system path where the file will be downloaded to.
 
     Args:
@@ -127,9 +121,7 @@ def build_file_path(
 
     destination_filename = prefix.filename
     if prefix.file_extension:
-        destination_filename = "{}.{}".format(
-            prefix.filename, prefix.file_extension
-        )
+        destination_filename = f"{prefix.filename}.{prefix.file_extension}"
 
     # turning off formatting for improved code readability
     # fmt: off
@@ -142,9 +134,7 @@ def build_file_path(
     )
     # fmt: on
 
-    echo_debug(
-        "Calculated destination filename: {}".format(destination_filename)
-    )
+    echo_debug(f"Calculated destination filename: {destination_filename}")
     return _create_filepath(download_to, prefix.dirs, destination_filename)
 
 
@@ -173,9 +163,7 @@ def fatal_request_error(err=None):
     max_time=MAX_RETRY_TIME_SECONDS,
     giveup=fatal_request_error,
 )
-def download_file(
-    file_path, download_url, skip_existing=True, no_progress=False
-):
+def download_file(file_path, download_url, skip_existing=True, no_progress=False):
     """Download a file to file system.
 
     Args:
@@ -190,17 +178,15 @@ def download_file(
             location of the downloaded file
     """
 
-    file_path_tmp = "{}.tmp".format(file_path)
+    file_path_tmp = f"{file_path}.tmp"
     if os.path.exists(file_path_tmp):
         file_mode = "ab"
-        headers = dict(
-            Range="bytes={}-".format(os.path.getsize(file_path_tmp))
-        )
-        echo_info("Resuming previous download: {}".format(file_path))
+        headers = dict(Range=f"bytes={os.path.getsize(file_path_tmp)}-")
+        echo_info(f"Resuming previous download: {file_path}")
     else:
         file_mode = "wb"
-        headers = dict()
-        echo_info("Downloading file to {}".format(file_path))
+        headers = {}
+        echo_info(f"Downloading file to {file_path}")
 
     stream_params = dict(
         stream=True, allow_redirects=False, headers=headers, timeout=30
@@ -215,10 +201,10 @@ def download_file(
             and os.path.isfile(file_path)
             and os.path.getsize(file_path) == total
         ):
-            echo_info("Skipping existing file: {}".format(file_path))
+            echo_info(f"Skipping existing file: {file_path}")
             return file_path
 
-        echo_debug("Starting to download file to: {}".format(file_path))
+        echo_debug(f"Starting to download file to: {file_path}")
 
         with open(file_path_tmp, file_mode) as downloaded_file:
             if not no_progress:
@@ -235,13 +221,10 @@ def download_file(
 
         # Cross-platform cross-python-version file overwriting
         if os.path.exists(file_path):
-            echo_debug(
-                "Found old file under same name: {}. "
-                "Removing it.".format(file_path)
-            )
+            echo_debug(f"Found old file under same name: {file_path}. Removing it.")
             os.remove(file_path)
         os.rename(file_path_tmp, file_path)
-        echo_info("Finished downloading a file: {}".format(file_path))
+        echo_info(f"Finished downloading a file: {file_path}")
         return file_path
 
 
@@ -258,17 +241,17 @@ def save_metadata_file(path, api_client, sample_id, skip_existing=True):
         None
     """
     if skip_existing and os.path.isfile(path) and os.path.getsize(path):
-        echo_info("Skipping existing file: {}".format(path))
+        echo_info(f"Skipping existing file: {path}")
         return
     try:
         metadata = api_client.get_metadata(sample_id)
     except client.APIClientError:
         echo_warning("Error getting sample metadata.")
         raise
-    echo_info("Downloading file to: {}".format(path))
-    with open(path, "w") as metadata_file:
+    echo_info(f"Downloading file to: {path}")
+    with open(path, "w", encoding="utf-8") as metadata_file:
         metadata_file.write(metadata.json())
-    echo_info("Finished downloading a file: {}".format(path))
+    echo_info(f"Finished downloading a file: {path}")
 
 
 def save_qc_file(path, api_client, sample_id, skip_existing=True):
@@ -284,18 +267,18 @@ def save_qc_file(path, api_client, sample_id, skip_existing=True):
         None
     """
     if skip_existing and os.path.isfile(path) and os.path.getsize(path):
-        echo_info("Skipping existing file: {}".format(path))
+        echo_info(f"Skipping existing file: {path}")
         return
     try:
         sample_qcs = api_client.get_sample_qc_metrics(sample_id).results
     except client.APIClientError:
         echo_warning("Error getting sample quality control metrics.")
         raise
-    echo_info("Downloading file to: {}".format(path))
-    with open(path, "w") as qc_file:
+    echo_info(f"Downloading file to: {path}")
+    with open(path, "w", encoding="utf-8") as qc_file:
         content = json.dumps(sample_qcs, cls=client.CustomEncoder)
         qc_file.write(content)
-    echo_info("Finished downloading a file: {}".format(path))
+    echo_info(f"Finished downloading a file: {path}")
 
 
 def fatal_process_sample_error(err):
@@ -323,13 +306,7 @@ def get_download_template_format_params(client_id, gencove_id):
     return {
         DownloadTemplateParts.CLIENT_ID.value: client_id,
         DownloadTemplateParts.GENCOVE_ID.value: gencove_id,
-        DownloadTemplateParts.FILE_TYPE.value: "{{{}}}".format(
-            DownloadTemplateParts.FILE_TYPE.value
-        ),
-        DownloadTemplateParts.FILE_EXTENSION.value: "{{{}}}".format(
-            DownloadTemplateParts.FILE_EXTENSION.value
-        ),
-        DownloadTemplateParts.DEFAULT_FILENAME.value: "{{{}}}".format(
-            DownloadTemplateParts.DEFAULT_FILENAME.value
-        ),
+        DownloadTemplateParts.FILE_TYPE.value: f"{{{DownloadTemplateParts.FILE_TYPE.value}}}",  # noqa: E501  # pylint: disable=line-too-long
+        DownloadTemplateParts.FILE_EXTENSION.value: f"{{{DownloadTemplateParts.FILE_EXTENSION.value}}}",  # noqa: E501  # pylint: disable=line-too-long
+        DownloadTemplateParts.DEFAULT_FILENAME.value: f"{{{DownloadTemplateParts.DEFAULT_FILENAME.value}}}",  # noqa: E501  # pylint: disable=line-too-long
     }

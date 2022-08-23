@@ -70,9 +70,7 @@ def test_s3_autoimport_create_project_id_not_uuid(
 @pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
-def test_s3_autoimport_create_invalid_metadata(
-    credentials, mocker, project_id
-):
+def test_s3_autoimport_create_invalid_metadata(credentials, mocker, project_id):
     """Test that passed optional metadata is valid when creating an
     automated import.
     """
@@ -127,9 +125,7 @@ def test_s3_autoimport_create_no_permission(credentials, mocker, project_id):
 @pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
-def test_s3_autoimport_create_with_empty_metadata(
-    credentials, mocker, project_id
-):
+def test_s3_autoimport_create_with_empty_metadata(credentials, mocker, project_id):
     """Test that user can pass empty metadata when creating an
     automated import.
     """
@@ -213,9 +209,7 @@ def test_s3_autoimport_create_with_metadata(credentials, mocker, project_id):
 @pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
-def test_s3_autoimport_create_without_metadata(
-    credentials, mocker, project_id
-):
+def test_s3_autoimport_create_without_metadata(credentials, mocker, project_id):
     """Test that user can create an import job without passing metadata."""
     runner = CliRunner()
 

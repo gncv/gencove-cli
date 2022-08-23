@@ -23,9 +23,7 @@ from .main import GetBatch
     help="If specified, no progress bar is shown.",
 )
 # pylint: disable=too-many-arguments
-def get_batch(
-    batch_id, output_filename, host, email, password, api_key, no_progress
-):
+def get_batch(batch_id, output_filename, host, email, password, api_key, no_progress):
     """Get batch that is available for a project."""
     GetBatch(
         batch_id,

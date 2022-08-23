@@ -167,9 +167,7 @@ def filter_batches_response(response, json_response):
     if "batch_type" in json_response:
         json_response["batch_type"] = "Mock batch_type"
     if "sample_ids" in json_response:
-        json_response["sample_ids"] = [
-            MOCK_UUID for _ in json_response["sample_ids"]
-        ]
+        json_response["sample_ids"] = [MOCK_UUID for _ in json_response["sample_ids"]]
     if "last_status" in json_response:
         json_response["last_status"]["id"] = MOCK_UUID
     for file in json_response.get("files", []):
@@ -193,8 +191,7 @@ def filter_import_existing_samples_request(request):
             body["project_id"] = MOCK_UUID
         if "samples" in body:
             body["samples"] = [
-                {"sample_id": MOCK_UUID, "client_id": "foo"}
-                for _ in body["samples"]
+                {"sample_id": MOCK_UUID, "client_id": "foo"} for _ in body["samples"]
             ]
         if "metadata" in body:
             body["metadata"] = {"foo": "bar"}

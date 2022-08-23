@@ -55,9 +55,7 @@ def vcr_config():
 
 @pytest.mark.vcr
 @assert_authorization
-def test_list_project_batches__empty(
-    credentials, mocker, project_id, recording, vcr
-):
+def test_list_project_batches__empty(credentials, mocker, project_id, recording, vcr):
     """Test project has not batches."""
     runner = CliRunner()
     if not recording:
@@ -109,9 +107,7 @@ def test_list_project_batches__not_empty(
 
         output_line = io.BytesIO()
         sys.stdout = output_line
-        for response in ProjectBatches(
-            **get_project_batches_response
-        ).results:
+        for response in ProjectBatches(**get_project_batches_response).results:
             echo(
                 "\t".join(
                     [
@@ -129,9 +125,7 @@ def test_list_project_batches__not_empty(
 @pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
-def test_list_project_batches__not_empty_slow_response_retry(
-    credentials, mocker
-):
+def test_list_project_batches__not_empty_slow_response_retry(credentials, mocker):
     """Test project batches slow response retry."""
     runner = CliRunner()
     mocked_get_project_batches = mocker.patch.object(

@@ -161,17 +161,14 @@ class APIClient:
             params = {}
 
         echo_debug(
-            "Contacting url: {} with payload: {}".format(
-                url, "[SENSITIVE CONTENT]" if sensitive else params
-            )
+            f"Contacting url: {url} with payload: "
+            f"{'[SENSITIVE CONTENT]' if sensitive else params}"
         )
         start = time.time()
 
         try:
             if method == "get":
-                response = get(
-                    url=url, params=params, headers=headers, timeout=timeout
-                )
+                response = get(url=url, params=params, headers=headers, timeout=timeout)
             elif method == "delete":
                 post_payload = APIClient._serialize_post_payload(params)
                 response = delete(
@@ -204,11 +201,9 @@ class APIClient:
             )
 
         echo_debug(
-            "API response is {} status is {} in {}ms".format(
-                "[SENSITIVE CONTENT]" if sensitive else response.content,
-                response.status_code,
-                (time.time() - start) * 1000,
-            )
+            f"API response "
+            f"is {'[SENSITIVE CONTENT]' if sensitive else response.content} "
+            f"status is {response.status_code} in {(time.time() - start) * 1000}ms"
         )
 
         # pylint: disable=no-member
@@ -220,32 +215,27 @@ class APIClient:
 
         http_error_msg = ""
         if 400 <= response.status_code < 500:
-            http_error_msg = "API Client Error: {}".format(response.reason)
+            http_error_msg = f"API Client Error: {response.reason}"
             if response.text:
                 response_json = response.json()
                 if "detail" in response_json:
-                    http_error_msg += ": {}".format(response_json["detail"])
+                    http_error_msg += f": {response_json['detail']}"
                 else:
                     try:
                         error_msg = "\n".join(
                             [
                                 # create-batch can return error details that
                                 # is a dict, not a list
-                                "  {}: {}".format(
-                                    key,
-                                    value[0]
-                                    if isinstance(value, list)
-                                    else str(value),
-                                )
+                                f"  {key}: {value[0] if isinstance(value, list) else str(value)}"  # noqa: E501  # pylint: disable=line-too-long
                                 for key, value in response_json.items()
                             ]
                         )
                     except AttributeError:
                         error_msg = "\n".join(response_json)
-                    http_error_msg += ":\n{}".format(error_msg)
+                    http_error_msg += f":\n{error_msg}"
 
         elif 500 <= response.status_code < 600:
-            http_error_msg = "Server Error: {}".format(response.reason)
+            http_error_msg = "Server Error: {response.reason}"
 
         raise APIClientError(http_error_msg, response.status_code)
 
@@ -261,8 +251,8 @@ class APIClient:
 
     def _get_authorization(self):
         if self._api_key:
-            return {"Authorization": "Api-Key {}".format(self._api_key)}
-        return {"Authorization": "Bearer {}".format(self._jwt_token)}
+            return {"Authorization": f"Api-Key {self._api_key}"}
+        return {"Authorization": f"Bearer {self._jwt_token}"}
 
     def _delete(
         self,
@@ -288,11 +278,7 @@ class APIClient:
                 return model(**response)
             return response
         except APIClientError as err:
-            if (
-                not refreshed
-                and self._jwt_refresh_token
-                and err.status_code == 401
-            ):
+            if not refreshed and self._jwt_refresh_token and err.status_code == 401:
                 self._refresh_authentication()
                 return self._delete(
                     endpoint,
@@ -330,11 +316,7 @@ class APIClient:
                 return model(**response)
             return response
         except APIClientError as err:
-            if (
-                not refreshed
-                and self._jwt_refresh_token
-                and err.status_code == 401
-            ):
+            if not refreshed and self._jwt_refresh_token and err.status_code == 401:
                 self._refresh_authentication()
                 return self._post(
                     endpoint,
@@ -394,9 +376,7 @@ class APIClient:
             query_params = {}
         query_params.update({"offset": 0, "limit": limit})
         if next_link:
-            query_params["offset"] = parse_qs(urlparse(next_link).query)[
-                "offset"
-            ]
+            query_params["offset"] = parse_qs(urlparse(next_link).query)["offset"]
         return query_params
 
     def set_api_key(self, api_key):
@@ -464,9 +444,7 @@ class APIClient:
         sort_order=SortOrder.DESC.value,
     ):
         """List single project's associated samples."""
-        project_endpoint = self.endpoints.PROJECT_SAMPLES.value.format(
-            id=project_id
-        )
+        project_endpoint = self.endpoints.PROJECT_SAMPLES.value.format(id=project_id)
         params = self._add_query_params(
             next_link,
             {
@@ -622,9 +600,7 @@ class APIClient:
 
     def get_project_batches(self, project_id, next_link=None):
         """List single project's batches."""
-        project_endpoint = self.endpoints.PROJECT_BATCHES.value.format(
-            id=project_id
-        )
+        project_endpoint = self.endpoints.PROJECT_BATCHES.value.format(id=project_id)
         params = self._add_query_params(next_link)
         return self._get(
             project_endpoint,
@@ -633,13 +609,9 @@ class APIClient:
             model=ProjectBatches,
         )
 
-    def create_project_batch(
-        self, project_id, batch_type, batch_name, sample_ids
-    ):
+    def create_project_batch(self, project_id, batch_type, batch_name, sample_ids):
         """Making a post request to create project batch."""
-        project_endpoint = self.endpoints.PROJECT_BATCHES.value.format(
-            id=project_id
-        )
+        project_endpoint = self.endpoints.PROJECT_BATCHES.value.format(id=project_id)
 
         payload = {
             "name": batch_name,
@@ -664,9 +636,7 @@ class APIClient:
 
         payload = {"sample_ids": sample_ids}
 
-        return self._post(
-            restore_project_samples_endpoint, payload, authorized=True
-        )
+        return self._post(restore_project_samples_endpoint, payload, authorized=True)
 
     def get_project(self, project_id):
         """Get single project."""
@@ -678,23 +648,19 @@ class APIClient:
         merge_vcf_endpoint = self.endpoints.PROJECT_MERGE_VCFS.value.format(
             id=project_id
         )
-        return self._post(
-            merge_vcf_endpoint, authorized=True, model=ProjectMergeVCFs
-        )
+        return self._post(merge_vcf_endpoint, authorized=True, model=ProjectMergeVCFs)
 
     def retrieve_merged_vcf(self, project_id):
         """Retrieve the status of the merge command for a project."""
         merge_vcf_endpoint = self.endpoints.PROJECT_MERGE_VCFS.value.format(
             id=project_id
         )
-        return self._get(
-            merge_vcf_endpoint, authorized=True, model=ProjectMergeVCFs
-        )
+        return self._get(merge_vcf_endpoint, authorized=True, model=ProjectMergeVCFs)
 
     def get_metadata(self, sample_id):
         """Retrieve the metadata for a sample."""
-        sample_metadata_endpoint = (
-            self.endpoints.SAMPLE_METADATA.value.format(id=sample_id)
+        sample_metadata_endpoint = self.endpoints.SAMPLE_METADATA.value.format(
+            id=sample_id
         )
         return self._get(
             sample_metadata_endpoint, authorized=True, model=SampleMetadata
@@ -702,8 +668,8 @@ class APIClient:
 
     def set_metadata(self, sample_id, metadata):
         """Assign the metadata to a sample."""
-        sample_metadata_endpoint = (
-            self.endpoints.SAMPLE_METADATA.value.format(id=sample_id)
+        sample_metadata_endpoint = self.endpoints.SAMPLE_METADATA.value.format(
+            id=sample_id
         )
         payload = {
             "metadata": metadata,
@@ -718,8 +684,8 @@ class APIClient:
     def import_basespace_projects(
         self, basespace_project_ids, project_id, metadata=None
     ):
-        """Make a request to import Biosamples from BaseSpace projects to a given
-        project.
+        """Make a request to import Biosamples from BaseSpace projects to
+        a given project.
 
         Args:
             basespace_project_ids (list of strings): BaseSpace projects
@@ -823,8 +789,8 @@ class APIClient:
         identifier,
         metadata=None,
     ):
-        """Make a request to create a periodic import job of BaseSpace projects'
-        Biosamples to a given Gencove project.
+        """Make a request to create a periodic import job of BaseSpace
+        projects' Biosamples to a given Gencove project.
 
         Args:
             project_id (str): project to which to assign the samples
@@ -941,16 +907,18 @@ class APIClient:
 
         payload = {"sample_ids": sample_ids}
 
-        return self._delete(
-            delete_project_samples_endpoint, payload, authorized=True
-        )
+        return self._delete(delete_project_samples_endpoint, payload, authorized=True)
 
-    def get_file_checksum(self, file_id):
+    def get_file_checksum(self, file_id, filename=None):
         """Fetch file checksum, using the client because need to be
         authenticated.
         """
+        params = {}
+        if filename:
+            params["filename"] = filename
         return self._get(
             self.endpoints.FILE_CHECKSUM.value.format(id=file_id),
+            query_params=params,
             authorized=True,
             raw_response=True,
         )

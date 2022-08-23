@@ -11,9 +11,7 @@ from .....exceptions import ValidationError
 class BaseSpaceImport(Command):
     """BaseSpace import command executor."""
 
-    def __init__(
-        self, basespace_project_ids, project_id, credentials, options
-    ):
+    def __init__(self, basespace_project_ids, project_id, credentials, options):
         super().__init__(credentials, options)
         self.basespace_project_ids = basespace_project_ids
         self.project_id = project_id
@@ -41,9 +39,8 @@ class BaseSpaceImport(Command):
         project.
         """
         self.echo_debug(
-            "Import Biosamples of the projects {} to a project {}".format(
-                self.basespace_project_ids, self.project_id
-            )
+            "Import Biosamples of the projects {self.basespace_project_ids} "
+            f"to a project {self.project_id}"
         )
 
         try:
@@ -51,20 +48,14 @@ class BaseSpaceImport(Command):
             metadata = None
             if self.metadata_json is not None:
                 metadata = json.loads(self.metadata_json)
-                self.echo_info(
-                    "Assigning metadata to the imported Biosamples."
-                )
-            import_basespace_projects = (
-                self.api_client.import_basespace_projects(
-                    basespace_project_ids=self.basespace_project_ids,
-                    project_id=self.project_id,
-                    metadata=metadata,
-                )
+                self.echo_info("Assigning metadata to the imported Biosamples.")
+            import_basespace_projects = self.api_client.import_basespace_projects(
+                basespace_project_ids=self.basespace_project_ids,
+                project_id=self.project_id,
+                metadata=metadata,
             )
             self.echo_debug(import_basespace_projects)
             self.echo_info("Request to import BaseSpace projects accepted.")
         except client.APIClientError:
-            self.echo_error(
-                "There was an error importing Biosamples from BaseSpace."
-            )
+            self.echo_error("There was an error importing Biosamples from BaseSpace.")
             raise

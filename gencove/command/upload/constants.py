@@ -63,6 +63,7 @@ class PathTemplateParts(Enum):
     r_notation = "r_notation"
 
 
-PATH_TEMPLATE = "{{{}}}_{{{}}}.fastq.gz".format(
-    PathTemplateParts.client_id.value, PathTemplateParts.r_notation.value
+PATH_TEMPLATE = (
+    f"{{{PathTemplateParts.client_id.value}}}_"
+    f"{{{PathTemplateParts.r_notation.value}}}.fastq.gz"
 )

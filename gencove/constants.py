@@ -123,10 +123,10 @@ class DownloadTemplateParts(Enum):
     DEFAULT_FILENAME = "default_filename"
 
 
-DOWNLOAD_TEMPLATE = "{{{}}}/{{{}}}/{{{}}}".format(
-    DownloadTemplateParts.CLIENT_ID.value,
-    DownloadTemplateParts.GENCOVE_ID.value,
-    DownloadTemplateParts.DEFAULT_FILENAME.value,
+DOWNLOAD_TEMPLATE = (
+    f"{{{DownloadTemplateParts.CLIENT_ID.value}}}/"
+    f"{{{DownloadTemplateParts.GENCOVE_ID.value}}}/"
+    f"{{{DownloadTemplateParts.DEFAULT_FILENAME.value}}}"
 )
 
 MAX_RETRY_TIME_SECONDS = 300  # 5 minutes

@@ -104,9 +104,7 @@ def test_list_uploads_slow_response_retry(mocker, credentials):
     res = runner.invoke(list_uploads, credentials)
     assert res.exit_code == 1
     assert mocked_get_sample_sheet.call_count == 5
-    assert (
-        res.output == "ERROR: Could not connect to the api server\nAborted!\n"
-    )
+    assert res.output == "ERROR: Could not connect to the api server\nAborted!\n"
 
 
 @pytest.mark.vcr

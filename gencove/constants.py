@@ -35,6 +35,7 @@ class ApiEndpoints(Enum):
     BASESPACE_PROJECTS_AUTOIMPORT = "/api/v2/basespace-projects-autoimport/"
     S3_URI_AUTOIMPORT = "/api/v2/s3-uri-autoimport/"
     FILE_CHECKSUM = "/api/v2/files/{id}.sha256"
+    IMPORT_EXISTING_SAMPLES = "/api/v2/project-samples-import/"
 
 
 @unique
@@ -122,10 +123,10 @@ class DownloadTemplateParts(Enum):
     DEFAULT_FILENAME = "default_filename"
 
 
-DOWNLOAD_TEMPLATE = "{{{}}}/{{{}}}/{{{}}}".format(
-    DownloadTemplateParts.CLIENT_ID.value,
-    DownloadTemplateParts.GENCOVE_ID.value,
-    DownloadTemplateParts.DEFAULT_FILENAME.value,
+DOWNLOAD_TEMPLATE = (
+    f"{{{DownloadTemplateParts.CLIENT_ID.value}}}/"
+    f"{{{DownloadTemplateParts.GENCOVE_ID.value}}}/"
+    f"{{{DownloadTemplateParts.DEFAULT_FILENAME.value}}}"
 )
 
 MAX_RETRY_TIME_SECONDS = 300  # 5 minutes

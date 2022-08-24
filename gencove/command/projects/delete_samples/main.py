@@ -35,9 +35,7 @@ class DeleteSamples(Command):
 
         if self.sample_ids:
             if not all(is_valid_uuid(s_id) for s_id in self.sample_ids):
-                raise ValidationError(
-                    "Not all sample IDs are valid. Exiting."
-                )
+                raise ValidationError("Not all sample IDs are valid. Exiting.")
 
     def execute(self):
         """Make a request to request samples delete for given project."""
@@ -47,16 +45,12 @@ class DeleteSamples(Command):
         )
 
         try:
-            deleted_project_samples_details = (
-                self.api_client.delete_project_samples(
-                    project_id=self.project_id,
-                    sample_ids=self.sample_ids,
-                )
+            deleted_project_samples_details = self.api_client.delete_project_samples(
+                project_id=self.project_id,
+                sample_ids=self.sample_ids,
             )
             self.echo_debug(deleted_project_samples_details)
-            self.echo_info(
-                "The following samples have been deleted successfully:"
-            )
+            self.echo_info("The following samples have been deleted successfully:")
             for sample in self.sample_ids:
                 self.echo_info(f"\t{sample}")
         except client.APIClientError as err:
@@ -68,8 +62,6 @@ class DeleteSamples(Command):
                 self.echo_info("The following error was returned:")
                 self.echo_info(err.message)
             elif err.status_code == 404:
-                self.echo_warning(
-                    f"Project {self.project_id} does not exist."
-                )
+                self.echo_warning(f"Project {self.project_id} does not exist.")
             else:
                 raise

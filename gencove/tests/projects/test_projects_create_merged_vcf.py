@@ -76,9 +76,7 @@ def test_create_merged_vcf__not_owned_project(mocker):
 def test_create_merged_vcf__already_running(mocker):
     """Test create merged file failure when the job is alredy running."""
     project_id = str(uuid4())
-    message = "Merge VCFs for project {} is already running".format(
-        project_id
-    )
+    message = f"Merge VCFs for project {project_id} is already running"
     mocked_response = [message]
 
     runner = CliRunner()
@@ -111,9 +109,7 @@ def test_create_merged_vcf__already_running(mocker):
 def test_create_merged_vcf__not_able(mocker):
     """Test create merged file failure when it cannot be done."""
     project_id = str(uuid4())
-    mocked_response = [
-        "You attempted to merge VCFs for a project that cannot do that"
-    ]
+    mocked_response = ["You attempted to merge VCFs for a project that cannot do that"]
 
     runner = CliRunner()
 
@@ -122,9 +118,7 @@ def test_create_merged_vcf__not_able(mocker):
         APIClient,
         "create_merged_vcf",
         return_value=mocked_response,
-        side_effect=APIClientError(
-            message=mocked_response[0], status_code=400
-        ),
+        side_effect=APIClientError(message=mocked_response[0], status_code=400),
     )
 
     res = runner.invoke(
@@ -141,10 +135,7 @@ def test_create_merged_vcf__not_able(mocker):
     assert res.exit_code == 1
     mocked_login.assert_called_once()
     mocked_create_merged_vcf.assert_called_once()
-    assert (
-        "You attempted to merge VCFs for a project that cannot do that"
-        in res.output
-    )
+    assert "You attempted to merge VCFs for a project that cannot do that" in res.output
 
 
 def test_create_merged_vcf__no_samples(mocker):
@@ -159,9 +150,7 @@ def test_create_merged_vcf__no_samples(mocker):
         APIClient,
         "create_merged_vcf",
         return_value=mocked_response,
-        side_effect=APIClientError(
-            message=mocked_response[0], status_code=400
-        ),
+        side_effect=APIClientError(message=mocked_response[0], status_code=400),
     )
 
     res = runner.invoke(
@@ -187,9 +176,7 @@ def test_create_merged_vcf__up_to_date(mocker):
     """
 
     project_id = str(uuid4())
-    message = "Merged VCF file for project {} is up-to-date".format(
-        project_id
-    )
+    message = f"Merged VCF file for project {project_id} is up-to-date"
     mocked_response = [message]
 
     runner = CliRunner()
@@ -231,9 +218,7 @@ def test_create_merged_vcf__needs_two_samples(mocker):
         APIClient,
         "create_merged_vcf",
         return_value=mocked_response,
-        side_effect=APIClientError(
-            message=mocked_response[0], status_code=400
-        ),
+        side_effect=APIClientError(message=mocked_response[0], status_code=400),
     )
 
     res = runner.invoke(
@@ -265,9 +250,7 @@ def test_create_merged_vcf__no_impute_files(mocker):
         APIClient,
         "create_merged_vcf",
         return_value=mocked_response,
-        side_effect=APIClientError(
-            message=mocked_response[0], status_code=400
-        ),
+        side_effect=APIClientError(message=mocked_response[0], status_code=400),
     )
 
     res = runner.invoke(
@@ -338,6 +321,4 @@ def test_create_merged_vcf__success(mocker):
         )
     )
     assert output_line.getvalue() in res.output.encode()
-    assert (
-        "Issued merge request for project {}".format(project_id) in res.output
-    )
+    assert f"Issued merge request for project {project_id}" in res.output

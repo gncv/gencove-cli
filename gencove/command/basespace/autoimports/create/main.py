@@ -41,9 +41,7 @@ class BaseSpaceAutoImport(Command):
         """
         self.echo_debug(
             "Create AutoImport job of the "
-            "identifier {} to a project {}".format(
-                self.identifier, self.project_id
-            )
+            f"identifier {self.identifier} to a project {self.project_id}"
         )
 
         try:
@@ -52,15 +50,11 @@ class BaseSpaceAutoImport(Command):
 
             if self.metadata_json is not None:
                 metadata = json.loads(self.metadata_json)
-                self.echo_info(
-                    "Metadata will be assigned to the imported Biosamples."
-                )
-            autoimport_from_basespace = (
-                self.api_client.autoimport_from_basespace(
-                    project_id=self.project_id,
-                    identifier=self.identifier,
-                    metadata=metadata,
-                )
+                self.echo_info("Metadata will be assigned to the imported Biosamples.")
+            autoimport_from_basespace = self.api_client.autoimport_from_basespace(
+                project_id=self.project_id,
+                identifier=self.identifier,
+                metadata=metadata,
             )
             self.echo_debug(autoimport_from_basespace)
             self.echo_info(

@@ -73,8 +73,8 @@ def test_status_merged_vcf__empty(mocker):
     mocked_login.assert_called_once()
     mocked_retrieve_merged_vcf.assert_called_once()
     message = (
-        "Project {} does not exist or there are no "
-        "running jobs associated with it.".format(project_id)
+        f"Project {project_id} does not exist or there are no "
+        "running jobs associated with it."
     )
     assert message in res.output
 
@@ -82,9 +82,7 @@ def test_status_merged_vcf__empty(mocker):
 def test_status_merged_vcf__not_able(mocker):
     """Test status merged file failure when it cannot be done."""
     project_id = str(uuid4())
-    mocked_response = [
-        "You attempted to merge VCFs for a project that cannot do that"
-    ]
+    mocked_response = ["You attempted to merge VCFs for a project that cannot do that"]
 
     runner = CliRunner()
 
@@ -93,9 +91,7 @@ def test_status_merged_vcf__not_able(mocker):
         APIClient,
         "retrieve_merged_vcf",
         return_value=mocked_response,
-        side_effect=APIClientError(
-            message=mocked_response[0], status_code=400
-        ),
+        side_effect=APIClientError(message=mocked_response[0], status_code=400),
     )
 
     res = runner.invoke(
@@ -112,10 +108,7 @@ def test_status_merged_vcf__not_able(mocker):
     assert res.exit_code == 1
     mocked_login.assert_called_once()
     mocked_retrieve_merged_vcf.assert_called_once()
-    assert (
-        "You attempted to merge VCFs for a project that cannot do that"
-        in res.output
-    )
+    assert "You attempted to merge VCFs for a project that cannot do that" in res.output
 
 
 def test_status_merged_vcf__success_but_job_failed(mocker):

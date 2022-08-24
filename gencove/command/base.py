@@ -67,9 +67,7 @@ def aws_cli_credentials():
 
     # Set AWS_SHARED_CREDENTIALS_FILE
     with tempfile.NamedTemporaryFile(delete=False) as credentials_file:
-        credentials_file.write(
-            b"[profile " + PROFILE_NAME.encode("utf") + b"]\n"
-        )
+        credentials_file.write(b"[profile " + PROFILE_NAME.encode("utf") + b"]\n")
         aws_shared_credentials_file = credentials_file.name
         os.environ[AWS_SHARED_CREDENTIALS_FILE] = aws_shared_credentials_file
 
@@ -131,9 +129,7 @@ class Command(object):  # pylint: disable=R0205
     def validate_login_success(self):
         """Check if login succeeded."""
         if not self.is_logged_in:
-            raise ValidationError(
-                "Please check your credentials and try again"
-            )
+            raise ValidationError("Please check your credentials and try again")
 
     @aws_cli_decorator
     def run(self):

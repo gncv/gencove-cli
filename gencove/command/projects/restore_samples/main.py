@@ -35,26 +35,21 @@ class RestoreSamples(Command):
 
         if self.sample_ids:
             if not all(is_valid_uuid(s_id) for s_id in self.sample_ids):
-                raise ValidationError(
-                    "Not all sample IDs are valid. Exiting."
-                )
+                raise ValidationError("Not all sample IDs are valid. Exiting.")
 
     # no retry for timeouts in order to avoid duplicate heavy operations on
     # the backend
     def execute(self):
         """Make a request to request samples restore for given project."""
         self.echo_debug(
-            "Requesting samples restore in project {} for samples {} ".format(
-                self.project_id, self.sample_ids
-            )
+            "Requesting samples restore in project "
+            f"{self.project_id} for samples {self.sample_ids}"
         )
 
         try:
-            restored_project_samples_details = (
-                self.api_client.restore_project_samples(
-                    project_id=self.project_id,
-                    sample_ids=self.sample_ids,
-                )
+            restored_project_samples_details = self.api_client.restore_project_samples(
+                project_id=self.project_id,
+                sample_ids=self.sample_ids,
             )
             self.echo_debug(restored_project_samples_details)
             self.echo_info("Request to restore samples accepted.")
@@ -67,8 +62,6 @@ class RestoreSamples(Command):
                 self.echo_info("The following error was returned:")
                 self.echo_info(err.message)
             elif err.status_code == 404:
-                self.echo_warning(
-                    "Project {} does not exist.".format(self.project_id)
-                )
+                self.echo_warning(f"Project {self.project_id} does not exist.")
             else:
                 raise

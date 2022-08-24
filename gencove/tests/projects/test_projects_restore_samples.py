@@ -67,7 +67,8 @@ def test_restore_project_samples__bad_project_id(mocker, credentials):
             "1111111",
             *credentials,
             "--sample-ids",
-            "11111111-1111-1111-1111-111111111111,22222222-2222-2222-2222-222222222222",  # noqa
+            "11111111-1111-1111-1111-111111111111,"
+            "22222222-2222-2222-2222-222222222222",
         ],
     )
     assert res.exit_code == 1
@@ -93,7 +94,8 @@ def test_restore_project_samples__not_owned_project(credentials, mocker):
             str(uuid4()),
             *credentials,
             "--sample-ids",
-            "11111111-1111-1111-1111-111111111111,22222222-2222-2222-2222-222222222222",  # noqa
+            "11111111-1111-1111-1111-111111111111,"
+            "22222222-2222-2222-2222-222222222222",
         ],
     )
     assert res.exit_code == 1
@@ -183,9 +185,7 @@ def test_restore_project_samples__sample_not_in_project(
             "restore_project_samples",
             side_effect=APIClientError(
                 message=restore_project_samples_response["body"]["string"],
-                status_code=restore_project_samples_response["status"][
-                    "code"
-                ],
+                status_code=restore_project_samples_response["status"]["code"],
             ),
         )
     res = runner.invoke(
@@ -200,9 +200,7 @@ def test_restore_project_samples__sample_not_in_project(
     assert res.exit_code == 0
     if not recording:
         mocked_restore_project_samples.assert_called_once()
-    assert (
-        "There was an error requesting project samples restore" in res.output
-    )
+    assert "There was an error requesting project samples restore" in res.output
 
 
 @pytest.mark.vcr

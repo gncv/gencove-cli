@@ -132,9 +132,7 @@ def login(api_client, credentials):
                 "Password", type=str, hide_input=True, err=True
             )
     try:
-        api_client.login(
-            credentials.email, credentials.password, credentials.otp_token
-        )
+        api_client.login(credentials.email, credentials.password, credentials.otp_token)
         echo_debug("User logged in successfully")
         return True
     except APIClientError as err:
@@ -144,10 +142,8 @@ def login(api_client, credentials):
                 "One time password", type=str, err=True
             )
             return login(api_client, credentials)
-        echo_debug("Failed to login: {}".format(err))
-        echo_error(
-            "Failed to login. Please verify your credentials and try again"
-        )
+        echo_debug(f"Failed to login: {err}")
+        echo_error("Failed to login. Please verify your credentials and try again")
         return False
 
 

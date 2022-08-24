@@ -25,10 +25,8 @@ def delete_project_samples(  # pylint: disable=too-many-arguments
     api_key,
 ):
     """Delete samples in a project."""
-    sample_ids = (
-        [s_id.strip() for s_id in sample_ids.split(",")] if sample_ids else []
-    )
-    echo_debug("Sample ids translation: {}".format(sample_ids))
+    sample_ids = [s_id.strip() for s_id in sample_ids.split(",")] if sample_ids else []
+    echo_debug(f"Sample ids translation: {sample_ids}")
 
     DeleteSamples(
         project_id,

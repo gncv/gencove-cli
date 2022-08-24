@@ -24,9 +24,7 @@ class BiosamplesList(Command):
     def execute(self):
         """Make a request to list Biosamples from a BaseSpace project."""
         self.echo_debug(
-            "Listing Biosamples from a BaseSpace project {}.".format(
-                self.basespace_project_id
-            )
+            f"Listing Biosamples from a BaseSpace project {self.basespace_project_id}."
         )
         try:
             for biosamples in self.get_paginated_biosamples():
@@ -66,6 +64,4 @@ class BiosamplesList(Command):
     )
     def get_biosamples(self, next_link=None):
         """Get BaseSpace Biosamples page."""
-        return self.api_client.list_biosamples(
-            self.basespace_project_id, next_link
-        )
+        return self.api_client.list_biosamples(self.basespace_project_id, next_link)

@@ -489,7 +489,7 @@ class APIClient:
         Args:
             samples (list of dicts): sample sheet results
             project_id (str): project to which to assign the samples
-            metadata (str): JSON metadata to be applied to all samples
+            metadata (str): Optional JSON metadata to be applied to all samples
         """
         payload = {"uploads": samples, "metadata": metadata}
 
@@ -723,7 +723,7 @@ class APIClient:
         Args:
             basespace_project_ids (list of strings): BaseSpace projects
             project_id (str): project to which to assign the samples
-            metadata (str): JSON metadata to be applied to all samples
+            metadata (str): Optional JSON metadata to be applied to all samples
         """
 
         payload = {
@@ -801,7 +801,7 @@ class APIClient:
         Args:
             s3_uri (str): s3 path formated as s3://<bucket-name>/prefix
             project_id (str): project to which to assign the samples
-            metadata (str): JSON metadata to be applied to all samples
+            metadata (str): Optional JSON metadata to be applied to all samples
         """
 
         payload = {
@@ -829,9 +829,8 @@ class APIClient:
             project_id (str): project to which to assign the samples
             identifier (str): identifier that is contained in BaseSpace
                 projects' name
-            metadata (str): JSON metadata to be applied to all samples
+            metadata (str): Optional JSON metadata to be applied to all samples
         """
-
         payload = {
             "project_id": project_id,
             "identifier": identifier,
@@ -884,7 +883,7 @@ class APIClient:
         Args:
             s3_uri (str): s3 path formated as s3://<bucket-name>/prefix
             project_id (str): project to which to assign the samples
-            metadata (str): JSON metadata to be applied to all samples
+            metadata (str): Optional JSON metadata to be applied to all samples
         """
 
         payload = {

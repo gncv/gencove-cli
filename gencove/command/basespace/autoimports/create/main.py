@@ -49,6 +49,7 @@ class BaseSpaceAutoImport(Command):
         try:
             # prepare metadata
             metadata = None
+
             if self.metadata_json is not None:
                 metadata = json.loads(self.metadata_json)
                 self.echo_info(
@@ -63,8 +64,10 @@ class BaseSpaceAutoImport(Command):
             )
             self.echo_debug(autoimport_from_basespace)
             self.echo_info(
-                "Request to create a periodic import job of BaseSpace "
-                "projects accepted."
+                "Request to {} a periodic import job of BaseSpace "
+                "projects accepted.".format(
+                    autoimport_from_basespace["action"]
+                )
             )
         except client.APIClientError:
             self.echo_error(

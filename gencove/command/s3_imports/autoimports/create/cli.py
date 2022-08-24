@@ -16,10 +16,7 @@ from .main import S3AutoImport
     "--metadata-json",
     required=False,
     default=None,
-    help=(
-        "Add metadata to all samples that are to be imported from "
-        "S3 to a project."
-    ),
+    help=("Add metadata to all samples that are to be imported from S3 to a project."),
 )
 @add_options(common_options)
 def create(  # pylint: disable=too-many-arguments

@@ -27,7 +27,7 @@ class ListSampleSheet(Command):
     def execute(self):
         self.echo_debug(
             "Retrieving sample sheet: "
-            "status={} search_term={}".format(self.status, self.gncv_path)
+            f"status={self.status} search_term={self.gncv_path}"
         )
         try:
             for uploads in self.get_paginated_sample_sheet():

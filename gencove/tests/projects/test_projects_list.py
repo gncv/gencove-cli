@@ -154,9 +154,7 @@ def test_list_projects_slow_response_retry_list(mocker, credentials):
 @pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
-def test_list_projects_slow_response_dump_log(
-    mocker, credentials, dump_filename
-):
+def test_list_projects_slow_response_dump_log(mocker, credentials, dump_filename):
     """Test projects slow response dumps a log filet."""
     del os.environ["GENCOVE_SAVE_DUMP_LOG"]
     runner = CliRunner()
@@ -236,9 +234,7 @@ def test_list_projects(mocker, credentials, recording, vcr):
         mocked_get_pipeline_capabilities = mocker.patch.object(
             APIClient,
             "get_pipeline_capabilities",
-            return_value=PipelineCapabilities(
-                **get_pipeline_capabilities_response
-            ),
+            return_value=PipelineCapabilities(**get_pipeline_capabilities_response),
         )
     res = runner.invoke(list_projects, credentials)
     assert res.exit_code == 0

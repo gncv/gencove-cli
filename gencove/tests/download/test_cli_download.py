@@ -85,9 +85,7 @@ def vcr_config():
 
 @pytest.mark.vcr
 @assert_authorization
-def test_no_required_options(
-    credentials, mocker
-):  # pylint: disable=unused-argument
+def test_no_required_options(credentials, mocker):  # pylint: disable=unused-argument
     """Test that command exits without project id or sample id provided."""
     runner = CliRunner()
     with runner.isolated_filesystem():
@@ -128,9 +126,7 @@ def test_both_project_id_and_sample_ids_provided(credentials, mocker):
 
 @pytest.mark.vcr
 @assert_authorization
-def test_project_id_provided(
-    credentials, mocker, project_id_download, recording, vcr
-):
+def test_project_id_provided(credentials, mocker, project_id_download, recording, vcr):
     """Check happy flow."""
     # pylint: disable=too-many-locals
     runner = CliRunner()
@@ -193,9 +189,7 @@ def test_project_id_provided(
 
 @pytest.mark.vcr
 @assert_authorization
-def test_sample_ids_provided(
-    credentials, mocker, recording, sample_id_download, vcr
-):
+def test_sample_ids_provided(credentials, mocker, recording, sample_id_download, vcr):
     """Check happy flow with sample ids."""
     runner = CliRunner()
     with runner.isolated_filesystem():
@@ -339,9 +333,7 @@ def test_sample_ids_provided_no_qc_file(
 
 @pytest.mark.vcr
 @assert_authorization
-def test_create_checksum_file(
-    credentials, mocker, recording, sample_id_download, vcr
-):
+def test_create_checksum_file(credentials, mocker, recording, sample_id_download, vcr):
     """Check checksums flag."""
     runner = CliRunner()
     with runner.isolated_filesystem():
@@ -397,7 +389,7 @@ def test_create_checksum_file(
                 f"cli_test_data/mock_client_id/{MOCK_UUID}/r2.fastq.gz.sha256"
             )
             assert os.path.exists(checksum_path)
-            with open(checksum_path, "r") as checksum_file:
+            with open(checksum_path, "r", encoding="utf-8") as checksum_file:
                 assert (
                     checksum_file.read()
                     == f"{MOCK_CHECKSUM} *{MOCK_UUID}_R2.fastq.gz\n"
@@ -457,9 +449,7 @@ def test_create_checksum_file_exception(
                 True,
                 False,
             )
-            file_path = (
-                f"cli_test_data/mock_client_id/{MOCK_UUID}/r1.fastq.gz"
-            )
+            file_path = f"cli_test_data/mock_client_id/{MOCK_UUID}/r1.fastq.gz"
             checksum_path = f"{file_path}.sha256"
             assert not os.path.exists(checksum_path)
 
@@ -566,9 +556,7 @@ def test_download_stdout_with_flag(
         output_line = io.BytesIO()
         sys.stdout = output_line
         for _ in get_project_samples_response["results"]:
-            archive_last_status_created = (
-                sample.archive_last_status.created.isoformat()
-            )
+            archive_last_status_created = sample.archive_last_status.created.isoformat()
             download_url_1 = "https://example.com/r1.fastq.gz"
             download_url_2 = "https://example.com/r2.fastq.gz"
             mocked_result = json.dumps(
@@ -683,7 +671,7 @@ def test_download_urls_to_file(
                         },
                     }
                 )
-            with open("output.json", "r") as json_file:
+            with open("output.json", "r", encoding="utf-8") as json_file:
                 assert output_file == json.load(json_file)
             mocked_project_samples.assert_called_once()
             mocked_sample_details.assert_called_once()
@@ -691,9 +679,7 @@ def test_download_urls_to_file(
 
 @pytest.mark.vcr
 @assert_authorization
-def test_download_no_progress(
-    credentials, mocker, recording, sample_id_download, vcr
-):
+def test_download_no_progress(credentials, mocker, recording, sample_id_download, vcr):
     """Test command doesn't show progress bar."""
     runner = CliRunner()
     with runner.isolated_filesystem():
@@ -834,9 +820,7 @@ def test_project_id_provided_skip_existing_qc_and_metadata(
         assert mocked_download_file.call_count == 2
 
         # call it the second time
-        mocked_qc_metrics = mocker.patch.object(
-            APIClient, "get_sample_qc_metrics"
-        )
+        mocked_qc_metrics = mocker.patch.object(APIClient, "get_sample_qc_metrics")
         mocked_get_metadata = mocker.patch.object(APIClient, "get_metadata")
         res = runner.invoke(
             download,
@@ -871,9 +855,7 @@ def test_download_not_working_because_archived(
                 "get_sample_details",
                 return_value=SampleDetails(**get_sample_details_response),
             )
-        mocked_qc_metrics = mocker.patch.object(
-            APIClient, "get_sample_qc_metrics"
-        )
+        mocked_qc_metrics = mocker.patch.object(APIClient, "get_sample_qc_metrics")
         mocked_get_metadata = mocker.patch.object(APIClient, "get_metadata")
         mocked_download_file = mocker.patch(
             "gencove.command.download.main.download_file",
@@ -906,16 +888,10 @@ def test_project_id_provided_filter_not_archived(credentials, mocker):
         mocked_project_samples = mocker.patch.object(
             APIClient,
             "get_project_samples",
-            return_value=ProjectSamples(
-                **{"results": [], "meta": {"next": None}}
-            ),
+            return_value=ProjectSamples(**{"results": [], "meta": {"next": None}}),
         )
-        mocked_sample_details = mocker.patch.object(
-            APIClient, "get_sample_details"
-        )
-        mocked_qc_metrics = mocker.patch.object(
-            APIClient, "get_sample_qc_metrics"
-        )
+        mocked_sample_details = mocker.patch.object(APIClient, "get_sample_details")
+        mocked_qc_metrics = mocker.patch.object(APIClient, "get_sample_qc_metrics")
         mocked_get_metadata = mocker.patch.object(APIClient, "get_metadata")
         mocked_download_file = mocker.patch(
             "gencove.command.download.main.download_file"

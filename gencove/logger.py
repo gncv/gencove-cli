@@ -33,14 +33,12 @@ def _log(msg):
 
 def output_warning(text):
     """Click echo warning."""
-    return click.style(
-        "WARNING: {}".format(text), fg="bright_yellow", bold=True
-    )
+    return click.style(f"WARNING: {text}", fg="bright_yellow", bold=True)
 
 
 def output_error(text):
     """Click echo error."""
-    return click.style("ERROR: {}".format(text), fg="bright_red", bold=True)
+    return click.style(f"ERROR: {text}", fg="bright_red", bold=True)
 
 
 def echo_data(msg, **kwargs):
@@ -75,15 +73,13 @@ def echo_error(msg, **kwargs):
 
 
 echo_debug(
-    "Python version: {}.{}.{}".format(
-        sys.version_info.major,
-        sys.version_info.minor,
-        sys.version_info.micro,
-    )
+    f"Python version: {sys.version_info.major}."
+    f"{sys.version_info.minor}."
+    f"{sys.version_info.micro}"
 )
-echo_debug("CLI version: {}".format(version()))
-echo_debug("OS details: {}".format(platform()))
-echo_debug("boto3 version: {}".format(boto3.__version__))
+echo_debug(f"CLI version: {version()}")
+echo_debug(f"OS details: {platform()}")
+echo_debug(f"boto3 version: {boto3.__version__}")
 if LOG_LEVEL == DEBUG:
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
     logging.getLogger("botocore.auth").setLevel(logging.CRITICAL)
@@ -111,7 +107,7 @@ def dump_debug_log():
         try:
             debug_filename = get_debug_file_name()
             log = "\n".join(DEBUG_LOG)
-            with open(debug_filename, "w") as dump_file:
+            with open(debug_filename, "w", encoding="utf-8") as dump_file:
                 dump_file.write(log)
             _echo(
                 f"Please attach the debug log file located in {debug_filename} to a bug report."  # noqa: E501  # pylint: disable=line-too-long

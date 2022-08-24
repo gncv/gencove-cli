@@ -67,7 +67,8 @@ def test_delete_project_samples__bad_project_id(mocker, credentials):
             "1111111",
             *credentials,
             "--sample-ids",
-            "11111111-1111-1111-1111-111111111111,22222222-2222-2222-2222-222222222222",  # noqa
+            "11111111-1111-1111-1111-111111111111,"
+            "22222222-2222-2222-2222-222222222222",
         ],
     )
     assert res.exit_code == 1
@@ -93,7 +94,8 @@ def test_delete_project_samples__not_owned_project(credentials, mocker):
             str(uuid4()),
             *credentials,
             "--sample-ids",
-            "11111111-1111-1111-1111-111111111111,22222222-2222-2222-2222-222222222222",  # noqa
+            "11111111-1111-1111-1111-111111111111,"
+            "22222222-2222-2222-2222-222222222222",
         ],
     )
     assert res.exit_code == 1
@@ -134,9 +136,7 @@ def test_delete_project_samples__success__empty_sample_ids(
     assert res.exit_code == 0
     if not recording:
         mocked_delete_project_samples.assert_called_once()
-    assert (
-        "The following samples have been deleted successfully" in res.output
-    )
+    assert "The following samples have been deleted successfully" in res.output
 
 
 @pytest.mark.default_cassette("jwt-create.yaml")
@@ -236,6 +236,4 @@ def test_delete_project_samples__success(
     assert res.exit_code == 0
     if not recording:
         mocked_delete_project_samples.assert_called_once()
-    assert (
-        "The following samples have been deleted successfully" in res.output
-    )
+    assert "The following samples have been deleted successfully" in res.output

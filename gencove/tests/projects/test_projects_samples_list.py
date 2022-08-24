@@ -129,7 +129,7 @@ def test_list_projects_no_project(mocker, credentials):
     echo_data(
         "\n".join(
             [
-                "ERROR: Project {} does not exist.".format(project_id),
+                f"ERROR: Project {project_id} does not exist.",
                 "ERROR: API Client Error: Not Found: Not found.",
                 "Aborted!",
             ]

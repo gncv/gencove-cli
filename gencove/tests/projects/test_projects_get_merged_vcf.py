@@ -105,9 +105,7 @@ def test_get_merged_vcf__empty(mocker):
     assert res.exit_code == 1
     mocked_login.assert_called_once()
     mocked_get_project.assert_called_once()
-    assert (
-        "No files to process for project {}".format(project_id) in res.output
-    )
+    assert f"No files to process for project {project_id}" in res.output
 
 
 def test_get_merged_vcf_custom_filename(mocker):
@@ -116,7 +114,7 @@ def test_get_merged_vcf_custom_filename(mocker):
     file_id = str(uuid4())
     download_url = (
         "https://bucket.s3.amazonaws.com/output/apps/merge_vcfs/"
-        "{file_id}/{file_id}.vcf.bgz".format(file_id=file_id)
+        f"{file_id}/{file_id}.vcf.bgz"
     )
 
     runner = CliRunner()
@@ -138,7 +136,7 @@ def test_get_merged_vcf_custom_filename(mocker):
                     "id": "755ec682-e4a5-414a-a5be-07e0af11cf75",
                     "s3_path": (
                         "app-data/output/apps/merge_vcfs/"
-                        "{file_id}/{file_id}.vcf.bgz".format(file_id=file_id)
+                        f"{file_id}/{file_id}.vcf.bgz"
                     ),
                     "size": None,
                     "download_url": download_url,
@@ -197,14 +195,12 @@ def test_get_merged_vcf__no_progress_success(mocker):
                     "id": "755ec682-e4a5-414a-a5be-07e0af11cf75",
                     "s3_path": (
                         "app-data/output/apps/merge_vcfs/"
-                        "{file_id}/{file_id}.vcf.bgz".format(file_id=file_id)
+                        f"{file_id}/{file_id}.vcf.bgz"
                     ),
                     "size": None,
                     "download_url": (
                         "https://bucket.s3.amazonaws.com/output/apps/"
-                        "merge_vcfs/{file_id}/{file_id}.vcf.bgz".format(
-                            file_id=file_id
-                        )
+                        f"merge_vcfs/{file_id}/{file_id}.vcf.bgz"
                     ),
                     "file_type": "impute-vcf-merged",
                 }
@@ -232,9 +228,9 @@ def test_get_merged_vcf__no_progress_success(mocker):
     mocked_login.assert_called_once()
     mocked_get_project.assert_called_once()
     mocked_download_file.assert_called_once_with(
-        "{}.vcf.bgz".format(file_id),
+        f"{file_id}.vcf.bgz",
         "https://bucket.s3.amazonaws.com/output/apps/"
-        "merge_vcfs/{file_id}/{file_id}.vcf.bgz".format(file_id=file_id),
+        f"merge_vcfs/{file_id}/{file_id}.vcf.bgz",
         no_progress=True,
     )
 
@@ -297,14 +293,12 @@ def test_get_merged_vcf__success(mocker):
                     "id": "755ec682-e4a5-414a-a5be-07e0af11cf75",
                     "s3_path": (
                         "app-data/output/apps/merge_vcfs/"
-                        "{file_id}/{file_id}.vcf.bgz".format(file_id=file_id)
+                        f"{file_id}/{file_id}.vcf.bgz"
                     ),
                     "size": None,
                     "download_url": (
                         "https://bucket.s3.amazonaws.com/output/apps/"
-                        "merge_vcfs/{file_id}/{file_id}.vcf.bgz".format(
-                            file_id=file_id
-                        )
+                        f"merge_vcfs/{file_id}/{file_id}.vcf.bgz"
                     ),
                     "file_type": "impute-vcf-merged",
                 }
@@ -331,9 +325,9 @@ def test_get_merged_vcf__success(mocker):
     mocked_login.assert_called_once()
     mocked_get_project.assert_called_once()
     mocked_download_file.assert_called_once_with(
-        "{}.vcf.bgz".format(file_id),
+        f"{file_id}.vcf.bgz",
         "https://bucket.s3.amazonaws.com/output/apps/"
-        "merge_vcfs/{file_id}/{file_id}.vcf.bgz".format(file_id=file_id),
+        f"merge_vcfs/{file_id}/{file_id}.vcf.bgz",
         no_progress=False,
     )
 
@@ -363,14 +357,12 @@ def test_get_merged_vcf__success__project_with_legacy_webhhok_url(mocker):
                     "id": "755ec682-e4a5-414a-a5be-07e0af11cf75",
                     "s3_path": (
                         "app-data/output/apps/merge_vcfs/"
-                        "{file_id}/{file_id}.vcf.bgz".format(file_id=file_id)
+                        f"{file_id}/{file_id}.vcf.bgz"
                     ),
                     "size": None,
                     "download_url": (
                         "https://bucket.s3.amazonaws.com/output/apps/"
-                        "merge_vcfs/{file_id}/{file_id}.vcf.bgz".format(
-                            file_id=file_id
-                        )
+                        f"merge_vcfs/{file_id}/{file_id}.vcf.bgz"
                     ),
                     "file_type": "impute-vcf-merged",
                 }
@@ -397,8 +389,8 @@ def test_get_merged_vcf__success__project_with_legacy_webhhok_url(mocker):
     mocked_login.assert_called_once()
     mocked_get_project.assert_called_once()
     mocked_download_file.assert_called_once_with(
-        "{}.vcf.bgz".format(file_id),
+        f"{file_id}.vcf.bgz",
         "https://bucket.s3.amazonaws.com/output/apps/"
-        "merge_vcfs/{file_id}/{file_id}.vcf.bgz".format(file_id=file_id),
+        f"merge_vcfs/{file_id}/{file_id}.vcf.bgz",
         no_progress=False,
     )

@@ -32,18 +32,14 @@ def download_file(destination, download_url, no_progress=False):
         str : file path
             location of the downloaded file
     """
-    stream_params = dict(
-        stream=True, allow_redirects=False, headers=dict(), timeout=30
-    )
+    stream_params = dict(stream=True, allow_redirects=False, headers={}, timeout=30)
 
     with requests.get(download_url, **stream_params) as req:
         req.raise_for_status()
         echo_debug("Starting download")
 
         if not no_progress:
-            pbar = get_progress_bar(
-                int(req.headers["content-length"]), "Downloading: "
-            )
+            pbar = get_progress_bar(int(req.headers["content-length"]), "Downloading: ")
             pbar.start()
         for chunk in req.iter_content(chunk_size=CHUNK_SIZE):
             destination.write(chunk)

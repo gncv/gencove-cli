@@ -207,5 +207,6 @@ def test_basespace_autoimport_create_without_metadata(credentials, mocker, proje
             *credentials,
         ],
     )
+
     assert res.exit_code == 0
     mocked_autoimport_from_basespace.assert_called_once()

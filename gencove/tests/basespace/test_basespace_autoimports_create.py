@@ -137,7 +137,7 @@ def test_basespace_autoimport_create_with_empty_metadata(
     mocked_autoimport_from_basespace = mocker.patch.object(
         APIClient,
         "autoimport_from_basespace",
-        return_value="",
+        return_value={"id": "dummy_id", "metadata": None, "action": "update"},
     )
     res = runner.invoke(
         create,
@@ -166,7 +166,11 @@ def test_basespace_autoimport_create_with_metadata(credentials, mocker, project_
     mocked_autoimport_from_basespace = mocker.patch.object(
         APIClient,
         "autoimport_from_basespace",
-        return_value="",
+        return_value={
+            "id": "dummy_id",
+            "metadata": {"some": "metadata"},
+            "action": "update",
+        },
     )
     res = runner.invoke(
         create,
@@ -193,7 +197,7 @@ def test_basespace_autoimport_create_without_metadata(credentials, mocker, proje
     mocked_autoimport_from_basespace = mocker.patch.object(
         APIClient,
         "autoimport_from_basespace",
-        return_value="",
+        return_value={"id": "dummy_id", "action": "update"},
     )
     res = runner.invoke(
         create,
@@ -203,6 +207,5 @@ def test_basespace_autoimport_create_without_metadata(credentials, mocker, proje
             *credentials,
         ],
     )
-
     assert res.exit_code == 0
     mocked_autoimport_from_basespace.assert_called_once()

@@ -56,6 +56,7 @@ class BaseSpaceAutoImport(Command):
                 identifier=self.identifier,
                 metadata=metadata,
             )
+
             self.echo_debug(autoimport_from_basespace)
             self.echo_info(
                 "Request to {} a periodic import job of BaseSpace "

@@ -59,9 +59,7 @@ class BaseSpaceAutoImport(Command):
             self.echo_debug(autoimport_from_basespace)
             self.echo_info(
                 "Request to {} a periodic import job of BaseSpace "
-                "projects accepted.".format(
-                    autoimport_from_basespace["action"]
-                )
+                "projects accepted.".format(autoimport_from_basespace["action"])
             )
         except client.APIClientError:
             self.echo_error(

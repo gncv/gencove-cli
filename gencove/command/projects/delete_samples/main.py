@@ -1,7 +1,8 @@
 """Request project delete samples"""
+import uuid
 from gencove import client  # noqa: I100
 from gencove.command.base import Command
-from gencove.command.utils import is_valid_uuid
+from gencove.command.utils import add_hyphens_or_pass_through, is_valid_uuid
 from gencove.exceptions import ValidationError
 
 
@@ -32,7 +33,6 @@ class DeleteSamples(Command):
         """
         if is_valid_uuid(self.project_id) is False:
             raise ValidationError("Project ID is not valid. Exiting.")
-
         if self.sample_ids:
             if not all(is_valid_uuid(s_id) for s_id in self.sample_ids):
                 raise ValidationError("Not all sample IDs are valid. Exiting.")
@@ -45,6 +45,7 @@ class DeleteSamples(Command):
         )
 
         try:
+            # project_id = add_hyphens_or_pass_through(self.project_id)
             deleted_project_samples_details = self.api_client.delete_project_samples(
                 project_id=self.project_id,
                 sample_ids=self.sample_ids,

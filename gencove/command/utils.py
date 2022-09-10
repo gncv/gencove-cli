@@ -3,6 +3,13 @@ import json
 import uuid
 
 
+def add_hyphens_or_pass_through(input_uuid: str) -> uuid.UUID:
+    """Converts a uuid to a hyphen 8-4-4-4-12 form uuid"""
+    if "-" not in input_uuid:
+        input_uuid = uuid.UUID(hex=input_uuid)
+    return input_uuid
+
+
 def sanitize_string(output):
     """Removes unwanted characters from output string."""
     return output.replace("\t", " ")

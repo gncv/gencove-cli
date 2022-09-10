@@ -1,5 +1,4 @@
 """Request project delete samples"""
-import uuid
 from gencove import client  # noqa: I100
 from gencove.command.base import Command
 from gencove.command.utils import add_hyphens_or_pass_through, is_valid_uuid
@@ -45,9 +44,9 @@ class DeleteSamples(Command):
         )
 
         try:
-            # project_id = add_hyphens_or_pass_through(self.project_id)
+            project_id = add_hyphens_or_pass_through(self.project_id)
             deleted_project_samples_details = self.api_client.delete_project_samples(
-                project_id=self.project_id,
+                project_id=project_id,
                 sample_ids=self.sample_ids,
             )
             self.echo_debug(deleted_project_samples_details)

@@ -47,6 +47,7 @@ class BaseSpaceAutoImport(Command):
         try:
             # prepare metadata
             metadata = None
+
             if self.metadata_json is not None:
                 metadata = json.loads(self.metadata_json)
                 self.echo_info("Metadata will be assigned to the imported Biosamples.")
@@ -55,9 +56,11 @@ class BaseSpaceAutoImport(Command):
                 identifier=self.identifier,
                 metadata=metadata,
             )
+
             self.echo_debug(autoimport_from_basespace)
+            action = autoimport_from_basespace["action"]
             self.echo_info(
-                "Request to create a periodic import job of BaseSpace "
+                f"Request to {action} a periodic import job of BaseSpace "
                 "projects accepted."
             )
         except client.APIClientError:

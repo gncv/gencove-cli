@@ -9,6 +9,7 @@ from gencove.command.basespace.autoimports.create.cli import (
 )
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
+from gencove.tests.utils import MOCK_UUID
 
 import pytest
 
@@ -126,8 +127,12 @@ def test_basespace_autoimport_create_no_permission(credentials, mocker, project_
 @pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
-def test_basespace_autoimport_create_with_empty_metadata(
-    credentials, mocker, project_id
+@pytest.mark.parametrize("action", ["create", "update"])
+def test_basespace_autoimport_update_with_empty_metadata(
+    credentials,
+    mocker,
+    project_id,
+    action,
 ):
     """Test that user can pass empty metadata when creating an
     automated import.
@@ -137,7 +142,7 @@ def test_basespace_autoimport_create_with_empty_metadata(
     mocked_autoimport_from_basespace = mocker.patch.object(
         APIClient,
         "autoimport_from_basespace",
-        return_value="",
+        return_value={"id": MOCK_UUID, "metadata": None, "action": action},
     )
     res = runner.invoke(
         create,
@@ -150,6 +155,10 @@ def test_basespace_autoimport_create_with_empty_metadata(
         ],
     )
 
+    assert res.output == (
+        f"Request to {action} a periodic import job of BaseSpace "
+        "projects accepted.\n"
+    )
     assert res.exit_code == 0
     mocked_autoimport_from_basespace.assert_called_once()
 
@@ -157,7 +166,8 @@ def test_basespace_autoimport_create_with_empty_metadata(
 @pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
-def test_basespace_autoimport_create_with_metadata(credentials, mocker, project_id):
+@pytest.mark.parametrize("action", ["create", "update"])
+def test_basespace_autoimport_with_metadata(credentials, mocker, project_id, action):
     """Test that user can pass optional metadata when creating an
     automated import.
     """
@@ -166,7 +176,11 @@ def test_basespace_autoimport_create_with_metadata(credentials, mocker, project_
     mocked_autoimport_from_basespace = mocker.patch.object(
         APIClient,
         "autoimport_from_basespace",
-        return_value="",
+        return_value={
+            "id": MOCK_UUID,
+            "metadata": {"some": "metadata"},
+            "action": action,
+        },
     )
     res = runner.invoke(
         create,
@@ -179,6 +193,11 @@ def test_basespace_autoimport_create_with_metadata(credentials, mocker, project_
         ],
     )
 
+    assert res.output == (
+        "Metadata will be assigned to the imported Biosamples.\n"
+        f"Request to {action} a periodic import job of BaseSpace "
+        "projects accepted.\n"
+    )
     assert res.exit_code == 0
     mocked_autoimport_from_basespace.assert_called_once()
 
@@ -186,15 +205,19 @@ def test_basespace_autoimport_create_with_metadata(credentials, mocker, project_
 @pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
-def test_basespace_autoimport_create_without_metadata(credentials, mocker, project_id):
+@pytest.mark.parametrize("action", ["create", "update"])
+def test_basespace_autoimport_update_without_metadata(
+    credentials, mocker, project_id, action
+):
     """Test that user can create an import job without passing metadata."""
     runner = CliRunner()
 
     mocked_autoimport_from_basespace = mocker.patch.object(
         APIClient,
         "autoimport_from_basespace",
-        return_value="",
+        return_value={"id": MOCK_UUID, "action": action},
     )
+
     res = runner.invoke(
         create,
         [
@@ -204,5 +227,9 @@ def test_basespace_autoimport_create_without_metadata(credentials, mocker, proje
         ],
     )
 
+    assert res.output == (
+        f"Request to {action} a periodic import job of BaseSpace "
+        "projects accepted.\n"
+    )
     assert res.exit_code == 0
     mocked_autoimport_from_basespace.assert_called_once()

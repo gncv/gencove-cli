@@ -5,9 +5,7 @@ import uuid
 
 def add_hyphens_or_pass_through(input_uuid: str) -> str:
     """Converts a uuid to a hyphen 8-4-4-4-12 form uuid"""
-    if "-" not in input_uuid:
-        input_uuid = uuid.UUID(input_uuid, version=4)
-    return input_uuid
+    return input_uuid if "-" in input_uuid else str(uuid.UUID(hex=input_uuid))
 
 
 def sanitize_string(output):

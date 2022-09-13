@@ -2,7 +2,6 @@
 import csv
 import os
 from enum import Enum
-import uuid
 
 from click.testing import CliRunner
 
@@ -371,16 +370,20 @@ def test_login_mfa(mocker):
 
 
 def test_uuid_without_hyphens_is_converted_to_uuid_with_hyphens():
+    """Test that when a uuid without hyphens is passed to the method, it
+    will automatically add the hyphens
+    """
     input_uuid = "1badbeef1111abcd1111efefefefefef"
     expected_uuid = "1badbeef-1111-abcd-1111-efefefefefef"
 
     actual_uuid = add_hyphens_or_pass_through(input_uuid)
 
-    assert type(actual_uuid) == str
+    assert isinstance(actual_uuid, str)
     assert actual_uuid == expected_uuid
 
 
 def test_uuid_with_hyphens_remains_as_is():
+    """Test that when uuid with hyphens it will not do anything"""
     input_uuid = "1badbeef-1111-abcd-1111-efefefefefef"
     expected_uuid = "1badbeef-1111-abcd-1111-efefefefefef"
 

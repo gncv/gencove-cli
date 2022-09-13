@@ -389,5 +389,5 @@ def test_uuid_with_hyphens_remains_as_is():
 
     actual_uuid = add_hyphens_or_pass_through(input_uuid)
 
-    assert type(actual_uuid) == str
+    assert isinstance(actual_uuid, str)
     assert actual_uuid == expected_uuid

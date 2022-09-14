@@ -56,6 +56,17 @@ To run only a specific job from tox (i.e. only the tests for python 3.7 using AP
 ```bash
 tox -e py37-api_key
 ```
+If you invoke tox like this:
+
+```
+tox -e py37-api_key -- gencove/tests/test_utils.py
+```
+or
+```
+tox -e py37-api_key -- gencove/tests/test_utils.py::test_is_valid_uuid__is_not_valid__text
+```
+the arguments after the -- will be substituted everywhere where you specify {posargs} in your test commands.
+
 
 Tests Configuration:
 

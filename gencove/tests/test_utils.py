@@ -16,7 +16,7 @@ from gencove.command.upload.utils import (
     parse_fastqs_map_file,
     upload_file,
 )
-from gencove.command.utils import add_hyphens_or_pass_through, is_valid_uuid
+from gencove.command.utils import validate_uuid, is_valid_uuid
 from gencove.constants import (
     ApiEndpoints,
     Credentials,
@@ -376,7 +376,7 @@ def test_uuid_without_hyphens_is_converted_to_uuid_with_hyphens():
     input_uuid = "1badbeef1111abcd1111efefefefefef"
     expected_uuid = "1badbeef-1111-abcd-1111-efefefefefef"
 
-    actual_uuid = add_hyphens_or_pass_through(input_uuid)
+    actual_uuid = validate_uuid(candidate=input_uuid, ctx=None, param=None)
 
     assert isinstance(actual_uuid, str)
     assert actual_uuid == expected_uuid
@@ -387,7 +387,7 @@ def test_uuid_with_hyphens_remains_as_is():
     input_uuid = "1badbeef-1111-abcd-1111-efefefefefef"
     expected_uuid = "1badbeef-1111-abcd-1111-efefefefefef"
 
-    actual_uuid = add_hyphens_or_pass_through(input_uuid)
+    actual_uuid = validate_uuid(candidate=input_uuid, ctx=None, param=None)
 
     assert isinstance(actual_uuid, str)
     assert actual_uuid == expected_uuid

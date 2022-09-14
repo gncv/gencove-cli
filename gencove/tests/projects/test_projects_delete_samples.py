@@ -71,7 +71,7 @@ def test_delete_project_samples__bad_project_id(mocker, credentials):
             "22222222-2222-2222-2222-222222222222",
         ],
     )
-    assert res.exit_code == 1
+    assert res.exit_code == 2  # UsageError
     mocked_delete_project_samples.assert_not_called()
     assert "Project ID is not valid" in res.output
 

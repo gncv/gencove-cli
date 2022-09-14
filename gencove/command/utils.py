@@ -1,11 +1,22 @@
 """Common utils used in multiple commands."""
 import json
 import uuid
+import click
 
 
-def add_hyphens_or_pass_through(input_uuid: str) -> str:
-    """Converts a uuid to a hyphen 8-4-4-4-12 form uuid"""
-    return input_uuid if "-" in input_uuid else str(uuid.UUID(hex=input_uuid))
+def validate_uuid(ctx, param, candidate: str) -> str:
+    """Test if provided string is a valid uuid version 4 string.
+    and convert to a hyphen uuid form if no hyphens are present
+
+    candidate (str): uuid to check
+
+    Returns:
+        str: valid uuid v4, (8-4-4-4-12 form)
+    """
+    if not is_valid_uuid(candidate):
+        raise click.UsageError("Project ID is not valid. Exiting.")
+
+    return candidate if "-" in candidate else str(uuid.UUID(hex=candidate))
 
 
 def sanitize_string(output):

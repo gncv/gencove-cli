@@ -3,12 +3,12 @@ import csv
 import os
 from enum import Enum
 from typing import List
-import pytest
-from faker import Faker
 
-from click.testing import CliRunner
-from click.core import Argument, Option
 from click import UsageError
+from click.core import Argument, Option
+from click.testing import CliRunner
+
+from faker import Faker
 
 from gencove.client import APIClient, APIClientError
 from gencove.command.download.utils import (
@@ -21,7 +21,7 @@ from gencove.command.upload.utils import (
     parse_fastqs_map_file,
     upload_file,
 )
-from gencove.command.utils import validate_uuid, is_valid_uuid, validate_uuid_list
+from gencove.command.utils import is_valid_uuid, validate_uuid, validate_uuid_list
 from gencove.constants import (
     ApiEndpoints,
     Credentials,
@@ -30,6 +30,8 @@ from gencove.constants import (
 )
 from gencove.exceptions import ValidationError
 from gencove.utils import enum_as_dict, login
+
+import pytest
 
 fake = Faker()
 

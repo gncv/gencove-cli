@@ -1,7 +1,8 @@
 """Common utils used in multiple commands."""
 import json
-from typing import List
 import uuid
+from typing import List
+
 import click
 
 map_arguments_to_human_readable = {

@@ -37,6 +37,7 @@ from gencove.models import (  # noqa: I101
     BaseSpaceProjectImport,
     BatchDetail,
     CreateJWT,
+    FileTypesModel,
     ImportExistingSamplesModel,
     PipelineCapabilities,
     Project,
@@ -935,4 +936,15 @@ class APIClient:
             payload,
             authorized=True,
             model=ImportExistingSamplesModel,
+        )
+
+    def get_file_types(self, project_id=None):
+        params = {}
+        if project_id:
+            params["project_id"] = project_id
+        return self._get(
+            self.endpoints.FILE_TYPES.value,
+            query_params=params,
+            authorized=True,
+            model=FileTypesModel,
         )

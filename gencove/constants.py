@@ -36,6 +36,7 @@ class ApiEndpoints(Enum):
     S3_URI_AUTOIMPORT = "/api/v2/s3-uri-autoimport/"
     FILE_CHECKSUM = "/api/v2/files/{id}.sha256"
     IMPORT_EXISTING_SAMPLES = "/api/v2/project-samples-import/"
+    FILE_TYPES = "/api/v2/file-types/"
 
 
 @unique

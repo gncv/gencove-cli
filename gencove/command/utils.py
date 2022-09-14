@@ -9,6 +9,7 @@ map_arguments_to_human_readable = {
     "sample_ids": "sample IDs",
 }
 
+
 # pylint: disable=unused-argument
 def validate_uuid(ctx, param, candidate: str) -> str:
     """Test if provided string is a valid uuid version 4 string.

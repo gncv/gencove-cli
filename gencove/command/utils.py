@@ -1,5 +1,6 @@
 """Common utils used in multiple commands."""
 import json
+from typing import List
 import uuid
 import click
 
@@ -13,10 +14,29 @@ def validate_uuid(ctx, param, candidate: str) -> str:
     Returns:
         str: valid uuid v4, (8-4-4-4-12 form)
     """
-    if not is_valid_uuid(candidate):
-        raise click.UsageError("Project ID is not valid. Exiting.")
+    try:
+        return str(uuid.UUID(candidate, version=4))
+    except ValueError:
+        param_name = param.__dict__["name"]
+        raise click.UsageError(f"{param_name} is not valid. Exiting.")
 
-    return candidate if "-" in candidate else str(uuid.UUID(hex=candidate))
+
+def validate_uuid_list(ctx, param, uuids: str) -> List[str]:
+    """Test if provided sample_ids list contains only valid
+    uuids when converted to a list.
+
+    sample_ids (List[str]): List to check
+
+    Returns:
+        Raises a UsageError if not all are valid
+    """
+    if uuids:
+        uuids_list = [s_id.strip() for s_id in uuids.split(",")]
+        if not all(is_valid_uuid(id) for id in uuids_list):
+            param_name = param.__dict__["name"]
+            raise click.UsageError(f"Not all {param_name} are valid. Exiting.")
+
+    return uuids_list if uuids else []
 
 
 def sanitize_string(output):

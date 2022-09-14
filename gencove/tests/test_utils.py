@@ -2,8 +2,12 @@
 import csv
 import os
 from enum import Enum
+from typing import List
+import pytest
+from faker import Faker
 
 from click.testing import CliRunner
+from click import UsageError
 
 from gencove.client import APIClient, APIClientError
 from gencove.command.download.utils import (
@@ -16,7 +20,7 @@ from gencove.command.upload.utils import (
     parse_fastqs_map_file,
     upload_file,
 )
-from gencove.command.utils import validate_uuid, is_valid_uuid
+from gencove.command.utils import validate_uuid, is_valid_uuid, validate_uuid_list
 from gencove.constants import (
     ApiEndpoints,
     Credentials,
@@ -25,6 +29,8 @@ from gencove.constants import (
 )
 from gencove.exceptions import ValidationError
 from gencove.utils import enum_as_dict, login
+
+fake = Faker()
 
 
 def test_upload_file(mocker):
@@ -303,9 +309,16 @@ def test__validate_header():
     assert _validate_header(header_row) is None
 
 
-def test_is_valid_uuid__is_valid():
+@pytest.mark.parametrize(
+    "uuid",
+    [
+        "11111111111111111111111111111111",
+        "11111111-1111-1111-1111-111111111111",
+    ],
+)
+def test_is_valid_uuid__is_valid(uuid):
     """Test that a UUID is a valid UUID"""
-    assert is_valid_uuid("11111111-1111-1111-1111-111111111111")
+    assert is_valid_uuid(uuid)
 
 
 def test_is_valid_uuid__is_not_valid__too_long():
@@ -373,10 +386,10 @@ def test_uuid_without_hyphens_is_converted_to_uuid_with_hyphens():
     """Test that when a uuid without hyphens is passed to the method, it
     will automatically add the hyphens
     """
-    input_uuid = "1badbeef1111abcd1111efefefefefef"
-    expected_uuid = "1badbeef-1111-abcd-1111-efefefefefef"
+    expected_uuid = str(fake.uuid4())
+    input_uuid_without_hyphens = expected_uuid.replace("-", "")
 
-    actual_uuid = validate_uuid(candidate=input_uuid, ctx=None, param=None)
+    actual_uuid = validate_uuid(None, "project_id", input_uuid_without_hyphens)
 
     assert isinstance(actual_uuid, str)
     assert actual_uuid == expected_uuid
@@ -384,10 +397,59 @@ def test_uuid_without_hyphens_is_converted_to_uuid_with_hyphens():
 
 def test_uuid_with_hyphens_remains_as_is():
     """Test that when uuid with hyphens it will not do anything"""
-    input_uuid = "1badbeef-1111-abcd-1111-efefefefefef"
-    expected_uuid = "1badbeef-1111-abcd-1111-efefefefefef"
+    input_uuid = fake.uuid4()
+    expected_uuid = str(input_uuid)
 
-    actual_uuid = validate_uuid(candidate=input_uuid, ctx=None, param=None)
+    actual_uuid = validate_uuid(None, "project_id", input_uuid)
 
     assert isinstance(actual_uuid, str)
     assert actual_uuid == expected_uuid
+
+
+def test_validate_uuid__raises_if_uuid_invalid():
+    """Test that an invalid uuid will raise a click.UsageError"""
+    input_uuid = "codef00d-1111-abcd-1111"
+
+    with pytest.raises(UsageError):
+        validate_uuid(None, "project_id", input_uuid)
+
+
+@pytest.fixture()
+def valid_uuids_string_fixture():
+    valid_uuid_list = [
+        str(fake.uuid4()),
+        str(fake.uuid4()),
+        str(fake.uuid4()),
+    ]
+    return ",".join(valid_uuid_list)
+
+
+def test_validate_uuid_list__returns_list_of_valid_uuids(valid_uuids_string_fixture):
+    """Test string of valid uuids returns list of valid uuids"""
+    valid_uuid_list_output = validate_uuid_list(
+        None, "some_ids", valid_uuids_string_fixture
+    )
+
+    assert isinstance(valid_uuid_list_output, List)
+    assert len(valid_uuid_list_output) == 3
+    assert (
+        validate_uuid(None, "test_id", valid_uuid_list_output[0])
+        == valid_uuid_list_output[0]
+    )
+    assert (
+        validate_uuid(None, "test_id", valid_uuid_list_output[1])
+        == valid_uuid_list_output[1]
+    )
+    assert (
+        validate_uuid(None, "test_id", valid_uuid_list_output[2])
+        == valid_uuid_list_output[2]
+    )
+
+
+def test_validate_uuid_list__raises_if_not_all_ids_valid(valid_uuids_string_fixture):
+    """Test uuid list containing at least one invalid uuid will raise a click.UsageError"""
+    invalid_uuid = "codef00d-1111-abcd-1111"
+    uuids_string = f"{valid_uuids_string_fixture},{invalid_uuid}"
+
+    with pytest.raises(UsageError):
+        validate_uuid_list(None, "some_ids", uuids_string)

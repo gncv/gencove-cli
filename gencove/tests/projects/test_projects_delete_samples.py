@@ -73,7 +73,7 @@ def test_delete_project_samples__bad_project_id(mocker, credentials):
     )
     assert res.exit_code == 2  # UsageError
     mocked_delete_project_samples.assert_not_called()
-    assert "project_id is not valid" in res.output
+    assert "Project ID is not valid" in res.output
 
 
 @pytest.mark.default_cassette("jwt-create.yaml")
@@ -162,7 +162,7 @@ def test_delete_project_samples__invalid_sample_ids(credentials, mocker):
     )
     assert res.exit_code == 2  # UsageError
     mocked_delete_project_samples.assert_not_called()
-    assert "Not all sample_ids are valid" in res.output
+    assert "Not all sample IDs are valid" in res.output
 
 
 @pytest.mark.vcr

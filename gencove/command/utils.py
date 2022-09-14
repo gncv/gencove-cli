@@ -4,6 +4,10 @@ from typing import List
 import uuid
 import click
 
+map_arguments_to_human_readable = {
+    "project_id": "Project ID",
+    "sample_ids": "sample IDs",
+}
 
 # pylint: disable=unused-argument
 def validate_uuid(ctx, param, candidate: str) -> str:
@@ -18,8 +22,10 @@ def validate_uuid(ctx, param, candidate: str) -> str:
     try:
         return str(uuid.UUID(candidate, version=4))
     except ValueError:
-        param_name = param.__dict__["name"]
-        raise click.UsageError(f"{param_name} is not valid. Exiting.")
+        human_readable_param = map_arguments_to_human_readable.get(
+            param.name, param.name
+        )
+        raise click.UsageError(f"{human_readable_param} is not valid. Exiting.")
 
 
 # pylint: disable=unused-argument
@@ -34,9 +40,13 @@ def validate_uuid_list(ctx, param, uuids: str) -> List[str]:
     """
     if uuids:
         uuids_list = [s_id.strip() for s_id in uuids.split(",")]
+        human_readable_param = map_arguments_to_human_readable.get(
+            param.name, param.name
+        )
         if not all(is_valid_uuid(id) for id in uuids_list):
-            param_name = param.__dict__["name"]
-            raise click.UsageError(f"Not all {param_name} are valid. Exiting.")
+            raise click.UsageError(
+                f"Not all {human_readable_param} are valid. Exiting."
+            )
 
     return uuids_list if uuids else []
 

@@ -7,6 +7,7 @@ import pytest
 from faker import Faker
 
 from click.testing import CliRunner
+from click.core import Argument, Option
 from click import UsageError
 
 from gencove.client import APIClient, APIClientError
@@ -309,16 +310,9 @@ def test__validate_header():
     assert _validate_header(header_row) is None
 
 
-@pytest.mark.parametrize(
-    "uuid",
-    [
-        "11111111111111111111111111111111",
-        "11111111-1111-1111-1111-111111111111",
-    ],
-)
-def test_is_valid_uuid__is_valid(uuid):
+def test_is_valid_uuid__is_valid():
     """Test that a UUID is a valid UUID"""
-    assert is_valid_uuid(uuid)
+    assert is_valid_uuid("11111111-1111-1111-1111-111111111111")
 
 
 def test_is_valid_uuid__is_not_valid__too_long():
@@ -389,7 +383,8 @@ def test_uuid_without_hyphens_is_converted_to_uuid_with_hyphens():
     expected_uuid = str(fake.uuid4())
     input_uuid_without_hyphens = expected_uuid.replace("-", "")
 
-    actual_uuid = validate_uuid(None, "project_id", input_uuid_without_hyphens)
+    param = Argument(["-project_id"])
+    actual_uuid = validate_uuid(None, param, input_uuid_without_hyphens)
 
     assert isinstance(actual_uuid, str)
     assert actual_uuid == expected_uuid
@@ -400,7 +395,8 @@ def test_uuid_with_hyphens_remains_as_is():
     input_uuid = fake.uuid4()
     expected_uuid = str(input_uuid)
 
-    actual_uuid = validate_uuid(None, "project_id", input_uuid)
+    param = Argument(["-project_id"])
+    actual_uuid = validate_uuid(None, param, input_uuid)
 
     assert isinstance(actual_uuid, str)
     assert actual_uuid == expected_uuid
@@ -410,8 +406,9 @@ def test_validate_uuid__raises_if_uuid_invalid():
     """Test that an invalid uuid will raise a click.UsageError"""
     input_uuid = "codef00d-1111-abcd-1111"
 
+    param = Argument(["-project_id"])
     with pytest.raises(UsageError):
-        validate_uuid(None, "project_id", input_uuid)
+        validate_uuid(None, param, input_uuid)
 
 
 @pytest.fixture()
@@ -426,30 +423,32 @@ def valid_uuids_string_fixture():
 
 def test_validate_uuid_list__returns_list_of_valid_uuids(valid_uuids_string_fixture):
     """Test string of valid uuids returns list of valid uuids"""
-    valid_uuid_list_output = validate_uuid_list(
-        None, "some_ids", valid_uuids_string_fixture
-    )
+
+    param = Option(["-sample_ids"], nargs=1, multiple=False, default=None)
+    valid_uuid_list_output = validate_uuid_list(None, param, valid_uuids_string_fixture)
 
     assert isinstance(valid_uuid_list_output, List)
     assert len(valid_uuid_list_output) == 3
     assert (
-        validate_uuid(None, "test_id", valid_uuid_list_output[0])
+        validate_uuid(None, param, valid_uuid_list_output[0])
         == valid_uuid_list_output[0]
     )
     assert (
-        validate_uuid(None, "test_id", valid_uuid_list_output[1])
+        validate_uuid(None, param, valid_uuid_list_output[1])
         == valid_uuid_list_output[1]
     )
     assert (
-        validate_uuid(None, "test_id", valid_uuid_list_output[2])
+        validate_uuid(None, param, valid_uuid_list_output[2])
         == valid_uuid_list_output[2]
     )
 
 
+# @pytest.mark.parametrize('sample_ids', [Option(["-sample_ids"])])
 def test_validate_uuid_list__raises_if_not_all_ids_valid(valid_uuids_string_fixture):
     """Test uuid list containing one invalid uuid will raise a click.UsageError"""
     invalid_uuid = "codef00d-1111-abcd-1111"
     uuids_string = f"{valid_uuids_string_fixture},{invalid_uuid}"
 
+    param = Option(["-sample_ids"], nargs=1, multiple=False, default=None)
     with pytest.raises(UsageError):
-        validate_uuid_list(None, "some_ids", uuids_string)
+        validate_uuid_list(None, param, uuids_string)

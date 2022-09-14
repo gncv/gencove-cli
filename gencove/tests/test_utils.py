@@ -34,6 +34,17 @@ from gencove.utils import enum_as_dict, login
 fake = Faker()
 
 
+@pytest.fixture()
+def valid_uuids_string_fixture():
+    """Fixture for a string of valid uuids"""
+    valid_uuid_list = [
+        str(fake.uuid4()),
+        str(fake.uuid4()),
+        str(fake.uuid4()),
+    ]
+    return ",".join(valid_uuid_list)
+
+
 def test_upload_file(mocker):
     """Sanity check upload function."""
     runner = CliRunner()
@@ -409,16 +420,6 @@ def test_validate_uuid__raises_if_uuid_invalid():
     param = Argument(["-project_id"])
     with pytest.raises(UsageError):
         validate_uuid(None, param, input_uuid)
-
-
-@pytest.fixture()
-def valid_uuids_string_fixture():
-    valid_uuid_list = [
-        str(fake.uuid4()),
-        str(fake.uuid4()),
-        str(fake.uuid4()),
-    ]
-    return ",".join(valid_uuid_list)
 
 
 def test_validate_uuid_list__returns_list_of_valid_uuids(valid_uuids_string_fixture):

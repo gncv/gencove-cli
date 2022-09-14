@@ -447,7 +447,7 @@ def test_validate_uuid_list__returns_list_of_valid_uuids(valid_uuids_string_fixt
 
 
 def test_validate_uuid_list__raises_if_not_all_ids_valid(valid_uuids_string_fixture):
-    """Test uuid list containing at least one invalid uuid will raise a click.UsageError"""
+    """Test uuid list containing one invalid uuid will raise a click.UsageError"""
     invalid_uuid = "codef00d-1111-abcd-1111"
     uuids_string = f"{valid_uuids_string_fixture},{invalid_uuid}"
 

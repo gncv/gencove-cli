@@ -5,6 +5,7 @@ import uuid
 import click
 
 
+# pylint: disable=unused-argument
 def validate_uuid(ctx, param, candidate: str) -> str:
     """Test if provided string is a valid uuid version 4 string.
     and convert to a hyphen uuid form if no hyphens are present
@@ -21,6 +22,7 @@ def validate_uuid(ctx, param, candidate: str) -> str:
         raise click.UsageError(f"{param_name} is not valid. Exiting.")
 
 
+# pylint: disable=unused-argument
 def validate_uuid_list(ctx, param, uuids: str) -> List[str]:
     """Test if provided sample_ids list contains only valid
     uuids when converted to a list.

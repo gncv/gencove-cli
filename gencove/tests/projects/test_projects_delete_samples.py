@@ -160,7 +160,7 @@ def test_delete_project_samples__invalid_sample_ids(credentials, mocker):
             "1111,222",
         ],
     )
-    assert res.exit_code == 2  #  UsageError
+    assert res.exit_code == 2  # UsageError
     mocked_delete_project_samples.assert_not_called()
     assert "Not all sample_ids are valid" in res.output
 

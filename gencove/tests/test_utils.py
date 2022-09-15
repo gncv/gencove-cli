@@ -1,5 +1,5 @@
 """Tests for utils of Gencove CLI."""
-# pylint: disable=C0411,W0621,E0401
+# pylint: disable=wrong-import-order, import-error, redefined-outer-name
 
 import csv
 import os

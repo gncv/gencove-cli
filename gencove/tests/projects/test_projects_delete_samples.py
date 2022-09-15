@@ -231,7 +231,7 @@ def test_delete_project_samples__success(  # pylint: disable=too-many-arguments
     assert "The following samples have been deleted successfully" in res.output
 
 
-@pytest.mark.vcr
+@pytest.mark.vcr(record_mode="once")
 @assert_authorization
 def test_delete_project_samples__success__project_id__no_hyphens(
     # pylint: disable=too-many-arguments

@@ -1,5 +1,4 @@
 """Test decorators."""
-# pylint: disable=W3101
 
 import json
 import os

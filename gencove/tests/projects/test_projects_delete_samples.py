@@ -77,11 +77,13 @@ def test_delete_project_samples__success__project_id__no_hyphens(mocker, credent
 
 
 @assert_no_requests
-def test_delete_project_samples__bad_project_id(mocker, credentials):
+def test_delete_project_samples__bad_project_id(
+    mocker, credentials
+):  # pylint: disable=unused-argument
     """Test delete project samples when non-uuid string is used as project
     id."""
     runner = CliRunner()
-    mocked_delete_project_samples = mocker.patch("gencove.client.delete")
+
     res = runner.invoke(
         delete_project_samples,
         [
@@ -93,7 +95,6 @@ def test_delete_project_samples__bad_project_id(mocker, credentials):
         ],
     )
     assert res.exit_code == 2  # UsageError
-    mocked_delete_project_samples.assert_not_called()
     assert "Project ID is not valid" in res.output
 
 
@@ -161,12 +162,13 @@ def test_delete_project_samples__success__empty_sample_ids(
 
 
 @assert_no_requests
-def test_delete_project_samples__invalid_sample_ids(credentials, mocker):
+def test_delete_project_samples__invalid_sample_ids(
+    credentials, mocker
+):  # pylint: disable=unused-argument
     """Test delete project samples failure when an invalid list of sample ids
     is sent."""
 
     runner = CliRunner()
-    mocked_delete_project_samples = mocker.patch("gencove.client.delete")
 
     res = runner.invoke(
         delete_project_samples,
@@ -178,7 +180,6 @@ def test_delete_project_samples__invalid_sample_ids(credentials, mocker):
         ],
     )
     assert res.exit_code == 2  # UsageError
-    mocked_delete_project_samples.assert_not_called()
     assert "Not all sample IDs are valid" in res.output
 
 

@@ -83,23 +83,15 @@ def assert_no_requests(func):
 
     @wraps(func)
     def wrapper(*args, mocker, **kwargs):
-        def mock_get(url, *args, **kwargs):
-            return requests.get(url, *args, **kwargs)
-
-        mocker.patch("gencove.client.get", side_effect=mock_get)
-
-        def mock_post(url, data, *args, **kwargs):
-            return requests.post(url, data, *args, **kwargs)
-
-        mocker.patch("gencove.client.post", side_effect=mock_post)
-
-        # pylint: disable=too-many-function-args
-        def mock_delete(url, data, *args, **kwargs):
-            return requests.delete(url, data, *args, **kwargs)
-
-        mocker.patch("gencove.client.delete", side_effect=mock_delete)
+        mock_get = mocker.patch("gencove.client.get")
+        mock_post = mocker.patch("gencove.client.post")
+        mock_delete = mocker.patch("gencove.client.delete")
 
         kwargs["mocker"] = mocker
         func(*args, **kwargs)
+
+        mock_get.assert_not_called()
+        mock_post.assert_not_called()
+        mock_delete.assert_not_called()
 
     return wrapper

@@ -1,5 +1,5 @@
 """Tests for utils of Gencove CLI."""
-# pylint: disable=wrong-import-order, import-error, redefined-outer-name
+# pylint: disable=wrong-import-order, import-error
 
 import csv
 import os

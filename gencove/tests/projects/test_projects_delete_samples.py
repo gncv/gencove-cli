@@ -50,32 +50,6 @@ def vcr_config():
     }
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
-def test_delete_project_samples__success__project_id__no_hyphens(mocker, credentials):
-    """Test delete project samples when non-uuid string is used as project
-    id."""
-    runner = CliRunner()
-    mocked_delete_project_samples = mocker.patch.object(
-        APIClient,
-        "delete_project_samples",
-    )
-    res = runner.invoke(
-        delete_project_samples,
-        [
-            str(uuid4()).replace("-", ""),
-            *credentials,
-            "--sample-ids",
-            "11111111-1111-1111-1111-111111111111,"
-            "22222222-2222-2222-2222-222222222222",
-        ],
-    )
-    assert res.exit_code == 0
-    mocked_delete_project_samples.assert_called_once()
-    assert "The following samples have been deleted successfully" in res.output
-
-
 @assert_no_requests
 def test_delete_project_samples__bad_project_id(
     mocker, credentials
@@ -225,9 +199,9 @@ def test_delete_project_samples__sample_not_in_project(
 
 @pytest.mark.vcr
 @assert_authorization
-def test_delete_project_samples__success(
+def test_delete_project_samples__success(  # pylint: disable=too-many-arguments
     deleted_sample, credentials, mocker, project_id, recording, vcr
-):  # pylint: disable=too-many-arguments
+):
     """Test delete project samples success."""
     runner = CliRunner()
     if not recording:
@@ -254,4 +228,37 @@ def test_delete_project_samples__success(
     assert res.exit_code == 0
     if not recording:
         mocked_delete_project_samples.assert_called_once()
+    assert "The following samples have been deleted successfully" in res.output
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_delete_project_samples__success__project_id__no_hyphens(  # pylint: disable=too-many-arguments
+    mocker, credentials, deleted_sample, project_id, recording, vcr
+):
+    """Test delete project samples when non-uuid string is used as project
+    id."""
+    runner = CliRunner()
+    if not recording:
+        # Mock delete_project_samples only if using the cassettes, since we
+        # mock the return value.
+        delete_project_samples_response = get_vcr_response(
+            "/api/v2/project-delete-samples/", vcr, operator.contains
+        )
+        mocked_delete_project_samples = mocker.patch.object(
+            APIClient,
+            "delete_project_samples",
+            return_value=delete_project_samples_response,
+        )
+    res = runner.invoke(
+        delete_project_samples,
+        [
+            project_id.replace("-", ""),
+            *credentials,
+            "--sample-ids",
+            deleted_sample,
+        ],
+    )
+    assert res.exit_code == 0
+    mocked_delete_project_samples.assert_called_once()
     assert "The following samples have been deleted successfully" in res.output

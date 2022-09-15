@@ -1,7 +1,6 @@
 """Common utils used in multiple commands."""
 import json
 import uuid
-from typing import List
 
 import click
 
@@ -20,14 +19,17 @@ def handle_exception(message):
     raise click.Abort()
 
 
-def validate_uuid(ctx, param, candidate: str) -> str:  # pylint: disable=unused-argument
-    """Test if provided string is a valid uuid version 4 string.
-    and convert to a hyphen uuid form if no hyphens are present
+def validate_uuid(ctx, param, candidate):  # pylint: disable=unused-argument
+    """Test if provided string is a valid uuid version 4 string and convert
+    to a hyphen uuid form if valid but no hyphens are present
 
     candidate (str): uuid to check
 
     Returns:
         str: valid uuid v4, (8-4-4-4-12 form)
+
+    Raises:
+        Abort - if uuid is invalid.
     """
     try:
         validated_uuid = str(uuid.UUID(candidate, version=4))
@@ -39,16 +41,17 @@ def validate_uuid(ctx, param, candidate: str) -> str:  # pylint: disable=unused-
     return validated_uuid
 
 
-def validate_uuid_list(
-    ctx, param, uuids: str  # pylint: disable=unused-argument
-) -> List[str]:
+def validate_uuid_list(ctx, param, uuids):  # pylint: disable=unused-argument
     """Test if provided sample_ids list contains only valid
     uuids when converted to a list.
 
-    sample_ids (List[str]): List to check
+    sample_ids (str): A comma separated list of uuids as a string, to check
 
     Returns:
-        Raises a UsageError if not all are valid
+        List[str]: a list of uuids
+
+    Raises:
+        Abort - if at least one uuid is invalid.
     """
     if uuids:
         uuids_list = [s_id.strip() for s_id in uuids.split(",")]

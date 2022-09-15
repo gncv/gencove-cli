@@ -5,10 +5,19 @@ from typing import List
 
 import click
 
+from gencove.logger import dump_debug_log, echo_error
+
 map_arguments_to_human_readable = {
     "project_id": "Project ID",
     "sample_ids": "sample IDs",
 }
+
+
+def handle_exception(message):
+    """Exception handler for validation which raises an Abort"""
+    echo_error(message)
+    dump_debug_log()
+    raise click.Abort()
 
 
 def validate_uuid(ctx, param, candidate: str) -> str:  # pylint: disable=unused-argument
@@ -22,16 +31,16 @@ def validate_uuid(ctx, param, candidate: str) -> str:  # pylint: disable=unused-
     """
     try:
         return str(uuid.UUID(candidate, version=4))
-    except ValueError as ex:
+    except ValueError:
         human_readable_param = map_arguments_to_human_readable.get(
             param.name, param.name
         )
-        raise click.UsageError(f"{human_readable_param} is not valid. Exiting.") from ex
+        handle_exception(f"{human_readable_param} is not valid. Exiting.")
 
 
 def validate_uuid_list(
-    ctx, param, uuids: str
-) -> List[str]:  # pylint: disable=unused-argument
+    ctx, param, uuids: str  # pylint: disable=unused-argument
+) -> List[str]:
     """Test if provided sample_ids list contains only valid
     uuids when converted to a list.
 
@@ -46,10 +55,7 @@ def validate_uuid_list(
             param.name, param.name
         )
         if not all(is_valid_uuid(id) for id in uuids_list):
-            raise click.UsageError(
-                f"Not all {human_readable_param} are valid. Exiting."
-            )
-
+            handle_exception(f"Not all {human_readable_param} are valid. Exiting.")
     return uuids_list if uuids else []
 
 

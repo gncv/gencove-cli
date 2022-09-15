@@ -94,7 +94,7 @@ def test_delete_project_samples__bad_project_id(
             "22222222-2222-2222-2222-222222222222",
         ],
     )
-    assert res.exit_code == 2  # UsageError
+    assert res.exit_code == 1
     assert "Project ID is not valid" in res.output
 
 
@@ -179,7 +179,7 @@ def test_delete_project_samples__invalid_sample_ids(
             "1111,222",
         ],
     )
-    assert res.exit_code == 2  # UsageError
+    assert res.exit_code == 1
     assert "Not all sample IDs are valid" in res.output
 
 

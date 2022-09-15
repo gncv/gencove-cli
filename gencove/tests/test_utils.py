@@ -434,18 +434,6 @@ def test_validate_uuid_list__returns_list_of_valid_uuids(valid_uuids_fixture):
 
     assert isinstance(valid_uuid_list_output, List)
     assert len(valid_uuid_list_output) == 3
-    assert (
-        validate_uuid(None, param, valid_uuid_list_output[0])
-        == valid_uuid_list_output[0]
-    )
-    assert (
-        validate_uuid(None, param, valid_uuid_list_output[1])
-        == valid_uuid_list_output[1]
-    )
-    assert (
-        validate_uuid(None, param, valid_uuid_list_output[2])
-        == valid_uuid_list_output[2]
-    )
 
 
 def test_validate_uuid_list__raises_if_not_all_ids_valid(valid_uuids_fixture):

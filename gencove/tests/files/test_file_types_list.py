@@ -1,6 +1,5 @@
 """Test file types list command"""
 # pylint: disable=wrong-import-order, import-error
-import operator
 from uuid import uuid4
 
 from click.testing import CliRunner
@@ -121,9 +120,7 @@ def test_list_all_file_types(mocker, credentials, recording, vcr):
 
     if not recording:
         # Mock list_file_types only if using cassettes since return value is mocked.
-        file_types_response = get_vcr_response(
-            "/api/v2/file-types/", vcr, operator.contains
-        )
+        file_types_response = get_vcr_response("/api/v2/file-types/", vcr)
         mocked_get_file_types = mocker.patch.object(
             APIClient,
             "get_file_types",
@@ -147,9 +144,3 @@ def test_list_all_file_types(mocker, credentials, recording, vcr):
             ]
         )
         assert f"{file_types}\n" == res.output
-
-
-# todo: need to write a test that returns file types on a per project basis, find a project that
-# todo: that has files, hopefully the test case already has one
-
-# todo: do actualy want to use encoding

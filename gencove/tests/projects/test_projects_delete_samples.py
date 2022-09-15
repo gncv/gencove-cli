@@ -218,11 +218,13 @@ def test_delete_project_samples__success(  # pylint: disable=too-many-arguments
             return_value=delete_project_samples_response,
         )
 
+    if remove_hyphens:
+        project_id = project_id.replace("-", "")
+
     res = runner.invoke(
         delete_project_samples,
         [
-            project_id.replace("-", "") if remove_hyphens else project_id,
-            *credentials,
+            project_id * credentials,
             "--sample-ids",
             deleted_sample,
         ],

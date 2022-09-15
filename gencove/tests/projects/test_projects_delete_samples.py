@@ -233,8 +233,14 @@ def test_delete_project_samples__success(  # pylint: disable=too-many-arguments
 
 @pytest.mark.vcr
 @assert_authorization
-def test_delete_project_samples__success__project_id__no_hyphens(  # pylint: disable=too-many-arguments
-    mocker, credentials, deleted_sample, project_id, recording, vcr
+def test_delete_project_samples__success__project_id__no_hyphens(
+    # pylint: disable=too-many-arguments
+    mocker,
+    credentials,
+    deleted_sample,
+    project_id,
+    recording,
+    vcr,
 ):
     """Test delete project samples when non-uuid string is used as project
     id."""

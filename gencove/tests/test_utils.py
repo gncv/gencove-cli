@@ -416,9 +416,8 @@ def test_validate_uuid__raises_if_uuid_invalid():
 
 def test_validate_uuid_list__returns_list_of_valid_uuids():
     """Test string of valid uuids returns list of valid uuids"""
-
     param = Option(["-sample_ids"], nargs=1, multiple=False, default=None)
-    valid_uuid_list = fake.pylist(value_types=("uuid4",))
+    valid_uuid_list = ",".join(fake.pylist(nb_elements=3, value_types=("uuid4",)))
     validation_result = validate_uuid_list(None, param, valid_uuid_list)
 
     assert isinstance(validation_result, list)
@@ -429,7 +428,7 @@ def test_validate_uuid_list__raises_if_not_all_ids_valid():
     """Test uuid list containing one invalid uuid will raise a click.Abort"""
     invalid_uuid = "codef00d-1111-abcd-1111"
     param = Option(["-sample_ids"], nargs=1, multiple=False, default=None)
-    valid_uuid_list = fake.pylist(value_types=("uuid4",))
+    valid_uuid_list = ",".join(fake.pylist(nb_elements=3, value_types=("uuid4",)))
     uuids_string = f"{valid_uuid_list},{invalid_uuid}"
 
     with pytest.raises(Abort):

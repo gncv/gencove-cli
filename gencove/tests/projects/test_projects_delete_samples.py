@@ -224,7 +224,8 @@ def test_delete_project_samples__success(  # pylint: disable=too-many-arguments
     res = runner.invoke(
         delete_project_samples,
         [
-            project_id * credentials,
+            project_id,
+            *credentials,
             "--sample-ids",
             deleted_sample,
         ],

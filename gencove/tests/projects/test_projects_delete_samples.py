@@ -199,7 +199,7 @@ def test_delete_project_samples__sample_not_in_project(
 
 @pytest.mark.vcr
 @assert_authorization
-# @pytest.mark.default_cassette("test_delete_project_samples__success.yaml")
+@pytest.mark.default_cassette("test_delete_project_samples__success.yaml")
 @pytest.mark.parametrize("remove_hyphens", [True, False])
 def test_delete_project_samples__success(  # pylint: disable=too-many-arguments
     deleted_sample, credentials, mocker, project_id, recording, vcr, remove_hyphens
@@ -221,7 +221,7 @@ def test_delete_project_samples__success(  # pylint: disable=too-many-arguments
     res = runner.invoke(
         delete_project_samples,
         [
-            project_id,
+            project_id.replace("-", "") if remove_hyphens else project_id,
             *credentials,
             "--sample-ids",
             deleted_sample,

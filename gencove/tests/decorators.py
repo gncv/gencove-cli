@@ -74,3 +74,32 @@ def assert_authorization(func):
             assert login_called, "jwt-create endpoint was not called"
 
     return wrapper
+
+
+def assert_no_requests(func):
+    """Decorator that mocks get, post and delete and asserts that
+    none of those methods are called
+    """
+
+    @wraps(func)
+    def wrapper(*args, mocker, **kwargs):
+        def mock_get(url, *args, **kwargs):
+            return requests.get(url, *args, **kwargs)
+
+        mocker.patch("gencove.client.get", side_effect=mock_get)
+
+        def mock_post(url, data, *args, **kwargs):
+            return requests.post(url, data, *args, **kwargs)
+
+        mocker.patch("gencove.client.post", side_effect=mock_post)
+
+        # pylint: disable=too-many-function-args
+        def mock_delete(url, data, *args, **kwargs):
+            return requests.delete(url, data, *args, **kwargs)
+
+        mocker.patch("gencove.client.delete", side_effect=mock_delete)
+
+        kwargs["mocker"] = mocker
+        func(*args, **kwargs)
+
+    return wrapper

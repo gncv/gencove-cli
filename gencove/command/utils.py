@@ -23,11 +23,11 @@ def validate_uuid(ctx, param, candidate: str) -> str:
     """
     try:
         return str(uuid.UUID(candidate, version=4))
-    except ValueError:
+    except ValueError as ex:
         human_readable_param = map_arguments_to_human_readable.get(
             param.name, param.name
         )
-        raise click.UsageError(f"{human_readable_param} is not valid. Exiting.")
+        raise click.UsageError(f"{human_readable_param} is not valid. Exiting.") from ex
 
 
 # pylint: disable=unused-argument

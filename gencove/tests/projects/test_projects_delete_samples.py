@@ -10,7 +10,7 @@ from gencove.client import (
     APIClientError,
 )  # noqa: I100
 from gencove.command.projects.cli import delete_project_samples
-from gencove.tests.decorators import assert_authorization
+from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.projects.vcr.filters import (
     filter_project_delete_samples,
@@ -53,7 +53,7 @@ def vcr_config():
 @pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
-def test_delete_project_samples__bad_project_id(mocker, credentials):
+def test_delete_project_samples__success__project_id__no_hyphens(mocker, credentials):
     """Test delete project samples when non-uuid string is used as project
     id."""
     runner = CliRunner()
@@ -64,7 +64,28 @@ def test_delete_project_samples__bad_project_id(mocker, credentials):
     res = runner.invoke(
         delete_project_samples,
         [
-            "1111111",
+            str(uuid4()).replace("-", ""),
+            *credentials,
+            "--sample-ids",
+            "11111111-1111-1111-1111-111111111111,"
+            "22222222-2222-2222-2222-222222222222",
+        ],
+    )
+    assert res.exit_code == 0
+    mocked_delete_project_samples.assert_called_once()
+    assert "The following samples have been deleted successfully" in res.output
+
+
+@assert_no_requests
+def test_delete_project_samples__bad_project_id(mocker, credentials):
+    """Test delete project samples when non-uuid string is used as project
+    id."""
+    runner = CliRunner()
+    mocked_delete_project_samples = mocker.patch("gencove.client.delete")
+    res = runner.invoke(
+        delete_project_samples,
+        [
+            "22222222",
             *credentials,
             "--sample-ids",
             "11111111-1111-1111-1111-111111111111,"
@@ -139,17 +160,13 @@ def test_delete_project_samples__success__empty_sample_ids(
     assert "The following samples have been deleted successfully" in res.output
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
+@assert_no_requests
 def test_delete_project_samples__invalid_sample_ids(credentials, mocker):
     """Test delete project samples failure when an invalid list of sample ids
     is sent."""
 
     runner = CliRunner()
-    mocked_delete_project_samples = mocker.patch.object(
-        APIClient, "delete_project_samples"
-    )
+    mocked_delete_project_samples = mocker.patch("gencove.client.delete")
 
     res = runner.invoke(
         delete_project_samples,

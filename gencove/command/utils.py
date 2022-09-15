@@ -11,8 +11,7 @@ map_arguments_to_human_readable = {
 }
 
 
-# pylint: disable=unused-argument
-def validate_uuid(ctx, param, candidate: str) -> str:
+def validate_uuid(ctx, param, candidate: str) -> str:  # pylint: disable=unused-argument
     """Test if provided string is a valid uuid version 4 string.
     and convert to a hyphen uuid form if no hyphens are present
 
@@ -30,8 +29,9 @@ def validate_uuid(ctx, param, candidate: str) -> str:
         raise click.UsageError(f"{human_readable_param} is not valid. Exiting.") from ex
 
 
-# pylint: disable=unused-argument
-def validate_uuid_list(ctx, param, uuids: str) -> List[str]:
+def validate_uuid_list(
+    ctx, param, uuids: str
+) -> List[str]:  # pylint: disable=unused-argument
     """Test if provided sample_ids list contains only valid
     uuids when converted to a list.
 

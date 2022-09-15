@@ -199,8 +199,10 @@ def test_delete_project_samples__sample_not_in_project(
 
 @pytest.mark.vcr
 @assert_authorization
+# @pytest.mark.default_cassette("test_delete_project_samples__success.yaml")
+@pytest.mark.parametrize("remove_hyphens", [True, False])
 def test_delete_project_samples__success(  # pylint: disable=too-many-arguments
-    deleted_sample, credentials, mocker, project_id, recording, vcr
+    deleted_sample, credentials, mocker, project_id, recording, vcr, remove_hyphens
 ):
     """Test delete project samples success."""
     runner = CliRunner()
@@ -228,43 +230,4 @@ def test_delete_project_samples__success(  # pylint: disable=too-many-arguments
     assert res.exit_code == 0
     if not recording:
         mocked_delete_project_samples.assert_called_once()
-    assert "The following samples have been deleted successfully" in res.output
-
-
-@pytest.mark.vcr(record_mode="once")
-@assert_authorization
-def test_delete_project_samples__success__project_id__no_hyphens(
-    # pylint: disable=too-many-arguments
-    mocker,
-    credentials,
-    deleted_sample,
-    project_id,
-    recording,
-    vcr,
-):
-    """Test delete project samples when non-uuid string is used as project
-    id."""
-    runner = CliRunner()
-    if not recording:
-        # Mock delete_project_samples only if using the cassettes, since we
-        # mock the return value.
-        delete_project_samples_response = get_vcr_response(
-            "/api/v2/project-delete-samples/", vcr, operator.contains
-        )
-        mocked_delete_project_samples = mocker.patch.object(
-            APIClient,
-            "delete_project_samples",
-            return_value=delete_project_samples_response,
-        )
-    res = runner.invoke(
-        delete_project_samples,
-        [
-            project_id.replace("-", ""),
-            *credentials,
-            "--sample-ids",
-            deleted_sample,
-        ],
-    )
-    assert res.exit_code == 0
-    mocked_delete_project_samples.assert_called_once()
     assert "The following samples have been deleted successfully" in res.output

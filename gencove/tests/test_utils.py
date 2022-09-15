@@ -1,9 +1,15 @@
 """Tests for utils of Gencove CLI."""
+# pylint: disable=wrong-import-order, import-error
+
 import csv
 import os
 from enum import Enum
 
+from click import Abort
+from click.core import Argument, Option
 from click.testing import CliRunner
+
+from faker import Faker
 
 from gencove.client import APIClient, APIClientError
 from gencove.command.download.utils import (
@@ -16,7 +22,7 @@ from gencove.command.upload.utils import (
     parse_fastqs_map_file,
     upload_file,
 )
-from gencove.command.utils import is_valid_uuid
+from gencove.command.utils import is_valid_uuid, validate_uuid, validate_uuid_list
 from gencove.constants import (
     ApiEndpoints,
     Credentials,
@@ -25,6 +31,10 @@ from gencove.constants import (
 )
 from gencove.exceptions import ValidationError
 from gencove.utils import enum_as_dict, login
+
+import pytest
+
+fake = Faker()
 
 
 def test_upload_file(mocker):
@@ -367,3 +377,61 @@ def test_login_mfa(mocker):
     login(api_client, credentials)
     assert mocked_request.call_count == 2
     mocked_prompt.assert_called_once_with("One time password", type=str, err=True)
+
+
+def test_uuid_without_hyphens_is_converted_to_uuid_with_hyphens():
+    """Test that when a uuid without hyphens is passed to the method, it
+    will automatically add the hyphens
+    """
+    expected_uuid = str(fake.uuid4())
+    input_uuid_without_hyphens = expected_uuid.replace("-", "")
+
+    param = Argument(["-project_id"])
+    actual_uuid = validate_uuid(None, param, input_uuid_without_hyphens)
+
+    assert isinstance(actual_uuid, str)
+    assert actual_uuid == expected_uuid
+
+
+def test_uuid_with_hyphens_remains_as_is():
+    """Test that when uuid with hyphens it will not do anything"""
+    input_uuid = fake.uuid4()
+    expected_uuid = str(input_uuid)
+
+    param = Argument(["-project_id"])
+    actual_uuid = validate_uuid(None, param, input_uuid)
+
+    assert isinstance(actual_uuid, str)
+    assert actual_uuid == expected_uuid
+
+
+def test_validate_uuid__raises_if_uuid_invalid():
+    """Test that an invalid uuid will raise a click.Abort"""
+    input_uuid = "codef00d-1111-abcd-1111"
+
+    param = Argument(["-project_id"])
+    with pytest.raises(Abort):
+        validate_uuid(None, param, input_uuid)
+
+
+def test_validate_uuid_list__returns_list_of_valid_uuids():
+    """Test string of valid uuids returns list of valid uuids"""
+    param = Option(["-sample_ids"], nargs=1, multiple=False, default=None)
+    valid_uuid_list = fake.pylist(nb_elements=3, value_types=("uuid4",))
+    valid_uuids_string = ",".join(valid_uuid_list)
+    validation_result = validate_uuid_list(None, param, valid_uuids_string)
+
+    assert isinstance(validation_result, list)
+    assert len(validation_result) == len(valid_uuid_list)
+
+
+def test_validate_uuid_list__raises_if_not_all_ids_valid():
+    """Test uuid list containing one invalid uuid will raise a click.Abort"""
+    invalid_uuid = "codef00d-1111-abcd-1111"
+    param = Option(["-sample_ids"], nargs=1, multiple=False, default=None)
+    valid_uuid_list = fake.pylist(nb_elements=3, value_types=("uuid4",))
+    valid_uuids_string = ",".join(valid_uuid_list)
+    uuids_string = f"{valid_uuids_string},{invalid_uuid}"
+
+    with pytest.raises(Abort):
+        validate_uuid_list(None, param, uuids_string)

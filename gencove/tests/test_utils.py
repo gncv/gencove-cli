@@ -421,7 +421,6 @@ def test_validate_uuid_list__returns_list_of_valid_uuids():
     validation_result = validate_uuid_list(None, param, valid_uuid_list)
 
     assert isinstance(validation_result, list)
-    assert len(validation_result) == 3
 
 
 def test_validate_uuid_list__raises_if_not_all_ids_valid():

@@ -939,6 +939,12 @@ class APIClient:
         )
 
     def get_file_types(self, project_id=None):
+        """List file types.
+
+        Args:
+            project_id (UUID, optional): project_id used to get all file types
+                for a project
+        """
         params = {}
         if project_id:
             params["project_id"] = project_id

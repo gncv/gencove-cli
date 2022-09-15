@@ -42,9 +42,8 @@ class ListFileTypes(Command):
                     self.echo_data(get_line(file_type))
 
         except client.APIClientError as err:
-            self.echo_debug(err)
             if err.status_code == 404:
-                self.echo_warning(f"Project {self.project_id} does not exist.")
+                self.echo_error(f"Project {self.project_id} does not exist.")
             raise
 
     @backoff.on_exception(

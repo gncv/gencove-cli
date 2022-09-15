@@ -1,2 +1,2 @@
 """File management commands."""
-from .cli import file_types  # noqa: F401
+from .cli import list_file_types  # noqa: F401

@@ -4,7 +4,7 @@ import click
 from gencove import version
 from gencove.command.basespace import basespace
 from gencove.command.download import download
-from gencove.command.files import file_types
+from gencove.command.files import list_file_types
 from gencove.command.projects import projects
 from gencove.command.s3_imports import s3
 from gencove.command.samples import samples
@@ -21,7 +21,7 @@ def cli():
 
 cli.add_command(basespace)
 cli.add_command(download)
-cli.add_command(file_types)
+cli.add_command(list_file_types)
 cli.add_command(upload)
 cli.add_command(uploads)
 cli.add_command(projects)

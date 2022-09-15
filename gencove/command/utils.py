@@ -30,12 +30,13 @@ def validate_uuid(ctx, param, candidate: str) -> str:  # pylint: disable=unused-
         str: valid uuid v4, (8-4-4-4-12 form)
     """
     try:
-        return str(uuid.UUID(candidate, version=4))
+        validated_uuid = str(uuid.UUID(candidate, version=4))
     except ValueError:
         human_readable_param = map_arguments_to_human_readable.get(
             param.name, param.name
         )
         handle_exception(f"{human_readable_param} is not valid. Exiting.")
+    return validated_uuid
 
 
 def validate_uuid_list(

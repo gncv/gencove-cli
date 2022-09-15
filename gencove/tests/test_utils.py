@@ -1,4 +1,6 @@
 """Tests for utils of Gencove CLI."""
+# pylint: disable=C0411,W0621,E0401
+
 import csv
 import os
 from enum import Enum
@@ -36,8 +38,8 @@ import pytest
 fake = Faker()
 
 
-@pytest.fixture()
-def valid_uuids_string_fixture():
+@pytest.fixture(scope="session")
+def valid_uuids_fixture():
     """Fixture for a string of valid uuids"""
     valid_uuid_list = [
         str(fake.uuid4()),
@@ -424,11 +426,11 @@ def test_validate_uuid__raises_if_uuid_invalid():
         validate_uuid(None, param, input_uuid)
 
 
-def test_validate_uuid_list__returns_list_of_valid_uuids(valid_uuids_string_fixture):
+def test_validate_uuid_list__returns_list_of_valid_uuids(valid_uuids_fixture):
     """Test string of valid uuids returns list of valid uuids"""
 
     param = Option(["-sample_ids"], nargs=1, multiple=False, default=None)
-    valid_uuid_list_output = validate_uuid_list(None, param, valid_uuids_string_fixture)
+    valid_uuid_list_output = validate_uuid_list(None, param, valid_uuids_fixture)
 
     assert isinstance(valid_uuid_list_output, List)
     assert len(valid_uuid_list_output) == 3
@@ -447,10 +449,10 @@ def test_validate_uuid_list__returns_list_of_valid_uuids(valid_uuids_string_fixt
 
 
 # @pytest.mark.parametrize('sample_ids', [Option(["-sample_ids"])])
-def test_validate_uuid_list__raises_if_not_all_ids_valid(valid_uuids_string_fixture):
+def test_validate_uuid_list__raises_if_not_all_ids_valid(valid_uuids_fixture):
     """Test uuid list containing one invalid uuid will raise a click.UsageError"""
     invalid_uuid = "codef00d-1111-abcd-1111"
-    uuids_string = f"{valid_uuids_string_fixture},{invalid_uuid}"
+    uuids_string = f"{valid_uuids_fixture},{invalid_uuid}"
 
     param = Option(["-sample_ids"], nargs=1, multiple=False, default=None)
     with pytest.raises(UsageError):

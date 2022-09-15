@@ -58,7 +58,9 @@ def validate_uuid_list(ctx, param, uuids):  # pylint: disable=unused-argument
         human_readable_param = map_arguments_to_human_readable.get(
             param.name, param.name
         )
-        if not all(is_valid_uuid(id) for id in uuids_list):
+        try:
+            _ = [str(uuid.UUID(id, version=4)) for id in uuids_list]
+        except ValueError:
             handle_exception(f"Not all {human_readable_param} are valid. Exiting.")
     return uuids_list if uuids else []
 

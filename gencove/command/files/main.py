@@ -38,7 +38,8 @@ class ListFileTypes(Command):
 
         try:
             for file_types in self.get_file_types():
-                for file_type in file_types:
+                sorted_file_types = sorted(file_types, key=lambda ft: ft.key)
+                for file_type in sorted_file_types:
                     self.echo_data(get_line(file_type))
 
         except client.APIClientError as err:

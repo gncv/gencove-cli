@@ -333,3 +333,17 @@ class ImportExistingSamplesModel(BaseModel):
     project_id: UUID
     samples: List[SampleImport]
     metadata: Optional[Any]
+
+
+class FileType(BaseModel):
+    """FileType model"""
+
+    key: Optional[str]
+    description: Optional[str]
+
+
+class FileTypesModel(BaseModel):
+    """File types model"""
+
+    meta: ResponseMeta
+    results: Optional[List[FileType]]

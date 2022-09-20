@@ -74,3 +74,24 @@ def assert_authorization(func):
             assert login_called, "jwt-create endpoint was not called"
 
     return wrapper
+
+
+def assert_no_requests(func):
+    """Decorator that mocks get, post and delete and asserts that
+    none of those methods are called
+    """
+
+    @wraps(func)
+    def wrapper(*args, mocker, **kwargs):
+        mock_get = mocker.patch("gencove.client.get")
+        mock_post = mocker.patch("gencove.client.post")
+        mock_delete = mocker.patch("gencove.client.delete")
+
+        kwargs["mocker"] = mocker
+        func(*args, **kwargs)
+
+        mock_get.assert_not_called()
+        mock_post.assert_not_called()
+        mock_delete.assert_not_called()
+
+    return wrapper

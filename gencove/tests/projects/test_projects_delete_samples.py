@@ -10,7 +10,7 @@ from gencove.client import (
     APIClientError,
 )  # noqa: I100
 from gencove.command.projects.cli import delete_project_samples
-from gencove.tests.decorators import assert_authorization
+from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.projects.vcr.filters import (
     filter_project_delete_samples,
@@ -50,21 +50,18 @@ def vcr_config():
     }
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
-def test_delete_project_samples__bad_project_id(mocker, credentials):
+@assert_no_requests
+def test_delete_project_samples__bad_project_id(
+    mocker, credentials
+):  # pylint: disable=unused-argument
     """Test delete project samples when non-uuid string is used as project
     id."""
     runner = CliRunner()
-    mocked_delete_project_samples = mocker.patch.object(
-        APIClient,
-        "delete_project_samples",
-    )
+
     res = runner.invoke(
         delete_project_samples,
         [
-            "1111111",
+            "22222222",
             *credentials,
             "--sample-ids",
             "11111111-1111-1111-1111-111111111111,"
@@ -72,7 +69,6 @@ def test_delete_project_samples__bad_project_id(mocker, credentials):
         ],
     )
     assert res.exit_code == 1
-    mocked_delete_project_samples.assert_not_called()
     assert "Project ID is not valid" in res.output
 
 
@@ -139,17 +135,14 @@ def test_delete_project_samples__success__empty_sample_ids(
     assert "The following samples have been deleted successfully" in res.output
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
-def test_delete_project_samples__invalid_sample_ids(credentials, mocker):
+@assert_no_requests
+def test_delete_project_samples__invalid_sample_ids(
+    credentials, mocker
+):  # pylint: disable=unused-argument
     """Test delete project samples failure when an invalid list of sample ids
     is sent."""
 
     runner = CliRunner()
-    mocked_delete_project_samples = mocker.patch.object(
-        APIClient, "delete_project_samples"
-    )
 
     res = runner.invoke(
         delete_project_samples,
@@ -161,7 +154,6 @@ def test_delete_project_samples__invalid_sample_ids(credentials, mocker):
         ],
     )
     assert res.exit_code == 1
-    mocked_delete_project_samples.assert_not_called()
     assert "Not all sample IDs are valid" in res.output
 
 
@@ -207,9 +199,11 @@ def test_delete_project_samples__sample_not_in_project(
 
 @pytest.mark.vcr
 @assert_authorization
-def test_delete_project_samples__success(
-    deleted_sample, credentials, mocker, project_id, recording, vcr
-):  # pylint: disable=too-many-arguments
+@pytest.mark.default_cassette("test_delete_project_samples__success.yaml")
+@pytest.mark.parametrize("remove_hyphens", [True, False])
+def test_delete_project_samples__success(  # pylint: disable=too-many-arguments
+    deleted_sample, credentials, mocker, project_id, recording, vcr, remove_hyphens
+):
     """Test delete project samples success."""
     runner = CliRunner()
     if not recording:
@@ -223,6 +217,9 @@ def test_delete_project_samples__success(
             "delete_project_samples",
             return_value=delete_project_samples_response,
         )
+
+    if remove_hyphens:
+        project_id = project_id.replace("-", "")
 
     res = runner.invoke(
         delete_project_samples,

@@ -1,5 +1,6 @@
 """Test file types list command"""
 # pylint: disable=wrong-import-order, import-error
+import operator
 from uuid import uuid4
 
 from click.testing import CliRunner
@@ -8,10 +9,7 @@ from gencove.client import APIClient, APIClientError
 from gencove.command.files.cli import list_file_types
 from gencove.models import FileTypesModel
 from gencove.tests.decorators import assert_authorization
-from gencove.tests.files.vcr.filters import (
-    filter_file_types_request,
-    filter_file_types_response,
-)
+from gencove.tests.files.vcr.filters import filter_file_types_request
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.utils import get_vcr_response
 
@@ -42,7 +40,6 @@ def vcr_config():
         ],
         "before_record_response": [
             filter_jwt,
-            filter_file_types_response,
         ],
     }
 
@@ -114,19 +111,21 @@ def test_list_file_types_no_project(mocker, credentials):
 
 @pytest.mark.vcr
 @assert_authorization
-def test_list_all_file_types(mocker, credentials, recording, vcr):
+def test_list_file_types_by_project(mocker, credentials, project_id, recording, vcr):
     """Test file types being outputted to the shell"""
     runner = CliRunner()
 
     if not recording:
         # Mock list_file_types only if using cassettes since return value is mocked.
-        file_types_response = get_vcr_response("/api/v2/file-types/", vcr)
+        file_types_response = get_vcr_response(
+            "/api/v2/file-types/", vcr, operator.contains
+        )
         mocked_get_file_types = mocker.patch.object(
             APIClient,
             "get_file_types",
             return_value=FileTypesModel(**file_types_response),
         )
-    res = runner.invoke(list_file_types, credentials)
+    res = runner.invoke(list_file_types, [project_id, *credentials])
     assert res.exit_code == 0
 
     if not recording:

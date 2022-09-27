@@ -91,6 +91,13 @@ class DownloadFile(Command):
                 "please restore the sample and try again."
             )
 
+        sample_file_types = [file.file_type for file in sample.files]
+        if self.file_type not in sample_file_types:
+            raise ValidationError(
+                f"Sample with id {sample.id} does not have any files with file type {self.file_type}. "
+                f"Valid file types for this sample are: {', '.join(sample_file_types)}"
+            )
+
         file_to_download = None
 
         for sample_file in sample.files:

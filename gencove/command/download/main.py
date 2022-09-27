@@ -8,6 +8,7 @@ import requests
 
 from gencove import client  # noqa: I100
 from gencove.command.base import Command
+from gencove.command.utils import validate_file_types
 from gencove.command.download.exceptions import DownloadTemplateError
 from gencove.constants import SampleArchiveStatus
 from gencove.exceptions import ValidationError
@@ -92,6 +93,27 @@ class Download(Command):
         if not self.sample_ids:
             raise ValidationError("No samples to process. Exiting.")
 
+        try:
+            if self.filters.project_id:
+                valid_file_types = self.api_client.get_file_types(
+                    project_id=self.filters.project_id
+                ).results
+            else:
+                valid_file_types = self.api_client.get_file_types().results
+            invalid_file_types = validate_file_types(
+                self.filters.file_types, valid_file_types
+            )
+
+            if invalid_file_types:
+                raise ValidationError(
+                    f"Invalid file types: {', '.join(invalid_file_types)}. "
+                    f"Use gencove file-types command for list of valid file types. Use with --project-id option to see "
+                    f"project file types."
+                )
+        except client.APIClientError as err:
+            self.echo_debug(err)
+            self.echo_warning("There was an error while validating file types.")
+
         if all(
             [
                 self.download_to == "-",
@@ -165,6 +187,13 @@ class Download(Command):
         if not ALLOWED_STATUSES_RE.match(sample.last_status.status):
             self.echo_warning(f"Sample #{sample.id} has no deliverable.")
             return
+
+        sample_file_types = [file.file_type for file in sample.files]
+        if not set(self.filters.file_types).issubset(set(sample_file_types)):
+            raise ValidationError(
+                f"Sample with id {sample.id} does not have any files with the following file types: "
+                f"{', '.join(list(set(self.filters.file_types).difference(set(sample_file_types))))}"
+            )
 
         file_types_re = re.compile("|".join(self.filters.file_types), re.IGNORECASE)
 

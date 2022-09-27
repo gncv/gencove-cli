@@ -1,7 +1,6 @@
 """Test project's delete samples command."""
 # pylint: disable=wrong-import-order, import-error
 import operator
-import os
 from uuid import uuid4
 
 from click.testing import CliRunner
@@ -11,7 +10,6 @@ from gencove.client import (
     APIClientError,
 )  # noqa: I100
 from gencove.command.projects.cli import delete_project_samples
-from gencove.constants import Credentials
 from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.projects.vcr.filters import (
@@ -243,8 +241,14 @@ def test_delete_project_samples__success(  # pylint: disable=too-many-arguments
 @pytest.mark.default_cassette(
     "test_delete_project_samples__returns_maintenance_error_503.yaml"
 )
-def test_delete_project_samples__returns_maintenance_error_503(  # pylint: disable=too-many-arguments
-    deleted_sample, credentials, mocker, project_id, recording, vcr
+def test_delete_project_samples__returns_maintenance_error_503(
+    # pylint: disable=too-many-arguments
+    deleted_sample,
+    credentials,
+    mocker,
+    project_id,
+    recording,
+    vcr,
 ):
     """Test delete project samples success."""
     runner = CliRunner()
@@ -272,6 +276,7 @@ def test_delete_project_samples__returns_maintenance_error_503(  # pylint: disab
     if not recording:
         mocked_delete_project_samples.assert_not_called()
     assert (
-        "Gencove is currently undergoing maintenance and will return at the given ETA. Thank you for your patience."
-        in res.output
-    )
+        "Gencove is currently undergoing maintenance and"
+        "will return at the given ETA."
+        "Thank you for your patience."
+    ) in res.output

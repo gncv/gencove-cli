@@ -1,6 +1,7 @@
 """Test project's delete samples command."""
 # pylint: disable=wrong-import-order, import-error
 import operator
+import os
 from uuid import uuid4
 
 from click.testing import CliRunner
@@ -10,6 +11,7 @@ from gencove.client import (
     APIClientError,
 )  # noqa: I100
 from gencove.command.projects.cli import delete_project_samples
+from gencove.constants import Credentials
 from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.projects.vcr.filters import (
@@ -234,3 +236,42 @@ def test_delete_project_samples__success(  # pylint: disable=too-many-arguments
     if not recording:
         mocked_delete_project_samples.assert_called_once()
     assert "The following samples have been deleted successfully" in res.output
+
+
+@pytest.mark.vcr
+@assert_authorization
+@pytest.mark.default_cassette(
+    "test_delete_project_samples__returns_maintenance_error_503.yaml"
+)
+def test_delete_project_samples__returns_maintenance_error_503(  # pylint: disable=too-many-arguments
+    deleted_sample, credentials, mocker, project_id, recording, vcr
+):
+    """Test delete project samples success."""
+    runner = CliRunner()
+    if not recording:
+        # Mock delete_project_samples only if using the cassettes, since we
+        # mock the return value.
+        delete_project_samples_response = get_vcr_response(
+            "/api/v2/jwt-create/", vcr, operator.contains
+        )
+        mocked_delete_project_samples = mocker.patch.object(
+            APIClient,
+            "delete_project_samples",
+            return_value=delete_project_samples_response,
+        )
+    res = runner.invoke(
+        delete_project_samples,
+        [
+            project_id,
+            *credentials,
+            "--sample-ids",
+            deleted_sample,
+        ],
+    )
+    assert res.exit_code == 1
+    if not recording:
+        mocked_delete_project_samples.assert_not_called()
+    assert (
+        "Gencove is currently undergoing maintenance and will return at the given ETA. Thank you for your patience."
+        in res.output
+    )

@@ -242,7 +242,6 @@ class APIClient:
                 if response.text:
                     response_json = response.json()
                     if "maintenance" in response_json:
-                        http_error_msg += f": {response_json['maintenance']}"
                         raise MaintenanceError(
                             message=response_json["maintenance_message"],
                             eta=response_json["maintenance_eta"],

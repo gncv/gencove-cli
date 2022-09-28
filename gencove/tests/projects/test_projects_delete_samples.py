@@ -276,7 +276,7 @@ def test_delete_project_samples__returns_maintenance_error_503(
     if not recording:
         mocked_delete_project_samples.assert_not_called()
     assert (
-        "Gencove is currently undergoing maintenance and"
-        "will return at the given ETA."
+        "ERROR: Gencove is currently undergoing maintenance and "
+        "will return at the given ETA. "
         "Thank you for your patience."
     ) in res.output

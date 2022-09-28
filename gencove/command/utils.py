@@ -108,7 +108,7 @@ def validate_file_types(candidate_file_types, valid_file_types):
     valid_file_types (list of FileType): Valid file types to check against
 
     Returns:
-        list: [] if candidate_file_types are all valid, list of invalid file types if not
+        list: [] if candidate_file_types are valid, list of invalid file types if not
     """
     file_type_keys = [file_type.key for file_type in valid_file_types]
 

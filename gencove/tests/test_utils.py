@@ -379,37 +379,39 @@ def test_login_mfa(mocker):
     mocked_prompt.assert_called_once_with("One time password", type=str, err=True)
 
 
-# def test_login__returns_maintenance_error_message(mocker):
-#     """Test that the the login function in APIClient asks for the one time
-#     password token.
-#     """
-#     api_client = APIClient()
-#     credentials = Credentials(email="foo@bar.com", password="123456", api_key="")
-#     def _request(
-#             endpoint,
-#             params,
-#             *args,  # pylint: disable=unused-argument
-#             **kwargs,  # pylint: disable=unused-argument
-#         ):
-#             if endpoint == ApiEndpoints.GET_JWT.value:
-#                 raise MaintenanceError(
-#                 {
-#                     "maintenance": True,
-#                     "maintenance_eta": "",
-#                     "maintenance_message": (
-#                         "Gencove is currently undergoing maintenance and"
-#                         "will return at the given ETA."
-#                         "Thank you for your patience."
-#                     ),
-#                 }, 503
-#             )
-#             return {}
+def test_login__returns_maintenance_error_message(mocker):
+    """Test that the the login function in APIClient asks for the one time
+    password token.
+    """
+    api_client = APIClient()
+    credentials = Credentials(email="foo@bar.com", password="123456", api_key="")
 
-#     mocked_request = mocker.patch.object(APIClient, "_request", side_effect=_request)
+    def _request(
+        endpoint,
+        params,
+        *args,  # pylint: disable=unused-argument
+        **kwargs,  # pylint: disable=unused-argument
+    ):
+        if endpoint == ApiEndpoints.GET_JWT.value:
+            raise MaintenanceError(
+                {
+                    "maintenance": True,
+                    "maintenance_eta": "",
+                    "maintenance_message": (
+                        "Gencove is currently undergoing maintenance and"
+                        "will return at the given ETA."
+                        "Thank you for your patience."
+                    ),
+                },
+                503,
+            )
+        return {}
 
-#     # with pytest.raises(MaintenanceError):
-#     login(api_client, credentials)
-#     mocked_request.assert_called_once()
+    mocked_request = mocker.patch.object(APIClient, "_request", side_effect=_request)
+
+    with pytest.raises(MaintenanceError):
+        login(api_client, credentials)
+    mocked_request.assert_called_once()
 
 
 def test_uuid_without_hyphens_is_converted_to_uuid_with_hyphens():

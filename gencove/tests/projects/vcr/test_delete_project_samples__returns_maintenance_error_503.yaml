@@ -13,7 +13,7 @@ interactions:
       content-type:
       - application/json
     method: POST
-    uri: http://127.0.0.1:8200/api/v2/jwt-create/
+    uri: https://www.example.com/api/v2/jwt-create/
   response:
     body:
       string: '{"maintenance": true, "maintenance_eta": "2022-07-21T17:00:00", "maintenance_message":

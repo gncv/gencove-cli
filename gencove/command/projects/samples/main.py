@@ -35,6 +35,7 @@ class ListSamples(Command):
             f"status={self.sample_status} "
             f"archive_status={self.sample_archive_status} "
             f"search_term={self.search_term}"
+            f"paginated_samples={[n for n in self.get_paginated_samples()]}"
         )
         try:
             for samples in self.get_paginated_samples():

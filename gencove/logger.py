@@ -16,6 +16,7 @@ INFO = "INFO"
 DEBUG = "DEBUG"
 LOG_LEVEL = os.environ.get("GENCOVE_LOG", INFO)
 DEBUG_LOG = []
+LOG_LEVEL = DEBUG
 
 
 def _echo(msg, **kwargs):

@@ -8,13 +8,15 @@ from gencove.constants import (
     SampleStatus,
 )
 from gencove.utils import enum_as_dict
+from gencove.command.utils import validate_uuid
 
 from .constants import SamplesOptions
 from .main import ListSamples
 
 
 @click.command("list-samples")
-@click.argument("project_id")
+# @click.argument("project_id")
+@click.argument("project_id", callback=validate_uuid)
 @click.option("--search", help="Gencove sample ID, client ID or metadata substring")
 @click.option(
     "--status",

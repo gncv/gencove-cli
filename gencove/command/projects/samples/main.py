@@ -26,8 +26,8 @@ class ListSamples(Command):
 
     def validate(self):
         """Validate command input."""
-        if is_valid_uuid(self.project_id) is False:
-            raise ValidationError("Project ID is not valid. Exiting.")
+        # if is_valid_uuid(self.project_id) is False:
+        #     raise ValidationError("Project ID is not valid. Exiting.")
 
     def execute(self):
         self.echo_debug(

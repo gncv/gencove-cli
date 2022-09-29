@@ -11,7 +11,7 @@ from functools import wraps
 import click
 
 from gencove.client import APIClient, APIClientError
-from gencove.exceptions import ValidationError
+from gencove.exceptions import MaintenanceError, ValidationError
 from gencove.logger import (
     DEBUG,
     LOG_LEVEL,
@@ -144,6 +144,11 @@ class Command(object):  # pylint: disable=R0205
             self.execute()
         except ValidationError as err:
             self.echo_error(err.message)
+            dump_debug_log()
+            raise click.Abort()
+        except MaintenanceError as err:
+            self.echo_error(err.message)
+            self.echo_error(f"ETA is {err.eta}")
             dump_debug_log()
             raise click.Abort()
         except APIClientError as err:

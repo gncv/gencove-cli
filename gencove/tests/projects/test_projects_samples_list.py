@@ -226,6 +226,7 @@ def test_list_project_samples(
         assert output_line.getvalue() == res.output.encode()
 
 
+@pytest.mark.default_cassette("jwt-create.yaml")
 @assert_authorization
 def test_list_project_samples__archive_status_null__prints_without_fail(
     mocker, credentials, project_id, sample_archive_status_null

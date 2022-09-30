@@ -11,7 +11,7 @@ from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.projects.cli import list_project_samples
 from gencove.logger import echo_data
 from gencove.models import ProjectSamples, SampleDetails
-from gencove.tests.decorators import assert_authorization
+from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.projects.vcr.filters import (
     filter_get_project_samples_request,
@@ -71,9 +71,7 @@ def test_list_empty(mocker, credentials, project_id):
     assert res.output == ""
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
+@assert_no_requests
 def test_list_projects_bad_project_id(
     mocker, credentials
 ):  # pylint: disable=unused-argument

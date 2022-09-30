@@ -229,12 +229,10 @@ def test_list_project_samples(
 @assert_authorization
 def test_list_project_samples__archive_status_null__prints_without_fail(
     mocker, credentials, project_id, sample_archive_status_null
-):  # pylint: disable=unused-argument
+):
     """Test project samples being outputed to the shell."""
     runner = CliRunner()
 
-    # Mock get_project_samples only if using the cassettes,
-    # since we mock the return value.
     mocked_sample__archive_status_null = sample_archive_status_null
     mocked_get_project_samples = mocker.patch.object(
         APIClient,
@@ -251,6 +249,5 @@ def test_list_project_samples__archive_status_null__prints_without_fail(
     sys.stdout = output_line
     for mocked_sample in mocked_sample__archive_status_null["results"]:
         mocked_sample = SampleDetails(**mocked_sample)
-
         echo_data(get_line(mocked_sample))
     assert output_line.getvalue() == res.output.encode()

@@ -226,8 +226,6 @@ def test_list_project_samples(
         assert output_line.getvalue() == res.output.encode()
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
-@assert_authorization
 def test_list_project_samples__archive_status_null__prints_without_fail(
     mocker, credentials, project_id, sample_archive_status_null
 ):
@@ -235,6 +233,7 @@ def test_list_project_samples__archive_status_null__prints_without_fail(
     runner = CliRunner()
 
     mocked_sample__archive_status_null = sample_archive_status_null
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
@@ -245,6 +244,7 @@ def test_list_project_samples__archive_status_null__prints_without_fail(
         [project_id, *credentials],
     )
     assert res.exit_code == 0
+    mocked_login.assert_called_once()
     mocked_get_project_samples.assert_called_once()
     output_line = io.BytesIO()
     sys.stdout = output_line

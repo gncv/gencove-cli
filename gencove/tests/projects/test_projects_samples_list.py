@@ -227,7 +227,7 @@ def test_list_project_samples(
 
 
 def test_list_project_samples__archive_status_null__prints_without_fail(
-    mocker, credentials, project_id, sample_archive_status_null
+    mocker, credentials, project_id, sample_archive_status_null, using_api_key
 ):
     """Test project samples being outputed to the shell."""
     runner = CliRunner()
@@ -244,7 +244,8 @@ def test_list_project_samples__archive_status_null__prints_without_fail(
         [project_id, *credentials],
     )
     assert res.exit_code == 0
-    mocked_login.assert_called_once()
+    if not using_api_key:
+        mocked_login.assert_called_once()
     mocked_get_project_samples.assert_called_once()
     output_line = io.BytesIO()
     sys.stdout = output_line

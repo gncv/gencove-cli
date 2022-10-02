@@ -10,6 +10,7 @@ from click.testing import CliRunner
 from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.projects.cli import list_project_samples
 from gencove.command.projects.samples.utils import get_line
+from gencove.constants import SampleArchiveStatus
 from gencove.logger import echo_data
 from gencove.models import ProjectSamples, SampleDetails
 from gencove.tests.decorators import assert_authorization, assert_no_requests
@@ -244,12 +245,15 @@ def test_list_project_samples__archive_status_null__prints_without_fail(
         [project_id, *credentials],
     )
     assert res.exit_code == 0
+
     if not using_api_key:
         mocked_login.assert_called_once()
     mocked_get_project_samples.assert_called_once()
     output_line = io.BytesIO()
     sys.stdout = output_line
+
     for mocked_sample in mocked_sample__archive_status_null["results"]:
         mocked_sample = SampleDetails(**mocked_sample)
         echo_data(get_line(mocked_sample))
     assert output_line.getvalue() == res.output.encode()
+    assert output_line.getvalue().decode("utf8")[4] == SampleArchiveStatus.DELETED.value

@@ -118,3 +118,8 @@ def filter_samples_response(response, response_json):
     """Filter samples sensitive data from response."""
     _filter_sample(response_json)
     return response, response_json
+
+
+def filter_file_types_request(request):
+    """Filter file types sensitive data from request."""
+    return _replace_uuid_from_url(request, "file-types")

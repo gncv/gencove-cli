@@ -9,7 +9,7 @@ from gencove.client import APIClient, APIClientError
 from gencove.command.files.cli import list_file_types
 from gencove.models import FileTypesModel
 from gencove.tests.decorators import assert_authorization
-from gencove.tests.files.vcr.filters import filter_file_types_request
+from gencove.tests.filters import filter_file_types_request
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.utils import get_vcr_response
 

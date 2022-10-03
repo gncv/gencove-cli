@@ -69,7 +69,7 @@ def test_list_file_types_bad_project_id(
     runner = CliRunner()
 
     project_id = "test"
-    res = runner.invoke(list_file_types, [project_id, *credentials])
+    res = runner.invoke(list_file_types, ["--project-id", project_id, *credentials])
     assert res.exit_code == 1
     assert "ERROR: Project ID is not valid. Exiting." in res.output
 
@@ -92,7 +92,7 @@ def test_list_file_types_no_project(mocker, credentials):
 
     res = runner.invoke(
         list_file_types,
-        [project_id, *credentials],
+        ["--project-id", project_id, *credentials],
     )
     assert res.exit_code == 1
     mocked_get_file_types.assert_called_once()
@@ -125,7 +125,7 @@ def test_list_file_types_by_project(mocker, credentials, project_id, recording, 
             "get_file_types",
             return_value=FileTypesModel(**file_types_response),
         )
-    res = runner.invoke(list_file_types, [project_id, *credentials])
+    res = runner.invoke(list_file_types, ["--project-id", project_id, *credentials])
     assert res.exit_code == 0
 
     if not recording:

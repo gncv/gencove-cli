@@ -9,7 +9,7 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.1.5
+      - 2.3.6
       content-type:
       - application/json
     method: POST
@@ -27,7 +27,7 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Wed, 13 Oct 2021 14:36:03 GMT
+      - Mon, 03 Oct 2022 15:18:33 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -51,7 +51,7 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.1.5
+      - 2.3.6
       content-type:
       - application/json
     method: GET
@@ -65,18 +65,61 @@ interactions:
         "status": "failed qc", "note": "", "created": "2021-10-12T19:55:46.498353Z"},
         "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
         "available", "created": "2021-10-12 19:47:15.394485+00:00", "transition_cutoff":
-        null}}]}'
+        null}, "failed_qc": ["format"]}]}'
     headers:
       Allow:
       - GET, POST, HEAD, OPTIONS
       Connection:
       - keep-alive
       Content-Length:
-      - '528'
+      - '551'
       Content-Type:
       - application/json
       Date:
-      - Wed, 13 Oct 2021 14:36:03 GMT
+      - Mon, 03 Oct 2022 15:18:42 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.3.6
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/file-types/?project_id=8619469a-bcb9-4ec5-beb8-f6fd74d3485a
+  response:
+    body:
+      string: '{"meta": {"count": 2, "next": null, "previous": null}, "results": [{"key":
+        "fastq-r1", "description": ""}, {"key": "fastq-r2", "description": ""}]}'
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '132'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 03 Oct 2022 15:18:43 GMT
       Referrer-Policy:
       - same-origin
       Server:

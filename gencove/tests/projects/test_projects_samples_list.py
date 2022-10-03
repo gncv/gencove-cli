@@ -57,7 +57,7 @@ def vcr_config():
 def fixture_sample_archive_status_null():
     """A sample containing a NULL (eg. deleted) archive status"""
     return {
-        "meta": {"count": 23, "next": None, "previous": None},
+        "meta": {"count": 1, "next": None, "previous": None},
         "results": [
             {
                 "id": "11111111-1111-1111-1111-111111111111",

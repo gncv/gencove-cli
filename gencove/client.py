@@ -29,6 +29,7 @@ from gencove.constants import (
     SampleStatus,
     SortOrder,
 )
+from gencove.exceptions import MaintenanceError
 from gencove.logger import echo_debug
 from gencove.models import (  # noqa: I101
     AccessJWT,
@@ -138,7 +139,7 @@ class APIClient:
         return json.dumps(payload, cls=CustomEncoder)
 
     # pylint: disable=bad-option-value,bad-continuation,too-many-arguments
-    # pylint: disable=too-many-branches,too-many-locals
+    # pylint: disable=too-many-branches,too-many-locals, too-many-statements
     def _request(
         self,
         endpoint="",
@@ -237,6 +238,14 @@ class APIClient:
 
         elif 500 <= response.status_code < 600:
             http_error_msg = "Server Error: {response.reason}"
+            if response.status_code == 503:
+                if response.text:
+                    response_json = response.json()
+                    if "maintenance" in response_json:
+                        raise MaintenanceError(
+                            message=response_json["maintenance_message"],
+                            eta=response_json["maintenance_eta"],
+                        )
 
         raise APIClientError(http_error_msg, response.status_code)
 

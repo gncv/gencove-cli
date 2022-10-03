@@ -53,31 +53,6 @@ def vcr_config():
     }
 
 
-@pytest.fixture(name="sample_archive_status_null")
-def fixture_sample_archive_status_null():
-    """A sample containing a NULL (eg. deleted) archive status"""
-    return {
-        "meta": {"count": 1, "next": None, "previous": None},
-        "results": [
-            {
-                "id": "11111111-1111-1111-1111-111111111111",
-                "created": "2021-09-21T18:30:44.799519Z",
-                "modified": "2021-09-21T18:38:57.735776Z",
-                "client_id": "mock client_id",
-                "physical_id": "",
-                "legacy_id": "",
-                "last_status": {
-                    "id": "11111111-1111-1111-1111-111111111111",
-                    "status": "mock status",
-                    "note": "",
-                    "created": "2021-09-21T18:38:57.735776Z",
-                },
-                "archive_last_status": None,
-            }
-        ],
-    }
-
-
 @pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
@@ -233,12 +208,11 @@ def test_list_project_samples__archive_status_null__prints_without_fail(
     """Test project samples being outputed to the shell."""
     runner = CliRunner()
 
-    mocked_sample__archive_status_null = sample_archive_status_null
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
     mocked_get_project_samples = mocker.patch.object(
         APIClient,
         "get_project_samples",
-        return_value=ProjectSamples(**mocked_sample__archive_status_null),
+        return_value=ProjectSamples(**sample_archive_status_null),
     )
     res = runner.invoke(
         list_project_samples,
@@ -252,7 +226,7 @@ def test_list_project_samples__archive_status_null__prints_without_fail(
     output_line = io.BytesIO()
     sys.stdout = output_line
 
-    for mocked_sample in mocked_sample__archive_status_null["results"]:
+    for mocked_sample in sample_archive_status_null["results"]:
         mocked_sample = SampleDetails(**mocked_sample)
         echo_data(get_line(mocked_sample))
     assert output_line.getvalue() == res.output.encode()

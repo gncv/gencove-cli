@@ -9,8 +9,6 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.projects.cli import list_project_samples
-from gencove.command.projects.samples.utils import get_line
-from gencove.constants import SampleArchiveStatus
 from gencove.logger import echo_data
 from gencove.models import ProjectSamples, SampleDetails
 from gencove.tests.decorators import assert_authorization, assert_no_requests
@@ -226,8 +224,13 @@ def test_list_project_samples__archive_status_null__prints_without_fail(
     output_line = io.BytesIO()
     sys.stdout = output_line
 
-    for mocked_sample in sample_archive_status_null["results"]:
-        mocked_sample = SampleDetails(**mocked_sample)
-        echo_data(get_line(mocked_sample))
-    assert output_line.getvalue() == res.output.encode()
-    assert output_line.getvalue().decode("utf8")[4] == SampleArchiveStatus.DELETED.value
+    mocked_sample = SampleDetails(**sample_archive_status_null["results"][0])
+    assert res.output.strip() == "\t".join(
+        [
+            str(mocked_sample.last_status.created.isoformat()),
+            str(mocked_sample.id),
+            mocked_sample.client_id,
+            mocked_sample.last_status.status,
+            "-",
+        ]
+    )

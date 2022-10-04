@@ -55,17 +55,18 @@ def download_file(
 
             gencove samples download-file e6b45af7-07c5-4a6d-9f97-6e1efbf3e215 ancestry-json - | gzip > ancestry.json.gz
     \f
+    .. ignore::
+        Args:
+            sample_id (str): specific sample for which
+                to download the results.
+            file_type (str): specific deliverable to download
+                results for.
+            destination (str): path/to/file.
+            no_progress (bool, optional, default False): do not show progress
+                bar.
+            checksum (bool, optional, default False): download additional checksum
+                files for each deliverable.
 
-    Args:
-        sample_id (str): specific sample for which
-            to download the results.
-        file_type (str): specific deliverable to download
-            results for.
-        destination (str): path/to/file.
-        no_progress (bool, optional, default False): do not show progress
-            bar.
-        checksum (bool, optional, default False): download additional checksum
-            files for each deliverable.
     """  # noqa: E501
     if destination in ("-", "/dev/stdout"):
         DownloadFile(

@@ -21,6 +21,6 @@ def get_line(sample):
             sample.last_status.status,
             sample.archive_last_status.status
             if sample.archive_last_status is not None
-            else SampleArchiveStatus.DELETED.value,
+            else SampleArchiveStatus.UNKNOWN.value,
         ]
     )

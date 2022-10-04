@@ -9,7 +9,7 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.3.0
+      - 2.3.7
       content-type:
       - application/json
     method: POST
@@ -27,7 +27,7 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Fri, 08 Jul 2022 15:42:22 GMT
+      - Mon, 03 Oct 2022 19:10:56 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -51,7 +51,69 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.3.0
+      - 2.3.7
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/file-types/
+  response:
+    body:
+      string: '{"meta": {"count": 35, "next": null, "previous": null}, "results":
+        [{"key": "alignment-bai", "description": ""}, {"key": "alignment-bam", "description":
+        ""}, {"key": "alignment-csi", "description": ""}, {"key": "ancestry-json",
+        "description": ""}, {"key": "call_capture-csi", "description": ""}, {"key":
+        "call_capture-forced_csi", "description": ""}, {"key": "call_capture-forced_vcf",
+        "description": ""}, {"key": "call_capture-large_indel_calls_json", "description":
+        ""}, {"key": "call_capture-vcf", "description": ""}, {"key": "call_capture-vcf_pathogenic",
+        "description": ""}, {"key": "cnv-cnr", "description": ""}, {"key": "cnv-cns",
+        "description": ""}, {"key": "cnv-pdf", "description": ""}, {"key": "cnv-png",
+        "description": ""}, {"key": "fastq-r1", "description": ""}, {"key": "fastq-r2",
+        "description": ""}, {"key": "impute-csi", "description": ""}, {"key": "impute-subset_csi",
+        "description": ""}, {"key": "impute-subset_override_csi", "description": ""},
+        {"key": "impute-subset_override_tbi", "description": ""}, {"key": "impute-subset_override_vcf",
+        "description": ""}, {"key": "impute-subset_tbi", "description": ""}, {"key":
+        "impute-subset_vcf", "description": ""}, {"key": "impute-tbi", "description":
+        ""}, {"key": "impute-vcf", "description": ""}, {"key": "kraken-report", "description":
+        ""}, {"key": "loh-bed", "description": ""}, {"key": "sex-json", "description":
+        ""}, {"key": "traits-json", "description": ""}, {"key": "wgs-aligned", "description":
+        ""}, {"key": "wgs-called", "description": ""}, {"key": "wgs-evenness", "description":
+        ""}, {"key": "wgs-filtered_called", "description": ""}, {"key": "wgs-filtered_indexed",
+        "description": ""}, {"key": "wgs-indexed", "description": ""}]}'
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1558'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 03 Oct 2022 19:11:00 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.3.7
       content-type:
       - application/json
     method: GET
@@ -80,7 +142,7 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Fri, 08 Jul 2022 15:42:23 GMT
+      - Mon, 03 Oct 2022 19:11:00 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -104,7 +166,7 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.3.0
+      - 2.3.7
       content-type:
       - application/json
     method: GET
@@ -113,18 +175,18 @@ interactions:
     body:
       string: '{"meta": {"count": 1, "next": null, "previous": null}, "results": [{"quality_control_type":
         {"key": "format", "type": "bool"}, "quality_control": {"value_expected": null,
-        "value_measured": null, "status": "failed"}}]}'
+        "value_measured": null, "value_string": "", "status": "failed"}}]}'
     headers:
       Allow:
       - GET, HEAD, OPTIONS
       Connection:
       - keep-alive
       Content-Length:
-      - '198'
+      - '216'
       Content-Type:
       - application/json
       Date:
-      - Fri, 08 Jul 2022 15:42:24 GMT
+      - Mon, 03 Oct 2022 19:11:00 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -148,7 +210,7 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.3.0
+      - 2.3.7
       content-type:
       - application/json
     method: GET
@@ -166,7 +228,7 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Fri, 08 Jul 2022 15:42:25 GMT
+      - Mon, 03 Oct 2022 19:11:00 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -204,7 +266,7 @@ interactions:
       Content-Type:
       - binary/octet-stream
       Date:
-      - Fri, 08 Jul 2022 15:42:27 GMT
+      - Mon, 03 Oct 2022 19:11:02 GMT
       ETag:
       - '"6e023d8b8758f8f826152de77a3cc1d9"'
       Last-Modified:
@@ -248,7 +310,7 @@ interactions:
       Content-Type:
       - binary/octet-stream
       Date:
-      - Fri, 08 Jul 2022 15:42:28 GMT
+      - Mon, 03 Oct 2022 19:11:02 GMT
       ETag:
       - '"6e023d8b8758f8f826152de77a3cc1d9"'
       Last-Modified:

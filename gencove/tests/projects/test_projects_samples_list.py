@@ -11,7 +11,7 @@ from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.projects.cli import list_project_samples
 from gencove.logger import echo_data
 from gencove.models import ProjectSamples, SampleDetails
-from gencove.tests.decorators import assert_authorization
+from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.projects.vcr.filters import (
     filter_get_project_samples_request,
@@ -71,9 +71,7 @@ def test_list_empty(mocker, credentials, project_id):
     assert res.output == ""
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
+@assert_no_requests
 def test_list_projects_bad_project_id(
     mocker, credentials
 ):  # pylint: disable=unused-argument
@@ -200,3 +198,38 @@ def test_list_project_samples(
                 )
             )
         assert output_line.getvalue() == res.output.encode()
+
+
+def test_list_project_samples__archive_status_null__prints_without_fail(
+    mocker, credentials, project_id, sample_archive_status_null, using_api_key
+):
+    """Test project samples being outputed to the shell."""
+    runner = CliRunner()
+
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_get_project_samples = mocker.patch.object(
+        APIClient,
+        "get_project_samples",
+        return_value=ProjectSamples(**sample_archive_status_null),
+    )
+    res = runner.invoke(
+        list_project_samples,
+        [project_id, *credentials],
+    )
+    assert res.exit_code == 0
+
+    if not using_api_key:
+        mocked_login.assert_called_once()
+
+    mocked_get_project_samples.assert_called_once()
+    mocked_sample = SampleDetails(**sample_archive_status_null["results"][0])
+
+    assert res.output.strip() == "\t".join(
+        [
+            str(mocked_sample.last_status.created.isoformat()),
+            str(mocked_sample.id),
+            mocked_sample.client_id,
+            mocked_sample.last_status.status,
+            "unknown",
+        ]
+    )

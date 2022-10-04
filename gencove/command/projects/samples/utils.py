@@ -1,6 +1,9 @@
 """Utilities for processing and validating samples."""
 
 
+from gencove.constants import SampleArchiveStatus
+
+
 def get_line(sample):
     """Build a list of relevant data to be printed.
 
@@ -16,6 +19,8 @@ def get_line(sample):
             str(sample.id),
             str(sample.client_id),
             sample.last_status.status,
-            sample.archive_last_status.status,
+            sample.archive_last_status.status
+            if sample.archive_last_status is not None
+            else SampleArchiveStatus.UNKNOWN.value,
         ]
     )

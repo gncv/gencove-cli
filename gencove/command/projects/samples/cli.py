@@ -2,6 +2,7 @@
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
+from gencove.command.utils import validate_uuid
 from gencove.constants import (
     Credentials,
     SampleArchiveStatus,
@@ -14,7 +15,7 @@ from .main import ListSamples
 
 
 @click.command("list-samples")
-@click.argument("project_id")
+@click.argument("project_id", callback=validate_uuid)
 @click.option("--search", help="Gencove sample ID, client ID or metadata substring")
 @click.option(
     "--status",

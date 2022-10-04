@@ -6,8 +6,6 @@ from gencove.client import APIClientError, APIClientTimeout  # noqa: I100
 from gencove.command.base import Command
 
 from .utils import get_line
-from ...utils import is_valid_uuid
-from ....exceptions import ValidationError
 
 
 class ListSamples(Command):
@@ -26,8 +24,6 @@ class ListSamples(Command):
 
     def validate(self):
         """Validate command input."""
-        if is_valid_uuid(self.project_id) is False:
-            raise ValidationError("Project ID is not valid. Exiting.")
 
     def execute(self):
         self.echo_debug(

@@ -220,11 +220,10 @@ def test_list_project_samples__archive_status_null__prints_without_fail(
 
     if not using_api_key:
         mocked_login.assert_called_once()
-    mocked_get_project_samples.assert_called_once()
-    output_line = io.BytesIO()
-    sys.stdout = output_line
 
+    mocked_get_project_samples.assert_called_once()
     mocked_sample = SampleDetails(**sample_archive_status_null["results"][0])
+
     assert res.output.strip() == "\t".join(
         [
             str(mocked_sample.last_status.created.isoformat()),

@@ -1,5 +1,5 @@
 """Test download command."""
-# pylint: disable=wrong-import-order, import-error
+# pylint: disable=wrong-import-order, import-error, too-many-lines
 import io
 import json
 import operator
@@ -1006,6 +1006,3 @@ def test_invalid_file_types_sample_ids_provided(
         mocked_qc_metrics.assert_not_called()
         mocked_get_metadata.assert_not_called()
         mocked_download_file.assert_not_called()
-
-
-# pylint: disable=too-many-lines

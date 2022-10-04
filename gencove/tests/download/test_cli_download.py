@@ -1,5 +1,5 @@
 """Test download command."""
-# pylint: disable=wrong-import-order, import-error
+# pylint: disable=wrong-import-order, import-error, too-many-lines
 import io
 import json
 import operator
@@ -30,6 +30,7 @@ from gencove.tests.download.vcr.filters import (
 )
 from gencove.tests.filters import (
     filter_aws_headers,
+    filter_file_types_request,
     filter_jwt,
     filter_project_samples_response,
     filter_samples_request,
@@ -65,6 +66,7 @@ def vcr_config():
         "path_transformer": VCR.ensure_suffix(".yaml"),
         "before_record_request": [
             replace_gencove_url_vcr,
+            filter_file_types_request,
             filter_files_request,
             filter_project_samples_request,
             filter_samples_request,
@@ -911,3 +913,96 @@ def test_project_id_provided_filter_not_archived(credentials, mocker):
         mocked_get_metadata.assert_not_called()
         mocked_download_file.assert_not_called()
         mocked_sample_details.assert_not_called()
+
+
+@pytest.mark.vcr
+def test_invalid_file_types_project_id_provided(
+    credentials, mocker, project_id_download, recording, vcr
+):
+    """Fails when an invalid file type is provided for a project"""
+    # pylint: disable=too-many-locals
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        if not recording:
+            # Mock only if using the cassettes, since we mock the return value.
+            get_project_samples_response = get_vcr_response(
+                "/api/v2/project-samples/", vcr, operator.contains
+            )
+            mocked_project_samples = mocker.patch.object(
+                APIClient,
+                "get_project_samples",
+                return_value=ProjectSamples(**get_project_samples_response),
+            )
+        mocked_sample_details = mocker.patch.object(APIClient, "get_sample_details")
+        mocked_qc_metrics = mocker.patch.object(APIClient, "get_sample_qc_metrics")
+        mocked_get_metadata = mocker.patch.object(APIClient, "get_metadata")
+        mocked_download_file = mocker.patch(
+            "gencove.command.download.main.download_file",
+            side_effect=download_file,
+        )
+        res = runner.invoke(
+            download,
+            [
+                "cli_test_data",
+                "--project-id",
+                project_id_download,
+                *credentials,
+                "--file-types",
+                "call_capture-forced_vcf",
+            ],
+        )
+        assert res.exit_code == 1
+        assert "ERROR: Invalid file types: call_capture-forced_vcf." in res.stdout
+        if not recording:
+            mocked_project_samples.assert_called_once()
+        mocked_sample_details.assert_not_called()
+        mocked_qc_metrics.assert_not_called()
+        mocked_get_metadata.assert_not_called()
+        mocked_download_file.assert_not_called()
+
+
+@pytest.mark.vcr
+def test_invalid_file_types_sample_ids_provided(
+    credentials, mocker, sample_id_download, recording, vcr
+):
+    """Fails when an invalid file type is provided for a sample"""
+    # pylint: disable=too-many-locals
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        if not recording:
+            # Mock only if using the cassettes, since we mock the return value.
+            get_sample_details_response = get_vcr_response(
+                "/api/v2/samples/", vcr, operator.contains
+            )
+            mocked_sample_details = mocker.patch.object(
+                APIClient,
+                "get_sample_details",
+                return_value=SampleDetails(**get_sample_details_response),
+            )
+        mocked_qc_metrics = mocker.patch.object(APIClient, "get_sample_qc_metrics")
+        mocked_get_metadata = mocker.patch.object(APIClient, "get_metadata")
+        mocked_download_file = mocker.patch(
+            "gencove.command.download.main.download_file",
+            side_effect=download_file,
+        )
+        res = runner.invoke(
+            download,
+            [
+                "cli_test_data",
+                "--sample-ids",
+                sample_id_download,
+                *credentials,
+                "--file-types",
+                "call_capture-forced_vcf",
+            ],
+        )
+        assert res.exit_code == 1
+        assert (
+            f"ERROR: Sample with id {MOCK_UUID} does not have any files with the "
+            f"following file types: call_capture-forced_vcf" in res.stdout
+        )
+        if not recording:
+            mocked_sample_details.assert_called_once()
+        mocked_qc_metrics.assert_not_called()
+        mocked_get_metadata.assert_not_called()
+        mocked_download_file.assert_not_called()

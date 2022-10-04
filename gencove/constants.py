@@ -75,6 +75,7 @@ class SampleArchiveStatus(Enum):
     ARCHIVED = "archived"
     RESTORE_REQUESTED = "restore_requested"
     ALL = "all"
+    UNKNOWN = "unknown"
 
 
 @unique

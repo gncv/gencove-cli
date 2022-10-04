@@ -9,6 +9,7 @@ import requests
 from gencove import client  # noqa: I100
 from gencove.command.base import Command
 from gencove.command.download.exceptions import DownloadTemplateError
+from gencove.command.utils import validate_file_types
 from gencove.constants import SampleArchiveStatus
 from gencove.exceptions import ValidationError
 
@@ -92,6 +93,27 @@ class Download(Command):
         if not self.sample_ids:
             raise ValidationError("No samples to process. Exiting.")
 
+        try:
+            if self.filters.project_id:
+                valid_file_types = self.api_client.get_file_types(
+                    project_id=self.filters.project_id
+                ).results
+            else:
+                valid_file_types = self.api_client.get_file_types().results
+            invalid_file_types = validate_file_types(
+                self.filters.file_types, valid_file_types
+            )
+
+            if invalid_file_types:
+                raise ValidationError(
+                    f"Invalid file types: {', '.join(invalid_file_types)}. "
+                    f"Use gencove file-types command for list of valid file types. "
+                    f"Use with --project-id option to see project file types."
+                )
+        except client.APIClientError as err:
+            self.echo_debug(err)
+            self.echo_warning("There was an error while validating file types.")
+
         if all(
             [
                 self.download_to == "-",
@@ -165,6 +187,16 @@ class Download(Command):
         if not ALLOWED_STATUSES_RE.match(sample.last_status.status):
             self.echo_warning(f"Sample #{sample.id} has no deliverable.")
             return
+
+        sample_file_types = [file.file_type for file in sample.files]
+        file_types_set = set(self.filters.file_types)
+        sample_file_types_set = set(sample_file_types)
+        if not file_types_set.issubset(sample_file_types_set):
+            raise ValidationError(
+                f"Sample with id {sample.id} does not have any files with "
+                f"the following file types: "
+                f"{', '.join(list(file_types_set.difference(sample_file_types_set)))}"
+            )
 
         file_types_re = re.compile("|".join(self.filters.file_types), re.IGNORECASE)
 

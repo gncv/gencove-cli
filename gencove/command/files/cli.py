@@ -8,7 +8,7 @@ from .main import ListFileTypes
 
 
 @click.command("file-types")
-@click.argument("project_id", required=False)
+@click.option("--project-id", required=False, help="Gencove project ID")
 @add_options(common_options)
 def list_file_types(project_id, host, email, password, api_key):
     """List file types in Gencove's system.
@@ -16,7 +16,7 @@ def list_file_types(project_id, host, email, password, api_key):
     PROJECT_ID (optional): List file types for a particular project
 
     Args:
-        project_id (UUID, optional): ID of a project to list file types for.
+        project_id (UUID, optional): project id in Gencove's system.
     """
     ListFileTypes(
         project_id,

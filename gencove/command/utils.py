@@ -99,3 +99,18 @@ def is_valid_json(candidate):
         return True
     except ValueError:
         return False
+
+
+def validate_file_types(candidate_file_types, valid_file_types):
+    """Test if provided list of file types is valid.
+
+    candidate_file_types (tuple of str): File types to check
+    valid_file_types (list of FileType): Valid file types to check against
+
+    Returns:
+        list: [] if candidate_file_types are valid, list of invalid file types if not
+    """
+    file_type_keys = [file_type.key for file_type in valid_file_types]
+
+    # file types that are in candidate_file_types but not in valid_file_types
+    return list(set(candidate_file_types).difference(set(file_type_keys)))

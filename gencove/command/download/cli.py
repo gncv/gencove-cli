@@ -98,24 +98,25 @@ def download(  # pylint: disable=E0012,C0330,R0913
             gencove download - --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db --download-urls
 
     \f
+    .. ignore::
+        Args:
+            destination (str): path/to/save/deliverables/to.
+            project_id (str): project id in Gencove's system.
+            sample_ids (list(str), optional): specific samples for which
+                to download the results. if not specified, download deliverables
+                for all samples.
+            file_types (list(str), optional): specific deliverables to download
+                results for. if not specified, all file types will be downloaded.
+            skip_existing (bool, optional, default True): skip downloading existing
+                files.
+            download_urls (bool, optional): output the files available for a
+                download. if the destination parameter is "-", it goes to the
+                stdout.
+            no_progress (bool, optional, default False): do not show progress
+                bar.
+            checksums (bool, optional, default False): download additonal checksum
+                files for each deliverable.
 
-    Args:
-        destination (str): path/to/save/deliverables/to.
-        project_id (str): project id in Gencove's system.
-        sample_ids (list(str), optional): specific samples for which
-            to download the results. if not specified, download deliverables
-            for all samples.
-        file_types (list(str), optional): specific deliverables to download
-            results for. if not specified, all file types will be downloaded.
-        skip_existing (bool, optional, default True): skip downloading existing
-            files.
-        download_urls (bool, optional): output the files available for a
-            download. if the destination parameter is "-", it goes to the
-            stdout.
-        no_progress (bool, optional, default False): do not show progress
-            bar.
-        checksums (bool, optional, default False): download additonal checksum
-            files for each deliverable.
     """  # noqa: E501
     s_ids = tuple()
     if sample_ids:

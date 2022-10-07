@@ -347,3 +347,16 @@ class FileTypesModel(BaseModel):
 
     meta: ResponseMeta
     results: Optional[List[FileType]]
+
+
+class Pipeline(GencoveBaseModel):
+    """Pipeline model"""
+
+    version: str
+
+
+class Pipelines(BaseModel):
+    """Pipeline model"""
+
+    meta: ResponseMeta
+    results: Optional[List[Pipeline]]

@@ -215,3 +215,26 @@ def filter_import_existing_samples_response(response, json_response):
             if "client_id" in sample:
                 sample["client_id"] = "foo"
     return response, json_response
+
+
+@parse_response_to_json
+def filter_project_pipelines_response(response, json_response):
+    """Filter project_pipelines sensitive data from response."""
+    if "results" in json_response:
+        for result in json_response["results"]:
+            if "id" in result:
+                result["id"] = MOCK_UUID
+            if "version" in result:
+                result["version"] = "foo"
+    if "meta" in json_response:
+        if json_response["meta"]["next"]:
+            next_url = urlparse(json_response["meta"]["next"])
+            json_response["meta"][
+                "next"
+            ] = f"https://example.com{next_url.path}?{next_url.query}"
+        if json_response["meta"]["previous"]:
+            previous_url = urlparse(json_response["meta"]["previous"])
+            json_response["meta"][
+                "previous"
+            ] = f"https://example.com{previous_url.path}?{previous_url.query}"
+    return response, json_response

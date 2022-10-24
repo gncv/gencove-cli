@@ -22,6 +22,7 @@ from requests import (
 
 from gencove import constants  # noqa: I100
 from gencove.constants import (
+    PipelineSortBy,
     SampleArchiveStatus,
     SampleAssignmentStatus,
     SampleSheetSortBy,
@@ -983,7 +984,13 @@ class APIClient:
                     "results": [...]
                 }
         """
-        params = self._add_query_params(next_link)
+        params = self._add_query_params(
+            next_link,
+            {
+                "sort_by": PipelineSortBy.CREATED.value,
+                "sort_order": SortOrder.DESC.value,
+            },
+        )
         return self._get(
             self.endpoints.PIPELINES.value,
             query_params=params,

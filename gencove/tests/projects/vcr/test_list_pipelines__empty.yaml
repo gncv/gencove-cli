@@ -55,7 +55,7 @@ interactions:
         content-type:
           - application/json
       method: GET
-      uri: https://www.example.com/api/v2/pipeline/?offset=0&limit=200
+      uri: https://www.example.com/api/v2/pipeline/?sort_by=created&sort_order=desc&offset=0&limit=200
     response:
       body:
         string: '{"meta": {"count": 0, "next": null,

@@ -98,6 +98,13 @@ class SortOrder(Enum):
     DESC = "desc"
 
 
+@unique
+class PipelineSortBy(Enum):
+    """PipelineSortBy enum"""
+
+    CREATED = "created"
+
+
 # pylint: disable=too-few-public-methods
 class Credentials(BaseModel):
     """Credentials model"""

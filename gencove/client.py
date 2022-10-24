@@ -22,6 +22,7 @@ from requests import (
 
 from gencove import constants  # noqa: I100
 from gencove.constants import (
+    PipelineSortBy,
     SampleArchiveStatus,
     SampleAssignmentStatus,
     SampleSheetSortBy,
@@ -41,6 +42,7 @@ from gencove.models import (  # noqa: I101
     FileTypesModel,
     ImportExistingSamplesModel,
     PipelineCapabilities,
+    Pipelines,
     Project,
     ProjectBatches,
     ProjectBatchTypes,
@@ -962,4 +964,36 @@ class APIClient:
             query_params=params,
             authorized=True,
             model=FileTypesModel,
+        )
+
+    def get_pipelines(self, next_link=None):
+        """List pipelines.
+
+        Args:
+            next_link (str, optional): url from previous
+                response['meta']['next'].
+
+        Returns:
+            api response (dict):
+                {
+                    "meta": {
+                        "count": int,
+                        "next": str,
+                        "previous": optional[str],
+                    },
+                    "results": [...]
+                }
+        """
+        params = self._add_query_params(
+            next_link,
+            {
+                "sort_by": PipelineSortBy.CREATED.value,
+                "sort_order": SortOrder.DESC.value,
+            },
+        )
+        return self._get(
+            self.endpoints.PIPELINES.value,
+            query_params=params,
+            authorized=True,
+            model=Pipelines,
         )

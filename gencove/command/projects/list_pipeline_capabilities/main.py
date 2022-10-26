@@ -35,8 +35,9 @@ class ListPipelineCapabilities(Command):
                 self.echo_warning("There was an error listing pipeline capabilities.")
                 self.echo_info("The following error was returned:")
                 self.echo_info(err.message)
-            else:
-                raise
+            elif err.status_code == 404:
+                self.echo_error(f"Pipeline {self.pipeline_id} does not exist.")
+            raise
 
     @backoff.on_exception(
         backoff.expo,

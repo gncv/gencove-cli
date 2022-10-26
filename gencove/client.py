@@ -2,6 +2,7 @@
 
 Exclude imports from linters due to install aliases breaking the rules.
 """
+# pylint: disable=too-many-lines
 
 import datetime
 import json
@@ -42,8 +43,8 @@ from gencove.models import (  # noqa: I101
     FileTypesModel,
     ImportExistingSamplesModel,
     PipelineCapabilities,
-    PipelineCapabilitiesFromPipeline,
     Pipelines,
+    PipelineDetail,
     Project,
     ProjectBatches,
     ProjectBatchTypes,
@@ -610,7 +611,7 @@ class APIClient:
         resp = self._get(
             self.endpoints.PIPELINE.value.format(id=pipeline_id),
             authorized=True,
-            model=PipelineCapabilitiesFromPipeline,
+            model=PipelineDetail,
         )
         return resp
 

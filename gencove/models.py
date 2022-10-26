@@ -355,14 +355,14 @@ class Pipeline(GencoveBaseModel):
     version: str
 
 
+class PipelineDetail(Pipeline):
+    """Pipeline detail model"""
+
+    capabilities: List[PipelineCapabilities]
+
+
 class Pipelines(BaseModel):
     """Pipeline model"""
 
     meta: ResponseMeta
     results: Optional[List[Pipeline]]
-
-
-class PipelineCapabilitiesFromPipeline(GencoveBaseModel):
-    """Pipeline capabilities model from pipeline"""
-
-    capabilities: List[PipelineCapabilities]

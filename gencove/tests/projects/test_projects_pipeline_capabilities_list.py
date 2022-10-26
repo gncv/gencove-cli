@@ -174,8 +174,8 @@ def test_list_pipeline_capabilities__not_empty(
         pipelines = "\n".join(
             [
                 f"{capability['id']}\t{capability['name']}\t"
-                f"{str(capability['private']).title()}\t"
-                f"{str(capability['merge_vcfs_enabled']).title()}"
+                f"{'private' if capability['private'] else 'public'}\t"
+                f"{'Merge VCFs enabled' if capability['merge_vcfs_enabled'] else 'Merge VCFs disabled'}"  # noqa: E501  # pylint: disable=line-too-long
                 for capability in get_pipeline_response["capabilities"]
             ]
         )

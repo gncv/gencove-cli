@@ -360,3 +360,9 @@ class Pipelines(BaseModel):
 
     meta: ResponseMeta
     results: Optional[List[Pipeline]]
+
+
+class PipelineCapabilitiesFromPipeline(GencoveBaseModel):
+    """Pipeline capabilities model from pipeline"""
+
+    capabilities: List[PipelineCapabilities]

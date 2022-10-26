@@ -38,6 +38,7 @@ class ApiEndpoints(Enum):
     IMPORT_EXISTING_SAMPLES = "/api/v2/project-samples-import/"
     FILE_TYPES = "/api/v2/file-types/"
     PIPELINES = "/api/v2/pipeline/"
+    PIPELINE = "/api/v2/pipeline/{id}"
 
 
 @unique

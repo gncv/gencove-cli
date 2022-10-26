@@ -42,6 +42,7 @@ from gencove.models import (  # noqa: I101
     FileTypesModel,
     ImportExistingSamplesModel,
     PipelineCapabilities,
+    PipelineCapabilitiesFromPipeline,
     Pipelines,
     Project,
     ProjectBatches,
@@ -594,6 +595,22 @@ class APIClient:
             self.endpoints.PIPELINE_CAPABILITES.value.format(id=pipeline_id),
             authorized=True,
             model=PipelineCapabilities,
+        )
+        return resp
+
+    def get_pipeline_capabilities_for_pipeline(self, pipeline_id):
+        """Get pipeline capabilities details.
+
+        Args:
+            pipeline_id (str:uuid): pipeline id
+
+        Returns:
+            dict: pipeline details
+        """
+        resp = self._get(
+            self.endpoints.PIPELINE.value.format(id=pipeline_id),
+            authorized=True,
+            model=PipelineCapabilitiesFromPipeline,
         )
         return resp
 

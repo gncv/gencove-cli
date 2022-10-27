@@ -173,9 +173,7 @@ def test_list_pipeline_capabilities__not_empty(
         mocked_get_pipeline_capabilities_for_pipeline.assert_called_once()
         pipelines = "\n".join(
             [
-                f"{capability['id']}\t{capability['name']}\t"
-                f"{'private' if capability['private'] else 'public'}\t"
-                f"{'Merge VCFs enabled' if capability['merge_vcfs_enabled'] else 'Merge VCFs disabled'}"  # noqa: E501  # pylint: disable=line-too-long
+                f"{capability['id']}\t{capability['name']}"
                 for capability in get_pipeline_response["capabilities"]
             ]
         )

@@ -14,9 +14,5 @@ def get_line(pipeline_capability):
         [
             str(pipeline_capability.id),
             pipeline_capability.name,
-            "private" if pipeline_capability.private else "public",
-            "Merge VCFs enabled"
-            if pipeline_capability.merge_vcfs_enabled
-            else "Merge VCFs disabled",
         ]
     )

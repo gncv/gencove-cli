@@ -2,6 +2,7 @@
 # pylint: disable=E0012,C0330,R0913
 import click
 
+from .create.cli import create_project
 from .create_batch.cli import create_project_batch
 from .create_merged_vcf.cli import create_merged_vcf
 from .delete_samples.cli import delete_project_samples
@@ -23,6 +24,7 @@ def projects():
     """Project managements commands."""
 
 
+projects.add_command(create_project)
 projects.add_command(create_project_batch)
 projects.add_command(list_projects)
 projects.add_command(list_project_samples)

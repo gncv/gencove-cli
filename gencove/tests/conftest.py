@@ -33,6 +33,12 @@ def project_id():
 
 
 @pytest.fixture(scope="session")
+def pipeline_capability_id():
+    """Returns the pipeline capability id."""
+    return os.getenv("GENCOVE_PIPELINE_CAPABILITY_ID")
+
+
+@pytest.fixture(scope="session")
 def project_id_batches():
     """Returns the project id that contains batches."""
     return os.getenv("GENCOVE_PROJECT_ID_BATCHES_TEST")

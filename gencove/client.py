@@ -2,6 +2,7 @@
 
 Exclude imports from linters due to install aliases breaking the rules.
 """
+# pylint: disable=too-many-lines
 
 import datetime
 import json
@@ -997,3 +998,14 @@ class APIClient:
             authorized=True,
             model=Pipelines,
         )
+
+    def create_project(self, project_name, pipeline_capability_id):
+        """Making a post request to create a project."""
+        project_endpoint = self.endpoints.PROJECTS.value
+
+        payload = {
+            "name": project_name,
+            "pipeline_capabilities": pipeline_capability_id,
+        }
+
+        return self._post(project_endpoint, payload, authorized=True, model=Project)

@@ -7,6 +7,7 @@ import click
 from gencove.logger import dump_debug_log, echo_error
 
 map_arguments_to_human_readable = {
+    "pipeline_capability_id": "Pipeline capability ID",
     "project_id": "Project ID",
     "sample_ids": "sample IDs",
 }

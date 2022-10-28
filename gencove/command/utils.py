@@ -60,9 +60,7 @@ def validate_uuid_list(ctx, param, uuids):  # pylint: disable=unused-argument
     """
     if uuids:
         try:
-            uuids_list = [
-                str(uuid.UUID(id.strip(), version=4)) for id in uuids.split(",")
-            ]
+            uuids_list = [str(uuid.UUID(id.strip())) for id in uuids.split(",")]
         except ValueError:
             human_readable_param = map_arguments_to_human_readable.get(
                 param.name, param.name
@@ -77,15 +75,15 @@ def sanitize_string(output):
 
 
 def is_valid_uuid(candidate):
-    """Test if provided string is a valid uuid version 4 string.
+    """Test if provided string is a valid uuid string.
 
     candidate (str): uuid to check
 
     Returns:
-        bool: True if is a valid uuid v4, False if not
+        bool: True if is a valid uuid, False if not
     """
     try:
-        uuid.UUID(candidate, version=4)
+        uuid.UUID(candidate)
         return True
     except ValueError:
         return False

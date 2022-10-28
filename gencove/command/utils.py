@@ -23,6 +23,10 @@ def validate_uuid(ctx, param, candidate):  # pylint: disable=unused-argument
     """Test if provided string is a valid uuid version 4 string and convert
     to a hyphen uuid form if valid but no hyphens are present
 
+    Note:
+    Version 4 UUIDs have the form `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`
+    where `x` is any hexadecimal digit and `y` is one of `8`, `9`, `a`, or `b`.
+
     candidate (str): uuid to check
 
     Returns:
@@ -32,7 +36,8 @@ def validate_uuid(ctx, param, candidate):  # pylint: disable=unused-argument
         Abort - if uuid is invalid.
     """
     try:
-        validated_uuid = str(uuid.UUID(candidate, version=4))
+        # if version=4 attribute is set, value is silently converted
+        validated_uuid = str(uuid.UUID(candidate))
     except ValueError:
         human_readable_param = map_arguments_to_human_readable.get(
             param.name, param.name
@@ -55,9 +60,7 @@ def validate_uuid_list(ctx, param, uuids):  # pylint: disable=unused-argument
     """
     if uuids:
         try:
-            uuids_list = [
-                str(uuid.UUID(id.strip(), version=4)) for id in uuids.split(",")
-            ]
+            uuids_list = [str(uuid.UUID(id.strip())) for id in uuids.split(",")]
         except ValueError:
             human_readable_param = map_arguments_to_human_readable.get(
                 param.name, param.name
@@ -72,15 +75,15 @@ def sanitize_string(output):
 
 
 def is_valid_uuid(candidate):
-    """Test if provided string is a valid uuid version 4 string.
+    """Test if provided string is a valid uuid string.
 
     candidate (str): uuid to check
 
     Returns:
-        bool: True if is a valid uuid v4, False if not
+        bool: True if is a valid uuid, False if not
     """
     try:
-        uuid.UUID(candidate, version=4)
+        uuid.UUID(candidate)
         return True
     except ValueError:
         return False

@@ -11,6 +11,7 @@ from .import_existing_samples.cli import import_existing_project_samples
 from .list.cli import list_projects
 from .list_batch_types.cli import list_project_batch_types
 from .list_batches.cli import list_project_batches
+from .list_pipeline_capabilities.cli import list_project_pipeline_capabilities
 from .list_pipelines.cli import list_project_pipelines
 from .restore_samples.cli import restore_project_samples
 from .run_prefix.cli import run_prefix
@@ -28,6 +29,7 @@ projects.add_command(list_projects)
 projects.add_command(list_project_samples)
 projects.add_command(list_project_batch_types)
 projects.add_command(list_project_batches)
+projects.add_command(list_project_pipeline_capabilities)
 projects.add_command(list_project_pipelines)
 projects.add_command(get_batch)
 projects.add_command(delete_project_samples)

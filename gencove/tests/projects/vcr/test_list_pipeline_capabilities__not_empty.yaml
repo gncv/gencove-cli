@@ -1,0 +1,103 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.3.9
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '537'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 26 Oct 2022 13:53:56 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.3.9
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/pipeline/11111111-1111-1111-1111-111111111111
+  response:
+    body:
+      string: '{"id": "11111111-1111-1111-1111-111111111111", "version": "mock version",
+        "capabilities": [{"id": "11111111-1111-1111-1111-111111111111", "name": "Domestic
+        cat low-pass v2.0 [0.1x-6x]", "private": false, "merge_vcfs_enabled": true,
+        "version": "mock name"}, {"id": "11111111-1111-1111-1111-111111111111", "name":
+        "Human low-pass GRCh37 v3.1 [0.1x-6x]", "private": false, "merge_vcfs_enabled":
+        true, "version": "mock name"}, {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "Human low-pass GRCh38 v3.3 [0.1x-6x]", "private": false, "merge_vcfs_enabled":
+        true, "version": "mock name"}, {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "Maize low-pass v1.2 [0.1x-6x]", "private": false, "merge_vcfs_enabled":
+        true, "version": "mock name"}, {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "Mouse low-pass v1.0 [0.1x-6x]", "private": false, "merge_vcfs_enabled":
+        false, "version": "mock name"}, {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "Soy low-pass Wm82.a2 v2.0 [0.1x-6x]", "private": false, "merge_vcfs_enabled":
+        true, "version": "mock name"}, {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "Soy low-pass Wm82.a4 v1.0 [0.1x-6x]", "private": false, "merge_vcfs_enabled":
+        true, "version": "mock name"}, {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "Tomato low-pass SL4.0 v1.0 [0.1x-6x]", "private": false, "merge_vcfs_enabled":
+        true, "version": "mock name"}]}'
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1148'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 26 Oct 2022 13:53:56 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

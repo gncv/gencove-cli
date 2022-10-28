@@ -274,3 +274,24 @@ def filter_create_project_response(response, json_response):
     if "webhook_url" in json_response and json_response["webhook_url"]:
         json_response["webhook_url"] = "http://mockurl.com"
     return response, json_response
+
+
+def filter_project_pipeline_capabilities_request(request):
+    """Filter pipeline_capabilities sensitive data from request."""
+    return _replace_uuid_from_url(request, "pipeline")
+
+
+@parse_response_to_json
+def filter_project_pipeline_capabilities_response(response, json_response):
+    """Filter pipeline_capabilities sensitive data from response."""
+    if "id" in json_response:
+        json_response["id"] = MOCK_UUID
+    if "version" in json_response:
+        json_response["version"] = "mock version"
+    if "capabilities" in json_response:
+        for capability in json_response["capabilities"]:
+            if "id" in capability:
+                capability["id"] = MOCK_UUID
+            if "name" in capability:
+                capability["version"] = "mock name"
+    return response, json_response

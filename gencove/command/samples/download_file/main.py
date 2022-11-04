@@ -92,11 +92,13 @@ class DownloadFile(Command):
             )
 
         sample_file_types = {file.file_type for file in sample.files}
-        if self.file_type not in sample_file_types:
+        additional_file_types = {"qc", "metadata"}
+        valid_file_types = sample_file_types.union(additional_file_types)
+        if self.file_type not in valid_file_types:
             raise ValidationError(
                 f"Sample with id {sample.id} does not have any files with "
                 f"file type {self.file_type}. Valid file types for this sample are: "
-                f"{', '.join(sample_file_types)}"
+                f"{', '.join(valid_file_types)}"
             )
 
         file_to_download = None

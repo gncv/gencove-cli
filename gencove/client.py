@@ -2,6 +2,7 @@
 
 Exclude imports from linters due to install aliases breaking the rules.
 """
+# pylint: disable=too-many-lines
 
 import datetime
 import json
@@ -22,6 +23,7 @@ from requests import (
 
 from gencove import constants  # noqa: I100
 from gencove.constants import (
+    PipelineSortBy,
     SampleArchiveStatus,
     SampleAssignmentStatus,
     SampleSheetSortBy,
@@ -41,6 +43,8 @@ from gencove.models import (  # noqa: I101
     FileTypesModel,
     ImportExistingSamplesModel,
     PipelineCapabilities,
+    Pipelines,
+    PipelineDetail,
     Project,
     ProjectBatches,
     ProjectBatchTypes,
@@ -595,6 +599,22 @@ class APIClient:
         )
         return resp
 
+    def get_pipeline_capabilities_for_pipeline(self, pipeline_id):
+        """Get pipeline capabilities details.
+
+        Args:
+            pipeline_id (str:uuid): pipeline id
+
+        Returns:
+            dict: pipeline details
+        """
+        resp = self._get(
+            self.endpoints.PIPELINE.value.format(id=pipeline_id),
+            authorized=True,
+            model=PipelineDetail,
+        )
+        return resp
+
     def get_project_batch_types(self, project_id, next_link=None):
         """List single project's available batch types."""
         project_endpoint = self.endpoints.PROJECT_BATCH_TYPES.value.format(
@@ -963,3 +983,46 @@ class APIClient:
             authorized=True,
             model=FileTypesModel,
         )
+
+    def get_pipelines(self, next_link=None):
+        """List pipelines.
+
+        Args:
+            next_link (str, optional): url from previous
+                response['meta']['next'].
+
+        Returns:
+            api response (dict):
+                {
+                    "meta": {
+                        "count": int,
+                        "next": str,
+                        "previous": optional[str],
+                    },
+                    "results": [...]
+                }
+        """
+        params = self._add_query_params(
+            next_link,
+            {
+                "sort_by": PipelineSortBy.CREATED.value,
+                "sort_order": SortOrder.DESC.value,
+            },
+        )
+        return self._get(
+            self.endpoints.PIPELINES.value,
+            query_params=params,
+            authorized=True,
+            model=Pipelines,
+        )
+
+    def create_project(self, project_name, pipeline_capability_id):
+        """Making a post request to create a project."""
+        project_endpoint = self.endpoints.PROJECTS.value
+
+        payload = {
+            "name": project_name,
+            "pipeline_capabilities": pipeline_capability_id,
+        }
+
+        return self._post(project_endpoint, payload, authorized=True, model=Project)

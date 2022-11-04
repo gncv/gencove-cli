@@ -440,6 +440,20 @@ def test_uuid_with_hyphens_remains_as_is():
     assert actual_uuid == expected_uuid
 
 
+def test_uuid_with_hyphens_remains_as_is__not_v4_uuid():
+    """Test that when uuid with hyphens it will not do anything even for values
+    that are not technically a uuid v4.
+    """
+    input_uuid = "11111111-1111-1111-1111-111111111234"
+    expected_uuid = str(input_uuid)
+
+    param = Argument(["-project_id"])
+    actual_uuid = validate_uuid(None, param, input_uuid)
+
+    assert isinstance(actual_uuid, str)
+    assert actual_uuid == expected_uuid
+
+
 def test_validate_uuid__raises_if_uuid_invalid():
     """Test that an invalid uuid will raise a click.Abort"""
     input_uuid = "codef00d-1111-abcd-1111"

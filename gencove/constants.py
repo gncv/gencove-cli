@@ -37,6 +37,8 @@ class ApiEndpoints(Enum):
     FILE_CHECKSUM = "/api/v2/files/{id}.sha256"
     IMPORT_EXISTING_SAMPLES = "/api/v2/project-samples-import/"
     FILE_TYPES = "/api/v2/file-types/"
+    PIPELINES = "/api/v2/pipeline/"
+    PIPELINE = "/api/v2/pipeline/{id}"
 
 
 @unique
@@ -95,6 +97,13 @@ class SortOrder(Enum):
 
     ASC = "asc"
     DESC = "desc"
+
+
+@unique
+class PipelineSortBy(Enum):
+    """PipelineSortBy enum"""
+
+    CREATED = "created"
 
 
 # pylint: disable=too-few-public-methods

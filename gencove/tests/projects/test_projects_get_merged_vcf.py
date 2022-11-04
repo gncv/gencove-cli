@@ -87,7 +87,7 @@ def test_get_merged_vcf__empty(mocker):
             created="2020-06-11T02:14:00.541889Z",
             organization=str(uuid4()),
             sample_count=3,
-            pipeline_capabilites=str(uuid4()),
+            pipeline_capabilities=str(uuid4()),
             files=[],
         ),
     )
@@ -130,7 +130,7 @@ def test_get_merged_vcf_custom_filename(mocker):
             created="2020-06-11T02:14:00.541889Z",
             organization=str(uuid4()),
             sample_count=3,
-            pipeline_capabilites=str(uuid4()),
+            pipeline_capabilities=str(uuid4()),
             files=[
                 {
                     "id": "755ec682-e4a5-414a-a5be-07e0af11cf75",
@@ -189,7 +189,7 @@ def test_get_merged_vcf__no_progress_success(mocker):
             created="2020-06-11T02:14:00.541889Z",
             organization=str(uuid4()),
             sample_count=3,
-            pipeline_capabilites=str(uuid4()),
+            pipeline_capabilities=str(uuid4()),
             files=[
                 {
                     "id": "755ec682-e4a5-414a-a5be-07e0af11cf75",
@@ -287,7 +287,7 @@ def test_get_merged_vcf__success(mocker):
             created="2020-06-11T02:14:00.541889Z",
             organization=str(uuid4()),
             sample_count=3,
-            pipeline_capabilites=str(uuid4()),
+            pipeline_capabilities=str(uuid4()),
             files=[
                 {
                     "id": "755ec682-e4a5-414a-a5be-07e0af11cf75",
@@ -351,7 +351,7 @@ def test_get_merged_vcf__success__project_with_legacy_webhhok_url(mocker):
             organization=str(uuid4()),
             webhook_url="",
             sample_count=3,
-            pipeline_capabilites=str(uuid4()),
+            pipeline_capabilities=str(uuid4()),
             files=[
                 {
                     "id": "755ec682-e4a5-414a-a5be-07e0af11cf75",

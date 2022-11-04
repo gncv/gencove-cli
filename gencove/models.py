@@ -62,8 +62,6 @@ class PipelineCapabilities(GencoveBaseModel):
     """Pipeline Capabilities record"""
 
     name: Optional[str]
-    private: Optional[bool]
-    merge_vcfs_enabled: Optional[bool]
 
 
 class SampleFile(GencoveBaseModel):
@@ -347,3 +345,22 @@ class FileTypesModel(BaseModel):
 
     meta: ResponseMeta
     results: Optional[List[FileType]]
+
+
+class Pipeline(GencoveBaseModel):
+    """Pipeline model"""
+
+    version: str
+
+
+class PipelineDetail(Pipeline):
+    """Pipeline detail model"""
+
+    capabilities: List[PipelineCapabilities]
+
+
+class Pipelines(BaseModel):
+    """Pipeline model"""
+
+    meta: ResponseMeta
+    results: Optional[List[Pipeline]]

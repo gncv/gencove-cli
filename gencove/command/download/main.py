@@ -107,7 +107,7 @@ class Download(Command):
             if invalid_file_types:
                 raise ValidationError(
                     f"Invalid file types: {', '.join(invalid_file_types)}. "
-                    f"Use gencove file-types command for list of valid file types. "
+                    f"Use gencove file-types command for a list of valid file types. "
                     f"Use with --project-id option to see project file types."
                 )
         except client.APIClientError as err:
@@ -187,16 +187,6 @@ class Download(Command):
         if not ALLOWED_STATUSES_RE.match(sample.last_status.status):
             self.echo_warning(f"Sample #{sample.id} has no deliverable.")
             return
-
-        sample_file_types = [file.file_type for file in sample.files]
-        file_types_set = set(self.filters.file_types)
-        sample_file_types_set = set(sample_file_types)
-        if not file_types_set.issubset(sample_file_types_set):
-            raise ValidationError(
-                f"Sample with id {sample.id} does not have any files with "
-                f"the following file types: "
-                f"{', '.join(list(file_types_set.difference(sample_file_types_set)))}"
-            )
 
         file_types_re = re.compile("|".join(self.filters.file_types), re.IGNORECASE)
 

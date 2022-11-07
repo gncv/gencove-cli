@@ -142,6 +142,15 @@ class Download(Command):
         if self.download_urls:
             self.output_list()
 
+        if all(
+            [self.download_to != "-", not self.download_urls, not self.downloaded_files]
+        ):
+            sample_ids = [str(sample_id) for sample_id in self.sample_ids]
+            self.echo_warning(
+                f"Files not found for sample ids: {', '.join(sample_ids)} "
+                f"and file types: {', '.join(self.filters.file_types)}."
+            )
+
     @backoff.on_exception(
         backoff.expo,
         requests.exceptions.HTTPError,

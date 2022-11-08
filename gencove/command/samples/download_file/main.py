@@ -96,7 +96,7 @@ class DownloadFile(Command):
             raise ValidationError(
                 f"Sample with id {sample.id} does not have any files with "
                 f"file type {self.file_type}. Valid file types for this sample are: "
-                f"{', '.join(sample_file_types)}"
+                f"{', '.join(sorted(sample_file_types))}."
             )
 
         file_to_download = None

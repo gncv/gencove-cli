@@ -993,16 +993,12 @@ def test_invalid_file_types_sample_ids_provided(
                 sample_id_download,
                 *credentials,
                 "--file-types",
-                "call_capture-forced_vcf",
+                "fastqr1",
             ],
         )
         assert res.exit_code == 1
-        assert (
-            f"ERROR: Sample with id {MOCK_UUID} does not have any files with the "
-            f"following file types: call_capture-forced_vcf" in res.stdout
-        )
-        if not recording:
-            mocked_sample_details.assert_called_once()
+        assert "ERROR: Invalid file types: fastqr1." in res.stdout
+        mocked_sample_details.assert_not_called()
         mocked_qc_metrics.assert_not_called()
         mocked_get_metadata.assert_not_called()
         mocked_download_file.assert_not_called()

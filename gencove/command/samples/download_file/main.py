@@ -93,12 +93,11 @@ class DownloadFile(Command):
 
         sample_file_types = {file.file_type for file in sample.files}
         if self.file_type not in sample_file_types:
-            self.echo_warning(
+            raise ValidationError(
                 f"Sample with id {sample.id} does not have any files with "
                 f"file type {self.file_type}. Valid file types for this sample are: "
                 f"{', '.join(sorted(sample_file_types))}."
             )
-            return
 
         file_to_download = None
 

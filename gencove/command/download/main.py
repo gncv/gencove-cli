@@ -158,7 +158,14 @@ class Download(Command):
         max_tries=10,
     )
     @backoff.on_exception(
-        backoff.expo, client.APIClientTooManyRequestsError, max_tries=20
+        backoff.expo,
+        client.APIClientTooManyRequestsError,
+        max_tries=20,
+    )
+    @backoff.on_exception(
+        backoff.expo,
+        client.APIClientTimeout,
+        max_tries=20,
     )
     def process_sample(self, sample_id):
         """Process sample.
@@ -173,7 +180,14 @@ class Download(Command):
             sample = self.api_client.get_sample_details(sample_id)
         except client.APIClientTooManyRequestsError:
             self.echo_debug(
-                f"Request was throttled for sample {sample_id}, trying again"
+                f"Request was throttled for sample {sample_id} "
+                "because of too many requests, trying again"
+            )
+            raise
+        except client.APIClientTimeout:
+            self.echo_debug(
+                f"Request was throttled for sample {sample_id} "
+                "because of timeout, trying again"
             )
             raise
         except client.APIClientError:

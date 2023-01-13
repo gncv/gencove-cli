@@ -168,6 +168,7 @@ class QualityControlData(BaseModel):
 
     value_expected: Optional[float]
     value_measured: Optional[float]
+    value_string: Optional[str]
     status: Optional[str]
 
 

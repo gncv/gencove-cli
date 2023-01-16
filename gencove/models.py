@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any, List, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, validator
 
 
 # pylint: disable=too-few-public-methods
@@ -170,6 +170,15 @@ class QualityControlData(BaseModel):
     value_measured: Optional[float]
     value_string: Optional[str]
     status: Optional[str]
+
+    @validator("value_string", pre=True)
+    def blank_string(
+        cls, value: str  # noqa: N805
+    ):  # pylint: disable=no-self-argument,no-self-use
+        """Validator for value_string field, return None in case of empty string"""
+        if value == "":
+            return None
+        return value
 
 
 class QualityControl(BaseModel):

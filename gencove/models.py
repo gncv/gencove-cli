@@ -173,8 +173,8 @@ class QualityControlData(BaseModel):
 
     @validator("value_string", pre=True)
     def blank_string(
-        cls, value: str
-    ):  # noqa: N805 # pylint: disable=no-self-argument,no-self-use
+        cls, value: str  # noqa: N805
+    ):  # pylint: disable=no-self-argument,no-self-use
         """Validator for value_string field, return None in case of empty string"""
         if value == "":
             return None

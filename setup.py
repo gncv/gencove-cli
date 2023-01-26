@@ -21,7 +21,7 @@ setup(
     name="gencove",
     description="Gencove API and CLI tool",
     long_description=long_description,
-    long_description_content_type='text/markdown'
+    long_description_content_type='text/markdown',
     url="http://docs.gencove.com",
     author="Tomaz Berisa",
     license="Apache 2.0",

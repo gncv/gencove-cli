@@ -1,6 +1,6 @@
 """Packaging for Gencove CLI."""
 from setuptools import find_packages, setup
-from pathilb import Path
+from pathlib import Path
 
 
 def version():

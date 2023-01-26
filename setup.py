@@ -13,7 +13,8 @@ def version():
 
     return f"{major}.{minor}.{patch}"
 
-long_description = ("pypi_readme.md").read_text()
+with open("pypi_readme.md") as f:
+    long_description = f.read()
 
 setup(
     name="gencove",

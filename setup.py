@@ -13,13 +13,15 @@ def version():
 
     return f"{major}.{minor}.{patch}"
 
-with open("pypi_readme.md") as f:
-    long_description = f.read()
+def long_description():
+    with open("gencove/pypi_readme.md") as f:
+        long_description = f.read()
+    return long_description
 
 setup(
     name="gencove",
     description="Gencove API and CLI tool",
-    long_description=long_description,
+    long_description=long_description(),
     long_description_content_type='text/markdown',
     url="http://docs.gencove.com",
     author="Tomaz Berisa",

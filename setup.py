@@ -13,16 +13,18 @@ def version():
 
     return f"{major}.{minor}.{patch}"
 
+
 def long_description():
     with open("gencove/description/pypi_readme.md") as f:
         long_description = f.read()
     return long_description
 
+
 setup(
     name="gencove",
     description="Gencove API and CLI tool",
     long_description=long_description(),
-    long_description_content_type='text/markdown',
+    long_description_content_type="text/markdown",
     url="http://docs.gencove.com",
     author="Tomaz Berisa",
     license="Apache 2.0",
@@ -52,5 +54,5 @@ setup(
         [console_scripts]
         gencove=gencove.cli:cli
     """,
-    package_data={"gencove": ["version/*","description/*"]},
+    package_data={"gencove": ["version/*", "description/*"]},
 )

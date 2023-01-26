@@ -14,7 +14,7 @@ def version():
     return f"{major}.{minor}.{patch}"
 
 def long_description():
-    with open("gencove/pypi_readme.md") as f:
+    with open("gencove/description/pypi_readme.md") as f:
         long_description = f.read()
     return long_description
 
@@ -52,5 +52,5 @@ setup(
         [console_scripts]
         gencove=gencove.cli:cli
     """,
-    package_data={"gencove": ["version/*"]},
+    package_data={"gencove": ["version/*","description/*"]},
 )

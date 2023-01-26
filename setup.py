@@ -1,5 +1,6 @@
 """Packaging for Gencove CLI."""
 from setuptools import find_packages, setup
+from pathilb import Path
 
 
 def version():
@@ -13,10 +14,14 @@ def version():
 
     return f"{major}.{minor}.{patch}"
 
+this_directory = Path(__file__).parent
+long_description = (this_directory / "pypi_readme.md").read_text()
 
 setup(
     name="gencove",
     description="Gencove API and CLI tool",
+    long_description=long_description,
+    long_description_content_type='text/markdown'
     url="http://docs.gencove.com",
     author="Tomaz Berisa",
     license="Apache 2.0",

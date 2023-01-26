@@ -1,6 +1,5 @@
 """Packaging for Gencove CLI."""
 from setuptools import find_packages, setup
-from pathlib import Path
 
 
 def version():
@@ -14,8 +13,7 @@ def version():
 
     return f"{major}.{minor}.{patch}"
 
-this_directory = Path(__file__).parent
-long_description = (this_directory / "pypi_readme.md").read_text()
+long_description = ("pypi_readme.md").read_text()
 
 setup(
     name="gencove",

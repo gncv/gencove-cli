@@ -24,7 +24,7 @@ It is most often used for:
   * Sequence (`.fastq.gz`)
   * Alignment (`.bam`, `.bai`)
   * Imputation (`.vcf.gz`, `.vcf.gz.tbi`, `.vcf.gz.csi`)
-* [Assigning metadata](https://docs.gencove.com/main/the-gencove-cli/#assigning-sample-metadata) to gencove samples
+* [Assigning metadata](https://docs.gencove.com/main/the-gencove-cli/#assigning-sample-metadata) to Gencove samples
 
 Before filing a bug report, please refer to the following [link](https://docs.gencove.com/main/the-gencove-cli/#filing-a-bug-report-for-the-cli). Bugs should be reported [here](https://resources.gencove.com/hc/en-us/requests/new).
 
@@ -41,6 +41,6 @@ pip install -U gencove
 
 Online documentation (with examples) is available at [docs.gencove.com](https://docs.gencove.com/main/introduction/)
 
-API reference for publicly available endpoints: [API Reference](https://api.gencove.com/api/v2/docs/?_gl=1*15xis9x*_ga*NjA2MTk0ODQ0LjE2NjM2MTA3NTA.*_ga_4WPY9B677S*MTY3NDQ4ODQ0OC4zMjQuMS4xNjc0NDkzMDg2LjI5LjAuMA..)
+API reference for publicly available endpoints: [API Reference](https://api.gencove.com/api/v2/docs/)
 
 Comprehensive CLI Documentation available: [CLI Reference](https://docs.gencove.com/cli/)

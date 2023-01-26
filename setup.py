@@ -16,8 +16,8 @@ def version():
 
 def long_description():
     with open("gencove/description/pypi_readme.md") as f:
-        long_description = f.read()
-    return long_description
+        text = f.read()
+    return text
 
 
 setup(

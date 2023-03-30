@@ -45,7 +45,7 @@ setup(
         "requests>=2.19.1",
         "boto3>=1.17.97",
         "progressbar2==3.55.0",
-        "backoff==1.11.0",
+        "backoff<=2.2.1",
         "pydantic==1.9.2",
     ],
     setup_requires=["pytest-runner"],

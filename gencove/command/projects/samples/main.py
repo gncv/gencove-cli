@@ -17,6 +17,7 @@ class ListSamples(Command):
         self.sample_status = options.status
         self.sample_archive_status = options.archive_status
         self.search_term = options.search
+        self.include_run = options.include_run
 
     def initialize(self):
         """Initialize list subcommand."""
@@ -39,7 +40,7 @@ class ListSamples(Command):
                     return
 
                 for sample in samples:
-                    self.echo_data(get_line(sample))
+                    self.echo_data(get_line(sample, self.include_run))
         except APIClientError as err:
             if err.status_code == 404:
                 self.echo_error(f"Project {self.project_id} does not exist.")

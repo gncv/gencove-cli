@@ -1,4 +1,4 @@
-"""Download project's merged VCF file executor."""
+"""Return pre-signed URL for project's merged VCF file executor."""
 import backoff
 
 from ...base import Command
@@ -8,7 +8,7 @@ from ....exceptions import ValidationError
 
 
 class GetMergedVCFURL(Command):
-    """Download project's merged VCF file executor."""
+    """Return pre-signed URL for project's merged VCF file executor."""
 
     # pylint: disable=too-many-arguments
     def __init__(
@@ -44,7 +44,7 @@ class GetMergedVCFURL(Command):
         max_time=30,
     )
     def execute(self):
-        """Download merged VCF file for a given project."""
+        """Print merged VCF pre-signed URL for a given project."""
         self.echo_debug(f"Downloading merged VCF file for project {self.project_id}")
         try:
             project = self.api_client.get_project(self.project_id)

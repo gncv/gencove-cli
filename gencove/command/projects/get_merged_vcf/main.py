@@ -42,7 +42,8 @@ class GetMergedVCF(Command):
 
         if self.output_filename and self.download_urls:
             raise ValidationError(
-                "Cannot output to file and return download url at the same time. Exiting."
+                "Cannot output to file and "
+                "return download url at the same time. Exiting."
             )
         if self.download_urls:
             self.echo_debug("Requesting download URL.")
@@ -70,20 +71,19 @@ class GetMergedVCF(Command):
             if self.download_urls:
                 self.echo_data(merged_vcf.download_url)
                 return
-            else:
-                download_path = (
-                    self.output_filename
-                    if self.output_filename
-                    else download.utils.get_filename_from_download_url(
-                        merged_vcf.download_url
-                    )
+            download_path = (
+                self.output_filename
+                if self.output_filename
+                else download.utils.get_filename_from_download_url(
+                    merged_vcf.download_url
                 )
+            )
 
-                download.utils.download_file(
-                    download_path,
-                    merged_vcf.download_url,
-                    no_progress=self.no_progress,
-                )
+            download.utils.download_file(
+                download_path,
+                merged_vcf.download_url,
+                no_progress=self.no_progress,
+            )
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 404:

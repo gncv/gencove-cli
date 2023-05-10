@@ -15,6 +15,7 @@ class GetMergedVCF(Command):
     def __init__(
         self,
         project_id,
+        download_urls,
         output_filename,
         credentials,
         options,
@@ -24,6 +25,7 @@ class GetMergedVCF(Command):
         self.project_id = project_id
         self.output_filename = output_filename
         self.no_progress = no_progress
+        self.download_urls = download_urls
 
     def initialize(self):
         """Initialize subcommand."""
@@ -37,6 +39,13 @@ class GetMergedVCF(Command):
         """
         if is_valid_uuid(self.project_id) is False:
             raise ValidationError("Project ID is not valid. Exiting.")
+
+        if self.output_filename and self.download_urls:
+            raise ValidationError(
+                "Cannot output to file and return download url at the same time. Exiting."
+            )
+        if self.download_urls:
+            self.echo_debug("Requesting download URL.")
 
     @backoff.on_exception(
         backoff.expo,
@@ -58,18 +67,23 @@ class GetMergedVCF(Command):
                 raise ValidationError(
                     f"No files to process for project {self.project_id}"
                 )
-            download_path = (
-                self.output_filename
-                if self.output_filename
-                else download.utils.get_filename_from_download_url(
-                    merged_vcf.download_url
+            if self.download_urls:
+                self.echo_data(merged_vcf.download_url)
+                return
+            else:
+                download_path = (
+                    self.output_filename
+                    if self.output_filename
+                    else download.utils.get_filename_from_download_url(
+                        merged_vcf.download_url
+                    )
                 )
-            )
-            download.utils.download_file(
-                download_path,
-                merged_vcf.download_url,
-                no_progress=self.no_progress,
-            )
+
+                download.utils.download_file(
+                    download_path,
+                    merged_vcf.download_url,
+                    no_progress=self.no_progress,
+                )
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 404:

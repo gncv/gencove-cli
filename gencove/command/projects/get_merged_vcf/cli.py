@@ -10,6 +10,11 @@ from .main import GetMergedVCF
 @click.command("get-merged-vcf")
 @click.argument("project_id")
 @click.option(
+    "--download-urls",
+    help="Output a list of urls in a JSON format.",
+    is_flag=True,
+)
+@click.option(
     "--output-filename",
     help="Output filename for merged VCF file.",
     type=click.Path(),
@@ -25,6 +30,7 @@ from .main import GetMergedVCF
 # pylint: disable=too-many-arguments
 def get_merged_vcf(
     project_id,
+    download_urls,
     output_filename,
     host,
     email,
@@ -35,6 +41,7 @@ def get_merged_vcf(
     """Download merged VCF file in a project."""
     GetMergedVCF(
         project_id,
+        download_urls,
         output_filename,
         Credentials(email=email, password=password, api_key=api_key),
         Optionals(host=host),

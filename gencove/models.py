@@ -104,6 +104,7 @@ class SampleDetails(GencoveBaseModel):
 
     created: Optional[datetime]
     modified: Optional[datetime]
+    run: Optional[str]
     client_id: Optional[str]
     physical_id: Optional[str]
     legacy_id: Optional[str]

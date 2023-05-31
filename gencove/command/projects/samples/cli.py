@@ -29,9 +29,22 @@ from .main import ListSamples
     type=click.Choice(enum_as_dict(SampleArchiveStatus).values()),
     default=SampleArchiveStatus.ALL.value,
 )
+@click.option(
+    "--include-run/--no-include-run",
+    help="Include run id",
+    default=False,
+)
 @add_options(common_options)
 def list_project_samples(  # pylint: disable=E0012,C0330,R0913
-    project_id, search, status, archive_status, host, email, password, api_key
+    project_id,
+    search,
+    status,
+    archive_status,
+    include_run,
+    host,
+    email,
+    password,
+    api_key,
 ):
     """List samples in a project."""
     ListSamples(
@@ -42,5 +55,6 @@ def list_project_samples(  # pylint: disable=E0012,C0330,R0913
             status=status,
             archive_status=archive_status,
             search=search,
+            include_run=include_run,
         ),
     ).run()

@@ -14,6 +14,7 @@ class ApiEndpoints(Enum):
     GET_JWT = "/api/v2/jwt-create/"
     REFRESH_JWT = "/api/v2/jwt-refresh/"
     UPLOAD_DETAILS = "/api/v2/uploads-post-data/"
+    UPLOAD_URL = "/api/v2/uploads-url/"
     GET_UPLOAD_CREDENTIALS = "/api/v2/upload-credentials/"
     PROJECT_SAMPLES = "/api/v2/project-samples/{id}"
     SAMPLE_DETAILS = "/api/v2/samples/{id}"

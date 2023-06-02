@@ -2,7 +2,10 @@
 import csv
 import os
 import platform
+import re
+import urllib.parse
 from collections import defaultdict
+from urllib.parse import urlparse
 
 from boto3.s3.transfer import TransferConfig
 
@@ -132,6 +135,7 @@ def _progress_bar_update(pbar):  # noqa: D413
         a function that in turn accepts chunk that is used to update the
         progressbar.
     """
+
     # noqa: D202
     def _update_pbar(chunk_uploaded_in_bytes):
         pbar.update(pbar.value + chunk_uploaded_in_bytes)
@@ -178,15 +182,22 @@ def _validate_fastq(fastq):
     Raises:
         ValidationError if fastq is not valid
     """
-    if not fastq.path.lower().endswith(FASTQ_EXTENSIONS):
-        echo_info(f"Unsupported file type found: {fastq.path}")
-        raise ValidationError(f"Bad file extension in path: {fastq.path}")
+    if looks_like_url(fastq.path):
+        if not file_name_in_url(fastq.path):
+            raise ValidationError(
+                f"Could not determine FASTQ file name from supplied URL {fastq.path}"
+            )
+    else:
+        if not fastq.path.lower().endswith(FASTQ_EXTENSIONS):
+            echo_info(f"Unsupported file type found: {fastq.path}")
+            raise ValidationError(f"Bad file extension in path: {fastq.path}")
+        if not os.path.exists(fastq.path):
+            echo_info(f"Path does not exist: {fastq.path}")
+            raise ValidationError(f"Could not find: {fastq.path}")
+
     if "_" in fastq.client_id:
         echo_info("Underscore is not allowed in client id")
         raise ValidationError("Underscore is not allowed in client id")
-    if not os.path.exists(fastq.path):
-        echo_info(f"Path does not exist: {fastq.path}")
-        raise ValidationError(f"Could not find: {fastq.path}")
     if fastq.r_notation not in R_NOTATION_MAP:
         echo_info(f"Wrong R notation: {fastq.r_notation}")
         echo_info(f"Valid R notations are: {R_NOTATION_MAP.keys()}")
@@ -207,6 +218,8 @@ def parse_fastqs_map_file(fastqs_map_path):
 
     Map file has to have following columns/headers:
         client_id, r_notation, path
+
+    Note this map file also supports URLs under the path column
 
     Example fastqs map file:
         client_id,r_notation,path
@@ -254,3 +267,31 @@ def get_gncv_path(client_id, r_notation):
             PathTemplateParts.r_notation.value: r_notation,
         }
     )
+
+
+def looks_like_url(value):
+    """Detects if input value appears to be a URL
+
+    Args:
+        value (str): value to test
+
+    Returns:
+        bool: True if URL-like, False otherwise
+    """
+    try:
+        result = urlparse(value)
+        return all([result.scheme, result.netloc])
+    except ValueError:
+        return False
+
+
+def file_name_in_url(value):
+    """Attempt to detect FASTQ file name in URL"""
+    path = urllib.parse.urlparse(value).path
+    fastq_extensions_regex = [x.replace(".", r"\.") for x in FASTQ_EXTENSIONS]
+    re_fastq_extensions = "|".join(fastq_extensions_regex)
+    re_pattern = rf"/([^/]*?({re_fastq_extensions}))$"
+    match = re.search(re_pattern, path)
+    if match:
+        return True
+    return False

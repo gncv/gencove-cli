@@ -60,6 +60,7 @@ from gencove.models import (  # noqa: I101
     UploadCredentials,
     UploadSamples,
     UploadsPostData,
+    URLImport,
 )
 from gencove.version import version as cli_version
 
@@ -241,7 +242,7 @@ class APIClient:
                     http_error_msg += f":\n{error_msg}"
 
         elif 500 <= response.status_code < 600:
-            http_error_msg = "Server Error: {response.reason}"
+            http_error_msg = f"Server Error: {response.reason}"
             if response.status_code == 503:
                 if response.text:
                     response_json = response.json()
@@ -965,6 +966,17 @@ class APIClient:
             payload,
             authorized=True,
             model=ImportExistingSamplesModel,
+        )
+
+    def import_fastqs_from_url(self, gncv_file_path, url):
+        """POST fastq URL data to API"""
+        url_imports_endpoint = self.endpoints.UPLOAD_URL.value
+        payload = {"destination_path": gncv_file_path, "source_url": url}
+        return self._post(
+            url_imports_endpoint,
+            payload,
+            authorized=True,
+            model=URLImport,
         )
 
     def get_file_types(self, project_id=None):

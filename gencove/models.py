@@ -375,3 +375,8 @@ class Pipelines(BaseModel):
 
     meta: ResponseMeta
     results: Optional[List[Pipeline]]
+
+
+class URLImport(BaseModel):
+    destination_path: Optional[str]
+    source_url: Optional[str]

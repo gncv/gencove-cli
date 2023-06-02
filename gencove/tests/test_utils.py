@@ -292,6 +292,44 @@ def test_fastqs_map_file_has_wrong_header():
             assert "Unexpected CSV header" in err.args[0]
 
 
+def test_parse_fastqs_map_file_with_urls():
+    """Test parsing of map file with URLs into dict"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("test_dir")
+        with open("test_dir/test.fastq.gz", "w", encoding="utf-8") as fastq_file1:
+            fastq_file1.write("AAABBB")
+
+        with open("test_dir/test_2.fastq.gz", "w", encoding="utf-8") as fastq_file2:
+            fastq_file2.write("AAABBB")
+
+        with open("test_dir/test_3.fastq.gz", "w", encoding="utf-8") as fastq_file3:
+            fastq_file3.write("AAABBB")
+
+        with open("test_url_map.fastq-map.csv", "w", encoding="utf-8") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r_notation", "path"],
+                    ["barid", "r1", "https://s3.amazonaws.com/samples/1/R1.fastq.gz"],
+                    ["barid", "r2", "https://s3.amazonaws.com/samples/1/R2.fastq.gz"],
+                    [
+                        "barid",
+                        "r1",
+                        "https://storage.googleapis.com/samples/2/R1.fastq.gz",
+                    ],
+                ]
+            )
+
+        fastqs = parse_fastqs_map_file("test_url_map.fastq-map.csv")
+        assert len(fastqs) == 2
+        assert ("barid", "R1") in fastqs
+        assert ("barid", "R2") in fastqs
+        assert len(fastqs[("barid", "R1")]) == 2
+        assert fastqs[("barid", "R1")][0] == "https://example.com/samples/1/R1.fastq.gz"
+        assert fastqs[("barid", "R1")][1] == "https://example.com/samples/2/R1.fastq.gz"
+
+
 def test__validate_header():
     """Test that header is validated properly."""
     header_row = dict(foo="foo", bar="bar")

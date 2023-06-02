@@ -43,6 +43,7 @@ from .utils import (
     seek_files_to_upload,
     upload_file,
     upload_multi_file,
+    looks_like_url,
 )
 from ..utils import is_valid_json
 from ...constants import ASSIGN_BATCH_SIZE
@@ -155,6 +156,7 @@ class Upload(Command):
         be assigned to this project, after upload.
         """
         s3_client = get_s3_client_refreshable(self.api_client.get_upload_credentials)
+
         try:
             if self.fastqs:
                 self.upload_from_source(s3_client)
@@ -183,11 +185,23 @@ class Upload(Command):
     def upload_from_map_file(self, s3_client):
         """Upload fastq files from a csv file."""
         for key, fastqs in self.fastqs_map.items():
-            upload = self.concatenate_and_upload_fastqs(key, fastqs, s3_client)
-            if self.project_id and upload:
-                self.upload_ids.add(upload.id)
+            if all([looks_like_url(f) for f in fastqs]):
+                self.post_fastq_url(key, fastqs)
+            else:
+                upload = self.concatenate_and_upload_fastqs(key, fastqs, s3_client)
+                if self.project_id and upload:
+                    self.upload_ids.add(upload.id)
 
-        self.echo_info("All files were successfully uploaded.")
+        self.echo_info("All files were successfully processed.")
+
+    def post_fastq_url(self, key, fastqs):
+        client_id, r_notation = key
+        gncv_path = self.destination + get_gncv_path(client_id, r_notation)
+        self.echo_debug(f"Calculated gncv path: {gncv_path}")
+
+        self.api_client.import_fastqs_from_url(
+            gncv_file_path=gncv_path, url=next(iter(fastqs))
+        )
 
     def concatenate_and_upload_fastqs(self, key, fastqs, s3_client):
         """Upload fastqs parts as one file."""

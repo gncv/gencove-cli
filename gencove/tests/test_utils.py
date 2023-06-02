@@ -326,8 +326,14 @@ def test_parse_fastqs_map_file_with_urls():
         assert ("barid", "R1") in fastqs
         assert ("barid", "R2") in fastqs
         assert len(fastqs[("barid", "R1")]) == 2
-        assert fastqs[("barid", "R1")][0] == "https://example.com/samples/1/R1.fastq.gz"
-        assert fastqs[("barid", "R1")][1] == "https://example.com/samples/2/R1.fastq.gz"
+        assert (
+            fastqs[("barid", "R1")][0]
+            == "https://s3.amazonaws.com/samples/1/R1.fastq.gz"
+        )
+        assert (
+            fastqs[("barid", "R1")][1]
+            == "https://storage.googleapis.com/samples/2/R1.fastq.gz"
+        )
 
 
 def test__validate_header():

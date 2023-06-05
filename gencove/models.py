@@ -377,6 +377,8 @@ class Pipelines(BaseModel):
     results: Optional[List[Pipeline]]
 
 
-class URLImport(BaseModel):
+class UploadURLImport(BaseModel):
+    """URL import moodel"""
+
     destination_path: Optional[str]
     source_url: Optional[str]

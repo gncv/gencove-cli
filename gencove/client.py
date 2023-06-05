@@ -59,8 +59,8 @@ from gencove.models import (  # noqa: I101
     SampleSheet,
     UploadCredentials,
     UploadSamples,
+    UploadURLImport,
     UploadsPostData,
-    URLImport,
 )
 from gencove.version import version as cli_version
 
@@ -971,12 +971,15 @@ class APIClient:
     def import_fastqs_from_url(self, gncv_file_path, url):
         """POST fastq URL data to API"""
         url_imports_endpoint = self.endpoints.UPLOAD_URL.value
-        payload = {"destination_path": gncv_file_path, "source_url": url}
+        payload = {
+            "destination_path": gncv_file_path,
+            "source_url": url,
+        }
         return self._post(
             url_imports_endpoint,
             payload,
             authorized=True,
-            model=URLImport,
+            model=UploadURLImport,
         )
 
     def get_file_types(self, project_id=None):

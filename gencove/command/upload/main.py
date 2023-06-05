@@ -39,11 +39,11 @@ from .utils import (
     get_filename_from_path,
     get_get_upload_details_retry_predicate,
     get_gncv_path,
+    looks_like_url,
     parse_fastqs_map_file,
     seek_files_to_upload,
     upload_file,
     upload_multi_file,
-    looks_like_url,
 )
 from ..utils import is_valid_json
 from ...constants import ASSIGN_BATCH_SIZE
@@ -200,7 +200,8 @@ class Upload(Command):
         self.echo_debug(f"Calculated gncv path: {gncv_path}")
 
         self.api_client.import_fastqs_from_url(
-            gncv_file_path=gncv_path, url=next(iter(fastqs))
+            gncv_file_path=gncv_path,
+            url=next(iter(fastqs)),
         )
 
     def concatenate_and_upload_fastqs(self, key, fastqs, s3_client):

@@ -280,9 +280,12 @@ def looks_like_url(value):
     """
     try:
         result = urlparse(value)
-        return all([result.scheme, result.netloc])
+        if result.scheme in ["http", "https"]:
+            if result.netloc:
+                return True
     except ValueError:
         return False
+    return False
 
 
 def file_name_in_url(value):

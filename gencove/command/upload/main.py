@@ -185,7 +185,7 @@ class Upload(Command):
     def upload_from_map_file(self, s3_client):
         """Upload fastq files from a csv file."""
         for key, fastqs in self.fastqs_map.items():
-            if all([looks_like_url(f) for f in fastqs]):
+            if all((looks_like_url(f) for f in fastqs)):
                 self.post_fastq_url(key, fastqs)
             else:
                 upload = self.concatenate_and_upload_fastqs(key, fastqs, s3_client)
@@ -195,6 +195,7 @@ class Upload(Command):
         self.echo_info("All files were successfully processed.")
 
     def post_fastq_url(self, key, fastqs):
+        """Post FASTQ URL to API endpoint"""
         client_id, r_notation = key
         gncv_path = self.destination + get_gncv_path(client_id, r_notation)
         self.echo_debug(f"Calculated gncv path: {gncv_path}")

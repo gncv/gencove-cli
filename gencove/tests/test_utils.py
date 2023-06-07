@@ -298,16 +298,6 @@ def test_parse_fastqs_map_file_with_urls():
     """Test parsing of map file with URLs into dict"""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        os.mkdir("test_dir")
-        with open("test_dir/test.fastq.gz", "w", encoding="utf-8") as fastq_file1:
-            fastq_file1.write("AAABBB")
-
-        with open("test_dir/test_2.fastq.gz", "w", encoding="utf-8") as fastq_file2:
-            fastq_file2.write("AAABBB")
-
-        with open("test_dir/test_3.fastq.gz", "w", encoding="utf-8") as fastq_file3:
-            fastq_file3.write("AAABBB")
-
         with open("test_url_map.fastq-map.csv", "w", encoding="utf-8") as map_file:
             writer = csv.writer(map_file)
             writer.writerows(

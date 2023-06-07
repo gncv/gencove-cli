@@ -183,7 +183,7 @@ def _validate_fastq(fastq):
         ValidationError if fastq is not valid
     """
     if looks_like_url(fastq.path):
-        if not file_name_in_url(fastq.path):
+        if not valid_fastq_file_name_in_url(fastq.path):
             raise ValidationError(
                 f"Could not determine FASTQ file name from supplied URL {fastq.path}"
             )
@@ -288,7 +288,7 @@ def looks_like_url(value):
     return False
 
 
-def file_name_in_url(value):
+def valid_fastq_file_name_in_url(value):
     """Attempt to detect FASTQ file name in URL"""
     path = urllib.parse.urlparse(value).path
     fastq_extensions_regex = [x.replace(".", r"\.") for x in FASTQ_EXTENSIONS]

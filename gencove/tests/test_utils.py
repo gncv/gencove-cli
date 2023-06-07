@@ -21,6 +21,8 @@ from gencove.command.upload.utils import (
     _validate_header,
     parse_fastqs_map_file,
     upload_file,
+    valid_fastq_file_name_in_url,
+    looks_like_url,
 )
 from gencove.command.utils import is_valid_uuid, validate_uuid, validate_uuid_list
 from gencove.constants import (
@@ -528,3 +530,41 @@ def test_validate_uuid_list__raises_if_not_all_ids_valid():
 
     with pytest.raises(Abort):
         validate_uuid_list(None, param, uuids_string)
+
+
+@pytest.mark.parametrize(
+    "url,expected",
+    [
+        ("http://example.com/file.fastq.bgz", True),
+        ("http://example.com/file.fastq.gz", True),
+        ("http://example.com/file.fq.bgz", True),
+        ("http://example.com/file.fq.gz", True),
+        ("http://example.com/file.txt", False),
+        ("http://example.com/file", False),
+        ("http://example.com/file.fastq", False),
+        ("http://example.com/.fastq", False),
+        ("http://example.com/", False),
+        ("foo", False),
+    ],
+)
+def test_file_name_in_url(url, expected):
+    assert valid_fastq_file_name_in_url(url) == expected
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        ("http://example.com", True),
+        ("https://example.com", True),
+        ("http://example.com/file.fastq", True),
+        ("https://www.example.com", True),
+        ("http://", False),
+        ("https://", False),
+        ("example.com", False),
+        ("ftp://example.com", False),
+        ("foo", False),
+        ("", False),
+    ],
+)
+def test_looks_like_url(value, expected):
+    assert looks_like_url(value) == expected

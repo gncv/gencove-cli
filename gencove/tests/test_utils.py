@@ -19,10 +19,10 @@ from gencove.command.download.utils import (
 )
 from gencove.command.upload.utils import (
     _validate_header,
+    looks_like_url,
     parse_fastqs_map_file,
     upload_file,
     valid_fastq_file_name_in_url,
-    looks_like_url,
 )
 from gencove.command.utils import is_valid_uuid, validate_uuid, validate_uuid_list
 from gencove.constants import (
@@ -562,6 +562,7 @@ def test_validate_uuid_list__raises_if_not_all_ids_valid():
     ],
 )
 def test_file_name_in_url(url, expected):
+    """Test multiple cases to ensure valid FASTQ file detected"""
     assert valid_fastq_file_name_in_url(url) == expected
 
 
@@ -581,4 +582,5 @@ def test_file_name_in_url(url, expected):
     ],
 )
 def test_looks_like_url(value, expected):
+    """Test multiple cases of URL strings"""
     assert looks_like_url(value) == expected

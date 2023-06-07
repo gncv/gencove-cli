@@ -328,6 +328,30 @@ def test_parse_fastqs_map_file_with_urls():
         )
 
 
+def test_parse_fastqs_map_file_with_urls_invalid():
+    """Test parsing of map file with URLs into dict, invalid URLs"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        with open("test_url_map.fastq-map.csv", "w", encoding="utf-8") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r_notation", "path"],
+                    ["barid", "r1", "https://s3.amazonaws.com/samples/1/invalid"],
+                    ["barid", "r2", "https://s3.amazonaws.com/samples/1/invalid"],
+                    [
+                        "barid",
+                        "r1",
+                        "https://storage.googleapis.com/samples/2/invalid",
+                    ],
+                ]
+            )
+        try:
+            parse_fastqs_map_file("test_url_map.fastq-map.csv")
+        except ValidationError as err:
+            assert "Could not determine FASTQ file" in err.args[0]
+
+
 def test__validate_header():
     """Test that header is validated properly."""
     header_row = dict(foo="foo", bar="bar")

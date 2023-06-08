@@ -970,13 +970,12 @@ class APIClient:
 
     def import_fastqs_from_url(self, gncv_file_path, url):
         """POST fastq URL data to API"""
-        url_imports_endpoint = self.endpoints.UPLOAD_URL.value
         payload = {
             "destination_path": gncv_file_path,
             "source_url": url,
         }
         return self._post(
-            url_imports_endpoint,
+            self.endpoints.UPLOAD_URL.value,
             payload,
             authorized=True,
             model=UploadURLImport,

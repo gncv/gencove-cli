@@ -377,8 +377,10 @@ class Pipelines(BaseModel):
     results: Optional[List[Pipeline]]
 
 
-class UploadURLImport(BaseModel):
+class UploadURLImport(GencoveBaseModel):
     """URL import moodel"""
 
+    s3: Optional[S3Object]
+    last_status: Optional[GencoveStatus]
     destination_path: Optional[str]
     source_url: Optional[str]

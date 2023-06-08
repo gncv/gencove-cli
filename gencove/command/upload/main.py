@@ -44,6 +44,9 @@ from .utils import (
     seek_files_to_upload,
     upload_file,
     upload_multi_file,
+    extract_filename_from_url,
+    client_id_from_url,
+    get_r_identifier_from_filename,
 )
 from ..utils import is_valid_json
 from ...constants import ASSIGN_BATCH_SIZE
@@ -76,6 +79,10 @@ class Upload(Command):
             f"{uuid.uuid4().hex}"
         )
 
+    @property
+    def source_is_url(self):
+        return looks_like_url(self.source)
+
     def initialize(self):
         """Initialize upload command parameters from provided arguments."""
         self.echo_debug(f"Host is {self.options.host}")
@@ -86,6 +93,8 @@ class Upload(Command):
             self.echo_debug("Scanning fastqs map file")
             self.fastqs_map = parse_fastqs_map_file(self.source)
             self.echo_debug(f"got fastq pairs: {self.fastqs_map}")
+        elif self.source_is_url:
+            self.fastqs = [self.source]
         else:
             self.echo_debug("Seeking files to upload")
             self.fastqs = list(seek_files_to_upload(self.source))
@@ -113,7 +122,7 @@ class Upload(Command):
             ValidationError - if something is wrong with command parameters.
         """
         # fmt: off
-        if self.destination and not self.destination.startswith(UPLOAD_PREFIX):
+        if (self.destination and not self.destination.startswith(UPLOAD_PREFIX)):
             self.echo_error(
                 f"Invalid destination path. Must start with '{UPLOAD_PREFIX}'"
             )
@@ -175,8 +184,11 @@ class Upload(Command):
 
     def upload_from_source(self, s3_client):
         """Upload command with <source> argument provided."""
-        for file_path in self.fastqs:
-            upload = self.upload_from_file_path(file_path, s3_client)
+        for fastq in self.fastqs:
+            if self.source_is_url:
+                upload = self.upload_from_url(fastq)
+            else:
+                upload = self.upload_from_file_path(fastq, s3_client)
             if self.project_id and upload:
                 self.upload_ids.add(upload.id)
 
@@ -233,6 +245,34 @@ class Upload(Command):
             upload_details.s3.object_name,
             self.no_progress,
         )
+        return upload_details
+
+    def upload_from_url(self, url):
+        filename = extract_filename_from_url(url)
+        gncv_notated_path = self.destination + filename
+
+        self.echo_info(f"Checking if file was already uploaded: {filename}")
+
+        try:
+            upload_details = self.get_upload_details(gncv_notated_path)
+        except APIClientError as err:
+            if err.status_code == 400:
+                self.echo_info(err.message)
+                raise UploadError  # pylint: disable=W0707
+            raise err
+
+        if (
+            upload_details.last_status
+            and upload_details.last_status.status == UploadStatuses.DONE.value
+        ):
+            self.echo_info(f"File was already uploaded: {filename}")
+            return upload_details
+
+        self.echo_info(f"Importing URL {self.source} to {gncv_notated_path}")
+        filename = extract_filename_from_url(self.source)
+        r_identifier, _ = get_r_identifier_from_filename(filename)
+        key = (client_id_from_url(self.source), r_identifier)
+        self.post_fastq_url(key=key, fastqs=self.fastqs)
         return upload_details
 
     def upload_from_file_path(self, file_path, s3_client):

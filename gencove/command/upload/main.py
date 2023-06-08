@@ -186,11 +186,12 @@ class Upload(Command):
         """Upload fastq files from a csv file."""
         for key, fastqs in self.fastqs_map.items():
             if all((looks_like_url(f) for f in fastqs)):
-                self.post_fastq_url(key, fastqs)
+                upload = self.post_fastq_url(key, fastqs)
             else:
                 upload = self.concatenate_and_upload_fastqs(key, fastqs, s3_client)
-                if self.project_id and upload:
-                    self.upload_ids.add(upload.id)
+
+            if self.project_id and upload:
+                self.upload_ids.add(upload.id)
 
         self.echo_info("All files were successfully processed.")
 
@@ -199,11 +200,11 @@ class Upload(Command):
         client_id, r_notation = key
         gncv_path = self.destination + get_gncv_path(client_id, r_notation)
         self.echo_debug(f"Calculated gncv path: {gncv_path}")
-
-        self.api_client.import_fastqs_from_url(
+        upload_details = self.api_client.import_fastqs_from_url(
             gncv_file_path=gncv_path,
             url=next(iter(fastqs)),
         )
+        return upload_details
 
     def concatenate_and_upload_fastqs(self, key, fastqs, s3_client):
         """Upload fastqs parts as one file."""

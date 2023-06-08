@@ -5,8 +5,7 @@ import platform
 import re
 import urllib.parse
 from collections import defaultdict
-from pathlib import Path
-from urllib.parse import urlparse, unquote
+from urllib.parse import urlparse
 
 from boto3.s3.transfer import TransferConfig
 
@@ -299,47 +298,3 @@ def valid_fastq_file_name_in_url(value):
     if match:
         return True
     return False
-
-
-def extract_filename_from_url(url):
-    """Extract a filename from a URL. Will ignore URL params."""
-    parsed_url = urlparse(url)
-    path = parsed_url.path
-    filename = path.split("/")[-1]
-    filename = unquote(filename)
-    return filename
-
-
-def client_id_from_url(url):
-    """Build a valid client ID from the filename"""
-    filename = extract_filename_from_url(url)
-    suffixes = "".join(Path(filename).suffixes)
-    client_id = filename.replace(suffixes, "")
-    _, r_identifier = get_r_identifier_from_filename(filename)
-    client_id = client_id.replace(r_identifier, "")
-    client_id = client_id.replace("_", "-")
-    for char in ["-", "."]:
-        client_id = client_id.rstrip(char)
-    echo_info(f"Client ID from URL: {client_id}")
-    return client_id
-
-
-def get_r_identifier_from_filename(filename):
-    r1_substrings = ["_R1", "_r1", "_1"]
-    r2_substrings = ["_R2", "_r2", "_2"]
-
-    for sub in r1_substrings:
-        pattern = sub + "(?=[._])"  # lookahead for . or _
-        match = re.search(pattern, filename)
-        if match:
-            return "r1", sub
-
-    for sub in r2_substrings:
-        pattern = sub + "(?=[._])"
-        match = re.search(pattern, filename)
-        if match:
-            return "r2", sub
-
-    raise ValidationError(
-        f"Could not detect r1 or r2 identifier in filename {filename}"
-    )

@@ -1010,11 +1010,6 @@ def test_upload_url(credentials, vcr, recording, mocker):
             upload,
             [map_file_path, *credentials],
         )
-        if res.exception:
-            import traceback
-
-            traceback.print_exception(*res.exc_info)
-
         assert not res.exception
         assert res.exit_code == 0
         if not recording:

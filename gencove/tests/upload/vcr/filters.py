@@ -10,7 +10,7 @@ from gencove.tests.utils import MOCK_UUID
 def filter_upload_request(request):
     """Removes destination path and aws url from request."""
     request = copy.deepcopy(request)
-    if "uploads-post-data" in request.path:
+    if "uploads-post-data" in request.path or "uploads-url" in request.path:
         request.body = '{"destination_path": "gncv://cli-mock/test.fastq.gz"}'
     if "s3.amazonaws.com" in request.uri:
         request.uri = f"https://s3.amazonaws.com/mock_bucket/organization/{MOCK_UUID}/user/{MOCK_UUID}/uploads/{MOCK_UUID}.fastq-r1"  # noqa: E501 line too long pylint: disable=line-too-long

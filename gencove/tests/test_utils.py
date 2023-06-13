@@ -328,6 +328,40 @@ def test_parse_fastqs_map_file_with_urls():
         )
 
 
+def test_parse_fastqs_map_file_with_urls_and_s3():
+    """Test parsing of map file with URLs into dict"""
+    runner = CliRunner()
+    fastq_file_path = "barid-R2.fastq.gz"
+    with runner.isolated_filesystem():
+        with open(fastq_file_path, "w", encoding="utf-8") as fastq_file:
+            fastq_file.write("AAABBB")
+
+        with open("test_url_map.fastq-map.csv", "w", encoding="utf-8") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r_notation", "path"],
+                    [
+                        "barid",
+                        "r1",
+                        "https://s3.amazonaws.com/samples/1/barid-R1.fastq.gz",
+                    ],
+                    ["barid", "r2", fastq_file_path],
+                ]
+            )
+
+        fastqs = parse_fastqs_map_file("test_url_map.fastq-map.csv")
+        assert len(fastqs) == 2
+        assert ("barid", "R1") in fastqs
+        assert ("barid", "R2") in fastqs
+        assert len(fastqs[("barid", "R1")]) == 1
+        assert (
+            fastqs[("barid", "R1")][0]
+            == "https://s3.amazonaws.com/samples/1/barid-R1.fastq.gz"
+        )
+        assert fastqs[("barid", "R2")][0] == fastq_file_path
+
+
 def test_parse_fastqs_map_file_with_urls_invalid():
     """Test parsing of map file with URLs into dict, invalid URLs"""
     runner = CliRunner()

@@ -1024,6 +1024,8 @@ def test_upload_url_and_run_immediately(
     credentials, vcr, recording, mocker, project_id
 ):
     """Test uploading then running in project"""
+    # pylint: disable=too-many-locals
+
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
@@ -1089,6 +1091,8 @@ def test_upload_url_and_run_immediately_with_s3(
     credentials, vcr, recording, mocker, project_id
 ):
     """Test uploading then running in project"""
+    # pylint: disable=too-many-locals
+
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
@@ -1101,9 +1105,6 @@ def test_upload_url_and_run_immediately_with_s3(
         mocked_get_credentials = mocker.patch(
             "gencove.command.upload.main.get_s3_client_refreshable",
             side_effect=get_s3_client_refreshable,
-        )
-        mocked_upload_file = mocker.patch(
-            "gencove.command.upload.main.upload_file", side_effect=upload_file
         )
         with open(map_file_path, "w", encoding="utf-8") as map_file:
             writer = csv.writer(map_file)

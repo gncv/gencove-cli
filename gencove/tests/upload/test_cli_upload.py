@@ -15,7 +15,7 @@ from gencove.cli import upload
 from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.upload.utils import upload_file
 from gencove.constants import ApiEndpoints, UPLOAD_PREFIX
-from gencove.models import SampleSheet, UploadSamples, UploadsPostData, UploadURLImport
+from gencove.models import SampleSheet, UploadSamples, UploadURLImport, UploadsPostData
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.filters import (
     filter_aws_headers,

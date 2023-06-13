@@ -973,7 +973,7 @@ def test_upload_retry_after_unauthorized(mocker):
 @pytest.mark.vcr
 @assert_authorization
 def test_upload_url(credentials, vcr, recording, mocker):
-    """Sanity check that upload is ok."""
+    """Basic check of uploading URL"""
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
@@ -992,8 +992,6 @@ def test_upload_url(credentials, vcr, recording, mocker):
             )
 
         if not recording:
-            # Mock get_upload credentials only if using the cassettes, since
-            # we mock the return value.
             response = get_vcr_response("/api/v2/uploads-url/", vcr)
             mocked_import_fastqs_from_url = mocker.patch.object(
                 APIClient,

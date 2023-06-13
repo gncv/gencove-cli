@@ -1016,3 +1016,163 @@ def test_upload_url(credentials, vcr, recording, mocker):
             mocked_import_fastqs_from_url.assert_called_once()
         mocked_get_credentials.assert_called_once()
         assert "All files were successfully processed" in res.output
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_upload_url_and_run_immediately(
+    credentials, vcr, recording, mocker, project_id
+):
+    """Test uploading then running in project"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("cli_test_data")
+        map_file_path = "cli_test_data/test_url_map.fastq-map.csv"
+
+        with open(map_file_path, "w", encoding="utf-8") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r_notation", "path"],
+                    [
+                        "some-id",
+                        "r1",
+                        "https://s3.amazonaws.com/example/client-id_R1.fastq.gz",
+                    ],
+                ]
+            )
+
+        if not recording:
+            response = get_vcr_response("/api/v2/uploads-url/", vcr)
+            mocked_import_fastqs_from_url = mocker.patch.object(
+                APIClient,
+                "import_fastqs_from_url",
+                return_value=UploadURLImport(**response),
+            )
+            sample_sheet_response = get_vcr_response("/api/v2/sample-sheet/", vcr)
+            mocked_get_sample_sheet = mocker.patch.object(
+                APIClient,
+                "get_sample_sheet",
+                return_value=SampleSheet(**sample_sheet_response),
+            )
+            project_sample_response = get_vcr_response(
+                "/api/v2/project-samples/", vcr, operator.contains
+            )
+            mocked_assign_sample = mocker.patch.object(
+                APIClient,
+                "add_samples_to_project",
+                return_value=UploadSamples(**project_sample_response),
+            )
+        mocked_regular_progress_bar = mocker.patch(
+            "gencove.command.upload.main.get_regular_progress_bar",
+            side_effect=get_regular_progress_bar,
+        )
+        res = runner.invoke(
+            upload,
+            [map_file_path, "--run-project-id", project_id, *credentials],
+        )
+
+        assert not res.exception
+        assert res.exit_code == 0
+        assert "All files were successfully processed" in res.output
+        if not recording:
+            mocked_import_fastqs_from_url.assert_called_once()
+            mocked_get_sample_sheet.assert_called()
+            mocked_assign_sample.assert_called_once()
+
+        mocked_regular_progress_bar.assert_called_once()
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_upload_url_and_run_immediately_with_s3(
+    credentials, vcr, recording, mocker, project_id
+):
+    """Test uploading then running in project"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("cli_test_data")
+        map_file_path = "cli_test_data/test_url_map.fastq-map.csv"
+        fastq_file_path = "cli_test_data/test.fastq.gz"
+
+        with open(fastq_file_path, "w", encoding="utf-8") as fastq_file:
+            fastq_file.write("AAABBB")
+
+        mocked_get_credentials = mocker.patch(
+            "gencove.command.upload.main.get_s3_client_refreshable",
+            side_effect=get_s3_client_refreshable,
+        )
+        mocked_upload_file = mocker.patch(
+            "gencove.command.upload.main.upload_file", side_effect=upload_file
+        )
+        with open(map_file_path, "w", encoding="utf-8") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r_notation", "path"],
+                    [
+                        "some-id",
+                        "r1",
+                        "https://s3.amazonaws.com/example/client-id_R1.fastq.gz",
+                    ],
+                    [
+                        "some-id",
+                        "r2",
+                        fastq_file_path,
+                    ],
+                ]
+            )
+
+        if not recording:
+
+            url_response = get_vcr_response("/api/v2/uploads-url/", vcr)
+            mocked_import_fastqs_from_url = mocker.patch.object(
+                APIClient,
+                "import_fastqs_from_url",
+                return_value=UploadURLImport(**url_response),
+            )
+
+            upload_details_response = get_vcr_response(
+                "/api/v2/uploads-post-data/", vcr
+            )
+            mocked_get_upload_details = mocker.patch.object(
+                APIClient,
+                "get_upload_details",
+                return_value=UploadsPostData(**upload_details_response),
+            )
+
+            sample_sheet_response = get_vcr_response("/api/v2/sample-sheet/", vcr)
+            mocked_get_sample_sheet = mocker.patch.object(
+                APIClient,
+                "get_sample_sheet",
+                return_value=SampleSheet(**sample_sheet_response),
+            )
+
+            project_sample_response = get_vcr_response(
+                "/api/v2/project-samples/", vcr, operator.contains
+            )
+            mocked_assign_sample = mocker.patch.object(
+                APIClient,
+                "add_samples_to_project",
+                return_value=UploadSamples(**project_sample_response),
+            )
+
+        mocked_regular_progress_bar = mocker.patch(
+            "gencove.command.upload.main.get_regular_progress_bar",
+            side_effect=get_regular_progress_bar,
+        )
+        res = runner.invoke(
+            upload,
+            [map_file_path, "--run-project-id", project_id, *credentials],
+        )
+
+        assert not res.exception
+        assert res.exit_code == 0
+        assert "All files were successfully processed" in res.output
+        mocked_get_credentials.assert_called_once()
+        if not recording:
+            mocked_import_fastqs_from_url.assert_called_once()
+            mocked_get_sample_sheet.assert_called()
+            mocked_assign_sample.assert_called_once()
+            mocked_get_upload_details.assert_called_once()
+        mocked_regular_progress_bar.assert_called_once()

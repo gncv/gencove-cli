@@ -1,4 +1,5 @@
 """Tests upload command of Gencove CLI."""
+import csv
 
 # pylint: disable=too-many-lines, import-error
 
@@ -14,7 +15,7 @@ from gencove.cli import upload
 from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.upload.utils import upload_file
 from gencove.constants import ApiEndpoints, UPLOAD_PREFIX
-from gencove.models import SampleSheet, UploadSamples, UploadsPostData
+from gencove.models import SampleSheet, UploadSamples, UploadsPostData, UploadURLImport
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.filters import (
     filter_aws_headers,
@@ -967,3 +968,44 @@ def test_upload_retry_after_unauthorized(mocker):
         # Call count = upload details + refresh jwt + retry upload details
         assert mocked_request.call_count == 3
         assert force_refresh_jwt is False
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_upload_url(credentials, vcr, recording, mocker):
+    """Sanity check that upload is ok."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("cli_test_data")
+        map_file_path = "cli_test_data/test_url_map.fastq-map.csv"
+        with open(map_file_path, "w", encoding="utf-8") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r_notation", "path"],
+                    [
+                        "some-id",
+                        "r1",
+                        "https://s3.amazonaws.com/samples/1/some_id_R1.fastq.gz",
+                    ],
+                ]
+            )
+
+        if not recording:
+            # Mock get_upload credentials only if using the cassettes, since
+            # we mock the return value.
+            response = get_vcr_response("/api/v2/uploads-url/", vcr)
+            mocked_import_fastqs_from_url = mocker.patch.object(
+                APIClient,
+                "import_fastqs_from_url",
+                return_value=UploadURLImport(**response),
+            )
+
+        res = runner.invoke(
+            upload,
+            [map_file_path, *credentials],
+        )
+        assert not res.exception
+        assert res.exit_code == 0
+        assert "All files were successfully processed" in res.output
+        mocked_import_fastqs_from_url.assert_called_once()

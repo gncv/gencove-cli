@@ -1,0 +1,91 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.4.7
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '537'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 13 Jun 2023 14:42:09 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"destination_path": "gncv://cli-mock/test.fastq.gz"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.4.7
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/uploads-url/
+  response:
+    body:
+      string: '{"id": "11111111-1111-1111-1111-111111111111", "destination_path":
+        "gncv://cli-mock/test.fastq.gz", "s3": {"bucket": "mock_bucket", "object_name":
+        "organization/11111111-1111-1111-1111-111111111111/user/11111111-1111-1111-1111-111111111111/uploads/11111111-1111-1111-1111-111111111111.fastq-r1"},
+        "last_status": {"id": "11111111-1111-1111-1111-111111111111", "status": "succeeded",
+        "note": "", "created": "2023-06-13T14:42:10.533261Z"}, "source": "cli url",
+        "source_url": "https://s3.amazonaws.com/samples/1/some_id_R1.fastq.gz"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '562'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 13 Jun 2023 14:42:10 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+version: 1

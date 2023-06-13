@@ -21,7 +21,7 @@ def filter_upload_url_request(request):
     """Removes destination path and aws url from request."""
     request = copy.deepcopy(request)
     if "uploads-url" in request.path:
-        request.body = '{"destination_path": "gncv://cli-mock/test.fastq.gz", "source_url": "https://s3.amazonaws.com/example/client-id_R1.fastq.gz"}'
+        request.body = '{"destination_path": "gncv://cli-mock/test.fastq.gz", "source_url": "https://s3.amazonaws.com/example/client-id_R1.fastq.gz"}'  # noqa: E501 pylint: disable=line-too-long
     return request
 
 

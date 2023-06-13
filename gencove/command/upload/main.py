@@ -200,11 +200,11 @@ class Upload(Command):
         client_id, r_notation = key
         gncv_path = self.destination + get_gncv_path(client_id, r_notation)
         self.echo_debug(f"Calculated gncv path: {gncv_path}")
-        upload_details = self.api_client.import_fastqs_from_url(
+        upload_url_details = self.api_client.import_fastqs_from_url(
             gncv_file_path=gncv_path,
             url=next(iter(fastqs)),
         )
-        return upload_details
+        return upload_url_details
 
     def concatenate_and_upload_fastqs(self, key, fastqs, s3_client):
         """Upload fastqs parts as one file."""

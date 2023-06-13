@@ -1,8 +1,8 @@
 """Tests upload command of Gencove CLI."""
-import csv
 
 # pylint: disable=too-many-lines, import-error
 
+import csv
 import json
 import operator
 import os

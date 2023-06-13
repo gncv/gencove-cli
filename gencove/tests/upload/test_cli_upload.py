@@ -22,12 +22,14 @@ from gencove.tests.filters import (
     replace_gencove_url_vcr,
 )
 from gencove.tests.upload.vcr.filters import (
+    filter_import_fastqs_from_url_response,
     filter_project_samples_request,
     filter_project_samples_response,
     filter_sample_sheet_response,
     filter_upload_credentials_response,
     filter_upload_post_data_response,
     filter_upload_request,
+    filter_upload_url_request,
     filter_volatile_dates,
 )
 from gencove.tests.utils import get_vcr_response
@@ -60,9 +62,11 @@ def vcr_config():
         "before_record_request": [
             replace_gencove_url_vcr,
             filter_upload_request,
+            filter_upload_url_request,
             filter_project_samples_request,
         ],
         "before_record_response": [
+            filter_import_fastqs_from_url_response,
             filter_jwt,
             filter_upload_credentials_response,
             filter_upload_post_data_response,
@@ -985,7 +989,7 @@ def test_upload_url(credentials, vcr, recording, mocker):
                     [
                         "some-id",
                         "r1",
-                        "https://s3.amazonaws.com/samples/1/some_id_R1.fastq.gz",
+                        "https://s3.amazonaws.com/example/client-id_R1.fastq.gz",
                     ],
                 ]
             )

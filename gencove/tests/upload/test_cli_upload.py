@@ -989,6 +989,10 @@ def test_upload_url(credentials, vcr, recording, mocker):
                     ],
                 ]
             )
+        mocked_get_credentials = mocker.patch(
+            "gencove.command.upload.main.get_s3_client_refreshable",
+            side_effect=get_s3_client_refreshable,
+        )
 
         if not recording:
             response = get_vcr_response("/api/v2/uploads-url/", vcr)
@@ -1007,9 +1011,9 @@ def test_upload_url(credentials, vcr, recording, mocker):
 
             traceback.print_exception(*res.exc_info)
 
-        if not recording:
-            mocked_import_fastqs_from_url.assert_called_once()
-
         assert not res.exception
         assert res.exit_code == 0
+        if not recording:
+            mocked_import_fastqs_from_url.assert_called_once()
+        mocked_get_credentials.assert_called_once()
         assert "All files were successfully processed" in res.output

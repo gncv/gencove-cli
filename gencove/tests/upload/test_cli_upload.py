@@ -1003,6 +1003,11 @@ def test_upload_url(credentials, vcr, recording, mocker):
             upload,
             [map_file_path, *credentials],
         )
+        if res.exception:
+            print(res.exception)
+            print(res.exc_info)
+            print(res.stderr)
+            print(res.stdout)
         assert not res.exception
         assert res.exit_code == 0
         assert "All files were successfully processed" in res.output

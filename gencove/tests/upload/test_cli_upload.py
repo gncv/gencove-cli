@@ -10,7 +10,6 @@ from uuid import uuid4
 
 from click.testing import CliRunner
 
-
 from gencove.cli import upload
 from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.upload.utils import upload_file
@@ -1004,11 +1003,13 @@ def test_upload_url(credentials, vcr, recording, mocker):
             [map_file_path, *credentials],
         )
         if res.exception:
-            print(res.exception)
-            print(res.exc_info)
-            print(res.stderr)
-            print(res.stdout)
+            import traceback
+
+            traceback.print_exception(*res.exc_info)
+
+        if not recording:
+            mocked_import_fastqs_from_url.assert_called_once()
+
         assert not res.exception
         assert res.exit_code == 0
         assert "All files were successfully processed" in res.output
-        mocked_import_fastqs_from_url.assert_called_once()

@@ -41,9 +41,6 @@ class CreateBatch(Command):
         if not self.batch_name:
             raise ValidationError("You must provide value for --batch-name. Exiting.")
 
-        if is_valid_uuid(self.project_id) is False:
-            raise ValidationError("Project ID is not valid. Exiting.")
-
         if self.sample_ids:
             if not all(is_valid_uuid(s_id) for s_id in self.sample_ids):
                 raise ValidationError("Not all sample IDs are valid. Exiting.")

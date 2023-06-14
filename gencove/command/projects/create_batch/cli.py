@@ -2,6 +2,7 @@
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
+from gencove.command.utils import validate_uuid
 from gencove.constants import Credentials, Optionals
 from gencove.logger import echo_debug
 
@@ -9,7 +10,7 @@ from .main import CreateBatch
 
 
 @click.command("create-batch")
-@click.argument("project_id")
+@click.argument("project_id", callback=validate_uuid)
 @click.option(
     "--batch-type",
     help="One of available project's batch types.\n"

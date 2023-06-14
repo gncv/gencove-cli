@@ -19,8 +19,10 @@ from gencove.command.download.utils import (
 )
 from gencove.command.upload.utils import (
     _validate_header,
+    looks_like_url,
     parse_fastqs_map_file,
     upload_file,
+    valid_fastq_file_name_in_url,
 )
 from gencove.command.utils import is_valid_uuid, validate_uuid, validate_uuid_list
 from gencove.constants import (
@@ -292,6 +294,98 @@ def test_fastqs_map_file_has_wrong_header():
             assert "Unexpected CSV header" in err.args[0]
 
 
+def test_parse_fastqs_map_file_with_urls():
+    """Test parsing of map file with URLs into dict"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        with open("test_url_map.fastq-map.csv", "w", encoding="utf-8") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r_notation", "path"],
+                    ["barid", "r1", "https://s3.amazonaws.com/samples/1/R1.fastq.gz"],
+                    ["barid", "r2", "https://s3.amazonaws.com/samples/1/R2.fastq.gz"],
+                    [
+                        "barid",
+                        "r1",
+                        "https://storage.googleapis.com/samples/2/R1.fastq.gz",
+                    ],
+                ]
+            )
+
+        fastqs = parse_fastqs_map_file("test_url_map.fastq-map.csv")
+        assert len(fastqs) == 2
+        assert ("barid", "R1") in fastqs
+        assert ("barid", "R2") in fastqs
+        assert len(fastqs[("barid", "R1")]) == 2
+        assert (
+            fastqs[("barid", "R1")][0]
+            == "https://s3.amazonaws.com/samples/1/R1.fastq.gz"
+        )
+        assert (
+            fastqs[("barid", "R1")][1]
+            == "https://storage.googleapis.com/samples/2/R1.fastq.gz"
+        )
+
+
+def test_parse_fastqs_map_file_with_urls_and_s3():
+    """Test parsing of map file with URLs into dict"""
+    runner = CliRunner()
+    fastq_file_path = "barid-R2.fastq.gz"
+    with runner.isolated_filesystem():
+        with open(fastq_file_path, "w", encoding="utf-8") as fastq_file:
+            fastq_file.write("AAABBB")
+
+        with open("test_url_map.fastq-map.csv", "w", encoding="utf-8") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r_notation", "path"],
+                    [
+                        "barid",
+                        "r1",
+                        "https://s3.amazonaws.com/samples/1/barid-R1.fastq.gz",
+                    ],
+                    ["barid", "r2", fastq_file_path],
+                ]
+            )
+
+        fastqs = parse_fastqs_map_file("test_url_map.fastq-map.csv")
+        assert len(fastqs) == 2
+        assert ("barid", "R1") in fastqs
+        assert ("barid", "R2") in fastqs
+        assert len(fastqs[("barid", "R1")]) == 1
+        assert (
+            fastqs[("barid", "R1")][0]
+            == "https://s3.amazonaws.com/samples/1/barid-R1.fastq.gz"
+        )
+        assert fastqs[("barid", "R2")][0] == fastq_file_path
+
+
+def test_parse_fastqs_map_file_with_urls_invalid():
+    """Test parsing of map file with URLs into dict, invalid URLs"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        with open("test_url_map.fastq-map.csv", "w", encoding="utf-8") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r_notation", "path"],
+                    ["barid", "r1", "https://s3.amazonaws.com/samples/1/invalid"],
+                    ["barid", "r2", "https://s3.amazonaws.com/samples/1/invalid"],
+                    [
+                        "barid",
+                        "r1",
+                        "https://storage.googleapis.com/samples/2/invalid",
+                    ],
+                ]
+            )
+        try:
+            parse_fastqs_map_file("test_url_map.fastq-map.csv")
+        except ValidationError as err:
+            assert "Could not determine FASTQ file" in err.args[0]
+
+
 def test__validate_header():
     """Test that header is validated properly."""
     header_row = dict(foo="foo", bar="bar")
@@ -484,3 +578,43 @@ def test_validate_uuid_list__raises_if_not_all_ids_valid():
 
     with pytest.raises(Abort):
         validate_uuid_list(None, param, uuids_string)
+
+
+@pytest.mark.parametrize(
+    "url,expected",
+    [
+        ("http://example.com/file.fastq.bgz", True),
+        ("http://example.com/file.fastq.gz", True),
+        ("http://example.com/file.fq.bgz", True),
+        ("http://example.com/file.fq.gz", True),
+        ("http://example.com/file.txt", False),
+        ("http://example.com/file", False),
+        ("http://example.com/file.fastq", False),
+        ("http://example.com/.fastq", False),
+        ("http://example.com/", False),
+        ("foo", False),
+    ],
+)
+def test_file_name_in_url(url, expected):
+    """Test multiple cases to ensure valid FASTQ file detected"""
+    assert valid_fastq_file_name_in_url(url) == expected
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        ("http://example.com", True),
+        ("https://example.com", True),
+        ("http://example.com/file.fastq", True),
+        ("https://www.example.com", True),
+        ("http://", False),
+        ("https://", False),
+        ("example.com", False),
+        ("ftp://example.com", False),
+        ("foo", False),
+        ("", False),
+    ],
+)
+def test_looks_like_url(value, expected):
+    """Test multiple cases of URL strings"""
+    assert looks_like_url(value) == expected

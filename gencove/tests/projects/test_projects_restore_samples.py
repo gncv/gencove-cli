@@ -10,7 +10,7 @@ from gencove.client import (
     APIClientError,
 )  # noqa: I100
 from gencove.command.projects.cli import restore_project_samples
-from gencove.tests.decorators import assert_authorization
+from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.projects.vcr.filters import (
     filter_post_project_restore_samples,
@@ -50,9 +50,7 @@ def vcr_config():
     }
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
+@assert_no_requests
 def test_restore_project_samples__bad_project_id(mocker, credentials):
     """Test restore project samples when non-uuid string is used as project
     id."""
@@ -137,9 +135,7 @@ def test_restore_project_samples__success__empty_sample_ids(
         mocked_restore_project_samples.assert_called_once()
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
+@assert_no_requests
 def test_restore_project_samples__invalid_sample_ids(credentials, mocker):
     """Test restore project samples failure when an empty list of sample ids
     is sent."""

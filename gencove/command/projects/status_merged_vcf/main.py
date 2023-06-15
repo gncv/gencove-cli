@@ -27,13 +27,7 @@ class StatusMergedVCF(Command):
         self.login()
 
     def validate(self):
-        """Validate command input.
-
-        Raises:
-            ValidationError - if something is wrong with command parameters.
-        """
-        if is_valid_uuid(self.project_id) is False:
-            raise ValidationError("Project ID is not valid. Exiting.")
+        """Validate command input."""
 
     @backoff.on_exception(
         backoff.expo,

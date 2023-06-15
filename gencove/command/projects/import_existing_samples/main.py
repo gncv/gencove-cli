@@ -27,10 +27,6 @@ class ImportExistingSamples(Command):
         Raises:
             ValidationError - if something is wrong with command parameters.
         """
-        if is_valid_uuid(self.project_id) is False:
-            raise ValidationError("Project ID is not valid. Exiting.")
-        if not all(is_valid_uuid(s_id) for s_id in self.sample_ids):
-            raise ValidationError("Not all sample IDs are valid. Exiting.")
         if self.metadata_json and is_valid_json(self.metadata_json) is False:
             raise ValidationError("Metadata JSON is not valid. Exiting.")
 

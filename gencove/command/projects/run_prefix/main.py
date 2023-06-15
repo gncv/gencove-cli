@@ -32,8 +32,6 @@ class RunPrefix(Command):
         Raises:
             ValidationError - if something is wrong with command parameters.
         """
-        if is_valid_uuid(self.project_id) is False:
-            raise ValidationError("Project ID is not valid. Exiting.")
         if self._valid_prefix() is False:
             raise ValidationError("Prefix is not valid. Exiting.")
         if self.metadata_json and is_valid_json(self.metadata_json) is False:

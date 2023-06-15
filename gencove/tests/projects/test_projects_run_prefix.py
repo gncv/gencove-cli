@@ -79,7 +79,7 @@ def test_run_prefix__bad_project_id(mocker):
         ],
     )
     assert res.exit_code == 1
-    mocked_login.assert_called_once()
+    mocked_login.assert_not_called()
     mocked_get_sample_sheet.assert_not_called()
     assert "Project ID is not valid" in res.output
 

@@ -3,6 +3,7 @@
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
+from gencove.command.utils import validate_uuid
 from gencove.constants import Credentials
 
 from .constants import S3AutoImportOptionals
@@ -10,7 +11,7 @@ from .main import S3AutoImport
 
 
 @click.command("create")
-@click.argument("project_id")
+@click.argument("project_id", callback=validate_uuid)
 @click.argument("s3_uri")
 @click.option(
     "--metadata-json",

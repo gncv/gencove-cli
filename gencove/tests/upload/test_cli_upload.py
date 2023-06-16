@@ -2,6 +2,7 @@
 
 # pylint: disable=too-many-lines, import-error
 
+import csv
 import json
 import operator
 import os
@@ -9,12 +10,11 @@ from uuid import uuid4
 
 from click.testing import CliRunner
 
-
 from gencove.cli import upload
 from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.upload.utils import upload_file
 from gencove.constants import ApiEndpoints, UPLOAD_PREFIX
-from gencove.models import SampleSheet, UploadSamples, UploadsPostData
+from gencove.models import SampleSheet, UploadSamples, UploadURLImport, UploadsPostData
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.filters import (
     filter_aws_headers,
@@ -22,12 +22,14 @@ from gencove.tests.filters import (
     replace_gencove_url_vcr,
 )
 from gencove.tests.upload.vcr.filters import (
+    filter_import_fastqs_from_url_response,
     filter_project_samples_request,
     filter_project_samples_response,
     filter_sample_sheet_response,
     filter_upload_credentials_response,
     filter_upload_post_data_response,
     filter_upload_request,
+    filter_upload_url_request,
     filter_volatile_dates,
 )
 from gencove.tests.utils import get_vcr_response
@@ -60,9 +62,11 @@ def vcr_config():
         "before_record_request": [
             replace_gencove_url_vcr,
             filter_upload_request,
+            filter_upload_url_request,
             filter_project_samples_request,
         ],
         "before_record_response": [
+            filter_import_fastqs_from_url_response,
             filter_jwt,
             filter_upload_credentials_response,
             filter_upload_post_data_response,
@@ -967,3 +971,182 @@ def test_upload_retry_after_unauthorized(mocker):
         # Call count = upload details + refresh jwt + retry upload details
         assert mocked_request.call_count == 3
         assert force_refresh_jwt is False
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_upload_url(credentials, vcr, recording, mocker):
+    """Basic check of uploading URL"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("cli_test_data")
+        map_file_path = "cli_test_data/test_url_map.fastq-map.csv"
+        with open(map_file_path, "w", encoding="utf-8") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r_notation", "path"],
+                    [
+                        "some-id",
+                        "r1",
+                        "https://s3.amazonaws.com/example/client-id_R1.fastq.gz",
+                    ],
+                ]
+            )
+        mocked_get_credentials = mocker.patch(
+            "gencove.command.upload.main.get_s3_client_refreshable",
+            side_effect=get_s3_client_refreshable,
+        )
+
+        if not recording:
+            response = get_vcr_response("/api/v2/uploads-url/", vcr)
+            mocked_import_fastqs_from_url = mocker.patch.object(
+                APIClient,
+                "import_fastqs_from_url",
+                return_value=UploadURLImport(**response),
+            )
+
+        res = runner.invoke(
+            upload,
+            [map_file_path, *credentials],
+        )
+        assert not res.exception
+        assert res.exit_code == 0
+        if not recording:
+            mocked_import_fastqs_from_url.assert_called_once()
+        mocked_get_credentials.assert_called_once()
+        assert "All files were successfully processed" in res.output
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_upload_url_with_local(credentials, vcr, recording, mocker):
+    """Basic check of uploading URL"""
+    # pylint: disable=too-many-locals
+
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("cli_test_data")
+        map_file_path = "cli_test_data/test_url_map.fastq-map.csv"
+
+        fastq_file_path = "cli_test_data/test.fastq.gz"
+
+        with open(fastq_file_path, "w", encoding="utf-8") as fastq_file:
+            fastq_file.write("AAABBB")
+
+        with open(map_file_path, "w", encoding="utf-8") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r_notation", "path"],
+                    [
+                        "foo",
+                        "r1",
+                        "https://s3.amazonaws.com/example/client-id_R1.fastq.gz",
+                    ],
+                    [
+                        "bar",
+                        "r1",
+                        fastq_file_path,
+                    ],
+                ]
+            )
+
+        mocked_get_credentials = mocker.patch(
+            "gencove.command.upload.main.get_s3_client_refreshable",
+            side_effect=get_s3_client_refreshable,
+        )
+
+        if not recording:
+            url_response = get_vcr_response("/api/v2/uploads-url/", vcr)
+            mocked_import_fastqs_from_url = mocker.patch.object(
+                APIClient,
+                "import_fastqs_from_url",
+                return_value=UploadURLImport(**url_response),
+            )
+
+            upload_response = get_vcr_response("/api/v2/uploads-post-data/", vcr)
+            mocked_get_upload_details = mocker.patch.object(
+                APIClient,
+                "get_upload_details",
+                return_value=UploadsPostData(**upload_response),
+            )
+
+        res = runner.invoke(
+            upload,
+            [map_file_path, *credentials],
+        )
+        assert not res.exception
+        assert res.exit_code == 0
+        if not recording:
+            mocked_import_fastqs_from_url.assert_called_once()
+            mocked_get_upload_details.assert_called_once()
+        mocked_get_credentials.assert_called_once()
+        assert "All files were successfully processed" in res.output
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_upload_url_and_run_immediately(
+    credentials, vcr, recording, mocker, project_id
+):
+    """Test uploading then running in project"""
+    # pylint: disable=too-many-locals
+
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("cli_test_data")
+        map_file_path = "cli_test_data/test_url_map.fastq-map.csv"
+
+        with open(map_file_path, "w", encoding="utf-8") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r_notation", "path"],
+                    [
+                        "some-id",
+                        "r1",
+                        "https://s3.amazonaws.com/example/client-id_R1.fastq.gz",
+                    ],
+                ]
+            )
+
+        if not recording:
+            response = get_vcr_response("/api/v2/uploads-url/", vcr)
+            mocked_import_fastqs_from_url = mocker.patch.object(
+                APIClient,
+                "import_fastqs_from_url",
+                return_value=UploadURLImport(**response),
+            )
+            sample_sheet_response = get_vcr_response("/api/v2/sample-sheet/", vcr)
+            mocked_get_sample_sheet = mocker.patch.object(
+                APIClient,
+                "get_sample_sheet",
+                return_value=SampleSheet(**sample_sheet_response),
+            )
+            project_sample_response = get_vcr_response(
+                "/api/v2/project-samples/", vcr, operator.contains
+            )
+            mocked_assign_sample = mocker.patch.object(
+                APIClient,
+                "add_samples_to_project",
+                return_value=UploadSamples(**project_sample_response),
+            )
+        mocked_regular_progress_bar = mocker.patch(
+            "gencove.command.upload.main.get_regular_progress_bar",
+            side_effect=get_regular_progress_bar,
+        )
+        res = runner.invoke(
+            upload,
+            [map_file_path, "--run-project-id", project_id, *credentials],
+        )
+
+        assert not res.exception
+        assert res.exit_code == 0
+        assert "All files were successfully processed" in res.output
+        if not recording:
+            mocked_import_fastqs_from_url.assert_called_once()
+            mocked_get_sample_sheet.assert_called()
+            mocked_assign_sample.assert_called_once()
+
+        mocked_regular_progress_bar.assert_called_once()

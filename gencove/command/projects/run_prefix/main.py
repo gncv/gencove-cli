@@ -5,7 +5,7 @@ import json
 import backoff
 
 from ...base import Command
-from ...utils import is_valid_json, is_valid_uuid
+from ...utils import is_valid_json
 from .... import client
 from ....constants import ASSIGN_BATCH_SIZE, UPLOAD_PREFIX
 from ....exceptions import ValidationError
@@ -32,8 +32,6 @@ class RunPrefix(Command):
         Raises:
             ValidationError - if something is wrong with command parameters.
         """
-        if is_valid_uuid(self.project_id) is False:
-            raise ValidationError("Project ID is not valid. Exiting.")
         if self._valid_prefix() is False:
             raise ValidationError("Prefix is not valid. Exiting.")
         if self.metadata_json and is_valid_json(self.metadata_json) is False:

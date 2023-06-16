@@ -4,6 +4,7 @@ definition.
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
+from gencove.command.utils import validate_uuid
 from gencove.constants import Credentials
 
 from .constants import BaseSpaceAutoImportOptionals
@@ -11,7 +12,7 @@ from .main import BaseSpaceAutoImport
 
 
 @click.command("create")
-@click.argument("project_id")
+@click.argument("project_id", callback=validate_uuid)
 @click.argument("identifier")
 @click.option(
     "--metadata-json",

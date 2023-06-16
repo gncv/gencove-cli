@@ -17,6 +17,14 @@ def filter_upload_request(request):
     return request
 
 
+def filter_upload_url_request(request):
+    """Removes destination path and aws url from request."""
+    request = copy.deepcopy(request)
+    if "uploads-url" in request.path:
+        request.body = '{"destination_path": "gncv://cli-mock/test.fastq.gz", "source_url": "https://s3.amazonaws.com/example/client-id_R1.fastq.gz"}'  # noqa: E501 pylint: disable=line-too-long
+    return request
+
+
 def filter_project_samples_request(request):
     """Filter sample sheet sensitive data from request."""
     request = copy.deepcopy(request)
@@ -57,6 +65,27 @@ def filter_upload_post_data_response(response, json_response):
         }
     if "last_status" in json_response:
         json_response["last_status"]["id"] = MOCK_UUID
+    return response, json_response
+
+
+@parse_response_to_json
+def filter_import_fastqs_from_url_response(response, json_response):
+    """Removes sensitive data from POST to uploads-post-data."""
+    if "id" in json_response:
+        json_response["id"] = MOCK_UUID
+    if "destination_path" in json_response:
+        json_response["destination_path"] = "gncv://cli-mock/test.fastq.gz"
+    if "s3" in json_response:
+        json_response["s3"] = {
+            "bucket": "mock_bucket",
+            "object_name": f"organization/{MOCK_UUID}/user/{MOCK_UUID}/uploads/{MOCK_UUID}.fastq-r1",  # noqa: E501 pylint: disable=line-too-long
+        }
+    if "last_status" in json_response:
+        json_response["last_status"]["id"] = MOCK_UUID
+    if "source_url" in json_response:
+        json_response[
+            "source_url"
+        ] = "https://s3.amazonaws.com/example/client-id_R1.fastq.gz"
     return response, json_response
 
 

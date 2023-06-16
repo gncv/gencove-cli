@@ -8,7 +8,7 @@ from click.testing import CliRunner  # noqa: I100,I201
 from gencove.client import APIClient, APIClientError  # noqa: I201
 from gencove.command.s3_imports.autoimports.create.cli import create
 from gencove.models import S3AutoimportTopic
-from gencove.tests.decorators import assert_authorization
+from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 
 from vcr import VCR
@@ -39,9 +39,7 @@ def vcr_config():
     }
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
+@assert_no_requests
 def test_s3_autoimport_create_project_id_not_uuid(
     credentials,
     mocker,

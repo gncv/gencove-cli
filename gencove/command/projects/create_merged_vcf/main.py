@@ -1,9 +1,7 @@
 """Merge project's VCF files executor."""
 from ..status_merged_vcf.utils import get_line
 from ...base import Command
-from ...utils import is_valid_uuid
 from .... import client
-from ....exceptions import ValidationError
 
 
 class CreateMergedVCF(Command):
@@ -23,13 +21,7 @@ class CreateMergedVCF(Command):
         self.login()
 
     def validate(self):
-        """Validate command input.
-
-        Raises:
-            ValidationError - if something is wrong with command parameters.
-        """
-        if is_valid_uuid(self.project_id) is False:
-            raise ValidationError("Project ID is not valid. Exiting.")
+        """Validate command input."""
 
     # no retry for timeouts in order to avoid duplicate heavy operations on
     # the backend

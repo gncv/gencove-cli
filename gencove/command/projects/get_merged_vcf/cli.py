@@ -2,13 +2,14 @@
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
+from gencove.command.utils import validate_uuid
 from gencove.constants import Credentials, Optionals
 
 from .main import GetMergedVCF
 
 
 @click.command("get-merged-vcf")
-@click.argument("project_id")
+@click.argument("project_id", callback=validate_uuid)
 @click.option(
     "--output-filename",
     help="Output filename for merged VCF file.",

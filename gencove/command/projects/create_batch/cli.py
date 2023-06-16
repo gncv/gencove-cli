@@ -2,9 +2,8 @@
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
-from gencove.command.utils import validate_uuid
+from gencove.command.utils import validate_uuid, validate_uuid_list
 from gencove.constants import Credentials, Optionals
-from gencove.logger import echo_debug
 
 from .main import CreateBatch
 
@@ -23,6 +22,7 @@ from .main import CreateBatch
     default="",
     help="A comma separated list of sample ids for "
     "which to create a batch; if not specified use all samples in project",
+    callback=validate_uuid_list,
 )
 @add_options(common_options)
 def create_project_batch(  # pylint: disable=too-many-arguments
@@ -36,12 +36,6 @@ def create_project_batch(  # pylint: disable=too-many-arguments
     api_key,
 ):
     """Create a batch in a project."""
-    if sample_ids:
-        sample_ids = [s_id.strip() for s_id in sample_ids.split(",")]
-        echo_debug(f"Sample ids translation: {sample_ids}")
-    else:
-        sample_ids = []
-
     CreateBatch(
         project_id,
         batch_type,

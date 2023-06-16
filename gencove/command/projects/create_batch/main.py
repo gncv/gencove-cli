@@ -2,7 +2,6 @@
 from gencove import client  # noqa: I100
 from gencove.command.base import Command
 from gencove.command.projects.list_batches.utils import get_line
-from gencove.command.utils import is_valid_uuid
 from gencove.exceptions import ValidationError
 
 
@@ -40,10 +39,6 @@ class CreateBatch(Command):
 
         if not self.batch_name:
             raise ValidationError("You must provide value for --batch-name. Exiting.")
-
-        if self.sample_ids:
-            if not all(is_valid_uuid(s_id) for s_id in self.sample_ids):
-                raise ValidationError("Not all sample IDs are valid. Exiting.")
 
     # no retry for timeouts in order to avoid duplicate heavy operations on
     # the backend

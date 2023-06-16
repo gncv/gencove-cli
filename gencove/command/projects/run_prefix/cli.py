@@ -2,6 +2,7 @@
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
+from gencove.command.utils import validate_uuid
 from gencove.constants import Credentials, SampleAssignmentStatus
 from gencove.utils import enum_as_dict
 
@@ -11,7 +12,7 @@ from .main import RunPrefix
 
 
 @click.command("run-prefix")
-@click.argument("project_id")
+@click.argument("project_id", callback=validate_uuid)
 @click.argument("prefix")
 @click.option(
     "--metadata-json",

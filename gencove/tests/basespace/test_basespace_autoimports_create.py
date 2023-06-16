@@ -7,7 +7,7 @@ from gencove.client import APIClient, APIClientError
 from gencove.command.basespace.autoimports.create.cli import (
     create,
 )
-from gencove.tests.decorators import assert_authorization
+from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.utils import MOCK_UUID
 
@@ -41,9 +41,7 @@ def vcr_config():
     }
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
+@assert_no_requests
 def test_basespace_autoimport_create_project_id_not_uuid(
     credentials,
     mocker,

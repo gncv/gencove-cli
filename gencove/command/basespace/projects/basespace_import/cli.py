@@ -3,6 +3,7 @@
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
+from gencove.command.utils import validate_uuid
 from gencove.constants import Credentials
 from gencove.logger import echo_debug
 
@@ -12,7 +13,7 @@ from .main import BaseSpaceImport
 
 @click.command("import")
 @click.argument("basespace_project_ids")
-@click.argument("project_id")
+@click.argument("project_id", callback=validate_uuid)
 @click.option(
     "--metadata-json",
     required=False,

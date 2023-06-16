@@ -11,7 +11,7 @@ from click.testing import CliRunner
 from gencove.client import APIClient, APIClientError  # noqa: I100
 from gencove.command.projects.cli import create_project_batch
 from gencove.models import ProjectBatches
-from gencove.tests.decorators import assert_authorization
+from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.projects.vcr.filters import (
     filter_project_batches_request,
@@ -95,9 +95,7 @@ def test_create_project_batches__missing_batch_name(credentials, mocker):
     assert "You must provide value for --batch-name" in res.output
 
 
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
+@assert_no_requests
 def test_create_project_batches__bad_project_id(credentials, mocker):
     """Test batch creation failure when non-uuid string is used as project
     id.

@@ -3,9 +3,7 @@ import backoff
 
 from .utils import get_line
 from ...base import Command
-from ...utils import is_valid_uuid
 from .... import client
-from ....exceptions import ValidationError
 
 
 class StatusMergedVCF(Command):

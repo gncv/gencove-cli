@@ -1,8 +1,6 @@
 """Request project's samples restore."""
 from gencove import client  # noqa: I100
 from gencove.command.base import Command
-from gencove.command.utils import is_valid_uuid
-from gencove.exceptions import ValidationError
 
 
 class RestoreSamples(Command):

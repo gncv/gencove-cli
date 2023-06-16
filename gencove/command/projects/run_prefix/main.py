@@ -5,7 +5,7 @@ import json
 import backoff
 
 from ...base import Command
-from ...utils import is_valid_json, is_valid_uuid
+from ...utils import is_valid_json
 from .... import client
 from ....constants import ASSIGN_BATCH_SIZE, UPLOAD_PREFIX
 from ....exceptions import ValidationError

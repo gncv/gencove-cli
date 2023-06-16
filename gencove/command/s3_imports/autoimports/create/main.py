@@ -5,7 +5,7 @@ import json
 from ..... import client
 from .....exceptions import ValidationError
 from ....base import Command  # noqa: I100
-from ....utils import is_valid_json, is_valid_uuid
+from ....utils import is_valid_json
 
 
 class S3AutoImport(Command):

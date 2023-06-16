@@ -3,7 +3,7 @@
 import json
 
 from ....base import Command
-from ....utils import is_valid_json, is_valid_uuid
+from ....utils import is_valid_json
 from ..... import client
 from .....exceptions import ValidationError
 

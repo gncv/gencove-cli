@@ -3,7 +3,6 @@ import backoff
 
 from ... import download
 from ...base import Command
-from ...utils import is_valid_uuid
 from .... import client
 from ....exceptions import ValidationError
 

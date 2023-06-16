@@ -1,9 +1,7 @@
 """Merge project's VCF files executor."""
 from ..status_merged_vcf.utils import get_line
 from ...base import Command
-from ...utils import is_valid_uuid
 from .... import client
-from ....exceptions import ValidationError
 
 
 class CreateMergedVCF(Command):

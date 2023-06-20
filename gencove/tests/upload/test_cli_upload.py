@@ -1126,7 +1126,6 @@ def test_upload_url_and_run_immediately(
         mocked_regular_progress_bar.assert_called_once()
 
 
-@assert_authorization
 def test_upload_default_destination(credentials, mocker):
     """Test to confirm default destination is gncv://cli-*"""
     runner = CliRunner()
@@ -1169,7 +1168,6 @@ def test_upload_default_destination(credentials, mocker):
     assert "uploaded to: gncv://cli-url-" not in res.output
 
 
-@assert_authorization
 def test_upload_url_destination(credentials, mocker):
     """Test to confirm default destination is gncv://cli-url-*"""
     runner = CliRunner()

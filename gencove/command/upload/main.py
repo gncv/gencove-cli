@@ -78,6 +78,8 @@ class Upload(Command):
 
     @staticmethod
     def map_paths_are_urls(fastq_map: dict) -> bool:
+        """If all path values for fastq_map look like URLs,
+        return True, otherwise False"""
         return all(looks_like_url(next(iter(path))) for path in fastq_map.values())
 
     def initialize(self):

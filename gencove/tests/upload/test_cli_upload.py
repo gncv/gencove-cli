@@ -1127,6 +1127,7 @@ def test_upload_url_and_run_immediately(
 
 
 def test_upload_default_destination(credentials):
+    """Test to confirm default destination is gncv://cli-*"""
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
@@ -1144,6 +1145,7 @@ def test_upload_default_destination(credentials):
 
 
 def test_upload_url_destination(credentials):
+    """Test to confirm default destination is gncv://cli-url-*"""
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")

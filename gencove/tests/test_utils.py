@@ -374,7 +374,7 @@ def test__validate_header():
     assert _validate_header(header_row) is None
 
 
-def test__validate_parsed_map__all_urls():
+def test_validate_parsed_map__all_urls():
     """Test validation of parsed map, all URLs OK"""
     runner = CliRunner()
     with runner.isolated_filesystem():

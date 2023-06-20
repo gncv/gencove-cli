@@ -23,6 +23,7 @@ from gencove.command.upload.utils import (
     parse_fastqs_map_file,
     upload_file,
     valid_fastq_file_name_in_url,
+    _validate_parsed_map,
 )
 from gencove.command.utils import is_valid_uuid, validate_uuid, validate_uuid_list
 from gencove.constants import (
@@ -328,40 +329,6 @@ def test_parse_fastqs_map_file_with_urls():
         )
 
 
-def test_parse_fastqs_map_file_with_urls_and_s3():
-    """Test parsing of map file with URLs into dict"""
-    runner = CliRunner()
-    fastq_file_path = "barid-R2.fastq.gz"
-    with runner.isolated_filesystem():
-        with open(fastq_file_path, "w", encoding="utf-8") as fastq_file:
-            fastq_file.write("AAABBB")
-
-        with open("test_url_map.fastq-map.csv", "w", encoding="utf-8") as map_file:
-            writer = csv.writer(map_file)
-            writer.writerows(
-                [
-                    ["client_id", "r_notation", "path"],
-                    [
-                        "barid",
-                        "r1",
-                        "https://s3.amazonaws.com/samples/1/barid-R1.fastq.gz",
-                    ],
-                    ["barid", "r2", fastq_file_path],
-                ]
-            )
-
-        fastqs = parse_fastqs_map_file("test_url_map.fastq-map.csv")
-        assert len(fastqs) == 2
-        assert ("barid", "R1") in fastqs
-        assert ("barid", "R2") in fastqs
-        assert len(fastqs[("barid", "R1")]) == 1
-        assert (
-            fastqs[("barid", "R1")][0]
-            == "https://s3.amazonaws.com/samples/1/barid-R1.fastq.gz"
-        )
-        assert fastqs[("barid", "R2")][0] == fastq_file_path
-
-
 def test_parse_fastqs_map_file_with_urls_invalid():
     """Test parsing of map file with URLs into dict, invalid URLs"""
     runner = CliRunner()
@@ -405,6 +372,75 @@ def test__validate_header():
     # with uppercase
     header_row = dict(client_id="client_id", r_notation="R_notation", path="path")
     assert _validate_header(header_row) is None
+
+
+def test__validate_parsed_map__all_urls():
+    """Test validation of parsed map, all URLs OK"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        with open("test_url_map.fastq-map.csv", "w", encoding="utf-8") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r_notation", "path"],
+                    ["url", "r1", "https://s3.amazonaws.com/samples/1/R1.fastq.gz"],
+                    ["url", "r2", "https://s3.amazonaws.com/samples/1/R2.fastq.gz"],
+                ]
+            )
+        fastqs = parse_fastqs_map_file("test_url_map.fastq-map.csv")
+    assert _validate_parsed_map(fastqs) is None
+
+
+def test_validate_parsed_map__all_paths():
+    """Test validation of parsed map, all paths OK"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("test_dir")
+        with open("test_dir/file_r1.fastq.gz", "w", encoding="utf-8") as fastq_file1:
+            fastq_file1.write("AAABBB")
+
+        with open("test_dir/file_r2.fastq.gz", "w", encoding="utf-8") as fastq_file2:
+            fastq_file2.write("AAABBB")
+
+        with open("test_file_map.fastq-map.csv", "w", encoding="utf-8") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r_notation", "path"],
+                    ["file", "r1", "test_dir/file_r1.fastq.gz"],
+                    ["file", "r2", "test_dir/file_r2.fastq.gz"],
+                ]
+            )
+        fastqs = parse_fastqs_map_file("test_file_map.fastq-map.csv")
+    assert _validate_parsed_map(fastqs) is None
+
+
+def test_validate_parsed_map__mixed():
+    """Test validation of parsed map to prevent heterogeneous path values"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("test_dir")
+        with open("test_dir/file_r1.fastq.gz", "w", encoding="utf-8") as fastq_file1:
+            fastq_file1.write("AAABBB")
+
+        with open("test_dir/file_r2.fastq.gz", "w", encoding="utf-8") as fastq_file2:
+            fastq_file2.write("AAABBB")
+
+        with open("test_mixed_map.fastq-map.csv", "w", encoding="utf-8") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r_notation", "path"],
+                    ["url", "r1", "https://s3.amazonaws.com/samples/1/R1.fastq.gz"],
+                    ["url", "r2", "https://s3.amazonaws.com/samples/1/R1.fastq.gz"],
+                    ["file", "r1", "test_dir/file_r1.fastq.gz"],
+                    ["file", "r2", "test_dir/file_r2.fastq.gz"],
+                ]
+            )
+        try:
+            parse_fastqs_map_file("test_mixed_map.fastq-map.csv")
+        except ValidationError as err:
+            assert "Detected both URLs and file paths" in err.args[0]
 
 
 def test_is_valid_uuid__is_valid():

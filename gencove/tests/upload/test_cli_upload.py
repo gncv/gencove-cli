@@ -1126,7 +1126,9 @@ def test_upload_url_and_run_immediately(
         mocked_regular_progress_bar.assert_called_once()
 
 
-def test_upload_default_destination(credentials, mocker):
+@pytest.mark.vcr
+@assert_authorization
+def test_upload_default_destination(credentials, vcr, recording, mocker):
     """Test to confirm default destination is gncv://cli-*"""
     runner = CliRunner()
     with runner.isolated_filesystem():
@@ -1149,18 +1151,25 @@ def test_upload_default_destination(credentials, mocker):
                     ],
                 ]
             )
-
-        mocker.patch("gencove.command.upload.main.upload_file", side_effect=upload_file)
-
-        mocker.patch(
+        mocked_get_credentials = mocker.patch(
             "gencove.command.upload.main.get_s3_client_refreshable",
             side_effect=get_s3_client_refreshable,
         )
+        if not recording:
+            response = get_vcr_response("/api/v2/uploads-post-data/", vcr)
+            mocker.patch.object(
+                APIClient,
+                "get_upload_details",
+                return_value=UploadsPostData(**response),
+            )
+        mocker.patch("gencove.command.upload.main.upload_file", side_effect=upload_file)
 
         res = runner.invoke(
             upload,
             [map_file_path, *credentials],
         )
+
+    mocked_get_credentials.assert_called_once()
 
     assert not res.exception
     assert res.exit_code == 0
@@ -1168,7 +1177,9 @@ def test_upload_default_destination(credentials, mocker):
     assert "uploaded to: gncv://cli-url-" not in res.output
 
 
-def test_upload_url_destination(credentials, mocker):
+@pytest.mark.vcr
+@assert_authorization
+def test_upload_url_destination(credentials, vcr, recording, mocker):
     """Test to confirm default destination is gncv://cli-url-*"""
     runner = CliRunner()
     with runner.isolated_filesystem():
@@ -1188,18 +1199,25 @@ def test_upload_url_destination(credentials, mocker):
                 ]
             )
 
-        mocker.patch("gencove.command.upload.main.upload_file", side_effect=upload_file)
-
-        mocker.patch(
+        mocked_get_credentials = mocker.patch(
             "gencove.command.upload.main.get_s3_client_refreshable",
             side_effect=get_s3_client_refreshable,
         )
+
+        if not recording:
+            response = get_vcr_response("/api/v2/uploads-url/", vcr)
+            mocker.patch.object(
+                APIClient,
+                "import_fastqs_from_url",
+                return_value=UploadURLImport(**response),
+            )
 
         res = runner.invoke(
             upload,
             [map_file_path, *credentials],
         )
 
+    mocked_get_credentials.assert_called_once()
     assert not res.exception
     assert res.exit_code == 0
     assert "uploaded to: gncv://cli-url-" in res.output

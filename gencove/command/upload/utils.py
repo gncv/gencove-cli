@@ -216,7 +216,7 @@ def _validate_header(header):
 def _validate_parsed_map(fastqs: dict):
     """Validates contents of fastqs dict to ensure path
     column contains homogenous values, i.e. all local paths
-     or all local URLs"""
+     or all URLs"""
     paths = [next(iter(x)) for x in fastqs.values()]
     all_urls = all(looks_like_url(p) for p in paths)
     all_paths = all(not looks_like_url(p) for p in paths)

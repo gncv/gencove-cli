@@ -1018,10 +1018,8 @@ def test_upload_url(credentials, vcr, recording, mocker):
         assert "All files were successfully processed" in res.output
 
 
-@pytest.mark.vcr
-@assert_authorization
-def test_upload_url_with_local(credentials, vcr, recording, mocker):
-    """Basic check of uploading URL"""
+def test_upload_url_with_local(credentials, recording):
+    """Confirm this case raises error, cannot mix URL and path"""
     # pylint: disable=too-many-locals
 
     runner = CliRunner()
@@ -1052,37 +1050,13 @@ def test_upload_url_with_local(credentials, vcr, recording, mocker):
                 ]
             )
 
-        mocked_get_credentials = mocker.patch(
-            "gencove.command.upload.main.get_s3_client_refreshable",
-            side_effect=get_s3_client_refreshable,
-        )
-
-        if not recording:
-            url_response = get_vcr_response("/api/v2/uploads-url/", vcr)
-            mocked_import_fastqs_from_url = mocker.patch.object(
-                APIClient,
-                "import_fastqs_from_url",
-                return_value=UploadURLImport(**url_response),
-            )
-
-            upload_response = get_vcr_response("/api/v2/uploads-post-data/", vcr)
-            mocked_get_upload_details = mocker.patch.object(
-                APIClient,
-                "get_upload_details",
-                return_value=UploadsPostData(**upload_response),
-            )
-
         res = runner.invoke(
             upload,
             [map_file_path, *credentials],
         )
-        assert not res.exception
-        assert res.exit_code == 0
-        if not recording:
-            mocked_import_fastqs_from_url.assert_called_once()
-            mocked_get_upload_details.assert_called_once()
-        mocked_get_credentials.assert_called_once()
-        assert "All files were successfully processed" in res.output
+        assert res.exception
+        assert res.exit_code == 1
+        assert "Please only supply one type of path" in res.output
 
 
 @pytest.mark.vcr

@@ -78,7 +78,7 @@ class Upload(Command):
 
     @staticmethod
     def map_paths_are_urls(fastq_map: dict) -> bool:
-        return all([looks_like_url(next(iter(path))) for path in fastq_map.values()])
+        return all(looks_like_url(next(iter(path))) for path in fastq_map.values())
 
     def initialize(self):
         """Initialize upload command parameters from provided arguments."""

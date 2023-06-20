@@ -1127,7 +1127,7 @@ def test_upload_url_and_run_immediately(
 
 
 @assert_authorization
-def test_upload_default_destination(credentials, recording, mocker):
+def test_upload_default_destination(credentials, mocker):
     """Test to confirm default destination is gncv://cli-*"""
     runner = CliRunner()
     with runner.isolated_filesystem():
@@ -1170,7 +1170,7 @@ def test_upload_default_destination(credentials, recording, mocker):
 
 
 @assert_authorization
-def test_upload_url_destination(credentials, recording, mocker):
+def test_upload_url_destination(credentials, mocker):
     """Test to confirm default destination is gncv://cli-url-*"""
     runner = CliRunner()
     with runner.isolated_filesystem():

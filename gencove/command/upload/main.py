@@ -68,13 +68,19 @@ class Upload(Command):
         self.metadata = options.metadata
 
     @staticmethod
-    def generate_gncv_destination():
+    def generate_gncv_destination(fastq_source: str = "cli"):
         """Autogenerate gencove destination path."""
         return (
-            f"{UPLOAD_PREFIX}cli-"
+            f"{UPLOAD_PREFIX}{fastq_source}-"
             f"{datetime.utcnow().strftime('%Y%m%d%H%M%S')}-"
             f"{uuid.uuid4().hex}"
         )
+
+    @staticmethod
+    def map_paths_are_urls(fastq_map: dict) -> bool:
+        """If all path values for fastq_map look like URLs,
+        return True, otherwise False"""
+        return all(looks_like_url(next(iter(path))) for path in fastq_map.values())
 
     def initialize(self):
         """Initialize upload command parameters from provided arguments."""
@@ -82,16 +88,19 @@ class Upload(Command):
         self.echo_warning(TMP_UPLOADS_WARNING)
 
         # fmt: off
+        fastqs_source = "cli"
         if os.path.isfile(self.source) and self.source.endswith(FASTQ_MAP_EXTENSION):  # noqa: E501  # pylint: disable=line-too-long
             self.echo_debug("Scanning fastqs map file")
             self.fastqs_map = parse_fastqs_map_file(self.source)
+            if self.map_paths_are_urls(self.fastqs_map):
+                fastqs_source = "cli-url"
             self.echo_debug(f"got fastq pairs: {self.fastqs_map}")
         else:
             self.echo_debug("Seeking files to upload")
             self.fastqs = list(seek_files_to_upload(self.source))
 
         if not self.destination:
-            self.destination = self.generate_gncv_destination()
+            self.destination = self.generate_gncv_destination(fastqs_source)
             self.echo_info(
                 f"Files will be uploaded to: {self.destination}"
             )

@@ -1126,46 +1126,82 @@ def test_upload_url_and_run_immediately(
         mocked_regular_progress_bar.assert_called_once()
 
 
-def test_upload_default_destination(credentials):
+@assert_authorization
+def test_upload_default_destination(credentials, recording, mocker):
     """Test to confirm default destination is gncv://cli-*"""
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
-        with open("cli_test_data/test.fastq.gz", "w", encoding="utf-8") as fastq_file:
+        map_file_path = "cli_test_data/test_map.fastq-map.csv"
+        fastq_file_path = "cli_test_data/test.fastq.gz"
+
+        with open(fastq_file_path, "w", encoding="utf-8") as fastq_file:
             fastq_file.write("AAABBB")
 
-        res = runner.invoke(
-            upload,
-            ["cli_test_data", *credentials],
-        )
-        assert not res.exception
-        assert res.exit_code == 0
-        assert "uploaded to: gncv://cli-" in res.output
-        assert "uploaded to: gncv://cli-url-" not in res.output
-
-
-def test_upload_url_destination(credentials):
-    """Test to confirm default destination is gncv://cli-url-*"""
-    runner = CliRunner()
-    with runner.isolated_filesystem():
-        os.mkdir("cli_test_data")
-        map_file_path = "cli_test_data/test_url_map.fastq-map.csv"
         with open(map_file_path, "w", encoding="utf-8") as map_file:
             writer = csv.writer(map_file)
             writer.writerows(
                 [
                     ["client_id", "r_notation", "path"],
                     [
-                        "some-id",
+                        "bar",
+                        "r1",
+                        fastq_file_path,
+                    ],
+                ]
+            )
+
+        mocker.patch("gencove.command.upload.main.upload_file", side_effect=upload_file)
+
+        mocker.patch(
+            "gencove.command.upload.main.get_s3_client_refreshable",
+            side_effect=get_s3_client_refreshable,
+        )
+
+        res = runner.invoke(
+            upload,
+            [map_file_path, *credentials],
+        )
+
+    assert not res.exception
+    assert res.exit_code == 0
+    assert "uploaded to: gncv://cli-" in res.output
+    assert "uploaded to: gncv://cli-url-" not in res.output
+
+
+@assert_authorization
+def test_upload_url_destination(credentials, recording, mocker):
+    """Test to confirm default destination is gncv://cli-url-*"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("cli_test_data")
+        map_file_path = "cli_test_data/test_map.fastq-map.csv"
+
+        with open(map_file_path, "w", encoding="utf-8") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r_notation", "path"],
+                    [
+                        "bar",
                         "r1",
                         "https://s3.amazonaws.com/example/client-id_R1.fastq.gz",
                     ],
                 ]
             )
+
+        mocker.patch("gencove.command.upload.main.upload_file", side_effect=upload_file)
+
+        mocker.patch(
+            "gencove.command.upload.main.get_s3_client_refreshable",
+            side_effect=get_s3_client_refreshable,
+        )
+
         res = runner.invoke(
             upload,
             [map_file_path, *credentials],
         )
-        assert not res.exception
-        assert res.exit_code == 0
-        assert "uploaded to: gncv://cli-url-" in res.output
+
+    assert not res.exception
+    assert res.exit_code == 0
+    assert "uploaded to: gncv://cli-url-" in res.output

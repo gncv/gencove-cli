@@ -1018,10 +1018,8 @@ def test_upload_url(credentials, vcr, recording, mocker):
         assert "All files were successfully processed" in res.output
 
 
-@pytest.mark.vcr
-@assert_authorization
-def test_upload_url_with_local(credentials, vcr, recording, mocker):
-    """Basic check of uploading URL"""
+def test_upload_url_with_local(credentials):
+    """Confirm this case raises error, cannot mix URL and path"""
     # pylint: disable=too-many-locals
 
     runner = CliRunner()
@@ -1052,37 +1050,13 @@ def test_upload_url_with_local(credentials, vcr, recording, mocker):
                 ]
             )
 
-        mocked_get_credentials = mocker.patch(
-            "gencove.command.upload.main.get_s3_client_refreshable",
-            side_effect=get_s3_client_refreshable,
-        )
-
-        if not recording:
-            url_response = get_vcr_response("/api/v2/uploads-url/", vcr)
-            mocked_import_fastqs_from_url = mocker.patch.object(
-                APIClient,
-                "import_fastqs_from_url",
-                return_value=UploadURLImport(**url_response),
-            )
-
-            upload_response = get_vcr_response("/api/v2/uploads-post-data/", vcr)
-            mocked_get_upload_details = mocker.patch.object(
-                APIClient,
-                "get_upload_details",
-                return_value=UploadsPostData(**upload_response),
-            )
-
         res = runner.invoke(
             upload,
             [map_file_path, *credentials],
         )
-        assert not res.exception
-        assert res.exit_code == 0
-        if not recording:
-            mocked_import_fastqs_from_url.assert_called_once()
-            mocked_get_upload_details.assert_called_once()
-        mocked_get_credentials.assert_called_once()
-        assert "All files were successfully processed" in res.output
+        assert res.exception
+        assert res.exit_code == 1
+        assert "Please only supply one type of path" in res.output
 
 
 @pytest.mark.vcr
@@ -1150,3 +1124,100 @@ def test_upload_url_and_run_immediately(
             mocked_assign_sample.assert_called_once()
 
         mocked_regular_progress_bar.assert_called_once()
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_upload_default_destination(credentials, vcr, recording, mocker):
+    """Test to confirm default destination is gncv://cli-*"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("cli_test_data")
+        map_file_path = "cli_test_data/test_map.fastq-map.csv"
+        fastq_file_path = "cli_test_data/test.fastq.gz"
+
+        with open(fastq_file_path, "w", encoding="utf-8") as fastq_file:
+            fastq_file.write("AAABBB")
+
+        with open(map_file_path, "w", encoding="utf-8") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r_notation", "path"],
+                    [
+                        "bar",
+                        "r1",
+                        fastq_file_path,
+                    ],
+                ]
+            )
+        mocked_get_credentials = mocker.patch(
+            "gencove.command.upload.main.get_s3_client_refreshable",
+            side_effect=get_s3_client_refreshable,
+        )
+        if not recording:
+            response = get_vcr_response("/api/v2/uploads-post-data/", vcr)
+            mocker.patch.object(
+                APIClient,
+                "get_upload_details",
+                return_value=UploadsPostData(**response),
+            )
+        mocker.patch("gencove.command.upload.main.upload_file", side_effect=upload_file)
+
+        res = runner.invoke(
+            upload,
+            [map_file_path, *credentials],
+        )
+
+    mocked_get_credentials.assert_called_once()
+
+    assert not res.exception
+    assert res.exit_code == 0
+    assert "uploaded to: gncv://cli-" in res.output
+    assert "uploaded to: gncv://cli-url-" not in res.output
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_upload_url_destination(credentials, vcr, recording, mocker):
+    """Test to confirm default destination is gncv://cli-url-*"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("cli_test_data")
+        map_file_path = "cli_test_data/test_map.fastq-map.csv"
+
+        with open(map_file_path, "w", encoding="utf-8") as map_file:
+            writer = csv.writer(map_file)
+            writer.writerows(
+                [
+                    ["client_id", "r_notation", "path"],
+                    [
+                        "bar",
+                        "r1",
+                        "https://s3.amazonaws.com/example/client-id_R1.fastq.gz",
+                    ],
+                ]
+            )
+
+        mocked_get_credentials = mocker.patch(
+            "gencove.command.upload.main.get_s3_client_refreshable",
+            side_effect=get_s3_client_refreshable,
+        )
+
+        if not recording:
+            response = get_vcr_response("/api/v2/uploads-url/", vcr)
+            mocker.patch.object(
+                APIClient,
+                "import_fastqs_from_url",
+                return_value=UploadURLImport(**response),
+            )
+
+        res = runner.invoke(
+            upload,
+            [map_file_path, *credentials],
+        )
+
+    mocked_get_credentials.assert_called_once()
+    assert not res.exception
+    assert res.exit_code == 0
+    assert "uploaded to: gncv://cli-url-" in res.output

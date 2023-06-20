@@ -19,11 +19,11 @@ from gencove.command.download.utils import (
 )
 from gencove.command.upload.utils import (
     _validate_header,
+    _validate_parsed_map,
     looks_like_url,
     parse_fastqs_map_file,
     upload_file,
     valid_fastq_file_name_in_url,
-    _validate_parsed_map,
 )
 from gencove.command.utils import is_valid_uuid, validate_uuid, validate_uuid_list
 from gencove.constants import (

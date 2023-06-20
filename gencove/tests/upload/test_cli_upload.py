@@ -1018,7 +1018,7 @@ def test_upload_url(credentials, vcr, recording, mocker):
         assert "All files were successfully processed" in res.output
 
 
-def test_upload_url_with_local(credentials, recording):
+def test_upload_url_with_local(credentials):
     """Confirm this case raises error, cannot mix URL and path"""
     # pylint: disable=too-many-locals
 

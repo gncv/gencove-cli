@@ -25,8 +25,6 @@ from gencove.tests.download.vcr.filters import (
     filter_files_request,
     filter_files_response,
     filter_project_samples_request,
-    filter_sample_metadata_request,
-    filter_sample_quality_controls_request,
 )
 from gencove.tests.filters import (
     filter_aws_headers,
@@ -37,7 +35,9 @@ from gencove.tests.filters import (
     filter_samples_response,
     mock_binary_response,
     replace_gencove_url_vcr,
+    filter_sample_metadata_request,
     replace_s3_from_url,
+    filter_sample_quality_controls_request,
 )
 from gencove.tests.utils import MOCK_CHECKSUM, MOCK_UUID, get_vcr_response
 

@@ -8,6 +8,7 @@ from gencove.constants import Credentials, Optionals
 from gencove.logger import echo_error
 
 from .main import DownloadFile
+from ...download.constants import METADATA_FILE_TYPE, QC_FILE_TYPE
 
 
 @click.command("download-file")
@@ -80,7 +81,14 @@ def download_file(
         ).run()
     else:
         try:
-            with open(destination, "wb") as destination_file:
+            extra_kwargs = {}
+            if file_type in [QC_FILE_TYPE, METADATA_FILE_TYPE]:
+                mode = "w"
+                extra_kwargs["encoding"] = "utf8"
+            else:
+                mode = "wb"
+            # pylint: disable=unspecified-encoding
+            with open(destination, mode, **extra_kwargs) as destination_file:
                 DownloadFile(
                     sample_id,
                     file_type,

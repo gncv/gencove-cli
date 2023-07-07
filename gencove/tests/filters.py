@@ -74,6 +74,16 @@ def filter_samples_request(request):
     return _replace_uuid_from_url(request, "samples")
 
 
+def filter_sample_metadata_request(request):
+    """Filter sample-metadata sensitive data from request."""
+    return _replace_uuid_from_url(request, "sample-metadata")
+
+
+def filter_sample_quality_controls_request(request):
+    """Filter sample quality control sensitive data from request."""
+    return _replace_uuid_from_url(request, "sample-quality-controls")
+
+
 def _filter_sample(result):
     """Common function that filters sample sensitive data."""
     # pylint: disable=too-many-branches
@@ -83,6 +93,8 @@ def _filter_sample(result):
         result["client_id"] = "mock_client_id"
     if "project" in result:
         result["project"] = MOCK_UUID
+    if "run" in result:
+        result["run"] = MOCK_UUID
     if "physical_id" in result and result["physical_id"]:
         result["physical_id"] = "mock_physical_id"
     if "legacy_id" in result and result["legacy_id"]:

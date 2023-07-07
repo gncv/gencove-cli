@@ -25,14 +25,14 @@ from gencove.tests.download.vcr.filters import (
     filter_files_request,
     filter_files_response,
     filter_project_samples_request,
-    filter_sample_metadata_request,
-    filter_sample_quality_controls_request,
 )
 from gencove.tests.filters import (
     filter_aws_headers,
     filter_file_types_request,
     filter_jwt,
     filter_project_samples_response,
+    filter_sample_metadata_request,
+    filter_sample_quality_controls_request,
     filter_samples_request,
     filter_samples_response,
     mock_binary_response,

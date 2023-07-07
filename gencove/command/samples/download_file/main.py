@@ -6,15 +6,15 @@ import requests
 
 from gencove.command.download.constants import (  # noqa: I100
     ALLOWED_ARCHIVE_STATUSES_RE,
-    QC_FILE_TYPE,
     METADATA_FILE_TYPE,
+    QC_FILE_TYPE,
 )
 
 from .utils import (
     download_file,
     fatal_process_sample_error,
-    save_qc_file,
     save_metadata_file,
+    save_qc_file,
 )
 from ...base import Command
 from ...utils import is_valid_uuid

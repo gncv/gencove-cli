@@ -3,7 +3,7 @@ import json
 
 import requests
 
-from gencove import client
+from gencove import client  # noqa: I100
 from gencove.logger import echo_debug, echo_warning  # noqa: I100
 from gencove.utils import get_progress_bar
 

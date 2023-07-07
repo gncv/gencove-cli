@@ -81,8 +81,14 @@ def download_file(
         ).run()
     else:
         try:
-            mode = "w" if file_type in [QC_FILE_TYPE, METADATA_FILE_TYPE] else "wb"
-            with open(destination, mode) as destination_file:
+            extra_kwargs = {}
+            if file_type in [QC_FILE_TYPE, METADATA_FILE_TYPE]:
+                mode = "w"
+                extra_kwargs["encoding"] = "utf8"
+            else:
+                mode = "wb"
+            # pylint: disable=unspecified-encoding
+            with open(destination, mode, **extra_kwargs) as destination_file:
                 DownloadFile(
                     sample_id,
                     file_type,

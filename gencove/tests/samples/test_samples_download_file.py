@@ -1,7 +1,7 @@
 """Test download command."""
-import json
 
 # pylint: disable=wrong-import-order, import-error
+import json
 import operator
 import os
 from uuid import UUID, uuid4
@@ -21,13 +21,13 @@ from gencove.tests.download.vcr.filters import (
 from gencove.tests.filters import (
     filter_aws_headers,
     filter_jwt,
+    filter_sample_metadata_request,
+    filter_sample_quality_controls_request,
     filter_samples_request,
     filter_samples_response,
     mock_binary_response,
     replace_gencove_url_vcr,
     replace_s3_from_url,
-    filter_sample_quality_controls_request,
-    filter_sample_metadata_request,
 )
 from gencove.tests.samples.vcr.filters import filter_files_response_filename
 from gencove.tests.utils import MOCK_CHECKSUM, MOCK_UUID, get_vcr_response
@@ -293,7 +293,7 @@ def test_samples_download_file_metadata(
         )
         assert res.exit_code == 0
         expected_metadata = {"metadata": {"test_metadata": True}}
-        with open(file_path, "r") as local_file:
+        with open(file_path, "r", encoding="utf8") as local_file:
             assert local_file.read() == json.dumps(expected_metadata)
 
 
@@ -323,5 +323,5 @@ def test_samples_download_file_qc(
                 "quality_control": {"status": "failed"},
             }
         ]
-        with open(file_path, "r") as local_file:
+        with open(file_path, "r", encoding="utf8") as local_file:
             assert local_file.read() == json.dumps(expected_qc)

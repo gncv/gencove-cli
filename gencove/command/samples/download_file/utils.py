@@ -1,8 +1,10 @@
 """Samples command utilities."""
+import json
+
 import requests
 
-
-from gencove.logger import echo_debug  # noqa: I100
+from gencove import client
+from gencove.logger import echo_debug, echo_warning  # noqa: I100
 from gencove.utils import get_progress_bar
 
 from .constants import CHUNK_SIZE
@@ -49,3 +51,49 @@ def download_file(destination, download_url, no_progress=False):
             pbar.finish()
 
         echo_debug("Finished downloading")
+
+
+def save_qc_file(destination, api_client, sample_id):
+    """Helper function to save qc metrics to json file.
+
+    Args:
+        destination(BinaryIO): Buffer where qc metrics will be saved
+        api_client(APIClient): an instance of the client to make a call
+        sample_id(str): sample UUID as string
+
+    Returns:
+        None
+    """
+    try:
+        sample_qcs = api_client.get_sample_qc_metrics(sample_id).results
+    except client.APIClientError:
+        echo_warning("Error getting sample quality control metrics.")
+        raise
+    content = json.dumps(sample_qcs, cls=client.CustomEncoder)
+    writing_to_stdout = destination.isatty()
+    if writing_to_stdout:
+        content = content.encode()
+    destination.write(content)
+
+
+def save_metadata_file(destination, api_client, sample_id):
+    """Helper function to save metadata to json file.
+
+    Args:
+        destination(BinaryIO): Buffer where qc metrics will be saved
+        api_client(APIClient): an instance of the client to make a call
+        sample_id(str): sample UUID as string
+
+    Returns:
+        None
+    """
+    try:
+        metadata = api_client.get_metadata(sample_id)
+    except client.APIClientError:
+        echo_warning("Error getting sample metadata.")
+        raise
+    content = json.dumps(metadata, cls=client.CustomEncoder)
+    writing_to_stdout = destination.isatty()
+    if writing_to_stdout:
+        content = content.encode()
+    destination.write(content)

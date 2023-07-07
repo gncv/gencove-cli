@@ -6,9 +6,16 @@ import requests
 
 from gencove.command.download.constants import (  # noqa: I100
     ALLOWED_ARCHIVE_STATUSES_RE,
+    QC_FILE_TYPE,
+    METADATA_FILE_TYPE,
 )
 
-from .utils import download_file, fatal_process_sample_error
+from .utils import (
+    download_file,
+    fatal_process_sample_error,
+    save_qc_file,
+    save_metadata_file,
+)
 from ...base import Command
 from ...utils import is_valid_uuid
 from .... import client
@@ -91,7 +98,9 @@ class DownloadFile(Command):
                 "please restore the sample and try again."
             )
 
-        sample_file_types = {file.file_type for file in sample.files}
+        sample_file_types = {file.file_type for file in sample.files}.union(
+            {QC_FILE_TYPE, METADATA_FILE_TYPE}
+        )
         if self.file_type not in sample_file_types:
             raise ValidationError(
                 f"Sample with id {sample.id} does not have any files with "
@@ -107,7 +116,11 @@ class DownloadFile(Command):
                 file_to_download = sample_file
                 break
 
-        if file_to_download is None or file_to_download.download_url is None:
+        if self.file_type == QC_FILE_TYPE:
+            save_qc_file(self.destination, self.api_client, self.sample_id)
+        elif self.file_type == METADATA_FILE_TYPE:
+            save_metadata_file(self.destination, self.api_client, self.sample_id)
+        elif file_to_download is None or file_to_download.download_url is None:
             self.echo_warning(
                 f"File not found for sample with id {self.sample_id} "
                 f"and file type {self.file_type}"

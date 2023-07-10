@@ -1,5 +1,7 @@
 """Test download command."""
+
 # pylint: disable=wrong-import-order, import-error
+import json
 import operator
 import os
 from uuid import UUID, uuid4
@@ -19,6 +21,8 @@ from gencove.tests.download.vcr.filters import (
 from gencove.tests.filters import (
     filter_aws_headers,
     filter_jwt,
+    filter_sample_metadata_request,
+    filter_sample_quality_controls_request,
     filter_samples_request,
     filter_samples_response,
     mock_binary_response,
@@ -53,6 +57,8 @@ def vcr_config():
             replace_gencove_url_vcr,
             filter_files_request,
             replace_s3_from_url,
+            filter_sample_metadata_request,
+            filter_sample_quality_controls_request,
             filter_samples_request,
         ],
         "before_record_response": [
@@ -264,3 +270,58 @@ def test_samples_download_file_directory(mocker):
             "ERROR: Please specify a file path (not directory path) for DESTINATION"  # noqa: E501 line too long pylint: disable=line-too-long
             in res.output
         )
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_samples_download_file_metadata(
+    credentials, sample_id_download, mocker
+):  # pylint: disable=unused-argument
+    """Test command outputs to local destination."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        file_type = "metadata"
+        file_path = "metadata.json"
+        res = runner.invoke(
+            download_file,
+            [
+                sample_id_download,
+                file_type,
+                file_path,
+                *credentials,
+            ],
+        )
+        assert res.exit_code == 0
+        expected_metadata = {"metadata": {"test_metadata": True}}
+        with open(file_path, "r", encoding="utf8") as local_file:
+            assert local_file.read() == json.dumps(expected_metadata)
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_samples_download_file_qc(
+    credentials, sample_id_download, mocker
+):  # pylint: disable=unused-argument
+    """Test command outputs to local destination."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        file_type = "qc"
+        file_path = "qc.json"
+        res = runner.invoke(
+            download_file,
+            [
+                sample_id_download,
+                file_type,
+                file_path,
+                *credentials,
+            ],
+        )
+        assert res.exit_code == 0
+        expected_qc = [
+            {
+                "quality_control_type": {"key": "format", "type": "bool"},
+                "quality_control": {"status": "failed"},
+            }
+        ]
+        with open(file_path, "r", encoding="utf8") as local_file:
+            assert local_file.read() == json.dumps(expected_qc)

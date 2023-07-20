@@ -974,6 +974,7 @@ class APIClient:
             "destination_path": gncv_file_path,
             "source_url": url,
         }
+        time.sleep(0.25)
         return self._post(
             self.endpoints.UPLOAD_URL.value,
             payload,

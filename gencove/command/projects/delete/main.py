@@ -47,6 +47,8 @@ class Delete(Command):
                 self.echo_info("The following error was returned:")
                 self.echo_info(err.message)
             elif err.status_code == 404:
-                self.echo_warning(f"Project {self.project_id} does not exist.")
+                self.echo_warning(
+                    f"Some of the projects {self.project_ids} do not exist."
+                )
             else:
                 raise

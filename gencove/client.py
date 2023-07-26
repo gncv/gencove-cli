@@ -939,6 +939,18 @@ class APIClient:
 
         return self._delete(delete_project_samples_endpoint, payload, authorized=True)
 
+    def delete_projects(self, project_ids):
+        """Make a request to delete projects.
+
+        Args:
+            project_ids (List[str]): projects to delete
+        """
+        delete_projects_endpoint = self.endpoints.PROJECTS_DELETE.value
+
+        payload = {"project_ids": project_ids}
+
+        return self._delete(delete_projects_endpoint, payload, authorized=True)
+
     def get_file_checksum(self, file_id, filename=None):
         """Fetch file checksum, using the client because need to be
         authenticated.

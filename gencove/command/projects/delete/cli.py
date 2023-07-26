@@ -12,8 +12,7 @@ from .main import Delete
 @click.command("delete")
 @click.argument(
     "project_ids",
-    default="",
-    help=("A comma separated list of project ids which will be deleted."),
+    required=True,
     callback=validate_uuid_list,
 )
 @add_options(common_options)
@@ -24,7 +23,10 @@ def delete_projects(  # pylint: disable=too-many-arguments
     password,
     api_key,
 ):
-    """Delete projects."""
+    """Delete projects.
+
+    PROJECT_IDS is the comma-separted list of projects to be deleted.
+    """
     echo_debug(f"Project ids translation: {project_ids}")
 
     Delete(

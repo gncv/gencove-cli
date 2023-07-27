@@ -1,0 +1,44 @@
+interactions:
+- request:
+    body: '{"project_ids": ["e03cc3f6-4085-4637-845a-a9ff37a9d9b1"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.5.2
+      content-type:
+      - application/json
+    method: DELETE
+    uri: https://www.example.com/api/v2/projects-delete/
+  response:
+    body:
+      string: ''
+    headers:
+      Allow:
+      - DELETE
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Thu, 27 Jul 2023 18:42:39 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 204
+      message: No Content
+version: 1

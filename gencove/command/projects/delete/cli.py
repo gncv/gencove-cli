@@ -2,7 +2,7 @@
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
-from gencove.command.utils import validate_uuid_list
+from gencove.command.utils import validate_uuid_list, handle_exception
 from gencove.constants import Credentials, Optionals
 from gencove.logger import echo_debug
 
@@ -28,6 +28,9 @@ def delete_projects(  # pylint: disable=too-many-arguments
     PROJECT_IDS is the comma-separted list of projects to be deleted.
     """
     echo_debug(f"Project ids translation: {project_ids}")
+
+    if not project_ids:
+        handle_exception("No project ids provided")
 
     Delete(
         project_ids,

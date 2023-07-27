@@ -1,0 +1,42 @@
+interactions:
+- request:
+    body: '{"project_ids": ["e03cc3f6-4085-4637-845a-a9ff37a9d9b1"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.5.2
+      content-type:
+      - application/json
+    method: DELETE
+    uri: http://127.0.0.1:2015/api/v2/projects-delete/
+  response:
+    body:
+      string: '{"maintenance": true, "maintenance_eta": "2022-07-27 17:00:00", "maintenance_message":
+        "Gencove is currently undergoing maintenance and will return at the given
+        ETA. Thank you for your patience."}'
+    headers:
+      Accept-Ranges:
+      - bytes
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Length:
+      - '211'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 27 Jul 2023 19:03:21 GMT
+      Last-Modified:
+      - Thu, 27 Jul 2023 18:52:03 GMT
+      Retry-After:
+      - '3600'
+      Server:
+      - Caddy
+    status:
+      code: 503
+      message: Service Unavailable
+version: 1

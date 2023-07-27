@@ -14,7 +14,7 @@ from gencove.exceptions import MaintenanceError
 from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.projects.vcr.filters import (
-    filter_project_delete_samples,
+    filter_projects_delete,
 )
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
 from gencove.tests.utils import get_vcr_response
@@ -42,7 +42,7 @@ def vcr_config():
         "path_transformer": VCR.ensure_suffix(".yaml"),
         "before_record_request": [
             replace_gencove_url_vcr,
-            filter_project_delete_samples,
+            filter_projects_delete,
         ],
         "before_record_response": [
             filter_jwt,
@@ -115,10 +115,9 @@ def test_delete_projects__fail__empty_project_ids(
 
 @pytest.mark.vcr
 @assert_authorization
-@pytest.mark.default_cassette("test_delete_projects__success.yaml")
 @pytest.mark.parametrize("remove_hyphens", [True, False])
 def test_delete_projects__success(  # pylint: disable=too-many-arguments
-    credentials, mocker, project_id, recording, vcr, remove_hyphens
+    credentials, mocker, project_id_delete, recording, vcr, remove_hyphens
 ):
     """Test delete projects success."""
     runner = CliRunner()
@@ -135,12 +134,12 @@ def test_delete_projects__success(  # pylint: disable=too-many-arguments
         )
 
     if remove_hyphens:
-        project_id = project_id.replace("-", "")
+        project_id_delete = project_id_delete.replace("-", "")
 
     res = runner.invoke(
         delete_projects,
         [
-            project_id,
+            project_id_delete,
             *credentials,
         ],
     )
@@ -152,14 +151,11 @@ def test_delete_projects__success(  # pylint: disable=too-many-arguments
 
 @pytest.mark.vcr
 @assert_authorization
-@pytest.mark.default_cassette(
-    "test_delete_projects__returns_maintenance_error_503.yaml"
-)
 def test_delete_projects__returns_maintenance_error_503(
     # pylint: disable=too-many-arguments
     credentials,
     mocker,
-    project_id,
+    project_id_delete,
     recording,
     using_api_key,
     vcr,
@@ -185,7 +181,7 @@ def test_delete_projects__returns_maintenance_error_503(
     res = runner.invoke(
         delete_projects,
         [
-            project_id,
+            project_id_delete,
             *credentials,
         ],
     )

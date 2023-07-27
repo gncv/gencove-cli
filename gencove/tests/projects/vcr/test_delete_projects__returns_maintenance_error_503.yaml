@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: '{"project_ids": ["e03cc3f6-4085-4637-845a-a9ff37a9d9b1"]}'
+    body: '{"project_ids": ["c42ac1bc-a880-4d88-9088-975c10d10b51"]}'
     headers:
       Accept:
       - '*/*'
@@ -29,7 +29,47 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Thu, 27 Jul 2023 19:03:21 GMT
+      - Thu, 27 Jul 2023 19:20:58 GMT
+      Last-Modified:
+      - Thu, 27 Jul 2023 18:52:03 GMT
+      Retry-After:
+      - '3600'
+      Server:
+      - Caddy
+    status:
+      code: 503
+      message: Service Unavailable
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.5.2
+      content-type:
+      - application/json
+    method: POST
+    uri: http://127.0.0.1:2015/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"maintenance": true, "maintenance_eta": "2022-07-27 17:00:00", "maintenance_message":
+        "Gencove is currently undergoing maintenance and will return at the given
+        ETA. Thank you for your patience."}'
+    headers:
+      Accept-Ranges:
+      - bytes
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Length:
+      - '211'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 27 Jul 2023 19:23:08 GMT
       Last-Modified:
       - Thu, 27 Jul 2023 18:52:03 GMT
       Retry-After:

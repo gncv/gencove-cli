@@ -1,6 +1,50 @@
 interactions:
 - request:
-    body: '{"project_ids": ["e03cc3f6-4085-4637-845a-a9ff37a9d9b1"]}'
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.5.2
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '582'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Thu, 27 Jul 2023 19:15:28 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"project_ids": ["c42ac1bc-a880-4d88-9088-975c10d10b51"]}'
     headers:
       Accept:
       - '*/*'
@@ -27,7 +71,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Thu, 27 Jul 2023 18:42:39 GMT
+      - Thu, 27 Jul 2023 19:15:28 GMT
       Referrer-Policy:
       - same-origin
       Server:

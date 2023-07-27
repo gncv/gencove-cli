@@ -2,7 +2,7 @@
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
-from gencove.command.utils import validate_uuid_list, handle_exception
+from gencove.command.utils import handle_exception, validate_uuid_list
 from gencove.constants import Credentials, Optionals
 from gencove.logger import echo_debug
 

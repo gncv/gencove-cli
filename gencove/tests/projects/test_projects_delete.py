@@ -96,7 +96,7 @@ def test_delete_projects__not_owned_project(credentials, mocker):
 @assert_no_requests
 def test_delete_projects__fail__empty_project_ids(
     credentials,
-    mocker,
+    mocker,  # pylint: disable=unused-argument
 ):
     """Test delete projects fail when an empty list of project ids is sent."""
 
@@ -118,7 +118,7 @@ def test_delete_projects__fail__empty_project_ids(
 @pytest.mark.default_cassette("test_delete_projects__success.yaml")
 @pytest.mark.parametrize("remove_hyphens", [True, False])
 def test_delete_projects__success(  # pylint: disable=too-many-arguments
-    deleted_sample, credentials, mocker, project_id, recording, vcr, remove_hyphens
+    credentials, mocker, project_id, recording, vcr, remove_hyphens
 ):
     """Test delete projects success."""
     runner = CliRunner()

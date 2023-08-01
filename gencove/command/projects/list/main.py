@@ -12,6 +12,10 @@ from .utils import get_line
 class List(Command):
     """List projects command executor."""
 
+    def __init__(self, include_capability, credentials, options):
+        super().__init__(credentials, options)
+        self.include_capability = include_capability
+
     def initialize(self):
         """Initialize list subcommand."""
         self.login()
@@ -35,7 +39,7 @@ class List(Command):
                 )
 
                 for project in augmented_projects:
-                    self.echo_data(get_line(project))
+                    self.echo_data(get_line(project, self.include_capability))
         except APIClientError as err:
             if err.status_code == 404:
                 self.echo_error("No projects found.")

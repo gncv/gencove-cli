@@ -61,7 +61,9 @@ class ResponseMeta(BaseModel):
 class PipelineCapabilities(GencoveBaseModel):
     """Pipeline Capabilities record"""
 
+    id: UUID
     name: Optional[str]
+    key: Optional[str]
 
 
 class SampleFile(GencoveBaseModel):

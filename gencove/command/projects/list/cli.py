@@ -11,7 +11,7 @@ from .main import List
 @click.option(
     "--include-capability/--no-include-capability",
     help="Include capability id and key",
-    default=False,
+    is_flag=True,
 )
 @add_options(common_options)
 def list_projects(include_capability, host, email, password, api_key):

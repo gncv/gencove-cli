@@ -259,6 +259,41 @@ def test_list_projects(mocker, credentials, recording, vcr):
         assert output_line.getvalue() == res.output.encode()
 
 
+@pytest.mark.vcr
+@assert_authorization
+def test_list_projects_with_capabilities(mocker, credentials, recording, vcr):
+    """Test projects being outputed to the shell."""
+    runner = CliRunner()
+    if not recording:
+        # Mock list_projects only if using the cassettes, since we mock the
+        # return value.
+        list_projects_response = get_vcr_response("/api/v2/projects/", vcr)
+        mocked_get_projects = mocker.patch.object(
+            APIClient,
+            "list_projects",
+            return_value=Projects(**list_projects_response),
+        )
+        get_pipeline_capabilities_response = get_vcr_response(
+            "/api/v2/pipeline-capabilities/", vcr, operator.contains
+        )
+        mocked_get_pipeline_capabilities = mocker.patch.object(
+            APIClient,
+            "get_pipeline_capabilities",
+            return_value=PipelineCapabilities(**get_pipeline_capabilities_response),
+        )
+    res = runner.invoke(list_projects, ["--include-capability", *credentials])
+    assert res.exit_code == 0
+    if not recording:
+        mocked_get_projects.assert_called_once()
+        projects = list_projects_response["results"]
+        assert mocked_get_pipeline_capabilities.call_count == len(projects)
+        assert "key" in get_pipeline_capabilities_response
+        projects = res.output.splitlines()
+        for project in projects:
+            # Confirm # of columns is correct
+            assert len(project.split("\t")) == 6
+
+
 # API responses may return new keys and values eventually
 MOCKED_PROJECTS_WITH_UNEXPECTED_KEYS = dict(
     meta=dict(next=None),

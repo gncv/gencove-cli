@@ -287,13 +287,11 @@ def test_list_projects_with_capabilities(mocker, credentials, recording, vcr):
         mocked_get_projects.assert_called_once()
         projects = list_projects_response["results"]
         assert mocked_get_pipeline_capabilities.call_count == len(projects)
-        output_line = io.BytesIO()
-        sys.stdout = output_line
         assert "key" in get_pipeline_capabilities_response
-        projects = res.output.split("\n")
-        for p in projects:
+        projects = res.output.splitlines()
+        for project in projects:
             # Confirm # of columns is correct
-            assert len(p.split("\t")) == 6
+            assert len(project.split("\t")) == 6
 
 
 # API responses may return new keys and values eventually

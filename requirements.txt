@@ -1,6 +1,6 @@
-tox==3.25.1
-Sphinx==5.1.1
-sphinx-click==3.1.0
-pre-commit==2.17.0
-pyinstaller==4.10
-docutils==0.18.1
+tox==4.9.0
+Sphinx==7.1.2
+sphinx-click==4.4.0
+pre-commit==3.3.3
+pyinstaller==5.13.0
+docutils==0.20.1

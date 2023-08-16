@@ -1,4 +1,4 @@
-tox==4.9.0
+tox==4.8.0
 Sphinx==7.1.2
 sphinx-click==4.4.0
 pre-commit==3.3.3

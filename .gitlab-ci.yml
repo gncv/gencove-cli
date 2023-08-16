@@ -14,19 +14,6 @@ before_script:
   # Setup package and it's requirements
   - pip install -e .
 
-python36_api_key:
-  image: python:3.6
-  stage: test
-  script: tox -e py36-api_key
-  except:
-    - tags
-
-python36_user_pass:
-  image: python:3.6
-  stage: test
-  script: tox -e py36-user_pass
-  except:
-    - tags
 
 python37_api_key:
   stage: test
@@ -80,6 +67,21 @@ python310_user_pass:
   image: python:3.10
   stage: test
   script: tox -e py310-user_pass
+  except:
+    - tags
+
+
+python311_api_key:
+  image: python:3.11
+  stage: test
+  script: tox -e py311-api_key
+  except:
+    - tags
+
+python311_user_pass:
+  image: python:3.11
+  stage: test
+  script: tox -e py311-user_pass
   except:
     - tags
 

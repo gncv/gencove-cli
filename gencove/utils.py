@@ -1,6 +1,7 @@
 """Gencove CLI utils."""
 import os
 import re
+import sys
 
 import boto3
 
@@ -12,6 +13,10 @@ import click
 import progressbar
 
 from gencove.client import APIClientError  # noqa: I100
+from gencove.constants import (
+    MINIMUM_SUPPORTED_PYTHON_MAJOR,
+    MINIMUM_SUPPORTED_PYTHON_MINOR,
+)
 from gencove.logger import echo_debug, echo_error, echo_info, echo_warning
 
 KB = 1024
@@ -180,3 +185,23 @@ def enum_as_dict(enum):
         dict Dictionary representation of enum.
     """
     return {s.name: s.value for s in enum}
+
+
+def python_version_check():
+    """Log a warning if the user is using a deprecated version of Python"""
+    major_version, minor_version, micro_version = (
+        sys.version_info.major,
+        sys.version_info.minor,
+        sys.version_info.micro,
+    )
+
+    if major_version < MINIMUM_SUPPORTED_PYTHON_MAJOR or (
+        major_version == MINIMUM_SUPPORTED_PYTHON_MAJOR
+        and minor_version < MINIMUM_SUPPORTED_PYTHON_MINOR
+    ):
+        echo_warning(
+            f"Your version of Python ({major_version}.{minor_version}.{micro_version}) is out of date. "
+            f"Note that the Gencove CLI will drop support for Python versions below "
+            f"{MINIMUM_SUPPORTED_PYTHON_MAJOR}.{MINIMUM_SUPPORTED_PYTHON_MINOR} in the near future. "
+            f"Please upgrade your Python distribution at your convenience."
+        )

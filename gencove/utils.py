@@ -200,7 +200,7 @@ def python_version_check():
         and minor_version < MINIMUM_SUPPORTED_PYTHON_MINOR
     ):
         echo_warning(
-            f"Your version of Python ({major_version}.{minor_version}.{micro_version}) "
+            f"Your Python version ({major_version}.{minor_version}.{micro_version}) "
             f"is out of date. Note that the Gencove CLI will drop support for Python "
             f"versions below "
             f"{MINIMUM_SUPPORTED_PYTHON_MAJOR}.{MINIMUM_SUPPORTED_PYTHON_MINOR} "

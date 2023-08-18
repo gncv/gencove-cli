@@ -11,6 +11,12 @@ from gencove.command.samples import samples
 from gencove.command.upload import upload
 from gencove.command.uploads import uploads
 from gencove.command.webhook import webhooks
+from gencove.utils import python_version_check
+
+
+def announcements():
+    """Preamble announcements displayed whenever the CLI is called"""
+    python_version_check()
 
 
 @click.group()
@@ -19,6 +25,7 @@ def cli():
     """Gencove's command line interface."""
 
 
+announcements()
 cli.add_command(basespace)
 cli.add_command(download)
 cli.add_command(list_file_types)
@@ -28,7 +35,6 @@ cli.add_command(projects)
 cli.add_command(samples)
 cli.add_command(s3)
 cli.add_command(webhooks)
-
 
 if __name__ == "__main__":
     cli()

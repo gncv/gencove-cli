@@ -24,6 +24,7 @@ class ApiEndpoints(Enum):
     PIPELINE_CAPABILITES = "/api/v2/pipeline-capabilities/{id}"
     PROJECT_BATCH_TYPES = "/api/v2/project-batch-types/{id}"
     PROJECT_BATCHES = "/api/v2/project-batches/{id}"
+    PROJECT_SAMPLE_MANIFESTS = "/api/v2/project-sample-manifests/{id}"
     BATCHES = "/api/v2/batches/{id}"
     PROJECT_MERGE_VCFS = "/api/v2/project-merge-vcfs/{id}"
     SAMPLE_METADATA = "/api/v2/sample-metadata/{id}"

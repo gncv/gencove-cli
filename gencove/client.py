@@ -7,6 +7,7 @@ Exclude imports from linters due to install aliases breaking the rules.
 import datetime
 import json
 import time
+import os
 from builtins import str as text  # noqa
 from urllib.parse import parse_qs, urljoin, urlparse
 from uuid import UUID
@@ -154,6 +155,7 @@ class APIClient:
         timeout=60,
         sensitive=False,
         raw_response=False,
+        files=None,
     ):
         url = urljoin(text(self.host), text(endpoint))
         headers = {
@@ -185,13 +187,20 @@ class APIClient:
                     timeout=timeout,
                 )
             else:
-                post_payload = APIClient._serialize_post_payload(params)
-                response = post(
-                    url=url,
-                    data=post_payload,
-                    headers=headers,
-                    timeout=timeout,
-                )
+                if files:
+                    # content-type is automatically set by requests library
+                    del headers["content-type"]
+                    response = post(
+                        url=url, headers=headers, timeout=timeout, files=files
+                    )
+                else:
+                    post_payload = APIClient._serialize_post_payload(params)
+                    response = post(
+                        url=url,
+                        data=post_payload,
+                        headers=headers,
+                        timeout=timeout,
+                    )
 
             if response.status_code == 429:
                 raise APIClientTooManyRequestsError("Too Many Requests")
@@ -316,6 +325,7 @@ class APIClient:
         sensitive=False,
         refreshed=False,
         model=None,
+        files=None,
     ):
         headers = {} if not authorized else self._get_authorization()
         try:
@@ -326,6 +336,7 @@ class APIClient:
                 timeout=timeout,
                 custom_headers=headers,
                 sensitive=sensitive,
+                files=files,
             )
             if model:
                 return model(**response)
@@ -658,6 +669,19 @@ class APIClient:
         """Get single batch."""
         batches_endpoint = self.endpoints.BATCHES.value.format(id=batch_id)
         return self._get(batches_endpoint, authorized=True, model=BatchDetail)
+
+    def create_sample_manifest(self, project_id, sample_manifest):
+        """Make a post request to create project sample manifest."""
+        project_endpoint = self.endpoints.PROJECT_SAMPLE_MANIFESTS.value.format(
+            id=project_id
+        )
+
+        with open(sample_manifest, "rb") as f:
+            return self._post(
+                project_endpoint,
+                authorized=True,
+                files={"sample_manifest": (os.path.basename(sample_manifest), f)},
+            )
 
     def restore_project_samples(self, project_id, sample_ids):
         """Make a request to restore samples in given project."""

@@ -18,6 +18,7 @@ from .restore_samples.cli import restore_project_samples
 from .run_prefix.cli import run_prefix
 from .samples.cli import list_project_samples
 from .status_merged_vcf.cli import status_merged_vcf
+from .create_sample_manifest.cli import create_sample_manifest
 
 
 @click.group()
@@ -41,3 +42,4 @@ projects.add_command(run_prefix)
 projects.add_command(create_merged_vcf)
 projects.add_command(status_merged_vcf)
 projects.add_command(get_merged_vcf)
+projects.add_command(create_sample_manifest)

@@ -1,5 +1,4 @@
 """Create project's batch executor."""
-import os
 from pathlib import Path
 
 from gencove import client  # noqa: I100

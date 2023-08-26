@@ -6,8 +6,8 @@ Exclude imports from linters due to install aliases breaking the rules.
 
 import datetime
 import json
-import time
 import os
+import time
 from builtins import str as text  # noqa
 from urllib.parse import parse_qs, urljoin, urlparse
 from uuid import UUID
@@ -55,6 +55,7 @@ from gencove.models import (  # noqa: I101
     S3AutoimportTopic,
     S3ProjectImport,
     SampleDetails,
+    SampleManifests,
     SampleMetadata,
     SampleQC,
     SampleSheet,
@@ -674,12 +675,21 @@ class APIClient:
             id=project_id
         )
 
-        with open(sample_manifest, "rb") as f:
+        with open(sample_manifest, "rb") as manifest_rb:
             return self._post(
                 project_endpoint,
                 authorized=True,
-                files={"sample_manifest": (os.path.basename(sample_manifest), f)},
+                files={
+                    "sample_manifest": (os.path.basename(sample_manifest), manifest_rb)
+                },
             )
+
+    def get_sample_manifests(self, project_id):
+        """Make a get request to get project sample manifests."""
+        project_endpoint = self.endpoints.PROJECT_SAMPLE_MANIFESTS.value.format(
+            id=project_id
+        )
+        return self._get(project_endpoint, authorized=True, model=SampleManifests)
 
     def restore_project_samples(self, project_id, sample_ids):
         """Make a request to restore samples in given project."""

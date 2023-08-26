@@ -386,3 +386,13 @@ class UploadURLImport(GencoveBaseModel):
     last_status: Optional[GencoveStatus]
     destination_path: Optional[str]
     source_url: Optional[str]
+
+
+class SampleManifest(GencoveBaseModel):
+    file_name: str
+    file: Optional[str]
+    project: UUID
+
+
+class SampleManifests(BaseModel):
+    results: List[SampleManifest]

@@ -389,10 +389,8 @@ class UploadURLImport(GencoveBaseModel):
 
 
 class SampleManifest(GencoveBaseModel):
+    """Sample manifest model"""
+
     file_name: str
     file: Optional[str]
     project: UUID
-
-
-class SampleManifests(BaseModel):
-    results: List[SampleManifest]

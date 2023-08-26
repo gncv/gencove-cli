@@ -20,7 +20,7 @@ def get_sample_manifests(  # pylint: disable=too-many-arguments
     password,
     api_key,
 ):
-    """Create a sample manifest in a project by uploading a CSV file."""
+    """Download all sample manifests in a project to a specified destination directory."""
     GetSampleManifests(
         project_id,
         destination,

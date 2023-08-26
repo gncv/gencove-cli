@@ -187,20 +187,18 @@ class APIClient:
                     timeout=timeout,
                 )
             else:
+                post_payload = APIClient._serialize_post_payload(params)
                 if files:
                     # content-type is automatically set by requests library
                     del headers["content-type"]
-                    response = post(
-                        url=url, headers=headers, timeout=timeout, files=files
-                    )
-                else:
-                    post_payload = APIClient._serialize_post_payload(params)
-                    response = post(
-                        url=url,
-                        data=post_payload,
-                        headers=headers,
-                        timeout=timeout,
-                    )
+                    post_payload = None
+                response = post(
+                    url=url,
+                    data=post_payload,
+                    headers=headers,
+                    timeout=timeout,
+                    files=files,
+                )
 
             if response.status_code == 429:
                 raise APIClientTooManyRequestsError("Too Many Requests")

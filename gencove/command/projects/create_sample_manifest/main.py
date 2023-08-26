@@ -49,6 +49,9 @@ class CreateSampleManifest(Command):
                 project_id=self.project_id, sample_manifest=self.sample_manifest
             )
             self.echo_debug(created_sample_manifest_details)
+            self.echo_info(
+                f"Successfully uploaded sample manifest to project {self.project_id}"
+            )
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 400:
@@ -59,6 +62,3 @@ class CreateSampleManifest(Command):
                 self.echo_warning(f"Project {self.project_id} does not exist.")
             else:
                 raise
-        self.echo_info(
-            f"Successfully uploaded sample manifest to project {self.project_id}"
-        )

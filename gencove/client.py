@@ -55,7 +55,6 @@ from gencove.models import (  # noqa: I101
     S3AutoimportTopic,
     S3ProjectImport,
     SampleDetails,
-    SampleManifests,
     SampleMetadata,
     SampleQC,
     SampleSheet,
@@ -689,7 +688,7 @@ class APIClient:
         project_endpoint = self.endpoints.PROJECT_SAMPLE_MANIFESTS.value.format(
             id=project_id
         )
-        return self._get(project_endpoint, authorized=True, model=SampleManifests)
+        return self._get(project_endpoint, authorized=True)
 
     def restore_project_samples(self, project_id, sample_ids):
         """Make a request to restore samples in given project."""

@@ -38,7 +38,7 @@ class GetSampleManifests(Command):
             )
 
     def execute(self):
-        """Make a request to download all sample manifests from a given project."""
+        """Request to download all sample manifests from a project."""
         self.echo_debug(f"Retrieving sample manifests for project {self.project_id}")
 
         try:
@@ -55,7 +55,8 @@ class GetSampleManifests(Command):
                 )
                 dst.parent.mkdir(exist_ok=True, parents=True)
                 self.echo_info(
-                    f"Downloading sample manifest with ID {sample_manifest.id} to {dst}"
+                    f"Downloading sample manifest with ID"
+                    f" {sample_manifest.id} to {dst}"
                 )
                 download_file(
                     file_path=str(dst),
@@ -66,11 +67,12 @@ class GetSampleManifests(Command):
             self.echo_debug(err)
             if err.status_code == 400:
                 self.echo_warning(
-                    "There was an error retrieving the sample manifests for this project."
+                    "There was an error retrieving the sample "
+                    "manifests for this project."
                 )
                 self.echo_info("The following error was returned:")
                 self.echo_info(err.message)
             elif err.status_code == 404:
-                self.echo_warning(f"Project {self.project_id} does not exist.")
+                self.echo_warning(f"Project {self.project_id} " f"does not exist.")
             else:
                 raise

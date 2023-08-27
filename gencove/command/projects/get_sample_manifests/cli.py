@@ -20,7 +20,7 @@ def get_sample_manifests(  # pylint: disable=too-many-arguments
     password,
     api_key,
 ):
-    """Download all sample manifests in a project to a specified destination directory."""
+    """Download all sample manifests in a project to a destination directory."""
     GetSampleManifests(
         project_id,
         destination,

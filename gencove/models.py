@@ -389,6 +389,8 @@ class UploadURLImport(GencoveBaseModel):
 
 
 class File(GencoveBaseModel):
+    """File model"""
+
     s3_path: Optional[str]
     size: Optional[int]
     download_url: Optional[str]
@@ -405,4 +407,6 @@ class SampleManifest(GencoveBaseModel):
 
 
 class SampleManifests(BaseModel):
+    """Sample manifests list model"""
+
     results: List[SampleManifest]

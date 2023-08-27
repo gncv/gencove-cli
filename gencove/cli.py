@@ -7,8 +7,8 @@ from gencove.command.download import download
 from gencove.command.files import list_file_types
 from gencove.command.projects import projects
 from gencove.command.s3_imports import s3
-from gencove.command.samples import samples
 from gencove.command.sample_manifests import sample_manifests
+from gencove.command.samples import samples
 from gencove.command.upload import upload
 from gencove.command.uploads import uploads
 from gencove.command.webhook import webhooks

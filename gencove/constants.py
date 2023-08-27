@@ -18,6 +18,7 @@ class ApiEndpoints(Enum):
     GET_UPLOAD_CREDENTIALS = "/api/v2/upload-credentials/"
     PROJECT_SAMPLES = "/api/v2/project-samples/{id}"
     SAMPLE_DETAILS = "/api/v2/samples/{id}"
+    SAMPLE_MANIFESTS = "/api/v2/sample-manifests/{id}"
     SAMPLE_QC_METRICS = "/api/v2/sample-quality-controls/{id}"
     SAMPLE_SHEET = "/api/v2/sample-sheet/"
     PROJECTS = "/api/v2/projects/"

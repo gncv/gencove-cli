@@ -55,6 +55,7 @@ from gencove.models import (  # noqa: I101
     S3AutoimportTopic,
     S3ProjectImport,
     SampleDetails,
+    SampleManifest,
     SampleMetadata,
     SampleQC,
     SampleSheet,
@@ -682,6 +683,13 @@ class APIClient:
                     "sample_manifest": (os.path.basename(sample_manifest), manifest_rb)
                 },
             )
+
+    def get_sample_manifest(self, manifest_id):
+        """Make a get request to get sample manifest."""
+        project_endpoint = self.endpoints.SAMPLE_MANIFESTS.value.format(
+            id=manifest_id,
+        )
+        return self._get(project_endpoint, authorized=True, model=SampleManifest)
 
     def get_sample_manifests(self, project_id):
         """Make a get request to get project sample manifests."""

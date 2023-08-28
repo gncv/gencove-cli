@@ -9,7 +9,7 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient  # noqa: I100
 from gencove.command.projects.cli import create_sample_manifest
-from gencove.tests.decorators import assert_authorization
+from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.projects.vcr.filters import (
     filter_project_sample_manifest_request,
@@ -136,3 +136,28 @@ def test_create_sample_manifest__not_owned_project(
         "Project does not exist or you do not have privileges to access it"
         in res.output
     )
+
+
+@assert_no_requests
+def test_create_sample_manifest__bad_project_id(
+    credentials, mocker, dummy_valid_manifest_csv
+):
+    """Test manifest creation failure when non-uuid string is used as project
+    id.
+    """
+    runner = CliRunner()
+    mocked_create_sample_manifest = mocker.patch.object(
+        APIClient,
+        "create_sample_manifest",
+    )
+    res = runner.invoke(
+        create_sample_manifest,
+        [
+            "1111111",
+            dummy_valid_manifest_csv,
+            *credentials,
+        ],
+    )
+    assert res.exit_code == 1
+    mocked_create_sample_manifest.assert_not_called()
+    assert "Project ID is not valid" in res.output

@@ -88,6 +88,7 @@ def test_create_sample_manifest__success(
     recording,
     vcr,
 ):
+    """Create sample manifest success case"""
     runner = CliRunner()
     if not recording:
         # Mock create_project only if using the cassettes, since we
@@ -98,7 +99,7 @@ def test_create_sample_manifest__success(
         mocked_create_sample_manifest = mocker.patch.object(
             APIClient,
             "create_sample_manifest",
-            return_value={},
+            return_value=create_sample_manifest_response,
         )
     res = runner.invoke(
         create_sample_manifest,
@@ -114,14 +115,12 @@ def test_create_sample_manifest__success(
 
 
 @pytest.mark.vcr
-@assert_authorization
 def test_create_sample_manifest__not_owned_project(
     credentials,
-    mocker,
     dummy_valid_manifest_csv,
     recording,
-    vcr,
 ):
+    """Test project not owned case"""
     runner = CliRunner()
     res = runner.invoke(
         create_sample_manifest,

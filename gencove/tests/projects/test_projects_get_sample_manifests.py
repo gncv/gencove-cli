@@ -87,3 +87,86 @@ def test_get_sample_manifests__success(
     assert res.exit_code == 0
     if not recording:
         mocked_create_sample_manifest.assert_called_once()
+    assert "Downloading sample manifest" in res.output
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_get_sample_manifests__empty(
+    credentials,
+    mocker,
+    project_id,  # project without any manifests
+    recording,
+    vcr,
+):
+    runner = CliRunner()
+    if not recording:
+        get_sample_manifest_response = get_vcr_response(
+            "/api/v2/project-sample-manifests/", vcr, operator.contains
+        )
+        mocked_create_sample_manifest = mocker.patch.object(
+            APIClient,
+            "get_sample_manifests",
+            return_value={},
+        )
+    with tempfile.TemporaryDirectory() as tempdir:
+        res = runner.invoke(
+            get_sample_manifests,
+            [
+                project_id,
+                tempdir,
+                *credentials,
+            ],
+        )
+    assert res.exit_code == 0
+    if not recording:
+        mocked_create_sample_manifest.assert_called_once()
+    assert res.output == ""
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_get_sample_manifests__not_owned_project(
+    credentials,
+    mocker,
+    recording,
+    vcr,
+):
+    runner = CliRunner()
+    with tempfile.TemporaryDirectory() as tempdir:
+        res = runner.invoke(
+            get_sample_manifests,
+            [
+                str(uuid.uuid4()),
+                tempdir,
+                *credentials,
+            ],
+        )
+    assert (
+        "Project does not exist or you do not have privileges to access it"
+        in res.output
+    )
+
+
+@assert_no_requests
+def test_get_sample_manifests__bad_project_id(credentials, mocker):
+    """Test manifest retrieve failure when non-uuid string is used as project
+    id.
+    """
+    runner = CliRunner()
+    mocked_create_sample_manifest = mocker.patch.object(
+        APIClient,
+        "get_sample_manifests",
+    )
+    with tempfile.TemporaryDirectory() as tempdir:
+        res = runner.invoke(
+            get_sample_manifests,
+            [
+                "1111111",
+                tempdir,
+                *credentials,
+            ],
+        )
+    assert res.exit_code == 1
+    mocked_create_sample_manifest.assert_not_called()
+    assert "Project ID is not valid" in res.output

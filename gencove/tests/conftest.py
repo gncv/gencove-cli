@@ -51,6 +51,12 @@ def project_id_batches():
 
 
 @pytest.fixture(scope="session")
+def project_id_sample_manifest():
+    """Returns the project id that contains batches."""
+    return os.getenv("GENCOVE_PROJECT_ID_SAMPLE_MANIFEST_TEST")
+
+
+@pytest.fixture(scope="session")
 def project_id_download():
     """Returns the project id that contains batches."""
     return os.getenv("GENCOVE_PROJECT_ID_DOWNLOAD_TEST")

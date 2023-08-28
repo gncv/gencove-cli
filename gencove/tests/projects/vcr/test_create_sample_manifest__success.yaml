@@ -1,0 +1,92 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.6.0
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '582'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Mon, 28 Aug 2023 14:50:33 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: "--07e2346617c217685c567beab9fcc5df\r\nContent-Disposition: form-data; name=\"sample_manifest\";
+      filename=\"tmp406jgn7j.csv\"\r\n\r\nPlate ID,Well,Unique sample identifier,Buffer,Concentration
+      if known (ng/ul),Species,Coverage\r\n,A1,client-id,,,,\r\n,B1,,,,,\r\n,C1,,,,,\r\n,D1,,,,,\r\n,E1,,,,,\r\n,F1,,,,,\r\n,G1,,,,,\r\n,H1,,,,,\r\n,A2,,,,,\r\n,B2,,,,,\r\n,C2,,,,,\r\n,D2,,,,,\r\n,E2,,,,,\r\n,F2,,,,,\r\n,G2,,,,,\r\n,H2,,,,,\r\n,A3,,,,,\r\n,B3,,,,,\r\n,C3,,,,,\r\n,D3,,,,,\r\n,E3,,,,,\r\n,F3,,,,,\r\n,G3,,,,,\r\n,H3,,,,,\r\n,A4,,,,,\r\n,B4,,,,,\r\n,C4,,,,,\r\n,D4,,,,,\r\n,E4,,,,,\r\n,F4,,,,,\r\n,G4,,,,,\r\n,H4,,,,,\r\n,A5,,,,,\r\n,B5,,,,,\r\n,C5,,,,,\r\n,D5,,,,,\r\n,E5,,,,,\r\n,F5,,,,,\r\n,G5,,,,,\r\n,H5,,,,,\r\n,A6,,,,,\r\n,B6,,,,,\r\n,C6,,,,,\r\n,D6,,,,,\r\n,E6,,,,,\r\n,F6,,,,,\r\n,G6,,,,,\r\n,H6,,,,,\r\n,A7,,,,,\r\n,B7,,,,,\r\n,C7,,,,,\r\n,D7,,,,,\r\n,E7,,,,,\r\n,F7,,,,,\r\n,G7,,,,,\r\n,H7,,,,,\r\n,A8,,,,,\r\n,B8,,,,,\r\n,C8,,,,,\r\n,D8,,,,,\r\n,E8,,,,,\r\n,F8,,,,,\r\n,G8,,,,,\r\n,H8,,,,,\r\n,A9,,,,,\r\n,B9,,,,,\r\n,C9,,,,,\r\n,D9,,,,,\r\n,E9,,,,,\r\n,F9,,,,,\r\n,G9,,,,,\r\n,H9,,,,,\r\n,A10,,,,,\r\n,B10,,,,,\r\n,C10,,,,,\r\n,D10,,,,,\r\n,E10,,,,,\r\n,F10,,,,,\r\n,G10,,,,,\r\n,H10,,,,,\r\n,A11,,,,,\r\n,B11,,,,,\r\n,C11,,,,,\r\n,D11,,,,,\r\n,E11,,,,,\r\n,F11,,,,,\r\n,G11,,,,,\r\n,H11,,,,,\r\n,A12,,,,,\r\n,B12,,,,,\r\n,C12,,,,,\r\n,D12,,,,,\r\n,E12,,,,,\r\n,F12,,,,,\r\n,G12,,,,,\r\n,H12,,,,,\r\n\r\n--07e2346617c217685c567beab9fcc5df--\r\n"
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - multipart/form-data; boundary=07e2346617c217685c567beab9fcc5df
+      Gencove-cli-version:
+      - 2.6.0
+    method: POST
+    uri: https://www.example.com/api/v2/project-sample-manifests/11111111-1111-1111-1111-111111111111
+  response:
+    body:
+      string: '{}'
+    headers:
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Mon, 28 Aug 2023 14:50:34 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 201
+      message: Created
+version: 1

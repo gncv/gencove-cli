@@ -298,12 +298,12 @@ def filter_project_pipeline_capabilities_response(response, json_response):
 
 
 def filter_project_sample_manifest_request(request):
-    """Filter pipeline capabilities sensitive data from request."""
+    """Filter project UUID data from request."""
     return _replace_uuid_from_url(request, "project-sample-manifests")
 
 
 @parse_response_to_json
-def filter_get_project_sample_manifest_response(response, json_response):
+def filter_get_project_sample_manifests_response(response, json_response):
     """Filter pipeline_capabilities sensitive data from response."""
     for e in json_response:
         if "id" in e:
@@ -314,8 +314,8 @@ def filter_get_project_sample_manifest_response(response, json_response):
             e["project"] = MOCK_UUID
         if "file" in e:
             e["file"]["id"] = MOCK_UUID
-            e["file"]["s3_path"] = "s3://dummy/file.csv"
-            e["file"]["download_url"] = "https://foo.com/file.csv"
+            e["file"]["s3_path"] = "s3://cli-test/file.csv"
+            e["file"]["download_url"] = "https://s3.amazonaws.com/file.csv"
     return response, json_response
 
 
@@ -326,6 +326,8 @@ def filter_get_sample_manifest_files_response(response, json_response):
     return response, json_response
 
 
-def filter_get_sample_manifest_files_request(request):
-    request.uri = "https://example.com/foo.csv"
+def filter_sample_manifests_request(request):
+    """Filter sample manifests sensitive data from request."""
+    if "amazonaws.com" in request.uri:
+        request.uri = "https://v2-api-example.s3.amazonaws.com/example.csv"
     return request

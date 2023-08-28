@@ -13,7 +13,7 @@ interactions:
       content-type:
       - application/json
     method: POST
-    uri: https://example.com/foo.csv
+    uri: https://www.example.com/api/v2/jwt-create/
   response:
     body:
       string: '{"refresh": "mock_refresh", "access": "mock_access"}'
@@ -29,7 +29,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Mon, 28 Aug 2023 16:48:41 GMT
+      - Mon, 28 Aug 2023 20:41:55 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -57,7 +57,7 @@ interactions:
       content-type:
       - application/json
     method: GET
-    uri: https://example.com/foo.csv
+    uri: https://www.example.com/api/v2/project-sample-manifests/6c2fe9eb-23ce-442c-8009-ed83476a6010
   response:
     body:
       string: '["Project does not exist or you do not have privileges to access it."]'
@@ -73,7 +73,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Mon, 28 Aug 2023 16:48:42 GMT
+      - Mon, 28 Aug 2023 20:41:56 GMT
       Referrer-Policy:
       - same-origin
       Server:

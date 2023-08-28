@@ -13,7 +13,7 @@ interactions:
       content-type:
       - application/json
     method: POST
-    uri: https://example.com/foo.csv
+    uri: https://www.example.com/api/v2/jwt-create/
   response:
     body:
       string: '{"refresh": "mock_refresh", "access": "mock_access"}'
@@ -29,7 +29,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Mon, 28 Aug 2023 16:44:14 GMT
+      - Mon, 28 Aug 2023 20:41:55 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -57,7 +57,7 @@ interactions:
       content-type:
       - application/json
     method: GET
-    uri: https://example.com/foo.csv
+    uri: https://www.example.com/api/v2/project-sample-manifests/bfa1a864-b32d-4131-b315-37db8b8f5633
   response:
     body:
       string: '[]'
@@ -73,7 +73,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Mon, 28 Aug 2023 16:44:14 GMT
+      - Mon, 28 Aug 2023 20:41:56 GMT
       Referrer-Policy:
       - same-origin
       Server:

@@ -1,12 +1,13 @@
-"""Test project's create sample manifest command."""
+"""Test project's get sample manifest command."""
 import operator
-import tempfile
+import os
 import uuid
 
 from click.testing import CliRunner
 
-from gencove.client import APIClient  # noqa: I100
+from gencove.client import APIClient, APIClientError  # noqa: I100
 from gencove.command.projects.cli import get_sample_manifests
+from gencove.models import SampleManifest
 from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import (
     filter_jwt,
@@ -14,10 +15,8 @@ from gencove.tests.filters import (
     filter_aws_headers,
 )
 from gencove.tests.projects.vcr.filters import (
-    filter_project_sample_manifest_request,
-    filter_get_project_sample_manifest_response,
-    filter_get_sample_manifest_files_request,
-    filter_get_sample_manifest_files_response,
+    filter_get_project_sample_manifests_response,
+    filter_sample_manifests_request,
 )
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
 from gencove.tests.utils import get_vcr_response
@@ -41,15 +40,13 @@ def vcr_config():
         "path_transformer": VCR.ensure_suffix(".yaml"),
         "before_record_request": [
             replace_gencove_url_vcr,
-            filter_project_sample_manifest_request,
-            filter_get_sample_manifest_files_request,
+            filter_sample_manifests_request,
         ],
         "before_record_response": [
             filter_jwt,
             filter_aws_headers,
             filter_volatile_dates,
-            filter_get_project_sample_manifest_response,
-            filter_get_sample_manifest_files_response,
+            filter_get_project_sample_manifests_response,
         ],
     }
 
@@ -63,22 +60,28 @@ def test_get_sample_manifests__success(
     recording,
     vcr,
 ):
+    """Test get sample manifests success case"""
     runner = CliRunner()
     if not recording:
         get_sample_manifest_response = get_vcr_response(
             "/api/v2/project-sample-manifests/", vcr, operator.contains
         )
+        mocker.patch(
+            "gencove.command.projects.get_sample_manifests.main.download_file",
+        )
         mocked_get_sample_manifests = mocker.patch.object(
             APIClient,
             "get_sample_manifests",
-            return_value={},
+            return_value=[SampleManifest(**x) for x in get_sample_manifest_response],
         )
-    with tempfile.TemporaryDirectory() as tempdir:
+
+    with runner.isolated_filesystem():
+        os.mkdir("test_dir")
         res = runner.invoke(
             get_sample_manifests,
             [
                 project_id_sample_manifest,
-                tempdir,
+                "test_dir",
                 *credentials,
             ],
         )
@@ -97,6 +100,7 @@ def test_get_sample_manifests__empty(
     recording,
     vcr,
 ):
+    """Get sample manifests empty case"""
     runner = CliRunner()
     if not recording:
         get_sample_manifest_response = get_vcr_response(
@@ -105,14 +109,18 @@ def test_get_sample_manifests__empty(
         mocked_get_sample_manifests = mocker.patch.object(
             APIClient,
             "get_sample_manifests",
-            return_value={},
+            return_value=get_sample_manifest_response,
         )
-    with tempfile.TemporaryDirectory() as tempdir:
+        mocker.patch(
+            "gencove.command.projects.get_sample_manifests.main.download_file",
+        )
+    with runner.isolated_filesystem():
+        os.mkdir("test_dir")
         res = runner.invoke(
             get_sample_manifests,
             [
                 project_id,
-                tempdir,
+                "test_dir",
                 *credentials,
             ],
         )
@@ -123,20 +131,24 @@ def test_get_sample_manifests__empty(
 
 
 @pytest.mark.vcr
-@assert_authorization
-def test_get_sample_manifests__not_owned_project(
-    credentials,
-    mocker,
-    recording,
-    vcr,
-):
+def test_get_sample_manifests__not_owned_project(credentials, recording, mocker, vcr):
+    """Get sample manifests project not owned case"""
     runner = CliRunner()
-    with tempfile.TemporaryDirectory() as tempdir:
+    mocker.patch.object(
+        APIClient,
+        "get_sample_manifests",
+        side_effect=APIClientError(
+            message="Project does not exist or you do not have privileges to access it",
+            status_code=400,
+        ),
+    )
+    with runner.isolated_filesystem():
+        os.mkdir("test_dir")
         res = runner.invoke(
             get_sample_manifests,
             [
                 str(uuid.uuid4()),
-                tempdir,
+                "test_dir",
                 *credentials,
             ],
         )
@@ -156,12 +168,13 @@ def test_get_sample_manifests__bad_project_id(credentials, mocker):
         APIClient,
         "get_sample_manifests",
     )
-    with tempfile.TemporaryDirectory() as tempdir:
+    with runner.isolated_filesystem():
+        os.mkdir("test_dir")
         res = runner.invoke(
             get_sample_manifests,
             [
                 "1111111",
-                tempdir,
+                "test_dir",
                 *credentials,
             ],
         )

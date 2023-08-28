@@ -300,3 +300,32 @@ def filter_project_pipeline_capabilities_response(response, json_response):
 def filter_project_sample_manifest_request(request):
     """Filter pipeline capabilities sensitive data from request."""
     return _replace_uuid_from_url(request, "project-sample-manifests")
+
+
+@parse_response_to_json
+def filter_get_project_sample_manifest_response(response, json_response):
+    """Filter pipeline_capabilities sensitive data from response."""
+    for e in json_response:
+        if "id" in e:
+            e["id"] = MOCK_UUID
+        if "s3_path" in e:
+            e["version"] = "mock version"
+        if "project" in e:
+            e["project"] = MOCK_UUID
+        if "file" in e:
+            e["file"]["id"] = MOCK_UUID
+            e["file"]["s3_path"] = "s3://dummy/file.csv"
+            e["file"]["download_url"] = "https://foo.com/file.csv"
+    return response, json_response
+
+
+@parse_response_to_json
+def filter_get_sample_manifest_files_response(response, json_response):
+    if "Content-Disposition" in response["headers"]:
+        response["headers"]["Content-Disposition"] = "attachment; filename=foo.csv"
+    return response, json_response
+
+
+def filter_get_sample_manifest_files_request(request):
+    request.uri = "https://example.com/foo.csv"
+    return request

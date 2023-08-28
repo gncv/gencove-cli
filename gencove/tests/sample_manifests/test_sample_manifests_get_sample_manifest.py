@@ -9,9 +9,9 @@ from gencove.command.sample_manifests.cli import get_sample_manifest
 from gencove.models import SampleManifest
 from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import (
+    filter_aws_headers,
     filter_jwt,
     replace_gencove_url_vcr,
-    filter_aws_headers,
 )
 from gencove.tests.projects.vcr.filters import (
     filter_get_sample_manifest_files_response,

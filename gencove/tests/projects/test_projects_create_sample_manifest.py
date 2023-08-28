@@ -1,6 +1,6 @@
 """Test project's create sample manifest command."""
-import csv
 
+import csv
 import operator
 import tempfile
 import uuid
@@ -71,9 +71,9 @@ def dummy_valid_manifest_csv():
     ) as tmp_file:
         writer = csv.writer(tmp_file)
         writer.writerow(manifest_columns)  # header
-        writer.writerow(["", "A1", f"client-id", "", "", "", ""])
+        writer.writerow(["", "A1", "client-id", "", "", "", ""])
         for well in well_pattern_96[1:]:
-            writer.writerow(["", well, f"", "", "", "", ""])
+            writer.writerow(["", well, "", "", "", "", ""])
         tmp_file.seek(0)
     return tmp_file.name
 

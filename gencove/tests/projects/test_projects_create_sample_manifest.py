@@ -118,7 +118,6 @@ def test_create_sample_manifest__success(
 def test_create_sample_manifest__not_owned_project(
     credentials,
     mocker,
-    project_id_sample_manifest,
     dummy_valid_manifest_csv,
     recording,
     vcr,

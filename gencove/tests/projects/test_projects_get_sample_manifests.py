@@ -1,6 +1,4 @@
 """Test project's create sample manifest command."""
-import csv
-
 import operator
 import tempfile
 import uuid
@@ -70,7 +68,7 @@ def test_get_sample_manifests__success(
         get_sample_manifest_response = get_vcr_response(
             "/api/v2/project-sample-manifests/", vcr, operator.contains
         )
-        mocked_create_sample_manifest = mocker.patch.object(
+        mocked_get_sample_manifests = mocker.patch.object(
             APIClient,
             "get_sample_manifests",
             return_value={},
@@ -86,7 +84,7 @@ def test_get_sample_manifests__success(
         )
     assert res.exit_code == 0
     if not recording:
-        mocked_create_sample_manifest.assert_called_once()
+        mocked_get_sample_manifests.assert_called_once()
     assert "Downloading sample manifest" in res.output
 
 
@@ -104,7 +102,7 @@ def test_get_sample_manifests__empty(
         get_sample_manifest_response = get_vcr_response(
             "/api/v2/project-sample-manifests/", vcr, operator.contains
         )
-        mocked_create_sample_manifest = mocker.patch.object(
+        mocked_get_sample_manifests = mocker.patch.object(
             APIClient,
             "get_sample_manifests",
             return_value={},
@@ -120,7 +118,7 @@ def test_get_sample_manifests__empty(
         )
     assert res.exit_code == 0
     if not recording:
-        mocked_create_sample_manifest.assert_called_once()
+        mocked_get_sample_manifests.assert_called_once()
     assert res.output == ""
 
 
@@ -154,7 +152,7 @@ def test_get_sample_manifests__bad_project_id(credentials, mocker):
     id.
     """
     runner = CliRunner()
-    mocked_create_sample_manifest = mocker.patch.object(
+    mocked_get_sample_manifests = mocker.patch.object(
         APIClient,
         "get_sample_manifests",
     )
@@ -168,5 +166,5 @@ def test_get_sample_manifests__bad_project_id(credentials, mocker):
             ],
         )
     assert res.exit_code == 1
-    mocked_create_sample_manifest.assert_not_called()
+    mocked_get_sample_manifests.assert_not_called()
     assert "Project ID is not valid" in res.output

@@ -295,3 +295,8 @@ def filter_project_pipeline_capabilities_response(response, json_response):
             if "name" in capability:
                 capability["version"] = "mock name"
     return response, json_response
+
+
+def filter_project_sample_manifest_request(request):
+    """Filter pipeline capabilities sensitive data from request."""
+    return _replace_uuid_from_url(request, "project-sample-manifests")

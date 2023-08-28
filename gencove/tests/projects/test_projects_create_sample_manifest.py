@@ -1,5 +1,6 @@
 """Test project's create sample manifest command."""
 
+# pylint: disable=wrong-import-order, import-error
 import csv
 import operator
 import tempfile
@@ -87,7 +88,7 @@ def test_create_sample_manifest__success(
     dummy_valid_manifest_csv,
     recording,
     vcr,
-):
+):  # pylint: disable=too-many-arguments,redefined-outer-name
     """Create sample manifest success case"""
     runner = CliRunner()
     if not recording:
@@ -119,7 +120,7 @@ def test_create_sample_manifest__not_owned_project(
     credentials,
     dummy_valid_manifest_csv,
     recording,
-):
+):  # pylint: disable=unused-argument,redefined-outer-name
     """Test project not owned case"""
     runner = CliRunner()
     res = runner.invoke(
@@ -139,7 +140,7 @@ def test_create_sample_manifest__not_owned_project(
 @assert_no_requests
 def test_create_sample_manifest__bad_project_id(
     credentials, mocker, dummy_valid_manifest_csv
-):
+):  # pylint: disable=redefined-outer-name
     """Test manifest creation failure when non-uuid string is used as project
     id.
     """

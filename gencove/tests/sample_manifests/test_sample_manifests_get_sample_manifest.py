@@ -1,4 +1,6 @@
 """Test project's create sample manifest command."""
+
+# pylint: disable=wrong-import-order, import-error
 import operator
 import tempfile
 

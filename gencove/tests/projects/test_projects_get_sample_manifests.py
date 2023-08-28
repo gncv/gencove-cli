@@ -1,4 +1,6 @@
 """Test project's get sample manifest command."""
+
+# pylint: disable=wrong-import-order, import-error
 import operator
 import os
 import uuid
@@ -59,7 +61,7 @@ def test_get_sample_manifests__success(
     project_id_sample_manifest,
     recording,
     vcr,
-):
+):  # pylint: disable=unused-argument
     """Test get sample manifests success case"""
     runner = CliRunner()
     if not recording:
@@ -131,7 +133,9 @@ def test_get_sample_manifests__empty(
 
 
 @pytest.mark.vcr
-def test_get_sample_manifests__not_owned_project(credentials, recording, mocker, vcr):
+def test_get_sample_manifests__not_owned_project(
+    credentials, recording, mocker, vcr
+):  # pylint: disable=unused-argument
     """Get sample manifests project not owned case"""
     runner = CliRunner()
     mocker.patch.object(

@@ -1,25 +1,17 @@
 """Test project's create sample manifest command."""
 import csv
 
-# pylint: disable=wrong-import-order, import-error
-import io
 import operator
-import sys
 import tempfile
 import uuid
 
-from click import echo
 from click.testing import CliRunner
 
-from gencove.client import APIClient, APIClientError  # noqa: I100
+from gencove.client import APIClient  # noqa: I100
 from gencove.command.projects.cli import create_sample_manifest
-from gencove.command.utils import sanitize_string
-from gencove.models import Project, SampleManifest
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.projects.vcr.filters import (
-    filter_create_project_request,
-    filter_create_project_response,
     filter_project_sample_manifest_request,
 )
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
@@ -119,3 +111,28 @@ def test_create_sample_manifest__success(
     assert res.exit_code == 0
     if not recording:
         mocked_create_sample_manifest.assert_called_once()
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_create_sample_manifest__not_owned_project(
+    credentials,
+    mocker,
+    project_id_sample_manifest,
+    dummy_valid_manifest_csv,
+    recording,
+    vcr,
+):
+    runner = CliRunner()
+    res = runner.invoke(
+        create_sample_manifest,
+        [
+            str(uuid.uuid4()),
+            dummy_valid_manifest_csv,
+            *credentials,
+        ],
+    )
+    assert (
+        "Project does not exist or you do not have privileges to access it"
+        in res.output
+    )

@@ -86,6 +86,12 @@ def deleted_sample():
 
 
 @pytest.fixture(scope="session")
+def sample_manifest_id():
+    """Returns a sample manifest id."""
+    return os.getenv("GENCOVE_SAMPLE_MANIFEST_ID_TEST")
+
+
+@pytest.fixture(scope="session")
 def sample_id_batches():
     """Returns the sample id to create batches."""
     return os.getenv("GENCOVE_SAMPLE_ID_BATCHES_TEST")

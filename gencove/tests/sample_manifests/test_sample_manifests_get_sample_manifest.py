@@ -6,6 +6,7 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient  # noqa: I100
 from gencove.command.sample_manifests.cli import get_sample_manifest
+from gencove.models import SampleManifest
 from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import (
     filter_jwt,
@@ -13,8 +14,8 @@ from gencove.tests.filters import (
     filter_aws_headers,
 )
 from gencove.tests.projects.vcr.filters import (
-    filter_get_sample_manifest_files_request,
     filter_get_sample_manifest_files_response,
+    filter_sample_manifests_request,
 )
 from gencove.tests.sample_manifests.vcr.filters import (
     filter_get_sample_manifest_response,
@@ -41,7 +42,7 @@ def vcr_config():
         "path_transformer": VCR.ensure_suffix(".yaml"),
         "before_record_request": [
             replace_gencove_url_vcr,
-            filter_get_sample_manifest_files_request,
+            filter_sample_manifests_request,
         ],
         "before_record_response": [
             filter_jwt,
@@ -62,6 +63,7 @@ def test_get_sample_manifest__success(
     recording,
     vcr,
 ):
+    """Test sample manifest success case"""
     runner = CliRunner()
     if not recording:
         get_sample_manifest_response = get_vcr_response(
@@ -70,7 +72,7 @@ def test_get_sample_manifest__success(
         mocked_get_sample_manifest = mocker.patch.object(
             APIClient,
             "get_sample_manifest",
-            return_value={},
+            return_value=SampleManifest(**get_sample_manifest_response),
         )
     with tempfile.TemporaryDirectory() as tempdir:
         res = runner.invoke(

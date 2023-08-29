@@ -1,12 +1,13 @@
-"""Test project's create sample manifest command."""
+"""Test sample manifest get command."""
 
 # pylint: disable=wrong-import-order, import-error
 import operator
 import tempfile
+import uuid
 
 from click.testing import CliRunner
 
-from gencove.client import APIClient  # noqa: I100
+from gencove.client import APIClient, APIClientError  # noqa: I100
 from gencove.command.sample_manifests.cli import get_sample_manifest
 from gencove.models import SampleManifest
 from gencove.tests.decorators import assert_authorization, assert_no_requests
@@ -54,6 +55,45 @@ def vcr_config():
             filter_get_sample_manifest_response,
         ],
     }
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_get_sample_manifest__not_owned(
+    credentials,
+    mocker,
+    sample_manifest_id,
+    recording,
+    vcr,
+):
+    """Test sample manifest not owned case"""
+    runner = CliRunner()
+    if not recording:
+        get_sample_manifest_response = get_vcr_response(
+            "/api/v2/sample-manifests/", vcr, operator.contains
+        )
+        mocked_get_sample_manifest = mocker.patch.object(
+            APIClient,
+            "get_sample_manifest",
+            side_effect=APIClientError(
+                message="Not found",
+                status_code=400,
+            ),
+            return_value=get_sample_manifest_response,
+        )
+    with tempfile.TemporaryDirectory() as tempdir:
+        res = runner.invoke(
+            get_sample_manifest,
+            [
+                str(uuid.uuid4()),
+                tempdir,
+                *credentials,
+            ],
+        )
+    assert res.exit_code == 0
+    if not recording:
+        mocked_get_sample_manifest.assert_called_once()
+    assert "Not found" in res.output
 
 
 @pytest.mark.vcr
@@ -113,3 +153,26 @@ def test_get_sample_manifests__bad_manifest_id(credentials, mocker):
     assert res.exit_code == 1
     mocked_get_sample_manifest.assert_not_called()
     assert "manifest_id is not valid" in res.output
+
+
+@assert_no_requests
+def test_get_sample_manifests__bad_destination(credentials, mocker):
+    """Test manifest retrieve failure when non-uuid string is used as project
+    id.
+    """
+    runner = CliRunner()
+    mocked_get_sample_manifest = mocker.patch.object(
+        APIClient,
+        "get_sample_manifest",
+    )
+    res = runner.invoke(
+        get_sample_manifest,
+        [
+            str(uuid.uuid4()),
+            "foo",
+            *credentials,
+        ],
+    )
+    assert res.exit_code == 1
+    mocked_get_sample_manifest.assert_not_called()
+    assert "destination is not a directory that exists" in res.output

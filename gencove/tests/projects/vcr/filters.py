@@ -305,8 +305,6 @@ def filter_project_sample_manifest_request(request):
 @parse_response_to_json
 def filter_get_project_sample_manifests_response(response, json_response):
     """Filter pipeline_capabilities sensitive data from response."""
-    if json_response["status"] == 404:
-        return response, json_response
     for item in json_response:
         if "id" in item:
             item["id"] = MOCK_UUID

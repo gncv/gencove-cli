@@ -31,10 +31,7 @@ class GetSampleManifest(Command):
         Raises:
             ValidationError - if something is wrong with command parameters.
         """
-        if not Path(self.destination).is_dir() or not Path(self.destination).exists():
-            raise ValidationError(
-                "destination argument must be a directory that exists"
-            )
+        pass
 
     def execute(self):
         """Request to get sample manifest and download it."""
@@ -65,6 +62,9 @@ class GetSampleManifest(Command):
                 self.echo_info("The following error was returned:")
                 self.echo_info(err.message)
             elif err.status_code == 404:
-                self.echo_warning(f"Sample manifest {self.manifest_id} does not exist.")
+                self.echo_warning(
+                    f"Sample manifest with ID {self.manifest_id} does not exist or "
+                    "you do not have access."
+                )
             else:
                 raise

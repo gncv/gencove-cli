@@ -2,7 +2,7 @@
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
-from gencove.command.utils import validate_uuid
+from gencove.command.utils import validate_uuid, validate_destination_exists
 from gencove.constants import Credentials, Optionals
 
 from .main import GetSampleManifest
@@ -10,7 +10,7 @@ from .main import GetSampleManifest
 
 @click.command("get-sample-manifest")
 @click.argument("manifest_id", callback=validate_uuid)
-@click.argument("destination")
+@click.argument("destination", callback=validate_destination_exists)
 @add_options(common_options)
 def get_sample_manifest(  # pylint: disable=too-many-arguments
     manifest_id,

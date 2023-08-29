@@ -18,9 +18,9 @@ from gencove.tests.filters import (
 )
 from gencove.tests.projects.vcr.filters import (
     filter_get_project_sample_manifests_response,
-    filter_sample_manifests_request,
-    filter_project_sample_manifest_request,
     filter_get_sample_manifest_files_response,
+    filter_project_sample_manifest_request,
+    filter_sample_manifests_request,
 )
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
 from gencove.tests.utils import get_vcr_response

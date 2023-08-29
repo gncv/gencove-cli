@@ -1,5 +1,6 @@
 """Common utils used in multiple commands."""
 import json
+import os
 import uuid
 
 import click
@@ -119,3 +120,16 @@ def validate_file_types(candidate_file_types, valid_file_types):
 
     # file types that are in candidate_file_types but not in valid_file_types
     return list(set(candidate_file_types).difference(set(file_type_keys)))
+
+
+def validate_destination_exists(
+    ctx, param, candidate
+):  # pylint: disable=unused-argument
+    if not os.path.exists(candidate) or not os.path.isdir(candidate):
+        human_readable_param = map_arguments_to_human_readable.get(
+            param.name, param.name
+        )
+        handle_exception(
+            f"{human_readable_param} is not a directory that exists. Exiting."
+        )
+    return candidate

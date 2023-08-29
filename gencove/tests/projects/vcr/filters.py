@@ -305,22 +305,23 @@ def filter_project_sample_manifest_request(request):
 @parse_response_to_json
 def filter_get_project_sample_manifests_response(response, json_response):
     """Filter pipeline_capabilities sensitive data from response."""
-    for e in json_response:
-        if "id" in e:
-            e["id"] = MOCK_UUID
-        if "s3_path" in e:
-            e["version"] = "mock version"
-        if "project" in e:
-            e["project"] = MOCK_UUID
-        if "file" in e:
-            e["file"]["id"] = MOCK_UUID
-            e["file"]["s3_path"] = "s3://cli-test/file.csv"
-            e["file"]["download_url"] = "https://s3.amazonaws.com/file.csv"
+    for item in json_response:
+        if "id" in item:
+            item["id"] = MOCK_UUID
+        if "s3_path" in item:
+            item["version"] = "mock version"
+        if "project" in item:
+            item["project"] = MOCK_UUID
+        if "file" in item:
+            item["file"]["id"] = MOCK_UUID
+            item["file"]["s3_path"] = "s3://cli-test/file.csv"
+            item["file"]["download_url"] = "https://s3.amazonaws.com/file.csv"
     return response, json_response
 
 
 @parse_response_to_json
 def filter_get_sample_manifest_files_response(response, json_response):
+    """Replace real filename with dummy data"""
     if "Content-Disposition" in response["headers"]:
         response["headers"]["Content-Disposition"] = "attachment; filename=foo.csv"
     return response, json_response

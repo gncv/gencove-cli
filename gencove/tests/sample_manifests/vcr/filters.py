@@ -1,5 +1,6 @@
 import json
 
+from gencove.tests.filters import _replace_uuid_from_url
 from gencove.tests.utils import MOCK_UUID
 
 
@@ -24,3 +25,8 @@ def filter_get_sample_manifest_response(response):
     except json.decoder.JSONDecodeError:
         pass
     return response
+
+
+def filter_sample_manifest_request(request):
+    """Filter project UUID data from request."""
+    return _replace_uuid_from_url(request, "sample-manifests")

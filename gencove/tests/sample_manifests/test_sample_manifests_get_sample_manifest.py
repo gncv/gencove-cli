@@ -22,6 +22,7 @@ from gencove.tests.projects.vcr.filters import (
 )
 from gencove.tests.sample_manifests.vcr.filters import (
     filter_get_sample_manifest_response,
+    filter_sample_manifest_request,
 )
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
 from gencove.tests.utils import get_vcr_response
@@ -46,6 +47,7 @@ def vcr_config():
         "before_record_request": [
             replace_gencove_url_vcr,
             filter_sample_manifests_request,
+            filter_sample_manifest_request,
         ],
         "before_record_response": [
             filter_jwt,

@@ -2,7 +2,7 @@
 
 # pylint: disable=wrong-import-order, import-error
 import operator
-import tempfile
+import os
 import uuid
 
 from click.testing import CliRunner
@@ -81,12 +81,13 @@ def test_get_sample_manifest__not_owned(
             ),
             return_value=get_sample_manifest_response,
         )
-    with tempfile.TemporaryDirectory() as tempdir:
+    with runner.isolated_filesystem():
+        os.mkdir("tempdir")
         res = runner.invoke(
             get_sample_manifest,
             [
                 str(uuid.uuid4()),
-                tempdir,
+                "tempdir",
                 *credentials,
             ],
         )
@@ -116,12 +117,13 @@ def test_get_sample_manifest__success(
             "get_sample_manifest",
             return_value=SampleManifest(**get_sample_manifest_response),
         )
-    with tempfile.TemporaryDirectory() as tempdir:
+    with runner.isolated_filesystem():
+        os.mkdir("tempdir")
         res = runner.invoke(
             get_sample_manifest,
             [
                 sample_manifest_id,
-                tempdir,
+                "tempdir",
                 *credentials,
             ],
         )
@@ -141,12 +143,13 @@ def test_get_sample_manifests__bad_manifest_id(credentials, mocker):
         APIClient,
         "get_sample_manifest",
     )
-    with tempfile.TemporaryDirectory() as tempdir:
+    with runner.isolated_filesystem():
+        os.mkdir("tempdir")
         res = runner.invoke(
             get_sample_manifest,
             [
                 "1111111",
-                tempdir,
+                "tempdir",
                 *credentials,
             ],
         )

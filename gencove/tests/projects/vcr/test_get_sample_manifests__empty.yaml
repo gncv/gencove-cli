@@ -29,7 +29,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Mon, 28 Aug 2023 20:41:55 GMT
+      - Tue, 29 Aug 2023 20:32:40 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -57,7 +57,7 @@ interactions:
       content-type:
       - application/json
     method: GET
-    uri: https://www.example.com/api/v2/project-sample-manifests/bfa1a864-b32d-4131-b315-37db8b8f5633
+    uri: https://www.example.com/api/v2/project-sample-manifests/11111111-1111-1111-1111-111111111111
   response:
     body:
       string: '[]'
@@ -73,7 +73,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Mon, 28 Aug 2023 20:41:56 GMT
+      - Tue, 29 Aug 2023 20:32:41 GMT
       Referrer-Policy:
       - same-origin
       Server:

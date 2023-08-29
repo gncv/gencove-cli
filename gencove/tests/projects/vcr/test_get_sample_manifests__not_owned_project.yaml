@@ -29,7 +29,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Mon, 28 Aug 2023 20:41:55 GMT
+      - Tue, 29 Aug 2023 20:32:40 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -43,48 +43,4 @@ interactions:
     status:
       code: 200
       message: OK
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Gencove-cli-version:
-      - 2.6.0
-      content-type:
-      - application/json
-    method: GET
-    uri: https://www.example.com/api/v2/project-sample-manifests/6c2fe9eb-23ce-442c-8009-ed83476a6010
-  response:
-    body:
-      string: '["Project does not exist or you do not have privileges to access it."]'
-    headers:
-      Allow:
-      - GET, POST, HEAD, OPTIONS
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '70'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Date:
-      - Mon, 28 Aug 2023 20:41:56 GMT
-      Referrer-Policy:
-      - same-origin
-      Server:
-      - gunicorn
-      Vary:
-      - Accept, Cookie, Origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 400
-      message: Bad Request
 version: 1

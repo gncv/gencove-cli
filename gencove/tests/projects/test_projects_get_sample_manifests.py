@@ -19,6 +19,8 @@ from gencove.tests.filters import (
 from gencove.tests.projects.vcr.filters import (
     filter_get_project_sample_manifests_response,
     filter_sample_manifests_request,
+    filter_project_sample_manifest_request,
+    filter_get_sample_manifest_files_response,
 )
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
 from gencove.tests.utils import get_vcr_response
@@ -42,6 +44,7 @@ def vcr_config():
         "path_transformer": VCR.ensure_suffix(".yaml"),
         "before_record_request": [
             replace_gencove_url_vcr,
+            filter_project_sample_manifest_request,
             filter_sample_manifests_request,
         ],
         "before_record_response": [
@@ -49,6 +52,7 @@ def vcr_config():
             filter_aws_headers,
             filter_volatile_dates,
             filter_get_project_sample_manifests_response,
+            filter_get_sample_manifest_files_response,
         ],
     }
 

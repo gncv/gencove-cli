@@ -32,10 +32,7 @@ class GetSampleManifests(Command):
         Raises:
             ValidationError - if something is wrong with command parameters.
         """
-        if not Path(self.destination).is_dir() or not Path(self.destination).exists():
-            raise ValidationError(
-                "destination argument must be a directory that exists"
-            )
+        pass
 
     def execute(self):
         """Request to download all sample manifests from a project."""

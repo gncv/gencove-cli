@@ -4,7 +4,6 @@ from pathlib import Path
 from gencove import client  # noqa: I100
 from gencove.command.base import Command
 from gencove.command.download.utils import download_file
-from gencove.exceptions import ValidationError
 from gencove.models import SampleManifests
 
 
@@ -32,7 +31,6 @@ class GetSampleManifests(Command):
         Raises:
             ValidationError - if something is wrong with command parameters.
         """
-        pass
 
     def execute(self):
         """Request to download all sample manifests from a project."""

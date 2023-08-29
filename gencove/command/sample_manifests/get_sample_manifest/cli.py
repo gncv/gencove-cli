@@ -2,7 +2,7 @@
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
-from gencove.command.utils import validate_uuid, validate_destination_exists
+from gencove.command.utils import validate_destination_exists, validate_uuid
 from gencove.constants import Credentials, Optionals
 
 from .main import GetSampleManifest

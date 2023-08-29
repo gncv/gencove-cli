@@ -62,7 +62,6 @@ def vcr_config():
 def test_get_sample_manifest__not_owned(
     credentials,
     mocker,
-    sample_manifest_id,
     recording,
     vcr,
 ):

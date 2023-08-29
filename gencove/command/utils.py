@@ -125,6 +125,7 @@ def validate_file_types(candidate_file_types, valid_file_types):
 def validate_destination_exists(
     ctx, param, candidate
 ):  # pylint: disable=unused-argument
+    """Validate that a destination is a directory and/or exists"""
     if not os.path.exists(candidate) or not os.path.isdir(candidate):
         human_readable_param = map_arguments_to_human_readable.get(
             param.name, param.name

@@ -186,3 +186,27 @@ def test_get_sample_manifests__bad_project_id(credentials, mocker):
     assert res.exit_code == 1
     mocked_get_sample_manifests.assert_not_called()
     assert "Project ID is not valid" in res.output
+
+
+@assert_no_requests
+def test_get_sample_manifests__bad_destination(credentials, mocker):
+    """Test manifest retrieve failure when bad destination is supplied
+    id.
+    """
+    runner = CliRunner()
+    mocked_get_sample_manifests = mocker.patch.object(
+        APIClient,
+        "get_sample_manifests",
+    )
+    with runner.isolated_filesystem():
+        res = runner.invoke(
+            get_sample_manifests,
+            [
+                str(uuid.uuid4()),
+                "bad_dir",
+                *credentials,
+            ],
+        )
+    assert res.exit_code == 1
+    mocked_get_sample_manifests.assert_not_called()
+    assert "is not a directory that exists" in res.output

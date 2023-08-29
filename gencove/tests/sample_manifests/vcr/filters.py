@@ -4,6 +4,8 @@ from gencove.tests.utils import MOCK_UUID
 
 
 def filter_get_sample_manifest_response(response):
+    if response["status"]["code"] == 404:
+        return response
     try:
         body = json.loads(response["body"]["string"])
         body["id"] = MOCK_UUID

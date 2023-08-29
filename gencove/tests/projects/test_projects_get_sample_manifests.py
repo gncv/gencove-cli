@@ -137,6 +137,7 @@ def test_get_sample_manifests__empty(
 
 
 @pytest.mark.vcr
+@assert_authorization
 def test_get_sample_manifests__not_owned_project(
     credentials, recording, mocker, vcr
 ):  # pylint: disable=unused-argument

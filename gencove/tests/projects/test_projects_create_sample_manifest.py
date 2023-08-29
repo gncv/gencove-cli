@@ -116,8 +116,10 @@ def test_create_sample_manifest__success(
 
 
 @pytest.mark.vcr
+@assert_authorization
 def test_create_sample_manifest__not_owned_project(
     credentials,
+    mocker,
     dummy_valid_manifest_csv,
     recording,
 ):  # pylint: disable=unused-argument,redefined-outer-name

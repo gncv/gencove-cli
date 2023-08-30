@@ -6,6 +6,7 @@ from .create.cli import create_project
 from .create_batch.cli import create_project_batch
 from .create_merged_vcf.cli import create_merged_vcf
 from .create_sample_manifest.cli import create_sample_manifest
+from .delete.cli import delete_projects
 from .delete_samples.cli import delete_project_samples
 from .get_batch.cli import get_batch
 from .get_merged_vcf.cli import get_merged_vcf
@@ -43,5 +44,6 @@ projects.add_command(run_prefix)
 projects.add_command(create_merged_vcf)
 projects.add_command(status_merged_vcf)
 projects.add_command(get_merged_vcf)
+projects.add_command(delete_projects)
 projects.add_command(create_sample_manifest)
 projects.add_command(get_sample_manifests)

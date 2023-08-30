@@ -29,6 +29,7 @@ class ApiEndpoints(Enum):
     BATCHES = "/api/v2/batches/{id}"
     PROJECT_MERGE_VCFS = "/api/v2/project-merge-vcfs/{id}"
     SAMPLE_METADATA = "/api/v2/sample-metadata/{id}"
+    PROJECTS_DELETE = "/api/v2/projects-delete/"
     PROJECT_DELETE_SAMPLES = "/api/v2/project-delete-samples/{id}"
     PROJECT_RESTORE_SAMPLES = "/api/v2/project-restore-samples/{id}"
     BASESPACE_PROJECTS_IMPORT = "/api/v2/basespace-projects-import/"

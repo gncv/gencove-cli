@@ -1,0 +1,82 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.5.2
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"maintenance": true, "maintenance_eta": "2022-07-27 17:00:00", "maintenance_message":
+        "Gencove is currently undergoing maintenance and will return at the given
+        ETA. Thank you for your patience."}'
+    headers:
+      Accept-Ranges:
+      - bytes
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Length:
+      - '211'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 27 Jul 2023 21:00:12 GMT
+      Last-Modified:
+      - Thu, 27 Jul 2023 18:52:03 GMT
+      Retry-After:
+      - '3600'
+      Server:
+      - Caddy
+    status:
+      code: 503
+      message: Service Unavailable
+- request:
+    body: '{"project_ids": ["11111111-1111-1111-1111-111111111111"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.5.2
+      content-type:
+      - application/json
+    method: DELETE
+    uri: https://www.example.com/api/v2/projects-delete/
+  response:
+    body:
+      string: '{"maintenance": true, "maintenance_eta": "2022-07-27 17:00:00", "maintenance_message":
+        "Gencove is currently undergoing maintenance and will return at the given
+        ETA. Thank you for your patience."}'
+    headers:
+      Accept-Ranges:
+      - bytes
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Length:
+      - '211'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 27 Jul 2023 21:01:21 GMT
+      Last-Modified:
+      - Thu, 27 Jul 2023 18:52:03 GMT
+      Retry-After:
+      - '3600'
+      Server:
+      - Caddy
+    status:
+      code: 503
+      message: Service Unavailable
+version: 1

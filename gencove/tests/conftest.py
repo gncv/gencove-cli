@@ -51,9 +51,21 @@ def project_id_batches():
 
 
 @pytest.fixture(scope="session")
+def project_id_sample_manifest():
+    """Returns the project id that contains batches."""
+    return os.getenv("GENCOVE_PROJECT_ID_SAMPLE_MANIFEST_TEST")
+
+
+@pytest.fixture(scope="session")
 def project_id_download():
     """Returns the project id that contains batches."""
     return os.getenv("GENCOVE_PROJECT_ID_DOWNLOAD_TEST")
+
+
+@pytest.fixture(scope="session")
+def project_id_delete():
+    """Returns the project id to be deleted."""
+    return os.getenv("GENCOVE_PROJECT_ID_DELETE_TEST")
 
 
 @pytest.fixture(scope="session")
@@ -77,6 +89,12 @@ def archived_sample():
 def deleted_sample():
     """Returns deleted sample id"""
     return os.getenv("GENCOVE_DELETED_SAMPLE_TEST")
+
+
+@pytest.fixture(scope="session")
+def sample_manifest_id():
+    """Returns a sample manifest id."""
+    return os.getenv("GENCOVE_SAMPLE_MANIFEST_ID_TEST")
 
 
 @pytest.fixture(scope="session")

@@ -6,6 +6,7 @@ Exclude imports from linters due to install aliases breaking the rules.
 
 import datetime
 import json
+import os
 import time
 from builtins import str as text  # noqa
 from urllib.parse import parse_qs, urljoin, urlparse
@@ -54,6 +55,7 @@ from gencove.models import (  # noqa: I101
     S3AutoimportTopic,
     S3ProjectImport,
     SampleDetails,
+    SampleManifest,
     SampleMetadata,
     SampleQC,
     SampleSheet,
@@ -154,6 +156,7 @@ class APIClient:
         timeout=60,
         sensitive=False,
         raw_response=False,
+        files=None,
     ):
         url = urljoin(text(self.host), text(endpoint))
         headers = {
@@ -186,11 +189,16 @@ class APIClient:
                 )
             else:
                 post_payload = APIClient._serialize_post_payload(params)
+                if files:
+                    # content-type is automatically set by requests library
+                    del headers["content-type"]
+                    post_payload = None
                 response = post(
                     url=url,
                     data=post_payload,
                     headers=headers,
                     timeout=timeout,
+                    files=files,
                 )
 
             if response.status_code == 429:
@@ -316,6 +324,7 @@ class APIClient:
         sensitive=False,
         refreshed=False,
         model=None,
+        files=None,
     ):
         headers = {} if not authorized else self._get_authorization()
         try:
@@ -326,6 +335,7 @@ class APIClient:
                 timeout=timeout,
                 custom_headers=headers,
                 sensitive=sensitive,
+                files=files,
             )
             if model:
                 return model(**response)
@@ -659,6 +669,35 @@ class APIClient:
         batches_endpoint = self.endpoints.BATCHES.value.format(id=batch_id)
         return self._get(batches_endpoint, authorized=True, model=BatchDetail)
 
+    def create_sample_manifest(self, project_id, sample_manifest):
+        """Make a post request to create project sample manifest."""
+        project_endpoint = self.endpoints.PROJECT_SAMPLE_MANIFESTS.value.format(
+            id=project_id
+        )
+
+        with open(sample_manifest, "rb") as manifest_rb:
+            return self._post(
+                project_endpoint,
+                authorized=True,
+                files={
+                    "sample_manifest": (os.path.basename(sample_manifest), manifest_rb)
+                },
+            )
+
+    def get_sample_manifest(self, manifest_id):
+        """Make a get request to get sample manifest."""
+        project_endpoint = self.endpoints.SAMPLE_MANIFESTS.value.format(
+            id=manifest_id,
+        )
+        return self._get(project_endpoint, authorized=True, model=SampleManifest)
+
+    def get_sample_manifests(self, project_id):
+        """Make a get request to get project sample manifests."""
+        project_endpoint = self.endpoints.PROJECT_SAMPLE_MANIFESTS.value.format(
+            id=project_id
+        )
+        return self._get(project_endpoint, authorized=True)
+
     def restore_project_samples(self, project_id, sample_ids):
         """Make a request to restore samples in given project."""
         restore_project_samples_endpoint = (
@@ -938,6 +977,18 @@ class APIClient:
         payload = {"sample_ids": sample_ids}
 
         return self._delete(delete_project_samples_endpoint, payload, authorized=True)
+
+    def delete_projects(self, project_ids):
+        """Make a request to delete projects.
+
+        Args:
+            project_ids (List[str]): projects to delete
+        """
+        delete_projects_endpoint = self.endpoints.PROJECTS_DELETE.value
+
+        payload = {"project_ids": project_ids}
+
+        return self._delete(delete_projects_endpoint, payload, authorized=True)
 
     def get_file_checksum(self, file_id, filename=None):
         """Fetch file checksum, using the client because need to be

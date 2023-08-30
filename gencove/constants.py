@@ -18,15 +18,18 @@ class ApiEndpoints(Enum):
     GET_UPLOAD_CREDENTIALS = "/api/v2/upload-credentials/"
     PROJECT_SAMPLES = "/api/v2/project-samples/{id}"
     SAMPLE_DETAILS = "/api/v2/samples/{id}"
+    SAMPLE_MANIFESTS = "/api/v2/sample-manifests/{id}"
     SAMPLE_QC_METRICS = "/api/v2/sample-quality-controls/{id}"
     SAMPLE_SHEET = "/api/v2/sample-sheet/"
     PROJECTS = "/api/v2/projects/"
     PIPELINE_CAPABILITES = "/api/v2/pipeline-capabilities/{id}"
     PROJECT_BATCH_TYPES = "/api/v2/project-batch-types/{id}"
     PROJECT_BATCHES = "/api/v2/project-batches/{id}"
+    PROJECT_SAMPLE_MANIFESTS = "/api/v2/project-sample-manifests/{id}"
     BATCHES = "/api/v2/batches/{id}"
     PROJECT_MERGE_VCFS = "/api/v2/project-merge-vcfs/{id}"
     SAMPLE_METADATA = "/api/v2/sample-metadata/{id}"
+    PROJECTS_DELETE = "/api/v2/projects-delete/"
     PROJECT_DELETE_SAMPLES = "/api/v2/project-delete-samples/{id}"
     PROJECT_RESTORE_SAMPLES = "/api/v2/project-restore-samples/{id}"
     BASESPACE_PROJECTS_IMPORT = "/api/v2/basespace-projects-import/"
@@ -145,3 +148,5 @@ MAX_RETRY_TIME_SECONDS = 300  # 5 minutes
 FASTQ_MAP_EXTENSION = ".fastq-map.csv"
 UPLOAD_PREFIX = "gncv://"
 ASSIGN_BATCH_SIZE = 200
+
+MINIMUM_SUPPORTED_PYTHON_MAJOR, MINIMUM_SUPPORTED_PYTHON_MINOR = 3, 8

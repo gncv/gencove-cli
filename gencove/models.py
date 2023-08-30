@@ -386,3 +386,27 @@ class UploadURLImport(GencoveBaseModel):
     last_status: Optional[GencoveStatus]
     destination_path: Optional[str]
     source_url: Optional[str]
+
+
+class File(GencoveBaseModel):
+    """File model"""
+
+    s3_path: Optional[str]
+    size: Optional[int]
+    download_url: Optional[str]
+    file_type: Optional[str]
+    checksum_sha256: Optional[str]
+
+
+class SampleManifest(GencoveBaseModel):
+    """Sample manifest model"""
+
+    file_name: str
+    file: Optional[File]
+    project: UUID
+
+
+class SampleManifests(BaseModel):
+    """Sample manifests list model"""
+
+    results: List[SampleManifest]

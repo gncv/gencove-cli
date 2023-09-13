@@ -4,6 +4,7 @@ site_url: https://docs.gencove.com/cli/
 theme:
   name: "material"
   features:
+    - content.code.copy
     - navigation.instant
     - navigation.sections
     - navigation.top

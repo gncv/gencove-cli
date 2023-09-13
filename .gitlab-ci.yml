@@ -110,7 +110,10 @@ bandit:
 docs:
   image: python:3.10
   stage: build
-  script: mkdocs build
+  script:
+    - pip install -r requirements.txt
+    - pip install -r requirements_docs.txt
+    - mkdocs build
   artifacts:
     paths:
       - site/

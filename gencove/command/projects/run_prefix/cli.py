@@ -33,6 +33,10 @@ def run_prefix(  # pylint: disable=too-many-arguments
     """Assign all uploads from Gencove prefix to a project. Optionally add
     metadata to the samples. Uploads can also be filtered through status.
 
+    `PROJECT_ID`: Gencove project ID
+
+    `RUN_PREFIX`: Gencove prefix where samples are located formated as gncv://path
+
     Examples:
 
         Assign uploads to a project:

@@ -35,7 +35,10 @@ def create_project_batch(  # pylint: disable=too-many-arguments
     password,
     api_key,
 ):
-    """Create a batch in a project."""
+    """Create a batch in a project.
+
+    `PROJECT_ID`: Gencove project ID
+    """
     CreateBatch(
         project_id,
         batch_type,

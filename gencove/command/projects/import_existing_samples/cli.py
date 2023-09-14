@@ -36,6 +36,8 @@ def import_existing_project_samples(  # pylint: disable=too-many-arguments
 ):  # pylint: disable=line-too-long
     """Import existing samples to a project.
 
+    `PROJECT_ID`: Gencove project ID
+
     Examples:
 
         Import samples:

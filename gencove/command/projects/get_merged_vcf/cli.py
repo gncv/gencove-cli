@@ -33,7 +33,10 @@ def get_merged_vcf(
     api_key,
     no_progress,
 ):
-    """Download merged VCF file in a project."""
+    """Download merged VCF file in a project.
+
+    `PROJECT_ID`: Gencove project ID
+    """
     GetMergedVCF(
         project_id,
         output_filename,

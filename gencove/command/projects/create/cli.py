@@ -20,7 +20,12 @@ def create_project(  # pylint: disable=too-many-arguments
     password,
     api_key,
 ):
-    """Create a project."""
+    """Create a project.
+
+    `PROJECT_NAME`: name of the Gencove project
+
+    `PIPELINE_CAPABILITY_ID`: id of the pipeline capability to be used for the project
+    """
 
     CreateProject(
         project_name,

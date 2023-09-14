@@ -36,6 +36,10 @@ def basespace_import(  # pylint: disable=too-many-arguments
     """Import all Biosamples from BaseSpace projects to a project. Optionally add
     metadata to the samples.
 
+    `BASESPACE_PROJECT_IDS`: comma separated list of BaseSpace project ID
+
+    `PROJECT_ID`: Gencove project ID
+
     Examples:
 
         Import Biosamples to a project:

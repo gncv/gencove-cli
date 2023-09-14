@@ -20,6 +20,8 @@ def biosamples_list(
 ):
     """List all Biosamples from BaseSpace project.
 
+    `BASESPACE_PROJECT_ID`: BaseSpace project ID
+
     Examples:
 
         List Biosamples of a BaseSpace project:

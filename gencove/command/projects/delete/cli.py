@@ -25,7 +25,7 @@ def delete_projects(  # pylint: disable=too-many-arguments
 ):
     """Delete projects.
 
-    PROJECT_IDS is the comma-separted list of projects to be deleted.
+    `PROJECT_IDS`: comma-separted list of projects to be deleted.
     """
     echo_debug(f"Project ids translation: {project_ids}")
 

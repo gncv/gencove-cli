@@ -20,7 +20,13 @@ def create_sample_manifest(  # pylint: disable=too-many-arguments
     password,
     api_key,
 ):
-    """Create a sample manifest in a project by uploading a CSV file."""
+    """Create a sample manifest in a project by uploading a CSV file.
+
+    `PROJECT_ID`: Gencove project ID
+
+    `SAMPLE_MANIFEST`: .csv file files that contains a table of information
+        about a sequencing run
+    """
     CreateSampleManifest(
         project_id,
         sample_manifest,

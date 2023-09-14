@@ -18,7 +18,10 @@ def status_merged_vcf(
     password,
     api_key,
 ):
-    """Get status of merge VCF files job in a project."""
+    """Get status of merge VCF files job in a project.
+
+    `PROJECT_ID`: Gencove project ID
+    """
     StatusMergedVCF(
         project_id,
         Credentials(email=email, password=password, api_key=api_key),

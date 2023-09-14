@@ -26,7 +26,10 @@ def delete_project_samples(  # pylint: disable=too-many-arguments
     password,
     api_key,
 ):
-    """Delete samples in a project."""
+    """Delete samples in a project.
+
+    `PROJECT_ID`: Gencove project ID
+    """
     echo_debug(f"Sample ids translation: {sample_ids}")
 
     DeleteSamples(

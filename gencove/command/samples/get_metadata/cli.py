@@ -26,7 +26,10 @@ def get_metadata(
     password,
     api_key,
 ):
-    """Get sample metadata."""
+    """Get sample metadata.
+
+    `SAMPLE_ID`: sample for which to get the metadata
+    """
     GetMetadata(
         sample_id,
         output_filename,

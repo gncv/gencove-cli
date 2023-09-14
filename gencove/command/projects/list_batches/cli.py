@@ -12,7 +12,10 @@ from .main import ListBatches
 @click.argument("project_id", callback=validate_uuid)
 @add_options(common_options)
 def list_project_batches(project_id, host, email, password, api_key):
-    """List batches that are available for a project."""
+    """List batches that are available for a project.
+
+    `PROJECT_ID`: Gencove project ID
+    """
     ListBatches(
         project_id,
         Credentials(email=email, password=password, api_key=api_key),

@@ -76,10 +76,12 @@ In order to do that, just run `cp gencove/tests/.env.dist gencove/tests/.env` an
 For more details, read internal `CLI testing` document.
 
 
-To create docs:
+To create and run docs locally:
 
 ```bash
-cd docs && make html
+pip install -r requirements_docs.txt
+mkdocs build
+mkdocs serve
 ```
 
 ## Release process ##

@@ -20,7 +20,12 @@ def get_sample_manifests(  # pylint: disable=too-many-arguments
     password,
     api_key,
 ):
-    """Download all sample manifests in a project to a destination directory."""
+    """Download all sample manifests in a project to a destination directory.
+
+    `PROJECT_ID`: Gencove project ID
+
+    `DESTINATION`: path/to/save/sample/manifests/to
+    """
     GetSampleManifests(
         project_id,
         destination,

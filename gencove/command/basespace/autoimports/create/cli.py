@@ -37,6 +37,10 @@ def create(  # pylint: disable=too-many-arguments
     to a project in Gencove. Optionally assign metadata to the samples to be added when the automatic
     import job runs.
 
+    `PROJECT_ID`: Gencove project ID
+
+    `IDENTIFIER`: string used for identifying projects on BaseSpace
+
     Examples:
 
         Set up automatic import of BaseSpace projects' samples that contain the identifier to a project:

@@ -24,7 +24,10 @@ def set_metadata(
     password,
     api_key,
 ):
-    """Set sample metadata."""
+    """Set sample metadata.
+
+    `SAMPLE_ID`: sample for which to set the metadata
+    """
     SetMetadata(
         sample_id,
         json,

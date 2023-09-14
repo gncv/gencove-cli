@@ -18,18 +18,11 @@ def verify(
 ):
     """Verify webhook signature.
 
-    SECRET  key to be used as a secret for hmac algorithm.
+    `SECRET`: key to be used as a secret for hmac algorithm.
 
-    HEADER  Gencove-Signature header content.
+    `HEADER`: Gencove-Signature header content.
 
-    PAYLOAD JSON payload (i.e., the request’s body).
-
-    \f
-    .. ignore::
-        Args:
-            secret (str): key to be used as a secret for hmac algorithm.
-            header (str): Gencove-Signature header content.
-            payload (str): JSON payload (i.e., the request’s body).
+    `PAYLOAD`: JSON payload (i.e., the request’s body).
     """
     if is_valid_signature(secret, header, payload):
         echo_info("Webhook payload successfully verified.")

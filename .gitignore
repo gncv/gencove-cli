@@ -42,7 +42,8 @@ venv*
 .coverage.*
 .logs
 
-
+# mkdocs site build
+/site/
 
 # dotenv file
 .env

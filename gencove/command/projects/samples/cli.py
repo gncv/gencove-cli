@@ -46,7 +46,10 @@ def list_project_samples(  # pylint: disable=E0012,C0330,R0913
     password,
     api_key,
 ):
-    """List samples in a project."""
+    """List samples in a project.
+
+    `PROJECT_ID`: Gencove project ID
+    """
     ListSamples(
         project_id,
         Credentials(email=email, password=password, api_key=api_key),

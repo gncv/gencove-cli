@@ -19,12 +19,18 @@ from .main import Download
 @click.option("--project-id", help="Gencove project ID")
 @click.option(
     "--sample-ids",
-    help="A comma separated list of sample ids for "
-    "which to download the deliverables",
+    help=(
+        "A comma separated list of sample ids for "
+        "which to download the deliverables. "
+        "If not specified, download deliverables for all samples."
+    ),
 )
 @click.option(
     "--file-types",
-    help="A comma separated list of deliverable file types to download.",
+    help=(
+        "A comma separated list of deliverable file types to download. "
+        "If not specified, all file types will be downloaded."
+    ),
 )
 @click.option(
     "--skip-existing/--no-skip-existing",
@@ -33,7 +39,7 @@ from .main import Download
 )
 @click.option(
     "--download-urls",
-    help="Output a list of urls in a JSON format.",
+    help="Output a list of file urls available for download in a JSON format.",
     is_flag=True,
 )
 @click.option(
@@ -77,6 +83,8 @@ def download(  # pylint: disable=E0012,C0330,R0913
 ):  # noqa: D413,D301,D412 # pylint: disable=C0301
     """Download deliverables of a project.
 
+    `DESTINATION`: path/to/save/deliverables/to
+
     Must specify either project id or sample ids.
 
     Examples:
@@ -96,27 +104,6 @@ def download(  # pylint: disable=E0012,C0330,R0913
         Skip download entirely and print out the deliverables as a JSON:
 
             gencove download - --project-id d9eaa54b-aaac-4b85-92b0-0b564be6d7db --download-urls
-
-    \f
-    .. ignore::
-        Args:
-            destination (str): path/to/save/deliverables/to.
-            project_id (str): project id in Gencove's system.
-            sample_ids (list(str), optional): specific samples for which
-                to download the results. if not specified, download deliverables
-                for all samples.
-            file_types (list(str), optional): specific deliverables to download
-                results for. if not specified, all file types will be downloaded.
-            skip_existing (bool, optional, default True): skip downloading existing
-                files.
-            download_urls (bool, optional): output the files available for a
-                download. if the destination parameter is "-", it goes to the
-                stdout.
-            no_progress (bool, optional, default False): do not show progress
-                bar.
-            checksums (bool, optional, default False): download additonal checksum
-                files for each deliverable.
-
     """  # noqa: E501
     s_ids = tuple()
     if sample_ids:

@@ -18,7 +18,10 @@ def create_merged_vcf(
     password,
     api_key,
 ):
-    """Merge VCF files in a project."""
+    """Merge VCF files in a project.
+
+    `PROJECT_ID`: Gencove project ID
+    """
     CreateMergedVCF(
         project_id,
         Credentials(email=email, password=password, api_key=api_key),

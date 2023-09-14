@@ -110,10 +110,13 @@ bandit:
 docs:
   image: python:3.10
   stage: build
-  script: cd docs && make html
+  script:
+    - pip install -r requirements.txt
+    - pip install -r requirements_docs.txt
+    - mkdocs build
   artifacts:
     paths:
-      - docs/
+      - site/
   except:
     - tags
 
@@ -127,7 +130,7 @@ staging:
     # # Install twine for uploading to pypi
     # - pip install twine
     # Upload docs
-    - aws s3 sync docs/build/html/ s3://$BUCKET_STAGING/cli/ --delete --region us-east-1
+    - aws s3 sync site/ s3://$BUCKET_STAGING/cli/ --delete --region us-east-1
     # Enable the aws cloudfront command
     - aws configure set preview.cloudfront true
     # Clear web cache
@@ -149,7 +152,7 @@ production:
     # Install twine for uploading to pypi
     - pip install twine
     # Upload docs
-    - aws s3 sync docs/build/html/ s3://$BUCKET_PRODUCTION/cli/ --delete --region us-east-1
+    - aws s3 sync site/ s3://$BUCKET_PRODUCTION/cli/ --delete --region us-east-1
     # Enable the aws cloudfront command
     - aws configure set preview.cloudfront true
     # Clear web cache

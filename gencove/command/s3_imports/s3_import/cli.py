@@ -32,6 +32,10 @@ def s3_import(  # pylint: disable=too-many-arguments
     """Import all samples from a S3 URI to a project. Optionally add
     metadata to the samples.
 
+    `S3_URI`: s3 prefix where samples are located
+
+    `PROJECT_ID`: Gencove project ID
+
     Examples:
 
         Import samples to a project:

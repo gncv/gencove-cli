@@ -20,7 +20,12 @@ def get_sample_manifest(  # pylint: disable=too-many-arguments
     password,
     api_key,
 ):
-    """Download a sample manifest to a specified destination directory."""
+    """Download a sample manifest to a specified destination directory.
+
+    `MANIFEST_ID`: Gencove manifest ID
+
+    `DESTINATION`: path/to/save/manfiest/to
+    """
     GetSampleManifest(
         manifest_id,
         destination,

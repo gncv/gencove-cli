@@ -32,6 +32,10 @@ def create(  # pylint: disable=too-many-arguments
     """Sets up automatic import from S3 URI to a project in Gencove. Optionally assign metadata to the samples to be added when the automatic
     import job runs.
 
+    `PROJECT_ID`: Gencove project ID
+
+    `S3_URI`: s3 prefix where samples are and will be located
+
     Examples:
 
         Set up automatic import from S3 to a project:

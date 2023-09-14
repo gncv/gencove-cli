@@ -38,13 +38,14 @@ def download_file(
     no_progress,
     checksum,
 ):  # noqa: D413,D301,D412 # pylint: disable=C0301
-    """Download sample file metadata.
+    """Download a single sample file. Using this command, sample file can be
+    streamed to stdout.
 
-    SAMPLE_ID   specific sample for which to download the results
+    `SAMPLE_ID`: sample for which to download the results
 
-    FILE_TYPE   specific deliverable to download results for
+    `FILE_TYPE`: specific deliverable to download results for
 
-    DESTINATION path/to/file
+    `DESTINATION`: path/to/file
 
     Examples:
 
@@ -55,19 +56,6 @@ def download_file(
         Download and print to stdout then compress using gzip:
 
             gencove samples download-file e6b45af7-07c5-4a6d-9f97-6e1efbf3e215 ancestry-json - | gzip > ancestry.json.gz
-    \f
-    .. ignore::
-        Args:
-            sample_id (str): specific sample for which
-                to download the results.
-            file_type (str): specific deliverable to download
-                results for.
-            destination (str): path/to/file.
-            no_progress (bool, optional, default False): do not show progress
-                bar.
-            checksum (bool, optional, default False): download additional checksum
-                files for each deliverable.
-
     """  # noqa: E501
     if destination in ("-", "/dev/stdout"):
         DownloadFile(

@@ -24,7 +24,8 @@ def create_sample_manifest(  # pylint: disable=too-many-arguments
 
     `PROJECT_ID`: Gencove project ID
 
-    `SAMPLE_MANIFEST`: .csv file files that contains a table of information about a sequencing run
+    `SAMPLE_MANIFEST`: .csv file files that contains a table of information
+        about a sequencing run
     """
     CreateSampleManifest(
         project_id,

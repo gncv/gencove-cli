@@ -41,7 +41,7 @@ def download_file(
     """Download a single sample file. Using this command, sample file can be
     streamed to stdout.
 
-    `SAMPLE_ID`: specific sample for which to download the results
+    `SAMPLE_ID`: sample for which to download the results
 
     `FILE_TYPE`: specific deliverable to download results for
 

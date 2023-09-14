@@ -71,3 +71,8 @@ nav:
 
 extra_css:
   - stylesheets/extra.css
+
+extra:
+  analytics:
+    provider: custom
+    property: GTM-M65SMBK

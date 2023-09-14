@@ -141,7 +141,6 @@ staging:
     # - twine upload dist/*
   only:
     - master
-    - feature/mkdocs
 
 production:
   stage: deploy

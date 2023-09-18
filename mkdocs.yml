@@ -67,7 +67,7 @@ nav:
   - Support: support.md
   - Gencove homepage: https://gencove.com
   - Gencove Base docs: /
-  - Gencove Explorer docs: /explorer-sdk
+  - Gencove Explorer docs: /explorer/
 
 extra_css:
   - stylesheets/extra.css

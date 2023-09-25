@@ -6,6 +6,7 @@ from gencove.command.basespace import basespace
 from gencove.command.download import download
 from gencove.command.files import list_file_types
 from gencove.command.projects import projects
+from gencove.command.reports import reports
 from gencove.command.s3_imports import s3
 from gencove.command.sample_manifests import sample_manifests
 from gencove.command.samples import samples
@@ -33,6 +34,7 @@ cli.add_command(list_file_types)
 cli.add_command(upload)
 cli.add_command(uploads)
 cli.add_command(projects)
+cli.add_command(reports)
 cli.add_command(samples)
 cli.add_command(sample_manifests)
 cli.add_command(s3)

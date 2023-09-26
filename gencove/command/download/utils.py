@@ -290,7 +290,7 @@ def fatal_process_sample_error(err):
     Returns:
         bool: True if to giveup on backing off, False it to continue.
     """
-    return err.response.status_code != 403
+    return err.response.status_code not in [403, 500, 502, 503, 504]
 
 
 def get_download_template_format_params(client_id, gencove_id):

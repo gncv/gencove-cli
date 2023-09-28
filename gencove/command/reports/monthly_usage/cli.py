@@ -2,7 +2,6 @@
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
-from gencove.command.utils import validate_destination_exists, validate_uuid
 from gencove.constants import Credentials, Optionals
 
 from .main import MonthlyUsageReport
@@ -33,7 +32,7 @@ from .main import MonthlyUsageReport
     required=False,
 )
 @add_options(common_options)
-def monthly_usage(  # pylint: disable=too-many-arguments
+def monthly_usage(  # pylint: disable=too-many-arguments,invalid-name
     from_,
     to,
     output_filename,

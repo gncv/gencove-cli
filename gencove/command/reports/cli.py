@@ -2,8 +2,8 @@
 # pylint: disable=E0012,C0330,R0913
 import click
 
-from .project_qc.cli import project_qc
 from .monthly_usage.cli import monthly_usage
+from .project_qc.cli import project_qc
 
 
 @click.group()

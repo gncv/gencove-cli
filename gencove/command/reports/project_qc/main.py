@@ -9,6 +9,7 @@ from gencove.command.utils import extract_filename_from_headers
 class ProjectQCReport(Command):
     """Get project QC report executor."""
 
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         project_id,
@@ -50,10 +51,11 @@ class ProjectQCReport(Command):
                 )
             else:
                 Path(self.output_filename).parent.mkdir(exist_ok=True, parents=True)
-            with open(self.output_filename, "wb") as f:
-                f.write(project_qc_report.content)
+            with open(self.output_filename, "wb") as filename:
+                filename.write(project_qc_report.content)
             self.echo_info(
-                f"Saved project QC report CSV for project {self.project_id} to {Path(self.output_filename).resolve()}"
+                f"Saved project QC report CSV for project {self.project_id} "
+                f"to {Path(self.output_filename).resolve()}"
             )
         except client.APIClientError as err:
             self.echo_debug(err)

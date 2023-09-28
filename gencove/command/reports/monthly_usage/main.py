@@ -9,7 +9,7 @@ from gencove.command.utils import extract_filename_from_headers
 class MonthlyUsageReport(Command):
     """Monthly usage report executor."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments,invalid-name
         self,
         from_,
         to,
@@ -35,7 +35,7 @@ class MonthlyUsageReport(Command):
 
     def execute(self):
         """Request to get project QC report and download it."""
-        self.echo_info(f"Retrieving monthly usage report for organization")
+        self.echo_info("Retrieving monthly usage report for organization")
 
         try:
             monthly_usage_report = (
@@ -51,10 +51,11 @@ class MonthlyUsageReport(Command):
             else:
                 Path(self.output_filename).parent.mkdir(exist_ok=True, parents=True)
 
-            with open(self.output_filename, "wb") as f:
-                f.write(monthly_usage_report.content)
+            with open(self.output_filename, "wb") as filename:
+                filename.write(monthly_usage_report.content)
             self.echo_info(
-                f"Saved organization monthly usage report CSV to {Path(self.output_filename).resolve()}"
+                f"Saved organization monthly usage report CSV "
+                f"to {Path(self.output_filename).resolve()}"
             )
         except client.APIClientError as err:
             self.echo_debug(err)

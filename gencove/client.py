@@ -725,7 +725,9 @@ class APIClient:
             project_qc_report_endpoint, query_params=query_params, authorized=True
         )
 
-    def get_organization_monthly_usage_report(self, from_, to):
+    def get_organization_monthly_usage_report(
+        self, from_, to
+    ):  # pylint: disable=invalid-name
         """Make a get request to get project QC report CSV."""
         monthly_usage_report_endpoint = (
             self.endpoints.ORGANIZATION_MONTHLY_USAGE_REPORT.value

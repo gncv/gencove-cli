@@ -24,7 +24,7 @@ def get_sample_manifest(  # pylint: disable=too-many-arguments
 
     `MANIFEST_ID`: Gencove manifest ID
 
-    `DESTINATION`: path/to/save/manfiest/to
+    `DESTINATION`: path/to/save/manifest/to
     """
     GetSampleManifest(
         manifest_id,

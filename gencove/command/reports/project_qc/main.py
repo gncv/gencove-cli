@@ -3,22 +3,24 @@ from pathlib import Path
 
 from gencove import client  # noqa: I100
 from gencove.command.base import Command
-from gencove.command.download.utils import download_file
+from gencove.command.utils import extract_filename_from_headers
 
 
 class ProjectQCReport(Command):
-    """Get sample manifest executor."""
+    """Get project QC report executor."""
 
     def __init__(
         self,
         project_id,
-        destination,
+        columns,
+        output_filename,
         credentials,
         options,
     ):
         super().__init__(credentials, options)
         self.project_id = project_id
-        self.destination = destination
+        self.columns = columns
+        self.output_filename = output_filename
 
     def initialize(self):
         """Initialize list subcommand."""
@@ -33,35 +35,37 @@ class ProjectQCReport(Command):
 
     def execute(self):
         """Request to get project QC report and download it."""
-        self.echo_debug(f"Retrieving project QC report for project {self.project_id}")
+        self.echo_info(
+            f"Retrieving project QC report for project with ID {self.project_id}"
+        )
 
         try:
-            sample_manifest = self.api_client.get_sample_manifest(
-                manifest_id=self.manifest_id,
+            project_qc_report = self.api_client.get_project_qc_report(
+                project_id=self.project_id, columns=self.columns
             )
-            dst = (
-                Path(self.destination)
-                / str(sample_manifest.id)
-                / sample_manifest.file_name
-            )
-            dst.parent.mkdir(exist_ok=True, parents=True)
+
+            if not self.output_filename:
+                self.output_filename = Path.cwd() / extract_filename_from_headers(
+                    headers=project_qc_report.headers
+                )
+            else:
+                Path(self.output_filename).parent.mkdir(exist_ok=True, parents=True)
+            with open(self.output_filename, "wb") as f:
+                f.write(project_qc_report.content)
             self.echo_info(
-                f"Downloading manifest with ID {sample_manifest.id} to {dst}"
-            )
-            download_file(
-                file_path=str(dst),
-                download_url=sample_manifest.file.download_url,
-                no_progress=True,
+                f"Saved project QC report CSV for project {self.project_id} to {Path(self.output_filename).resolve()}"
             )
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 400:
-                self.echo_warning("There was an error retrieving the sample manifest.")
+                self.echo_warning(
+                    "There was an error retrieving the project QC report."
+                )
                 self.echo_info("The following error was returned:")
                 self.echo_info(err.message)
             elif err.status_code == 404:
                 self.echo_warning(
-                    f"Sample manifest with ID {self.manifest_id} does not exist or "
+                    f"Project with ID {self.project_id} does not exist or "
                     "you do not have access."
                 )
             else:

@@ -3,7 +3,7 @@ from pathlib import Path
 
 from gencove import client  # noqa: I100
 from gencove.command.base import Command
-from gencove.command.download.utils import download_file
+from gencove.command.utils import extract_filename_from_headers
 
 
 class MonthlyUsageReport(Command):
@@ -11,12 +11,16 @@ class MonthlyUsageReport(Command):
 
     def __init__(
         self,
-        destination,
+        from_,
+        to,
+        output_filename,
         credentials,
         options,
     ):
         super().__init__(credentials, options)
-        self.destination = destination
+        self.from_ = from_
+        self.to = to
+        self.output_filename = output_filename
 
     def initialize(self):
         """Initialize list subcommand."""
@@ -30,37 +34,37 @@ class MonthlyUsageReport(Command):
         """
 
     def execute(self):
-        """Request to retrieve monthly usage report."""
-        self.echo_debug(f"Retrieving monthly usage report")
+        """Request to get project QC report and download it."""
+        self.echo_info(f"Retrieving monthly usage report for organization")
 
         try:
-            sample_manifest = self.api_client.get_sample_manifest(
-                manifest_id=self.manifest_id,
+            monthly_usage_report = (
+                self.api_client.get_organization_monthly_usage_report(
+                    from_=self.from_, to=self.to
+                )
             )
-            dst = (
-                Path(self.destination)
-                / str(sample_manifest.id)
-                / sample_manifest.file_name
-            )
-            dst.parent.mkdir(exist_ok=True, parents=True)
+
+            if not self.output_filename:
+                self.output_filename = Path.cwd() / extract_filename_from_headers(
+                    headers=monthly_usage_report.headers
+                )
+            else:
+                Path(self.output_filename).parent.mkdir(exist_ok=True, parents=True)
+
+            with open(self.output_filename, "wb") as f:
+                f.write(monthly_usage_report.content)
             self.echo_info(
-                f"Downloading manifest with ID {sample_manifest.id} to {dst}"
-            )
-            download_file(
-                file_path=str(dst),
-                download_url=sample_manifest.file.download_url,
-                no_progress=True,
+                f"Saved organization monthly usage report CSV to {Path(self.output_filename).resolve()}"
             )
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 400:
-                self.echo_warning("There was an error retrieving the sample manifest.")
+                self.echo_warning(
+                    "There was an error retrieving the monthly usage report."
+                )
                 self.echo_info("The following error was returned:")
                 self.echo_info(err.message)
             elif err.status_code == 404:
-                self.echo_warning(
-                    f"Sample manifest with ID {self.manifest_id} does not exist or "
-                    "you do not have access."
-                )
+                self.echo_warning("You do not have access to this report")
             else:
                 raise

@@ -3,15 +3,12 @@
 # pylint: disable=wrong-import-order, import-error
 import operator
 import os
-import uuid
-from unittest.mock import Mock
-import logging
 
 from click.testing import CliRunner
 
-from gencove.client import APIClient, APIClientError  # noqa: I100
+from gencove.client import APIClient  # noqa: I100
 from gencove.command.reports.cli import project_qc
-from gencove.tests.decorators import assert_authorization, assert_no_requests
+from gencove.tests.decorators import assert_authorization
 from gencove.tests.filters import (
     filter_aws_headers,
     filter_jwt,

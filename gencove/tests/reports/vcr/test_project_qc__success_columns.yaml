@@ -1,0 +1,158 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.7.2
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '582'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Fri, 29 Sep 2023 13:57:26 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.7.2
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/project-qc-report/11111111-1111-1111-1111-111111111111?columns=id%2Cclient_id
+  response:
+    body:
+      string: 'id,client_id
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,some-id
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,sample
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,some-id
+
+        11111111-1111-1111-1111-111111111111,some-id
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,foo
+
+        11111111-1111-1111-1111-111111111111,some-id
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,some-id
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,some-id
+
+        11111111-1111-1111-1111-111111111111,some-id
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,bar
+
+        11111111-1111-1111-1111-111111111111,test
+
+        11111111-1111-1111-1111-111111111111,test
+
+        '
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Disposition:
+      - attachment; filename="project-qc-report.csv"
+      Content-Length:
+      - '1378'
+      Content-Type:
+      - text/csv
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Fri, 29 Sep 2023 13:57:27 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -67,7 +67,9 @@ def get_response_from_vcr_dict(vcr_dict: dict) -> Response:
 
 
 @pytest.mark.vcr
-def test_project_qc__not_owned(credentials, mocker, recording, vcr, using_api_key):
+def test_project_qc__not_owned(
+    credentials, mocker, recording, vcr, using_api_key
+):  # pylint: disable=unused-argument
     """Test project qc report not owned case"""
     runner = CliRunner()
     if not recording:

@@ -5,10 +5,10 @@ import operator
 import os
 
 from click.testing import CliRunner
+from requests import Response
 
 from gencove.client import APIClient  # noqa: I100
 from gencove.command.reports.cli import project_qc
-from gencove.tests.decorators import assert_authorization
 from gencove.tests.filters import (
     filter_aws_headers,
     filter_jwt,
@@ -53,21 +53,34 @@ def vcr_config():
     }
 
 
+def get_response_from_vcr_dict(vcr_dict) -> Response:
+    """Create Response object from get_vcr_response return value"""
+    response = Response()
+    response.status_code = vcr_dict["status"]["code"]
+    response.headers = vcr_dict["headers"]
+    response.headers["content-disposition"] = response.headers["Content-Disposition"][0]
+    response._content = vcr_dict["body"]["string"]
+    return response
+
+
 @pytest.mark.vcr
-@assert_authorization
-def test_project_qc__success(
-    credentials, mocker, project_id, recording, vcr, using_api_key
+def test_project_qc__success(  # pylint: disable=too-many-arguments
+    credentials, mocker, project_id, recording, vcr
 ):
     """Test QC report success case"""
     runner = CliRunner()
     if not recording:
-        project_qc_response = get_vcr_response(
+        project_qc_dict = get_vcr_response(
             "/api/v2/project-qc-report/", vcr, operator.contains, just_body=False
         )
+        response = get_response_from_vcr_dict(project_qc_dict)
+
+        # Need to reconstruct the raw response
+        mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
         mocked_project_qc = mocker.patch.object(
             APIClient,
             "get_project_qc_report",
-            return_value=project_qc_response,
+            return_value=response,
         )
     with runner.isolated_filesystem():
         os.mkdir("tempdir")
@@ -82,4 +95,5 @@ def test_project_qc__success(
     assert res.exit_code == 0
     if not recording:
         mocked_project_qc.assert_called_once()
+        mocked_login.assert_called_once()
     assert "Saved project QC report CSV" in res.output

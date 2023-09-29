@@ -8,6 +8,7 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient, APIClientError  # noqa: I100
 from gencove.command.reports.cli import monthly_usage
+from gencove.tests.decorators import assert_authorization
 from gencove.tests.filters import (
     filter_aws_headers,
     filter_jwt,
@@ -54,6 +55,7 @@ def vcr_config():
 
 
 @pytest.mark.vcr
+@assert_authorization
 def test_monthly_usage__success(  # pylint: disable=too-many-arguments,unused-argument
     credentials, mocker, recording, vcr, using_api_key
 ):
@@ -69,7 +71,6 @@ def test_monthly_usage__success(  # pylint: disable=too-many-arguments,unused-ar
         response = get_response_from_vcr_dict(monthly_usage_dict)
 
         # Need to reconstruct the raw response
-        mocker.patch.object(APIClient, "login", return_value=None)
         mocked_monthly_usage = mocker.patch.object(
             APIClient,
             "get_organization_monthly_usage_report",
@@ -91,6 +92,7 @@ def test_monthly_usage__success(  # pylint: disable=too-many-arguments,unused-ar
 
 
 @pytest.mark.vcr
+@assert_authorization
 def test_monthly_usage__success_dates(
     credentials, mocker, recording, vcr, using_api_key
 ):  # pylint: disable=too-many-arguments,too-many-locals,unused-argument
@@ -106,7 +108,6 @@ def test_monthly_usage__success_dates(
         response = get_response_from_vcr_dict(monthly_usage_dict)
 
         # Need to reconstruct the raw response
-        mocker.patch.object(APIClient, "login", return_value=None)
         mocked_monthly_usage = mocker.patch.object(
             APIClient,
             "get_organization_monthly_usage_report",
@@ -149,6 +150,7 @@ def test_monthly_usage__success_dates(
 
 
 @pytest.mark.vcr
+@assert_authorization
 def test_monthly_usage__bad_date(  # pylint: disable=too-many-arguments,unused-argument
     credentials, mocker, recording, vcr, using_api_key
 ):
@@ -164,7 +166,6 @@ def test_monthly_usage__bad_date(  # pylint: disable=too-many-arguments,unused-a
         response = get_response_from_vcr_dict(monthly_usage_dict)
 
         # Need to reconstruct the raw response
-        mocker.patch.object(APIClient, "login", return_value=None)
         mocked_monthly_usage = mocker.patch.object(
             APIClient,
             "get_organization_monthly_usage_report",

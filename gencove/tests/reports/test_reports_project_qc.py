@@ -8,6 +8,7 @@ from click.testing import CliRunner
 
 from gencove.client import APIClient, APIClientError  # noqa: I100
 from gencove.command.reports.cli import project_qc
+from gencove.tests.decorators import assert_authorization
 from gencove.tests.filters import (
     filter_aws_headers,
     filter_jwt,
@@ -54,6 +55,7 @@ def vcr_config():
 
 
 @pytest.mark.vcr
+@assert_authorization
 def test_project_qc__not_owned(
     credentials, mocker, recording, vcr, using_api_key
 ):  # pylint: disable=unused-argument
@@ -65,7 +67,6 @@ def test_project_qc__not_owned(
         )
         response = get_response_from_vcr_dict(project_qc_dict)
 
-        mocker.patch.object(APIClient, "login", return_value=None)
         mocked_project_qc = mocker.patch.object(
             APIClient,
             "get_project_qc_report",
@@ -89,6 +90,7 @@ def test_project_qc__not_owned(
 
 
 @pytest.mark.vcr
+@assert_authorization
 def test_project_qc__success(  # pylint: disable=too-many-arguments,unused-argument
     credentials, mocker, project_id, recording, vcr, using_api_key
 ):
@@ -101,7 +103,6 @@ def test_project_qc__success(  # pylint: disable=too-many-arguments,unused-argum
         response = get_response_from_vcr_dict(project_qc_dict)
 
         # Need to reconstruct the raw response
-        mocker.patch.object(APIClient, "login", return_value=None)
         mocked_project_qc = mocker.patch.object(
             APIClient,
             "get_project_qc_report",
@@ -124,6 +125,7 @@ def test_project_qc__success(  # pylint: disable=too-many-arguments,unused-argum
 
 
 @pytest.mark.vcr
+@assert_authorization
 def test_project_qc__success_columns(
     credentials, mocker, project_id, recording, vcr, using_api_key
 ):  # pylint: disable=too-many-arguments,too-many-locals,unused-argument
@@ -136,7 +138,6 @@ def test_project_qc__success_columns(
         response = get_response_from_vcr_dict(project_qc_dict)
 
         # Need to reconstruct the raw response
-        mocker.patch.object(APIClient, "login", return_value=None)
         mocked_project_qc = mocker.patch.object(
             APIClient,
             "get_project_qc_report",
@@ -173,6 +174,7 @@ def test_project_qc__success_columns(
 
 
 @pytest.mark.vcr
+@assert_authorization
 def test_project_qc__bad_columns(  # pylint: disable=too-many-arguments,unused-argument
     credentials, mocker, project_id, recording, vcr, using_api_key
 ):
@@ -185,7 +187,6 @@ def test_project_qc__bad_columns(  # pylint: disable=too-many-arguments,unused-a
         response = get_response_from_vcr_dict(project_qc_dict)
 
         # Need to reconstruct the raw response
-        mocker.patch.object(APIClient, "login", return_value=None)
         mocked_project_qc = mocker.patch.object(
             APIClient,
             "get_project_qc_report",

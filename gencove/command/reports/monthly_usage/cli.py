@@ -11,14 +11,16 @@ from .main import MonthlyUsageReport
 @click.option(
     "--from",
     "from_",
-    help="Date to start report from in format YYYY-MM, e.g. 2023-01",
+    help="Date to start report from in format YYYY-MM, e.g. 2023-01. "
+    "If supplied, --to parameter must also be supplied.",
     type=str,
     default=None,
     required=False,
 )
 @click.option(
     "--to",
-    help="Date to end report at in format YYYY-MM, e.g. 2023-03",
+    help="Date to end report at in format YYYY-MM, e.g. 2023-03. "
+    "If supplied, --from parameter must also be supplied.",
     type=str,
     default=None,
     required=False,
@@ -41,7 +43,9 @@ def monthly_usage(  # pylint: disable=too-many-arguments,invalid-name
     password,
     api_key,
 ):
-    """Get monthly usage report for organization."""
+    """Get monthly usage report for organization.
+    If --to and --from parameters are not supplied,
+    the last 12 months of usage are retrieved."""
     MonthlyUsageReport(
         from_,
         to,

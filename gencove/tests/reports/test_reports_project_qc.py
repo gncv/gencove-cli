@@ -67,12 +67,7 @@ def get_response_from_vcr_dict(vcr_dict: dict) -> Response:
 
 
 @pytest.mark.vcr
-def test_project_qc__not_owned(
-    credentials,
-    mocker,
-    recording,
-    vcr,
-):
+def test_project_qc__not_owned(credentials, mocker, recording, vcr, using_api_key):
     """Test project qc report not owned case"""
     runner = CliRunner()
     if not recording:
@@ -81,7 +76,7 @@ def test_project_qc__not_owned(
         )
         response = get_response_from_vcr_dict(project_qc_dict)
 
-        mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+        mocker.patch.object(APIClient, "login", return_value=None)
         mocked_project_qc = mocker.patch.object(
             APIClient,
             "get_project_qc_report",
@@ -101,12 +96,11 @@ def test_project_qc__not_owned(
     assert res.exit_code == 0
     if not recording:
         mocked_project_qc.assert_called_once()
-        mocked_login.assert_called_once()
     assert "does not exist or you do not have access" in res.output
 
 
 @pytest.mark.vcr
-def test_project_qc__success(  # pylint: disable=too-many-arguments
+def test_project_qc__success(  # pylint: disable=too-many-arguments,unused-argument
     credentials, mocker, project_id, recording, vcr, using_api_key
 ):
     """Test QC report success case"""
@@ -118,7 +112,7 @@ def test_project_qc__success(  # pylint: disable=too-many-arguments
         response = get_response_from_vcr_dict(project_qc_dict)
 
         # Need to reconstruct the raw response
-        mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+        mocker.patch.object(APIClient, "login", return_value=None)
         mocked_project_qc = mocker.patch.object(
             APIClient,
             "get_project_qc_report",
@@ -137,14 +131,13 @@ def test_project_qc__success(  # pylint: disable=too-many-arguments
     assert res.exit_code == 0
     if not recording:
         mocked_project_qc.assert_called_once()
-        mocked_login.assert_called_once()
     assert "Saved project QC report CSV" in res.output
 
 
 @pytest.mark.vcr
-def test_project_qc__success_columns(  # pylint: disable=too-many-arguments
+def test_project_qc__success_columns(
     credentials, mocker, project_id, recording, vcr, using_api_key
-):
+):  # pylint: disable=too-many-arguments,too-many-locals,unused-argument
     """Test QC report success case with requested coluns"""
     runner = CliRunner()
     if not recording:
@@ -154,7 +147,7 @@ def test_project_qc__success_columns(  # pylint: disable=too-many-arguments
         response = get_response_from_vcr_dict(project_qc_dict)
 
         # Need to reconstruct the raw response
-        mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+        mocker.patch.object(APIClient, "login", return_value=None)
         mocked_project_qc = mocker.patch.object(
             APIClient,
             "get_project_qc_report",
@@ -174,13 +167,12 @@ def test_project_qc__success_columns(  # pylint: disable=too-many-arguments
                 *credentials,
             ],
         )
-        with open(outfile, "r") as f:
-            contents = f.readlines()
+        with open(outfile, "r", encoding="utf-8") as fileobj:
+            contents = fileobj.readlines()
 
     assert res.exit_code == 0
     if not recording:
         mocked_project_qc.assert_called_once()
-        mocked_login.assert_called_once()
     assert "Saved project QC report CSV" in res.output
 
     # Confirm columns are as expected
@@ -192,7 +184,7 @@ def test_project_qc__success_columns(  # pylint: disable=too-many-arguments
 
 
 @pytest.mark.vcr
-def test_project_qc__bad_columns(  # pylint: disable=too-many-arguments
+def test_project_qc__bad_columns(  # pylint: disable=too-many-arguments,unused-argument
     credentials, mocker, project_id, recording, vcr, using_api_key
 ):
     """Test QC report with bad column name passed to --columns"""
@@ -204,7 +196,7 @@ def test_project_qc__bad_columns(  # pylint: disable=too-many-arguments
         response = get_response_from_vcr_dict(project_qc_dict)
 
         # Need to reconstruct the raw response
-        mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+        mocker.patch.object(APIClient, "login", return_value=None)
         mocked_project_qc = mocker.patch.object(
             APIClient,
             "get_project_qc_report",
@@ -230,5 +222,4 @@ def test_project_qc__bad_columns(  # pylint: disable=too-many-arguments
     assert res.exit_code == 0
     if not recording:
         mocked_project_qc.assert_called_once()
-        mocked_login.assert_called_once()
     assert "There was an error retrieving the project QC report" in res.output

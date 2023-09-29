@@ -8,7 +8,12 @@ def filter_project_qc_report_request(request):
     return _replace_uuid_from_url(request, "project-qc-report")
 
 
-def filter_project_qc_report_response_body(response):
+def filter_monthly_usage_report_request(request):
+    """Filter project UUID data from request."""
+    return _replace_uuid_from_url(request, "monthly-usage")
+
+
+def filter_report_response_body(response):
     """Filter out all UUIDs in the response body"""
     body = response["body"]["string"].decode()
     uuid_pattern = (
@@ -20,9 +25,9 @@ def filter_project_qc_report_response_body(response):
     return response
 
 
-def filter_project_qc_report_response_filename(response):
+def filter_report_response_filename(response):
     if "Content-Disposition" in response["headers"]:
         response["headers"]["Content-Disposition"] = [
-            'attachment; filename="project-qc-report.csv"'
+            'attachment; filename="report.csv"'
         ]
     return response

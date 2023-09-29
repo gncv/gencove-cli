@@ -6,8 +6,6 @@ import os
 
 from click.testing import CliRunner
 
-from requests import Response
-
 from gencove.client import APIClient, APIClientError  # noqa: I100
 from gencove.command.reports.cli import project_qc
 from gencove.tests.filters import (
@@ -15,10 +13,11 @@ from gencove.tests.filters import (
     filter_jwt,
     replace_gencove_url_vcr,
 )
+from gencove.tests.reports.util import get_response_from_vcr_dict
 from gencove.tests.reports.vcr.filters import (
     filter_project_qc_report_request,
-    filter_project_qc_report_response_body,
-    filter_project_qc_report_response_filename,
+    filter_report_response_body,
+    filter_report_response_filename,
 )
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
 from gencove.tests.utils import get_vcr_response
@@ -48,22 +47,10 @@ def vcr_config():
             filter_jwt,
             filter_aws_headers,
             filter_volatile_dates,
-            filter_project_qc_report_response_body,
-            filter_project_qc_report_response_filename,
+            filter_report_response_body,
+            filter_report_response_filename,
         ],
     }
-
-
-def get_response_from_vcr_dict(vcr_dict: dict) -> Response:
-    """Create Response object from get_vcr_response return value"""
-    response = Response()
-    response.status_code = vcr_dict["status"]["code"]
-    response.headers = vcr_dict["headers"]
-    content_disposition = response.headers.get("Content-Disposition")
-    if content_disposition:
-        response.headers["content-disposition"] = content_disposition[0]
-    response._content = vcr_dict["body"]["string"]  # pylint: disable=protected-access
-    return response
 
 
 @pytest.mark.vcr

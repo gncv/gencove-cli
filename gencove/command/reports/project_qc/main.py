@@ -46,9 +46,12 @@ class ProjectQCReport(Command):
             )
 
             if not self.output_filename:
-                self.output_filename = Path.cwd() / extract_filename_from_headers(
+                filename = extract_filename_from_headers(
                     headers=project_qc_report.headers
                 )
+                if not filename:
+                    filename = "project-qc-report.csv"
+                self.output_filename = Path.cwd() / filename
             else:
                 Path(self.output_filename).parent.mkdir(exist_ok=True, parents=True)
             with open(self.output_filename, "wb") as filename:

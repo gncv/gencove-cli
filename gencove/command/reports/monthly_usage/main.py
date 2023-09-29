@@ -45,9 +45,12 @@ class MonthlyUsageReport(Command):
             )
 
             if not self.output_filename:
-                self.output_filename = Path.cwd() / extract_filename_from_headers(
+                filename = extract_filename_from_headers(
                     headers=monthly_usage_report.headers
                 )
+                if not filename:
+                    filename = "monthly-usage-report.csv"
+                self.output_filename = Path.cwd() / filename
             else:
                 Path(self.output_filename).parent.mkdir(exist_ok=True, parents=True)
 

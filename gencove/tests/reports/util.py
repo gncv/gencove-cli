@@ -1,3 +1,5 @@
+"""Shared test code for reports"""
+
 from requests import Response
 
 

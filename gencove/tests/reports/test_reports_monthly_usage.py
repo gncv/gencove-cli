@@ -128,10 +128,6 @@ def test_monthly_usage__success_dates(
             ],
         )
 
-        import logging
-
-        logging.error(res.output)
-
         with open(outfile, "r", encoding="utf-8") as fileobj:
             contents = fileobj.readlines()
 

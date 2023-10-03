@@ -15,14 +15,13 @@ from gencove.tests.filters import (
     filter_jwt,
     replace_gencove_url_vcr,
 )
-from gencove.tests.reports.util import get_response_from_vcr_dict
 from gencove.tests.reports.vcr.filters import (
     filter_project_qc_report_request,
     filter_report_response_body,
     filter_report_response_filename,
 )
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
-from gencove.tests.utils import get_vcr_response
+from gencove.tests.utils import get_vcr_response, get_response_from_vcr_dict
 
 import pytest
 

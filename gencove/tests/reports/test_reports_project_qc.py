@@ -57,7 +57,7 @@ def vcr_config():
 @pytest.mark.vcr
 @assert_authorization
 def test_project_qc__not_owned(
-    credentials, mocker, recording, vcr, using_api_key
+    credentials, mocker, recording, vcr
 ):  # pylint: disable=unused-argument
     """Test project qc report not owned case"""
     runner = CliRunner()
@@ -92,7 +92,7 @@ def test_project_qc__not_owned(
 @pytest.mark.vcr
 @assert_authorization
 def test_project_qc__success(  # pylint: disable=too-many-arguments,unused-argument
-    credentials, mocker, project_id, recording, vcr, using_api_key
+    credentials, mocker, project_id, recording, vcr
 ):
     """Test QC report success case"""
     runner = CliRunner()
@@ -127,7 +127,7 @@ def test_project_qc__success(  # pylint: disable=too-many-arguments,unused-argum
 @pytest.mark.vcr
 @assert_authorization
 def test_project_qc__success_columns(
-    credentials, mocker, project_id, recording, vcr, using_api_key
+    credentials, mocker, project_id, recording, vcr
 ):  # pylint: disable=too-many-arguments,too-many-locals,unused-argument
     """Test QC report success case with requested coluns"""
     runner = CliRunner()
@@ -176,7 +176,7 @@ def test_project_qc__success_columns(
 @pytest.mark.vcr
 @assert_authorization
 def test_project_qc__bad_columns(  # pylint: disable=too-many-arguments,unused-argument
-    credentials, mocker, project_id, recording, vcr, using_api_key
+    credentials, mocker, project_id, recording, vcr
 ):
     """Test QC report with bad column name passed to --columns"""
     runner = CliRunner()

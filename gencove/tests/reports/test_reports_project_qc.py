@@ -119,6 +119,8 @@ def test_project_qc__success(  # pylint: disable=too-many-arguments,unused-argum
         )
         csv_file = Path("report.csv")  # filename from mocked response
         assert csv_file.exists()
+        csv_contents = csv_file.read_text()
+        assert csv_contents == response.text
 
     assert res.exit_code == 0
     if not recording:

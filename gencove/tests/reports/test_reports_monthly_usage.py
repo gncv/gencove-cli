@@ -96,7 +96,7 @@ def test_monthly_usage__success(  # pylint: disable=too-many-arguments,unused-ar
 def test_monthly_usage__success_dates(
     credentials, mocker, recording, vcr
 ):  # pylint: disable=too-many-arguments,too-many-locals,unused-argument
-    """Test monthly usage report success case with requested columns"""
+    """Test monthly usage report success case with requested dates"""
     runner = CliRunner()
     if not recording:
         monthly_usage_dict = get_vcr_response(
@@ -154,7 +154,7 @@ def test_monthly_usage__success_dates(
 def test_monthly_usage__bad_date(  # pylint: disable=too-many-arguments,unused-argument
     credentials, mocker, recording, vcr
 ):
-    """Test monthly usage report with bad column name passed to --columns"""
+    """Test monthly usage report with bad date value"""
     runner = CliRunner()
     if not recording:
         monthly_usage_dict = get_vcr_response(

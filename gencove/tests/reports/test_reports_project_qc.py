@@ -3,6 +3,7 @@
 # pylint: disable=wrong-import-order, import-error
 import operator
 import os
+from pathlib import Path
 
 from click.testing import CliRunner
 
@@ -109,7 +110,6 @@ def test_project_qc__success(  # pylint: disable=too-many-arguments,unused-argum
             return_value=response,
         )
     with runner.isolated_filesystem():
-        os.mkdir("tempdir")
         res = runner.invoke(
             project_qc,
             [
@@ -117,6 +117,8 @@ def test_project_qc__success(  # pylint: disable=too-many-arguments,unused-argum
                 *credentials,
             ],
         )
+        csv_file = Path("report.csv")  # filename from mocked response
+        assert csv_file.exists()
 
     assert res.exit_code == 0
     if not recording:

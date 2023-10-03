@@ -193,14 +193,13 @@ def test_project_qc__bad_columns(  # pylint: disable=too-many-arguments,unused-a
             APIClient,
             "get_project_qc_report",
             side_effect=APIClientError(
-                message="API Client Error: Bad Request",
+                message=response.content,
                 status_code=response.status_code,
             ),
             return_value=response,
         )
 
     with runner.isolated_filesystem():
-        os.mkdir("tempdir")
         res = runner.invoke(
             project_qc,
             [
@@ -215,3 +214,4 @@ def test_project_qc__bad_columns(  # pylint: disable=too-many-arguments,unused-a
     if not recording:
         mocked_project_qc.assert_called_once()
     assert "There was an error retrieving the project QC report" in res.output
+    assert "Acceptable column names include the following" in res.output

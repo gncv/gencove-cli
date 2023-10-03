@@ -1,6 +1,7 @@
 import re
 
 from gencove.tests.filters import _replace_uuid_from_url
+from gencove.tests.utils import MOCK_UUID
 
 
 def filter_project_qc_report_request(request):
@@ -19,8 +20,7 @@ def filter_report_response_body(response):
     uuid_pattern = (
         r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
     )
-    censored_uuid = "11111111-1111-1111-1111-111111111111"
-    censored_body = re.sub(uuid_pattern, censored_uuid, body)
+    censored_body = re.sub(uuid_pattern, MOCK_UUID, body)
     response["body"]["string"] = censored_body.encode()
     return response
 

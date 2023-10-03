@@ -1,7 +1,9 @@
 """Common utils used in multiple commands."""
 import json
 import os
+import re
 import uuid
+from typing import Optional
 
 import click
 
@@ -134,3 +136,12 @@ def validate_destination_exists(
             f"{human_readable_param} is not a directory that exists. Exiting."
         )
     return candidate
+
+
+def extract_filename_from_headers(headers: dict) -> Optional[str]:
+    """Extract filename from the Content-Disposition header, if present"""
+    content_disposition = headers.get("content-disposition", "")
+    match = re.search('filename="([^"]+)"', str(content_disposition))
+    if match:
+        return match.group(1)
+    return None

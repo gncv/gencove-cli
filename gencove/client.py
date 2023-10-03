@@ -224,6 +224,8 @@ class APIClient:
         # pylint: disable=no-member
         if response.status_code >= 200 and response.status_code < 300:
             content = response.text
+            if response.headers.get("Content-Type") == "text/csv":
+                return response
             if not raw_response:
                 content = response.json() if content else {}
             return content
@@ -712,6 +714,28 @@ class APIClient:
         """Get single project."""
         project_endpoint = f"{self.endpoints.PROJECTS.value}{project_id}"
         return self._get(project_endpoint, authorized=True, model=Project)
+
+    def get_project_qc_report(self, project_id, columns):
+        """Make a get request to get project QC report CSV."""
+        project_qc_report_endpoint = self.endpoints.PROJECT_QC_REPORT.value.format(
+            id=project_id,
+        )
+        query_params = {"columns": columns} if columns else None
+        return self._get(
+            project_qc_report_endpoint, query_params=query_params, authorized=True
+        )
+
+    def get_organization_monthly_usage_report(
+        self, from_, to
+    ):  # pylint: disable=invalid-name
+        """Make a get request to get monthly usage report CSV."""
+        monthly_usage_report_endpoint = (
+            self.endpoints.ORGANIZATION_MONTHLY_USAGE_REPORT.value
+        )
+        query_params = {"from": from_, "to": to} if from_ or to else None
+        return self._get(
+            monthly_usage_report_endpoint, query_params=query_params, authorized=True
+        )
 
     def create_merged_vcf(self, project_id):
         """Merge VCF files for a project."""

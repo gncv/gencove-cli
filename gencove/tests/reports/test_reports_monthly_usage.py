@@ -20,7 +20,7 @@ from gencove.tests.reports.vcr.filters import (
     filter_report_response_filename,
 )
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
-from gencove.tests.utils import get_vcr_response, get_response_from_vcr_dict
+from gencove.tests.utils import get_response_from_vcr_dict, get_vcr_response
 
 import pytest
 

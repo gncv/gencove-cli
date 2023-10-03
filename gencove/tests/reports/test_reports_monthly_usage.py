@@ -170,7 +170,7 @@ def test_monthly_usage__bad_date(  # pylint: disable=too-many-arguments,unused-a
             APIClient,
             "get_organization_monthly_usage_report",
             side_effect=APIClientError(
-                message="API Client Error: Bad Request",
+                message=response.content,
                 status_code=response.status_code,
             ),
             return_value=response,
@@ -192,3 +192,6 @@ def test_monthly_usage__bad_date(  # pylint: disable=too-many-arguments,unused-a
     if not recording:
         mocked_monthly_usage.assert_called_once()
     assert "There was an error retrieving the monthly usage report" in res.output
+    assert (
+        "Must provide both 'from' and 'to' query parameters, or neither" in res.output
+    )

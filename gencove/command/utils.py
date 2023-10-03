@@ -141,7 +141,7 @@ def validate_destination_exists(
 def extract_filename_from_headers(headers: dict) -> Optional[str]:
     """Extract filename from the Content-Disposition header, if present"""
     content_disposition = headers.get("content-disposition", "")
-    match = re.search('filename="([^"]+)"', content_disposition)
+    match = re.search('filename="([^"]+)"', str(content_disposition))
     if match:
         return match.group(1)
     return None

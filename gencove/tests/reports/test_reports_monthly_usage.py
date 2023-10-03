@@ -57,7 +57,7 @@ def vcr_config():
 @pytest.mark.vcr
 @assert_authorization
 def test_monthly_usage__success(  # pylint: disable=too-many-arguments,unused-argument
-    credentials, mocker, recording, vcr, using_api_key
+    credentials, mocker, recording, vcr
 ):
     """Test monthly usage report success case"""
     runner = CliRunner()
@@ -94,7 +94,7 @@ def test_monthly_usage__success(  # pylint: disable=too-many-arguments,unused-ar
 @pytest.mark.vcr
 @assert_authorization
 def test_monthly_usage__success_dates(
-    credentials, mocker, recording, vcr, using_api_key
+    credentials, mocker, recording, vcr
 ):  # pylint: disable=too-many-arguments,too-many-locals,unused-argument
     """Test monthly usage report success case with requested columns"""
     runner = CliRunner()
@@ -152,7 +152,7 @@ def test_monthly_usage__success_dates(
 @pytest.mark.vcr
 @assert_authorization
 def test_monthly_usage__bad_date(  # pylint: disable=too-many-arguments,unused-argument
-    credentials, mocker, recording, vcr, using_api_key
+    credentials, mocker, recording, vcr
 ):
     """Test monthly usage report with bad column name passed to --columns"""
     runner = CliRunner()

@@ -224,9 +224,9 @@ class APIClient:
         # pylint: disable=no-member
         if response.status_code >= 200 and response.status_code < 300:
             content = response.text
+            if response.headers.get("Content-Type") == "text/csv":
+                return response
             if not raw_response:
-                if response.headers.get("Content-Type") == "text/csv":
-                    return response
                 content = response.json() if content else {}
             return content
 

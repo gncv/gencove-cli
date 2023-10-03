@@ -1,0 +1,118 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.7.2
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '582'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Fri, 29 Sep 2023 16:25:53 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.7.2
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/organization-monthly-usage-report/
+  response:
+    body:
+      string: 'year,month,succeeded_samples,failed_samples
+
+        2022,10,0,0
+
+        2022,11,0,0
+
+        2022,12,0,0
+
+        2023,1,0,0
+
+        2023,2,0,0
+
+        2023,3,0,0
+
+        2023,4,0,0
+
+        2023,5,0,0
+
+        2023,6,0,0
+
+        2023,7,0,0
+
+        2023,8,0,0
+
+        2023,9,0,0
+
+        '
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Disposition:
+      - attachment; filename="report.csv"
+      Content-Length:
+      - '179'
+      Content-Type:
+      - text/csv
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Fri, 29 Sep 2023 16:25:53 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

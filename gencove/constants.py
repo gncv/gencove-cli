@@ -32,6 +32,7 @@ class ApiEndpoints(Enum):
     PROJECTS_DELETE = "/api/v2/projects-delete/"
     PROJECT_DELETE_SAMPLES = "/api/v2/project-delete-samples/{id}"
     PROJECT_RESTORE_SAMPLES = "/api/v2/project-restore-samples/{id}"
+    PROJECT_QC_REPORT = "/api/v2/project-qc-report/{id}"
     BASESPACE_PROJECTS_IMPORT = "/api/v2/basespace-projects-import/"
     BASESPACE_PROJECTS_LIST = "/api/v2/basespace-projects/"
     BASESPACE_BIOSAMPLES_LIST = "/api/v2/basespace-project-biosamples/{id}"
@@ -43,6 +44,7 @@ class ApiEndpoints(Enum):
     FILE_TYPES = "/api/v2/file-types/"
     PIPELINES = "/api/v2/pipeline/"
     PIPELINE = "/api/v2/pipeline/{id}"
+    ORGANIZATION_MONTHLY_USAGE_REPORT = "/api/v2/organization-monthly-usage-report/"
 
 
 @unique

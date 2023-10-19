@@ -4,6 +4,7 @@ import click
 from gencove import version
 from gencove.command.basespace import basespace
 from gencove.command.download import download
+from gencove.command.explorer import explorer
 from gencove.command.files import list_file_types
 from gencove.command.projects import projects
 from gencove.command.reports import reports
@@ -30,6 +31,7 @@ def cli():
 announcements()
 cli.add_command(basespace)
 cli.add_command(download)
+cli.add_command(explorer)
 cli.add_command(list_file_types)
 cli.add_command(upload)
 cli.add_command(uploads)

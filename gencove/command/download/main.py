@@ -276,7 +276,10 @@ class Download(Command):
                 )
                 if self.checksums:
                     try:
-                        checksum = self.api_client.get_file_checksum(sample_file.id)
+                        filename = file_path.split("/")[-1]
+                        checksum = self.api_client.get_file_checksum(
+                            sample_file.id, filename=filename
+                        )
                         self.create_checksum_file(file_path, checksum)
                     except client.APIClientTooManyRequestsError:
                         self.echo_debug(

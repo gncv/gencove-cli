@@ -401,6 +401,81 @@ def test_create_checksum_file(credentials, mocker, recording, sample_id_download
 
 @pytest.mark.vcr
 @assert_authorization
+def test_create_checksum_file_template(
+    credentials, mocker, recording, sample_id_download, vcr
+):
+    """Check checksums flag with a given template."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        if not recording:
+            # Mock only if using the cassettes, since we mock the return value.
+            get_sample_details_response = get_vcr_response(
+                "/api/v2/samples/", vcr, operator.contains
+            )
+            mocked_sample_details = mocker.patch.object(
+                APIClient,
+                "get_sample_details",
+                return_value=SampleDetails(**get_sample_details_response),
+            )
+            mocked_download_file = mocker.patch(
+                "gencove.command.download.main.download_file",
+                side_effect=download_file,
+            )
+            get_file_checksum_response = get_vcr_response(
+                "/api/v2/files/", vcr, operator.contains
+            )
+            mocked_get_file_checksum = mocker.patch.object(
+                APIClient,
+                "get_file_checksum",
+                return_value=get_file_checksum_response.decode(),
+            )
+        res = runner.invoke(
+            download,
+            [
+                "cli_test_data",
+                "--sample-ids",
+                sample_id_download,
+                *credentials,
+                "--file-types",
+                "fastq-r2",
+                "--download-template",
+                "{client_id}.{file_extension}",
+                "--checksums",
+            ],
+        )
+        assert res.exit_code == 0
+        if not recording:
+            mocked_sample_details.assert_called_once()
+            filename = f"mock-client-id.fastq.gz"
+            mocked_download_file.assert_called_once_with(
+                f"cli_test_data/{filename}",
+                HttpUrl(
+                    url=next(
+                        file["download_url"]
+                        for file in get_sample_details_response["files"]
+                        if file["file_type"] == "fastq-r2"
+                    ),
+                    scheme="https",
+                    host="example.com",
+                ),
+                True,
+                False,
+            )
+
+            mocked_get_file_checksum.assert_called_once_with(
+                UUID(MOCK_UUID), filename=filename
+            )
+            checksum_path = f"cli_test_data/{filename}.sha256"
+            assert os.path.exists(checksum_path)
+            with open(checksum_path, "r", encoding="utf-8") as checksum_file:
+                assert (
+                    checksum_file.read()
+                    == f"{MOCK_CHECKSUM} *{MOCK_UUID}_R2.fastq.gz\n"
+                )
+
+
+@pytest.mark.vcr
+@assert_authorization
 def test_create_checksum_file_exception(
     credentials, mocker, recording, sample_id_download, vcr
 ):

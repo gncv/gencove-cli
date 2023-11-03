@@ -9,7 +9,7 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.3.7
+      - 2.8.0
       content-type:
       - application/json
     method: POST
@@ -23,11 +23,13 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '537'
+      - '582'
       Content-Type:
       - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
       Date:
-      - Mon, 03 Oct 2022 19:10:56 GMT
+      - Fri, 03 Nov 2023 19:17:45 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -51,7 +53,7 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.3.7
+      - 2.8.0
       content-type:
       - application/json
     method: GET
@@ -59,24 +61,27 @@ interactions:
   response:
     body:
       string: '{"meta": {"count": 1, "next": null, "previous": null}, "results": [{"id":
-        "11111111-1111-1111-1111-111111111111", "created": "2021-10-12T19:47:15.332776Z",
-        "modified": "2021-10-12T19:55:46.498353Z", "client_id": "mock_client_id",
-        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
-        "status": "failed qc", "note": "", "created": "2021-10-12T19:55:46.498353Z"},
-        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
-        "available", "created": "2021-10-12 19:47:15.394485+00:00", "transition_cutoff":
-        null}, "failed_qc": ["format"]}]}'
+        "11111111-1111-1111-1111-111111111111", "run": "11111111-1111-1111-1111-111111111111",
+        "created": "2021-10-12T19:47:15.332776Z", "modified": "2021-10-12T19:55:46.498353Z",
+        "client_id": "mock-client-id", "physical_id": "", "legacy_id": "", "last_status":
+        {"id": "11111111-1111-1111-1111-111111111111", "status": "failed qc", "note":
+        "", "created": "2021-10-12T19:55:46.498353Z"}, "archive_last_status": {"id":
+        "11111111-1111-1111-1111-111111111111", "status": "available", "created":
+        "2021-10-12 19:47:15.394485+00:00", "transition_cutoff": null}, "failed_qc":
+        ["format"]}]}'
     headers:
       Allow:
       - GET, POST, HEAD, OPTIONS
       Connection:
       - keep-alive
       Content-Length:
-      - '551'
+      - '606'
       Content-Type:
       - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
       Date:
-      - Mon, 03 Oct 2022 19:10:56 GMT
+      - Fri, 03 Nov 2023 19:17:46 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -100,26 +105,29 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.3.7
+      - 2.8.0
       content-type:
       - application/json
     method: GET
     uri: https://www.example.com/api/v2/file-types/?project_id=11111111-1111-1111-1111-111111111111
   response:
     body:
-      string: '{"meta": {"count": 2, "next": null, "previous": null}, "results": [{"key":
-        "fastq-r1", "description": ""}, {"key": "fastq-r2", "description": ""}]}'
+      string: '{"meta": {"count": 4, "next": null, "previous": null}, "results": [{"key":
+        "fastq-r1", "description": ""}, {"key": "fastq-r2", "description": ""}, {"key":
+        "qc", "description": ""}, {"key": "metadata", "description": ""}]}'
     headers:
       Allow:
       - GET, HEAD, OPTIONS
       Connection:
       - keep-alive
       Content-Length:
-      - '132'
+      - '198'
       Content-Type:
       - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
       Date:
-      - Mon, 03 Oct 2022 19:10:56 GMT
+      - Fri, 03 Nov 2023 19:17:47 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -143,7 +151,7 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.3.7
+      - 2.8.0
       content-type:
       - application/json
     method: GET
@@ -151,16 +159,16 @@ interactions:
   response:
     body:
       string: '{"id": "11111111-1111-1111-1111-111111111111", "project": "11111111-1111-1111-1111-111111111111",
-        "created": "2021-10-12T19:47:15.332776Z", "modified": "2021-10-12T19:55:46.498353Z",
-        "client_id": "mock_client_id", "physical_id": "", "legacy_id": "", "last_status":
-        {"id": "11111111-1111-1111-1111-111111111111", "status": "failed qc", "note":
-        "", "created": "2021-10-12T19:55:46.498353Z"}, "archive_last_status": {"id":
-        "11111111-1111-1111-1111-111111111111", "status": "available", "created":
-        "2021-10-12 19:47:15.394485+00:00", "transition_cutoff": null}, "files": [{"id":
-        "11111111-1111-1111-1111-111111111111", "s3_path": "mock/r1.fastq.gz", "size":
-        null, "download_url": "https://example.com/r1.fastq.gz", "file_type": "fastq-r1",
-        "checksum_sha256": ""}, {"id": "11111111-1111-1111-1111-111111111111", "s3_path":
-        "mock/r2.fastq.gz", "size": null, "download_url": "https://example.com/r2.fastq.gz",
+        "run": "11111111-1111-1111-1111-111111111111", "created": "2021-10-12T19:47:15.332776Z",
+        "modified": "2021-10-12T19:55:46.498353Z", "client_id": "mock-client-id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "failed qc", "note": "", "created": "2021-10-12T19:55:46.498353Z"},
+        "archive_last_status": {"id": "11111111-1111-1111-1111-111111111111", "status":
+        "available", "created": "2021-10-12 19:47:15.394485+00:00", "transition_cutoff":
+        null}, "files": [{"id": "11111111-1111-1111-1111-111111111111", "s3_path":
+        "mock/r1.fastq.gz", "size": null, "download_url": "https://example.com/r1.fastq.gz?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_R1.fastq.gz",
+        "file_type": "fastq-r1", "checksum_sha256": ""}, {"id": "11111111-1111-1111-1111-111111111111",
+        "s3_path": "mock/r2.fastq.gz", "size": null, "download_url": "https://example.com/r2.fastq.gz?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_R2.fastq.gz",
         "file_type": "fastq-r2", "checksum_sha256": "111111111111111111111111111111111111111111111111111111111111111a"}]}'
     headers:
       Allow:
@@ -168,11 +176,13 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '2484'
+      - '2539'
       Content-Type:
       - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
       Date:
-      - Mon, 03 Oct 2022 19:10:57 GMT
+      - Fri, 03 Nov 2023 19:17:48 GMT
       Referrer-Policy:
       - same-origin
       Server:

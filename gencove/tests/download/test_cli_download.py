@@ -380,14 +380,21 @@ def test_create_checksum_file(credentials, mocker, recording, sample_id_download
             mocked_download_file.assert_called_once_with(
                 f"cli_test_data/mock-client-id/{MOCK_UUID}/{filename}",
                 HttpUrl(
-                    url="https://example.com/r2.fastq.gz",
+                    url=next(
+                        file["download_url"]
+                        for file in get_sample_details_response["files"]
+                        if file["file_type"] == "fastq-r2"
+                    ),
                     scheme="https",
                     host="example.com",
                 ),
                 True,
                 False,
             )
-            mocked_get_file_checksum.assert_called_once_with(UUID(MOCK_UUID))
+
+            mocked_get_file_checksum.assert_called_once_with(
+                UUID(MOCK_UUID), filename=filename
+            )
             checksum_path = (
                 f"cli_test_data/mock-client-id/{MOCK_UUID}/{filename}.sha256"
             )
@@ -521,7 +528,11 @@ def test_create_checksum_file_exception(
             mocked_download_file.assert_called_once_with(
                 f"cli_test_data/mock-client-id/{MOCK_UUID}/{filename}",
                 HttpUrl(
-                    url="https://example.com/r1.fastq.gz",
+                    url=next(
+                        file["download_url"]
+                        for file in get_sample_details_response["files"]
+                        if file["file_type"] == "fastq-r1"
+                    ),
                     scheme="https",
                     host="example.com",
                 ),
@@ -636,8 +647,8 @@ def test_download_stdout_with_flag(
         sys.stdout = output_line
         for _ in get_project_samples_response["results"]:
             archive_last_status_created = sample.archive_last_status.created.isoformat()
-            download_url_1 = "https://example.com/r1.fastq.gz"
-            download_url_2 = "https://example.com/r2.fastq.gz"
+            download_url_1 = "https://example.com/r1.fastq.gz?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_R1.fastq.gz"  # noqa: E501 pylint: disable=line-too-long
+            download_url_2 = "https://example.com/r2.fastq.gz?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_R2.fastq.gz"  # noqa: E501 pylint: disable=line-too-long
             mocked_result = json.dumps(
                 [
                     {
@@ -719,8 +730,8 @@ def test_download_urls_to_file(
                 archive_last_status_created = (
                     sample.archive_last_status.created.isoformat()
                 )
-                download_url_1 = "https://example.com/r1.fastq.gz"
-                download_url_2 = "https://example.com/r2.fastq.gz"
+                download_url_1 = "https://example.com/r1.fastq.gz?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_R1.fastq.gz"  # noqa: E501 pylint: disable=line-too-long
+                download_url_2 = "https://example.com/r2.fastq.gz?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_R2.fastq.gz"  # noqa: E501 pylint: disable=line-too-long
                 output_file.append(
                     {
                         "gencove_id": MOCK_UUID,
@@ -809,7 +820,11 @@ def test_download_no_progress(credentials, mocker, recording, sample_id_download
                     call(
                         f"cli_test_data/mock_client_id/{MOCK_UUID}/r1.fastq.gz",  # noqa: E501 pylint: disable=line-too-long
                         HttpUrl(
-                            url="https://example.com/r1.fastq.gz",
+                            url=next(
+                                file["download_url"]
+                                for file in get_sample_details_response["files"]
+                                if file["file_type"] == "fastq-r1"
+                            ),
                             scheme="https",
                             host="example.com",
                         ),
@@ -819,7 +834,11 @@ def test_download_no_progress(credentials, mocker, recording, sample_id_download
                     call(
                         f"cli_test_data/mock_client_id/{MOCK_UUID}/r2.fastq.gz",  # noqa: E501 pylint: disable=line-too-long
                         HttpUrl(
-                            url="https://example.com/r2.fastq.gz",
+                            url=next(
+                                file["download_url"]
+                                for file in get_sample_details_response["files"]
+                                if file["file_type"] == "fastq-r2"
+                            ),
                             scheme="https",
                             host="example.com",
                         ),

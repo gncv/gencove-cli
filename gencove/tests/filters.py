@@ -1,7 +1,7 @@
 """General filters for VCR cassettes."""
 import copy
 import re
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from gencove.tests.decorators import parse_response_to_json
 from gencove.tests.utils import MOCK_CHECKSUM, MOCK_UUID
@@ -26,16 +26,35 @@ def replace_gencove_url_vcr(request):
     return request
 
 
+def uuid_regex():
+    """Returns a Pattern object to replace any UUID."""
+    return re.compile(
+        r"[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}",
+        re.IGNORECASE,
+    )
+
+
 def _replace_uuid_from_url(request, endpoint):
     """Removes the id from the last part of the URL."""
     request = copy.deepcopy(request)
     if endpoint in request.path:
-        uuid = re.compile(
-            r"[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}",  # noqa: E501 pylint: disable=line-too-long
-            re.IGNORECASE,
-        )
-        request.uri = uuid.sub(MOCK_UUID, request.uri)
+        request.uri = uuid_regex().sub(MOCK_UUID, request.uri)
     return request
+
+
+def _clean_query_params_from_filename(uri):
+    """Returns filename of URL with response-content-disposition query param."""
+    filename = urlparse(uri).path.split("/")[-1]
+    query_params = parse_qs(urlparse(uri).query)
+    try:
+        content_disposition = uuid_regex().sub(
+            MOCK_UUID, query_params["response-content-disposition"][0]
+        )
+        query = urlencode({"response-content-disposition": content_disposition})
+        filename += f"?{query}"
+    except KeyError:
+        pass
+    return filename
 
 
 def filter_aws_headers(response):
@@ -52,7 +71,7 @@ def replace_s3_from_url(request):
     """Mock the S3 URLS."""
     request = copy.deepcopy(request)
     if "s3.amazonaws.com" in request.uri:
-        filename = urlparse(request.uri).path.split("/")[-1]
+        filename = _clean_query_params_from_filename(request.uri)
         request.uri = f"https://s3.amazonaws.com/{filename}"
     return request
 
@@ -90,7 +109,7 @@ def _filter_sample(result):
     if "id" in result:
         result["id"] = MOCK_UUID
     if "client_id" in result:
-        result["client_id"] = "mock_client_id"
+        result["client_id"] = "mock-client-id"
     if "project" in result:
         result["project"] = MOCK_UUID
     if "run" in result:
@@ -111,7 +130,7 @@ def _filter_sample(result):
         if "size" in file and file["size"]:
             file["size"] = "1"
         if "download_url" in file and file["download_url"]:
-            filename = urlparse(file["download_url"]).path.split("/")[-1]
+            filename = _clean_query_params_from_filename(file["download_url"])
             file["download_url"] = f"https://example.com/{filename}"
         if "checksum_sha256" in file and file["checksum_sha256"]:
             file["checksum_sha256"] = MOCK_CHECKSUM

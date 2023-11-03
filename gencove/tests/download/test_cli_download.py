@@ -241,7 +241,7 @@ def test_sample_ids_provided(credentials, mocker, recording, sample_id_download,
             mocked_get_metadata.assert_called_once()
             calls = [
                 call(
-                    f"cli_test_data/mock_client_id/{MOCK_UUID}/r1.fastq.gz",
+                    f"cli_test_data/mock-client-id/{MOCK_UUID}/r1.fastq.gz",
                     HttpUrl(
                         url="https://example.com/r1.fastq.gz",
                         scheme="https",
@@ -251,7 +251,7 @@ def test_sample_ids_provided(credentials, mocker, recording, sample_id_download,
                     False,
                 ),
                 call(
-                    f"cli_test_data/mock_client_id/{MOCK_UUID}/r2.fastq.gz",
+                    f"cli_test_data/mock-client-id/{MOCK_UUID}/r2.fastq.gz",
                     HttpUrl(
                         url="https://example.com/r2.fastq.gz",
                         scheme="https",
@@ -376,8 +376,9 @@ def test_create_checksum_file(credentials, mocker, recording, sample_id_download
         assert res.exit_code == 0
         if not recording:
             mocked_sample_details.assert_called_once()
+            filename = f"{MOCK_UUID}_R2.fastq.gz"
             mocked_download_file.assert_called_once_with(
-                f"cli_test_data/mock_client_id/{MOCK_UUID}/r2.fastq.gz",
+                f"cli_test_data/mock-client-id/{MOCK_UUID}/{filename}",
                 HttpUrl(
                     url="https://example.com/r2.fastq.gz",
                     scheme="https",
@@ -388,7 +389,7 @@ def test_create_checksum_file(credentials, mocker, recording, sample_id_download
             )
             mocked_get_file_checksum.assert_called_once_with(UUID(MOCK_UUID))
             checksum_path = (
-                f"cli_test_data/mock_client_id/{MOCK_UUID}/r2.fastq.gz.sha256"
+                f"cli_test_data/mock-client-id/{MOCK_UUID}/{filename}.sha256"
             )
             assert os.path.exists(checksum_path)
             with open(checksum_path, "r", encoding="utf-8") as checksum_file:
@@ -441,8 +442,9 @@ def test_create_checksum_file_exception(
         )
         if not recording:
             mocked_sample_details.assert_called_once()
+            filename = f"{MOCK_UUID}_R1.fastq.gz"
             mocked_download_file.assert_called_once_with(
-                f"cli_test_data/mock_client_id/{MOCK_UUID}/r1.fastq.gz",
+                f"cli_test_data/mock-client-id/{MOCK_UUID}/{filename}",
                 HttpUrl(
                     url="https://example.com/r1.fastq.gz",
                     scheme="https",
@@ -451,7 +453,7 @@ def test_create_checksum_file_exception(
                 True,
                 False,
             )
-            file_path = f"cli_test_data/mock_client_id/{MOCK_UUID}/r1.fastq.gz"
+            file_path = f"cli_test_data/mock-client-id/{MOCK_UUID}/{filename}"
             checksum_path = f"{file_path}.sha256"
             assert not os.path.exists(checksum_path)
 
@@ -565,7 +567,7 @@ def test_download_stdout_with_flag(
                 [
                     {
                         "gencove_id": MOCK_UUID,
-                        "client_id": "mock_client_id",
+                        "client_id": "mock-client-id",
                         "last_status": {
                             "id": MOCK_UUID,
                             "status": sample.last_status.status,
@@ -647,7 +649,7 @@ def test_download_urls_to_file(
                 output_file.append(
                     {
                         "gencove_id": MOCK_UUID,
-                        "client_id": "mock_client_id",
+                        "client_id": "mock-client-id",
                         "last_status": {
                             "id": MOCK_UUID,
                             "status": sample.last_status.status,

@@ -90,7 +90,7 @@ def _filter_sample(result):
     if "id" in result:
         result["id"] = MOCK_UUID
     if "client_id" in result:
-        result["client_id"] = "mock_client_id"
+        result["client_id"] = "mock-client-id"
     if "project" in result:
         result["project"] = MOCK_UUID
     if "run" in result:

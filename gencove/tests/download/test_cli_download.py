@@ -818,7 +818,7 @@ def test_download_no_progress(credentials, mocker, recording, sample_id_download
             mocked_download_file.assert_has_calls(
                 [
                     call(
-                        f"cli_test_data/mock_client_id/{MOCK_UUID}/r1.fastq.gz",  # noqa: E501 pylint: disable=line-too-long
+                        f"cli_test_data/mock-client-id/{MOCK_UUID}/{MOCK_UUID}_R1.fastq.gz",  # noqa: E501 pylint: disable=line-too-long
                         HttpUrl(
                             url=next(
                                 file["download_url"]
@@ -832,7 +832,7 @@ def test_download_no_progress(credentials, mocker, recording, sample_id_download
                         True,
                     ),
                     call(
-                        f"cli_test_data/mock_client_id/{MOCK_UUID}/r2.fastq.gz",  # noqa: E501 pylint: disable=line-too-long
+                        f"cli_test_data/mock-client-id/{MOCK_UUID}/{MOCK_UUID}_R2.fastq.gz",  # noqa: E501 pylint: disable=line-too-long
                         HttpUrl(
                             url=next(
                                 file["download_url"]

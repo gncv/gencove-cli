@@ -1,7 +1,7 @@
 """General filters for VCR cassettes."""
 import copy
 import re
-from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from gencove.tests.decorators import parse_response_to_json
 from gencove.tests.utils import MOCK_CHECKSUM, MOCK_UUID

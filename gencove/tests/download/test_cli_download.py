@@ -453,7 +453,7 @@ def test_create_checksum_file_template(
         assert res.exit_code == 0
         if not recording:
             mocked_sample_details.assert_called_once()
-            filename = f"mock-client-id.fastq.gz"
+            filename = "mock-client-id.fastq.gz"
             mocked_download_file.assert_called_once_with(
                 f"cli_test_data/{filename}",
                 HttpUrl(

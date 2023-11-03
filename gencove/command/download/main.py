@@ -1,6 +1,7 @@
 """Download command executor."""
 import json
 import re
+from pathlib import Path
 
 import backoff
 
@@ -276,9 +277,8 @@ class Download(Command):
                 )
                 if self.checksums:
                     try:
-                        filename = file_path.split("/")[-1]
                         checksum = self.api_client.get_file_checksum(
-                            sample_file.id, filename=filename
+                            sample_file.id, filename=Path(file_path).name
                         )
                         self.create_checksum_file(file_path, checksum)
                     except client.APIClientTooManyRequestsError:

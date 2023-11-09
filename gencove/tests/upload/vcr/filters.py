@@ -102,7 +102,7 @@ def filter_volatile_dates(response, json_response):
 def _filter_sample_sheet(result):
     """Common function that filters sample sheet sensitive data."""
     if "client_id" in result:
-        result["client_id"] = "mock_client_id"
+        result["client_id"] = "mock-client-id"
     if "fastq" in result and "r1" in result["fastq"]:
         r1 = result["fastq"]["r1"]  # pylint: disable=invalid-name
         if "upload" in r1:

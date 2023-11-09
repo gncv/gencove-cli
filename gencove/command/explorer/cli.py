@@ -1,10 +1,12 @@
 """Commands to be executed from command line."""
 import shutil
 import sys
+
 import click
 
 # This package enables Click to default to a command if it is not specified.
 from click_default_group import DefaultGroup
+
 import sh
 
 

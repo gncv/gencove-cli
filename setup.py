@@ -48,6 +48,7 @@ setup(
         "backoff<=2.2.1",
         "pydantic==1.9.2",
         "click-default-group>=1.2.4",
+        "sh>=2.0.6",
     ],
     setup_requires=["pytest-runner"],
     tests_require=["pytest", "pytest-mock"],

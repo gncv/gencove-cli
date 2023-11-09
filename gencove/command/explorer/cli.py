@@ -1,12 +1,11 @@
 """Commands to be executed from command line."""
-# pylint: disable=E0012,C0330,R0913
+import shutil
+import sys
 import click
 
 # This package enables Click to default to a command if it is not specified.
 from click_default_group import DefaultGroup
 import sh
-import shutil
-import sys
 
 
 @click.group(
@@ -16,7 +15,6 @@ import sys
 )
 def explorer():
     """Gencove Explorer commands."""
-    pass
 
 
 # # API-related Gencove CLI commands would be added like standard Click commands
@@ -36,6 +34,7 @@ def explorer():
 )
 @click.pass_context
 def default(ctx):
+    """Default command to execute"""
     if shutil.which("explorer") is None:
         click.echo(
             "It doesn't seem like this command has been run from the Explorer "
@@ -51,5 +50,5 @@ def default(ctx):
             _out=sys.stdout,
             _err=sys.stderr,
         )
-    except sh.ErrorReturnCode as e:
-        sys.exit(e.exit_code)
+    except sh.ErrorReturnCode as exception:
+        sys.exit(exception.exit_code)

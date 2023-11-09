@@ -46,11 +46,11 @@ def default(ctx):
         sys.exit(1)
 
     try:
-        sh.explorer(
+        sh.explorer(  # pylint: disable=E1101
             *ctx.args,
             _in=sys.stdin,
             _out=sys.stdout,
             _err=sys.stderr,
         )
     except sh.ErrorReturnCode as exception:
-        sys.exit(exception.exit_code)
+        sys.exit(exception.exit_code)  # pylint: disable=E1101

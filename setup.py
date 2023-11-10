@@ -47,6 +47,8 @@ setup(
         "progressbar2==3.55.0",
         "backoff<=2.2.1",
         "pydantic==1.9.2",
+        "click-default-group>=1.2.4",
+        "sh>=1.14.3",
     ],
     setup_requires=["pytest-runner"],
     tests_require=["pytest", "pytest-mock"],

@@ -1,7 +1,7 @@
 """Configure inactivity stop for explorer instances subcommand."""
 
-from ....base import Command
 from .utils import get_line
+from ....base import Command
 
 
 class ListInstances(Command):

@@ -16,7 +16,7 @@ def stop(  # pylint: disable=too-many-arguments
     password,
     api_key,
 ):  # pylint: disable=line-too-long
-    """Stop explorer instances."""  # noqa: E501
+    """Stop instances."""  # noqa: E501
     StopInstances(
         Credentials(email=email, password=password, api_key=api_key),
         Optionals(host=host),

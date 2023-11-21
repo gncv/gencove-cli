@@ -43,7 +43,8 @@ def inactivity_stop(  # pylint: disable=too-many-arguments
     password,
     api_key,
 ):  # pylint: disable=line-too-long
-    """An instance can be configured to be stopped after some time of inactivity.
+    """Stop instances after hours of inactivity.
+    An instance can be configured to be stopped after some time of inactivity.
     Aditionally, this configuration can also be set at an Organization-level.
     By default the instance configuration has precedence over the org-level config,
     but this can be changed with the --override flag.

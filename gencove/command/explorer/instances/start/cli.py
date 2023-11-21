@@ -16,7 +16,7 @@ def start(  # pylint: disable=too-many-arguments
     password,
     api_key,
 ):  # pylint: disable=line-too-long
-    """Start explorer instances."""  # noqa: E501
+    """Start instances."""  # noqa: E501
     StartInstances(
         Credentials(email=email, password=password, api_key=api_key),
         Optionals(host=host),

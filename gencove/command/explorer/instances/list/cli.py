@@ -10,7 +10,7 @@ from .main import ListInstances
 
 @click.command("list")
 @add_options(common_options)
-def list(  # pylint: disable=too-many-arguments
+def list_instances(  # pylint: disable=too-many-arguments
     host,
     email,
     password,

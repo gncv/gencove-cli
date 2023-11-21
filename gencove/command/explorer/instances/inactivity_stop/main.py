@@ -9,7 +9,14 @@ from ....base import Command
 class StopInstanceInactivity(Command):
     """Configure inactivity stop for explorer instances command executor."""
 
-    def __init__(self, hours, organization, override, credentials, options):
+    def __init__(  # pylint: disabled=too-many-arguments
+        self,
+        hours,
+        organization,
+        override,
+        credentials,
+        options,
+    ):
         super().__init__(credentials, options)
         self.hours = hours
         self.organization = organization
@@ -77,6 +84,7 @@ class StopInstanceInactivity(Command):
         self.show_inactivity_config(instances_config, org_config)
 
     def hours_to_human_readable(self, hours: Union[int, None]) -> str:
+        """Turn hours into human readable format."""
         if hours == 0:
             return "0 (disabled)"
         if hours is None:
@@ -84,6 +92,7 @@ class StopInstanceInactivity(Command):
         return str(hours)
 
     def show_inactivity_config(self, instances_config, org_config):
+        """Display inactivity config"""
         self.echo_debug("Displaying inactivity config")
         self.echo_data("Inactivity stop configuration")
         self.echo_data(

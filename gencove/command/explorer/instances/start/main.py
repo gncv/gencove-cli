@@ -1,7 +1,5 @@
 """Configure inactivity stop for explorer instances subcommand."""
 
-from typing import Union
-
 from ....base import Command
 
 

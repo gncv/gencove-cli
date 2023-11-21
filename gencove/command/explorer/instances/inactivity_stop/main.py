@@ -2,8 +2,8 @@
 
 from typing import Union
 
-from ....exceptions import ValidationError
-from ...base import Command
+from .....exceptions import ValidationError
+from ....base import Command
 
 
 class StopInstanceInactivity(Command):

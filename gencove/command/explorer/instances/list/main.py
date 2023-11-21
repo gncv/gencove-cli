@@ -7,12 +7,6 @@ from .utils import get_line
 class ListInstances(Command):
     """Configure inactivity stop for explorer instances command executor."""
 
-    def __init__(self, hours, organization, override, credentials, options):
-        super().__init__(credentials, options)
-        self.hours = hours
-        self.organization = organization
-        self.override = override
-
     def initialize(self):
         """Initialize inactivity-stop subcommand."""
         self.login()

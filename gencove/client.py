@@ -34,8 +34,6 @@ from gencove.models import (
     BaseSpaceProjectImport,
     BatchDetail,
     CreateJWT,
-    ExplorerInstanceIds,
-    ExplorerInstanceInactivityStop,
     ExplorerInstanceInactivityStopOrganization,
     ExplorerInstances,
     FileTypesModel,
@@ -1120,7 +1118,8 @@ class APIClient:
         return self._get(endpoint, authorized=True, model=ExplorerInstances)
 
     def set_explorer_instances_activity_stop(self, instance_ids, hours):
-        """Making a post request to configure explorer instances inactivity to stop after hours."""
+        """Making a post request to configure explorer instances inactivity
+        to stop after hours."""
         endpoint = self.endpoints.EXPLORER_INSTANCES_INACTIVITY_STOP.value
 
         payload = {
@@ -1131,7 +1130,8 @@ class APIClient:
         return self._post(endpoint, payload, authorized=True)
 
     def set_explorer_instances_activity_stop_organization(self, override, hours):
-        """Making a post request to configure organization explorer instances inactivity to stop after hours."""
+        """Making a post request to configure organization explorer instances
+        inactivity to stop after hours."""
         endpoint = self.endpoints.EXPLORER_INSTANCES_INACTIVITY_STOP_ORGANIZATION.value
 
         payload = {
@@ -1142,7 +1142,8 @@ class APIClient:
         return self._post(endpoint, payload, authorized=True)
 
     def get_explorer_instances_activity_stop_organization(self):
-        """Making a get request to retrieve organization explorer instances inactivity to stop after hours configuration."""
+        """Making a get request to retrieve organization explorer instances
+        inactivity to stop after hours configuration."""
         endpoint = self.endpoints.EXPLORER_INSTANCES_INACTIVITY_STOP_ORGANIZATION.value
 
         return self._get(
@@ -1150,6 +1151,7 @@ class APIClient:
         )
 
     def stop_explorer_instances(self, instance_ids):
+        """Making a post request to stop explorer instances."""
         endpoint = self.endpoints.EXPLORER_INSTANCES_STOP.value
 
         payload = {
@@ -1159,6 +1161,7 @@ class APIClient:
         return self._post(endpoint, payload, authorized=True)
 
     def start_explorer_instances(self, instance_ids):
+        """Making a post request to start explorer instances."""
         endpoint = self.endpoints.EXPLORER_INSTANCES_START.value
 
         payload = {

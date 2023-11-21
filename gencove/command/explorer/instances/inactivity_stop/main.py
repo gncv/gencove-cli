@@ -20,6 +20,7 @@ class StopInstanceInactivity(Command):
         self.hours = hours
         self.organization = organization
         self.override = override
+        self.hours_is_empty = False
 
     def initialize(self):
         """Initialize inactivity-stop subcommand."""

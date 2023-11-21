@@ -1,15 +1,14 @@
 """Configure inactivity stop for explorer instances subcommand."""
 
-from typing import Union
-
 from .....exceptions import ValidationError
 from ....base import Command
+from .utils import hours_to_human_readable
 
 
 class StopInstanceInactivity(Command):
     """Configure inactivity stop for explorer instances command executor."""
 
-    def __init__(  # pylint: disabled=too-many-arguments
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         hours,
         organization,
@@ -83,22 +82,14 @@ class StopInstanceInactivity(Command):
 
         self.show_inactivity_config(instances_config, org_config)
 
-    def hours_to_human_readable(self, hours: Union[int, None]) -> str:
-        """Turn hours into human readable format."""
-        if hours == 0:
-            return "0 (disabled)"
-        if hours is None:
-            return "None (default to organization config)"
-        return str(hours)
-
     def show_inactivity_config(self, instances_config, org_config):
         """Display inactivity config"""
         self.echo_debug("Displaying inactivity config")
         self.echo_data("Inactivity stop configuration")
         self.echo_data(
-            f"Organization:\t\t\t\t\thours={self.hours_to_human_readable(org_config['explorer_stop_after_inactivity_hours'])}, override={org_config['explorer_override_stop_after_inactivity_hours']}"
+            f"Organization:\t\t\t\t\thours={hours_to_human_readable(org_config['explorer_stop_after_inactivity_hours'])}, override={org_config['explorer_override_stop_after_inactivity_hours']}"
         )
         for instance in instances_config:
             self.echo_data(
-                f"Instance {instance['id'].replace('-', '')}:\thours={self.hours_to_human_readable(instance['stop_after_inactivity_hours'])}"
+                f"Instance {instance['id'].replace('-', '')}:\thours={hours_to_human_readable(instance['stop_after_inactivity_hours'])}"
             )

@@ -3,10 +3,11 @@ import shutil
 import sys
 
 import click
-import sh
 
 # This package enables Click to default to a command if it is not specified.
 from click_default_group import DefaultGroup
+
+import sh
 
 from .instances.cli import instances
 

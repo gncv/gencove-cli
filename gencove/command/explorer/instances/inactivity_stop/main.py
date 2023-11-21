@@ -1,8 +1,8 @@
 """Configure inactivity stop for explorer instances subcommand."""
 
-from .....exceptions import ValidationError
-from ....base import Command
 from .utils import hours_to_human_readable
+from ....base import Command
+from .....exceptions import ValidationError
 
 
 class StopInstanceInactivity(Command):

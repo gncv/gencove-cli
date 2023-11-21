@@ -27,13 +27,14 @@ from gencove.constants import (
 )
 from gencove.exceptions import MaintenanceError
 from gencove.logger import echo_debug
+from gencove.models import BaseSpaceBiosample  # noqa: I101
 from gencove.models import (
     AccessJWT,
-    BaseSpaceBiosample,  # noqa: I101
     BaseSpaceProject,
     BaseSpaceProjectImport,
     BatchDetail,
     CreateJWT,
+    ExplorerInstanceIds,
     ExplorerInstanceInactivityStop,
     ExplorerInstanceInactivityStopOrganization,
     ExplorerInstances,
@@ -1112,7 +1113,7 @@ class APIClient:
 
         return self._post(project_endpoint, payload, authorized=True, model=Project)
 
-    def get_explorer_instances(self):
+    def get_explorer_instances(self) -> ExplorerInstances:
         """Making a get request to retrieve explorer instances"""
         endpoint = self.endpoints.EXPLORER_INSTANCES.value
 
@@ -1127,9 +1128,7 @@ class APIClient:
             "stop_after_inactivity_hours": hours,
         }
 
-        return self._post(
-            endpoint, payload, authorized=True, model=ExplorerInstanceInactivityStop
-        )
+        return self._post(endpoint, payload, authorized=True)
 
     def set_explorer_instances_activity_stop_organization(self, override, hours):
         """Making a post request to configure organization explorer instances inactivity to stop after hours."""
@@ -1140,12 +1139,7 @@ class APIClient:
             "explorer_stop_after_inactivity_hours": hours,
         }
 
-        return self._post(
-            endpoint,
-            payload,
-            authorized=True,
-            model=ExplorerInstanceInactivityStopOrganization,
-        )
+        return self._post(endpoint, payload, authorized=True)
 
     def get_explorer_instances_activity_stop_organization(self):
         """Making a get request to retrieve organization explorer instances inactivity to stop after hours configuration."""
@@ -1154,3 +1148,21 @@ class APIClient:
         return self._get(
             endpoint, authorized=True, model=ExplorerInstanceInactivityStopOrganization
         )
+
+    def stop_explorer_instances(self, instance_ids):
+        endpoint = self.endpoints.EXPLORER_INSTANCES_STOP.value
+
+        payload = {
+            "instance_ids": instance_ids,
+        }
+
+        return self._post(endpoint, payload, authorized=True)
+
+    def start_explorer_instances(self, instance_ids):
+        endpoint = self.endpoints.EXPLORER_INSTANCES_START.value
+
+        payload = {
+            "instance_ids": instance_ids,
+        }
+
+        return self._post(endpoint, payload, authorized=True)

@@ -33,6 +33,12 @@ class ExplorerInstance(BaseModel):
     stop_after_inactivity_hours: int
 
 
+class ExplorerInstanceIds(BaseModel):
+    """ExplorerInstanceIds model"""
+
+    instance_ids: List[UUID]
+
+
 class ExplorerInstances(BaseModel):
     """ExplorerInstances model"""
 

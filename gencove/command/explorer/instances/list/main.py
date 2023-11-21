@@ -5,7 +5,10 @@ from .utils import get_line
 
 
 class ListInstances(Command):
-    """Configure inactivity stop for explorer instances command executor."""
+    """List explorer instances command executor."""
+
+    def validate(self):
+        """Validate list instances"""
 
     def initialize(self):
         """Initialize inactivity-stop subcommand."""

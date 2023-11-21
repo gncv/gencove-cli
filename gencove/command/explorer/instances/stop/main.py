@@ -5,7 +5,10 @@ from ....base import Command
 
 
 class StopInstances(Command):
-    """Start explorer instances command executor."""
+    """Stop explorer instances command executor."""
+
+    def validate(self):
+        """Validate stop instances"""
 
     def initialize(self):
         """Initialize inactivity-stop subcommand."""

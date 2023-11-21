@@ -8,6 +8,9 @@ from ....base import Command
 class StartInstances(Command):
     """Start explorer instances command executor."""
 
+    def validate(self):
+        """Validate start instances"""
+
     def initialize(self):
         """Initialize inactivity-stop subcommand."""
         self.login()

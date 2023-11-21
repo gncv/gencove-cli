@@ -5,19 +5,19 @@ import click
 from gencove.command.common_cli_options import add_options, common_options
 from gencove.constants import Credentials, Optionals
 
-from .main import StartInstances
+from .main import ListInstances
 
 
-@click.command("start")
+@click.command("list")
 @add_options(common_options)
-def start(  # pylint: disable=too-many-arguments
+def list(  # pylint: disable=too-many-arguments
     host,
     email,
     password,
     api_key,
 ):  # pylint: disable=line-too-long
-    """Start explorer instances."""  # noqa: E501
-    StartInstances(
+    """List instances."""  # noqa: E501
+    ListInstances(
         Credentials(email=email, password=password, api_key=api_key),
         Optionals(host=host),
     ).run()

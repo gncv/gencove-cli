@@ -12,7 +12,7 @@ class StopInstances(Command):
         self.login()
 
     def execute(self):
-        """Make a request to configure instance stop inactivity."""
+        """Make a request to stop explorer instances."""
         self.echo_debug("Stop explorer instances.")
 
         explorer_instances = self.api_client.get_explorer_instances()

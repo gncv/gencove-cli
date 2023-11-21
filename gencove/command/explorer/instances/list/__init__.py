@@ -1,2 +1,2 @@
 """Shortcut for imports of only the exposed components."""
-from .cli import stop  # noqa: F401
+from .cli import list  # noqa: F401

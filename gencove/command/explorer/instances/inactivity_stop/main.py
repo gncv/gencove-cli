@@ -1,6 +1,6 @@
 """Configure inactivity stop for explorer instances subcommand."""
 
-from .utils import hours_to_human_readable
+from .utils import hours_to_human_readable, calculate_applied_hours_to_instance
 from ....base import Command
 from .....exceptions import ValidationError
 
@@ -83,16 +83,6 @@ class StopInstanceInactivity(Command):
 
         self.show_inactivity_config(instances_config, org_config)
 
-    def calculate_applied_hours_to_instance(self, instance_config, org_config):
-        if (
-            instance_config["stop_after_inactivity_hours"] is not None
-            and not org_config["explorer_override_stop_after_inactivity_hours"]
-        ):
-            hours, from_org = instance_config["stop_after_inactivity_hours"], False
-        else:
-            hours, from_org = org_config["explorer_stop_after_inactivity_hours"], True
-        return hours, from_org
-
     def show_inactivity_config(self, instances_config, org_config):
         """Display inactivity config"""
         self.echo_debug("Displaying inactivity config")
@@ -109,7 +99,7 @@ class StopInstanceInactivity(Command):
             instance_hours = hours_to_human_readable(
                 instance["stop_after_inactivity_hours"]
             )
-            applied_hours, from_org = self.calculate_applied_hours_to_instance(
+            applied_hours, from_org = calculate_applied_hours_to_instance(
                 instance, org_config
             )
             if from_org:

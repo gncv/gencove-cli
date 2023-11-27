@@ -1,6 +1,6 @@
 """Configure inactivity stop for explorer instances subcommand."""
 
-from .utils import hours_to_human_readable, calculate_applied_hours_to_instance
+from .utils import calculate_applied_hours_to_instance, hours_to_human_readable
 from ....base import Command
 from .....exceptions import ValidationError
 

@@ -51,12 +51,12 @@ class StopInstanceInactivity(Command):
         self.echo_debug("Configure explorer instances stop after inactivity.")
 
         instances_config, org_config = (
-            self.api_client.get_explorer_instances(),
-            self.api_client.get_explorer_instances_activity_stop_organization(),
+            self.api_client.get_explorer_instances().dict(),
+            self.api_client.get_explorer_instances_activity_stop_organization().dict(),
         )
 
-        request_data = {}
         if self.organization:
+            request_data = {}
             if self.override is not None:
                 request_data[
                     "explorer_override_stop_after_inactivity_hours"
@@ -65,7 +65,7 @@ class StopInstanceInactivity(Command):
                 request_data["explorer_stop_after_inactivity_hours"] = self.hours
             if request_data:
                 self.echo_debug("Setting configuration organization wide")
-                org_config |= request_data
+                org_config.update(request_data)
                 self.api_client.set_explorer_instances_activity_stop_organization(
                     org_config["explorer_override_stop_after_inactivity_hours"],
                     org_config["explorer_stop_after_inactivity_hours"],
@@ -74,23 +74,49 @@ class StopInstanceInactivity(Command):
             if not self.hours_is_empty:
                 self.echo_debug("Setting configuration for instances")
                 self.api_client.set_explorer_instances_activity_stop(
-                    [e["id"] for e in instances_config], self.hours
+                    [e["id"] for e in instances_config["results"]], self.hours
                 )
-                instances_config = [
+                instances_config["results"] = [
                     {"id": e["id"], "stop_after_inactivity_hours": self.hours}
-                    for e in instances_config
+                    for e in instances_config["results"]
                 ]
 
         self.show_inactivity_config(instances_config, org_config)
 
+    def calculate_applied_hours_to_instance(self, instance_config, org_config):
+        if (
+            instance_config["stop_after_inactivity_hours"] is not None
+            and not org_config["explorer_override_stop_after_inactivity_hours"]
+        ):
+            hours, from_org = instance_config["stop_after_inactivity_hours"], False
+        else:
+            hours, from_org = org_config["explorer_stop_after_inactivity_hours"], True
+        return hours, from_org
+
     def show_inactivity_config(self, instances_config, org_config):
         """Display inactivity config"""
         self.echo_debug("Displaying inactivity config")
-        self.echo_data("Inactivity stop configuration")
-        self.echo_data(
-            f"Organization:\t\t\t\t\thours={hours_to_human_readable(org_config['explorer_stop_after_inactivity_hours'])}, override={org_config['explorer_override_stop_after_inactivity_hours']}"
+        self.echo_info("Inactivity stop configuration")
+        org_hours = hours_to_human_readable(
+            org_config["explorer_stop_after_inactivity_hours"]
         )
-        for instance in instances_config:
-            self.echo_data(
-                f"Instance {instance['id'].replace('-', '')}:\thours={hours_to_human_readable(instance['stop_after_inactivity_hours'])}"
+        org_override = org_config["explorer_override_stop_after_inactivity_hours"]
+        self.echo_info(
+            f"Organization:\t\t\t\t\thours={org_hours}, override={org_override}"
+        )
+        for instance in instances_config["results"]:
+            instance_id = str(instance["id"]).replace("-", "")
+            instance_hours = hours_to_human_readable(
+                instance["stop_after_inactivity_hours"]
+            )
+            applied_hours, from_org = self.calculate_applied_hours_to_instance(
+                instance, org_config
+            )
+            if from_org:
+                original_config = f", instance_config[hours={instance_hours}]"
+            else:
+                original_config = ""
+            applied_hours = hours_to_human_readable(applied_hours, from_org=from_org)
+            self.echo_info(
+                f"Instance {instance_id}:\thours={applied_hours}{original_config}"
             )

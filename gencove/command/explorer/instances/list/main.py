@@ -18,5 +18,5 @@ class ListInstances(Command):
         """Make a request to list instances."""
         self.echo_debug("List instances.")
 
-        for instance in self.api_client.get_explorer_instances().instances:
+        for instance in self.api_client.get_explorer_instances().results:
             self.echo_data(get_line(instance))

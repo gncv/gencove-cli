@@ -3,10 +3,13 @@
 from typing import Union
 
 
-def hours_to_human_readable(hours: Union[int, None]) -> str:
+def hours_to_human_readable(hours: int, from_org: Union[int, None] = None) -> str:
     """Turn hours into human readable format."""
-    if hours == 0:
-        return "0 (disabled)"
-    if hours is None:
-        return "None (default to organization config)"
-    return str(hours)
+    description = "disabled" if hours == 0 else ""
+    if from_org:
+        if description:
+            description += " applied from organization"
+        else:
+            description = "applied from organization"
+    description = f" ({description})" if description else ""
+    return f"{hours}{description}"

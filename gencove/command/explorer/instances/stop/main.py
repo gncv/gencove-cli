@@ -19,7 +19,13 @@ class StopInstances(Command):
         self.echo_debug("Stop explorer instances.")
 
         explorer_instances = self.api_client.get_explorer_instances()
+        self.echo_debug(f"Found {len(explorer_instances.results)} explorer instances.")
 
         self.api_client.stop_explorer_instances(
-            instance_ids=[e.id for e in explorer_instances.instances]
+            instance_ids=[e.id for e in explorer_instances.results]
         )
+        self.echo_debug(
+            f"Requested to stop {len(explorer_instances.results)} explorer instances."
+        )
+
+        self.echo_info("Request to stop explorer instances accepted.")

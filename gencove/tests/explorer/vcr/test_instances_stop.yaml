@@ -1,5 +1,49 @@
 interactions:
 - request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.9.0
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '582'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Tue, 28 Nov 2023 20:09:09 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
     body: null
     headers:
       Accept:
@@ -17,7 +61,7 @@ interactions:
   response:
     body:
       string: '{"meta": {"count": 1, "next": null, "previous": null}, "results": [{"id":
-        "11111111-1111-1111-1111-111111111111", "status": "starting", "stop_after_inactivity_hours":
+        "11111111-1111-1111-1111-111111111111", "status": "running", "stop_after_inactivity_hours":
         null}]}'
     headers:
       Allow:
@@ -25,13 +69,13 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '161'
+      - '160'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Tue, 28 Nov 2023 19:18:46 GMT
+      - Tue, 28 Nov 2023 20:09:10 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -73,7 +117,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Tue, 28 Nov 2023 19:18:48 GMT
+      - Tue, 28 Nov 2023 20:09:11 GMT
       Referrer-Policy:
       - same-origin
       Server:

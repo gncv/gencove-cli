@@ -29,7 +29,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Tue, 28 Nov 2023 20:16:55 GMT
+      - Tue, 28 Nov 2023 20:10:49 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -75,7 +75,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Tue, 28 Nov 2023 20:16:55 GMT
+      - Tue, 28 Nov 2023 20:10:51 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -103,21 +103,24 @@ interactions:
       content-type:
       - application/json
     method: POST
-    uri: https://www.example.com/api/v2/explorer-start-instances/
+    uri: https://www.example.com/api/v2/explorer-stop-instances/
   response:
     body:
-      string: ''
+      string: '{"instance_ids": ["Instance c7c23d31-8260-44ae-8ef6-ab51464d4f49 is
+        already in stopped status."]}'
     headers:
       Allow:
       - POST, OPTIONS
       Connection:
       - keep-alive
       Content-Length:
-      - '0'
+      - '96'
+      Content-Type:
+      - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Tue, 28 Nov 2023 20:16:56 GMT
+      - Tue, 28 Nov 2023 20:10:52 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -129,6 +132,6 @@ interactions:
       X-Frame-Options:
       - DENY
     status:
-      code: 202
-      message: Accepted
+      code: 400
+      message: Bad Request
 version: 1

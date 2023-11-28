@@ -102,3 +102,24 @@ def test_instances_start(mocker, credentials, recording, vcr):
     assert res.exit_code == 0
     if not recording:
         mocked_instances_start.assert_called_once()
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_instances_start_not_stopped(mocker, credentials, recording, vcr):
+    """Test instances not being stopped."""
+    runner = CliRunner()
+    if not recording:
+        # Mock start only if using the cassettes, since we mock the
+        # return value.
+        get_vcr_response("/api/v2/explorer-start-instances/", vcr)
+        mocked_instances_start = mocker.patch.object(
+            APIClient,
+            "start_explorer_instances",
+            return_value=None,
+        )
+    res = runner.invoke(start, credentials)
+    assert b"not in stopped status" in res.output.encode()
+    assert res.exit_code == 1
+    if not recording:
+        mocked_instances_start.assert_called_once()

@@ -54,7 +54,7 @@ def vcr_config():
 @pytest.mark.vcr
 @assert_authorization
 def test_instances_stop_no_permission(mocker, credentials):
-    """Test projects no permission available to show them."""
+    """Test instances no permission available to stop them."""
     runner = CliRunner()
     mocked_get_instances = mocker.patch.object(
         APIClient,
@@ -86,7 +86,7 @@ def test_instances_stop_no_permission(mocker, credentials):
 @pytest.mark.vcr
 @assert_authorization
 def test_instances_stop(mocker, credentials, recording, vcr):
-    """Test instances being outputed to the shell."""
+    """Test instances being stopped."""
     runner = CliRunner()
     if not recording:
         # Mock stop only if using the cassettes, since we mock the
@@ -100,5 +100,26 @@ def test_instances_stop(mocker, credentials, recording, vcr):
     res = runner.invoke(stop, credentials)
     assert b"Request to stop explorer instances accepted." in res.output.encode()
     assert res.exit_code == 0
+    if not recording:
+        mocked_instances_stop.assert_called_once()
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_instances_stop_already_stopped(mocker, credentials, recording, vcr):
+    """Test instances already being stopped."""
+    runner = CliRunner()
+    if not recording:
+        # Mock stop only if using the cassettes, since we mock the
+        # return value.
+        get_vcr_response("/api/v2/explorer-stop-instances/", vcr)
+        mocked_instances_stop = mocker.patch.object(
+            APIClient,
+            "stop_explorer_instances",
+            return_value=None,
+        )
+    res = runner.invoke(stop, credentials)
+    assert b"already in stopped status" in res.output.encode()
+    assert res.exit_code == 1
     if not recording:
         mocked_instances_stop.assert_called_once()

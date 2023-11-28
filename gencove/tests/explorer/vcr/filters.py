@@ -1,9 +1,6 @@
 """VCR filters for explorer tests."""
-import json
-from urllib.parse import urlparse
 
 from gencove.tests.decorators import parse_response_to_json
-from gencove.tests.filters import _replace_uuid_from_url
 from gencove.tests.utils import MOCK_UUID
 
 

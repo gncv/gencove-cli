@@ -12,10 +12,6 @@ from gencove.client import (
     APIClientError,
 )  # noqa: I100
 from gencove.command.explorer.instances.cli import stop
-from gencove.models import (
-    ExplorerInstances,
-    ExplorerInstance,
-)
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.explorer.vcr.filters import filter_list_instances_response

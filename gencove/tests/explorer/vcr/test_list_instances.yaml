@@ -1,0 +1,48 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.9.0
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/explorer-instances/
+  response:
+    body:
+      string: '{"meta": {"count": 1, "next": null, "previous": null}, "results": [{"id":
+        "11111111-1111-1111-1111-111111111111", "status": "creating", "stop_after_inactivity_hours":
+        null}]}'
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '161'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Tue, 28 Nov 2023 18:20:02 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

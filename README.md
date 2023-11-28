@@ -73,7 +73,7 @@ Tests Configuration:
 If you need to interact with the API (for instance to record new VCR cassettes) you need to set up environment variables, this way, the tests will have the credentials to have access.
 In order to do that, just run `cp gencove/tests/.env.dist gencove/tests/.env` and change the desired values from the `.env` file.
 
-For more details, read internal `CLI testing` document.
+For more details, read internal [`CLI testing`](https://www.notion.so/gncv/CLI-testing-fb532d5d01824fd79b38ba698d09e7da) document.
 
 
 To create and run docs locally:

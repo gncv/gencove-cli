@@ -80,6 +80,17 @@ def credentials(using_api_key):  # pylint: disable=redefined-outer-name
 
 
 @pytest.fixture(scope="session")
+def credentials_member(using_api_key):  # pylint: disable=redefined-outer-name
+    """Fixture to have the appropriate credentials."""
+    api_key = os.getenv("GENCOVE_API_KEY_MEMBER_TEST")
+    email = os.getenv("GENCOVE_EMAIL_MEMBER_TEST")
+    password = os.getenv("GENCOVE_PASSWORD_MEMBER_TEST")
+    if using_api_key:
+        return ["--api-key", api_key]
+    return ["--email", email, "--password", password]
+
+
+@pytest.fixture(scope="session")
 def archived_sample():
     """Returns the archived sample id.."""
     return os.getenv("GENCOVE_ARCHIVED_SAMPLE_TEST")

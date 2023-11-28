@@ -30,48 +30,15 @@ def assert_authorization(func):
     """Decorator that ensures that the API key is being passed to our
     endpoints, and the login endpoint is called if email/password is provided.
     """
-    return _base_assert_authorization(
-        func,
-        host=os.getenv("GENCOVE_HOST"),
-        api_key=os.getenv("GENCOVE_API_KEY_TEST"),
-        email=os.getenv("GENCOVE_EMAIL_TEST"),
-        password=os.getenv("GENCOVE_PASSWORD_TEST"),
-        using_api_key=os.getenv("USING_API_KEY"),
-    )
-
-
-def assert_member_authorization(func):
-    """Decorator that ensures that the API key is being passed to our
-    endpoints, and the login endpoint is called if email/password is provided.
-    """
-    return _base_assert_authorization(
-        func,
-        host=os.getenv("GENCOVE_HOST"),
-        api_key=os.getenv("GENCOVE_API_KEY_MEMBER_TEST"),
-        email=os.getenv("GENCOVE_EMAIL_MEMBER_TEST"),
-        password=os.getenv("GENCOVE_PASSWORD_MEMBER_TEST"),
-        using_api_key=os.getenv("USING_API_KEY"),
-    )
-
-
-def _base_assert_authorization(func, host, api_key, email, password, using_api_key):
-    """Base decorator that ensures that the API key is being passed to our
-    endpoints, and the login endpoint is called if email/password is provided.
-
-    Args:
-        func (function): Function to be decorated.
-        host (str): Gencove HOST.
-        api_key (str): Gencove Api Key.
-        email (str): Email of Gencove user.
-        password (str): Password of Gencove user.
-        using_api_key (str): Empty if not using api key.
-
-    Returns:
-        function: Decorated function.
-    """
 
     @wraps(func)
     def wrapper(*args, mocker, **kwargs):
+        host = (os.getenv("GENCOVE_HOST"),)
+        api_key = (os.getenv("GENCOVE_API_KEY_TEST"),)
+        email = (os.getenv("GENCOVE_EMAIL_TEST"),)
+        password = (os.getenv("GENCOVE_PASSWORD_TEST"),)
+        using_api_key = (os.getenv("USING_API_KEY"),)
+
         def mock_get_auth(url, *args, headers, **kwargs):
             if host in url and using_api_key:
                 assert (

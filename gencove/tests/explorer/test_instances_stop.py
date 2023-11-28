@@ -112,11 +112,20 @@ def test_instances_stop_already_stopped(mocker, credentials, recording, vcr):
     if not recording:
         # Mock stop only if using the cassettes, since we mock the
         # return value.
-        get_vcr_response("/api/v2/explorer-stop-instances/", vcr)
+        response_json = get_vcr_response("/api/v2/explorer-stop-instances/", vcr)
+        error_msg = "\n".join(
+            [
+                f"  {key}: {value[0] if isinstance(value, list) else str(value)}"  # noqa: E501  # pylint: disable=line-too-long
+                for key, value in response_json.items()
+            ]
+        )
         mocked_instances_stop = mocker.patch.object(
             APIClient,
             "stop_explorer_instances",
-            return_value=None,
+            side_effect=APIClientError(
+                message=f"API Client Error: Bad Request:\n{error_msg}",
+                status_code=400,
+            ),
         )
     res = runner.invoke(stop, credentials)
     assert b"already in stopped status" in res.output.encode()

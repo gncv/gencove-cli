@@ -1,4 +1,4 @@
-"""Test instances list command."""
+"""Test instances start command."""
 # pylint: disable=wrong-import-order, import-error
 import io
 import sys
@@ -11,7 +11,7 @@ from gencove.client import (
     APIClient,
     APIClientError,
 )  # noqa: I100
-from gencove.command.explorer.instances.cli import list_instances
+from gencove.command.explorer.instances.cli import start
 from gencove.models import (
     ExplorerInstances,
     ExplorerInstance,
@@ -57,24 +57,7 @@ def vcr_config():
 @pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
-def test_list_empty(mocker, credentials):
-    """Test user organization has no projects."""
-    runner = CliRunner()
-    mocked_get_projects = mocker.patch.object(
-        APIClient,
-        "get_explorer_instances",
-        return_value=ExplorerInstances(results=[], meta=dict(next=None)),
-    )
-    res = runner.invoke(list_instances, credentials)
-    assert res.exit_code == 0
-    mocked_get_projects.assert_called_once()
-    assert "" in res.output
-
-
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
-def test_list_instances_no_permission(mocker, credentials):
+def test_instances_start_no_permission(mocker, credentials):
     """Test projects no permission available to show them."""
     runner = CliRunner()
     mocked_get_instances = mocker.patch.object(
@@ -85,7 +68,7 @@ def test_list_instances_no_permission(mocker, credentials):
         ),
         return_value={"detail": "Not found"},
     )
-    res = runner.invoke(list_instances, credentials)
+    res = runner.invoke(start, credentials)
     assert res.exit_code == 1
     mocked_get_instances.assert_called_once()
 
@@ -106,33 +89,20 @@ def test_list_instances_no_permission(mocker, credentials):
 
 @pytest.mark.vcr
 @assert_authorization
-def test_list_instances(mocker, credentials, recording, vcr):
+def test_instances_start(mocker, credentials, recording, vcr):
     """Test instances being outputed to the shell."""
     runner = CliRunner()
     if not recording:
-        # Mock list_instances only if using the cassettes, since we mock the
+        # Mock start only if using the cassettes, since we mock the
         # return value.
-        list_instances_response = get_vcr_response("/api/v2/explorer-instances/", vcr)
-        mocked_get_instances = mocker.patch.object(
+        get_vcr_response("/api/v2/explorer-instances-start/", vcr)
+        mocked_instances_start = mocker.patch.object(
             APIClient,
-            "get_explorer_instances",
-            return_value=ExplorerInstances(**list_instances_response),
+            "start_explorer_instances",
+            return_value=None,
         )
-    res = runner.invoke(list_instances, credentials)
+    res = runner.invoke(start, credentials)
+    assert b"Request to start explorer instances accepted." in res.output.encode()
     assert res.exit_code == 0
     if not recording:
-        mocked_get_instances.assert_called_once()
-        instances = list_instances_response["results"]
-        output_line = io.BytesIO()
-        sys.stdout = output_line
-        for instance in instances:
-            instance = ExplorerInstance(**instance)
-            echo(
-                "\t".join(
-                    [
-                        str(instance.id),
-                        str(instance.status),
-                    ]
-                )
-            )
-        assert output_line.getvalue() == res.output.encode()
+        mocked_instances_start.assert_called_once()

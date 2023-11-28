@@ -33,11 +33,11 @@ def assert_authorization(func):
 
     @wraps(func)
     def wrapper(*args, mocker, **kwargs):
-        host = (os.getenv("GENCOVE_HOST"),)
-        api_key = (os.getenv("GENCOVE_API_KEY_TEST"),)
-        email = (os.getenv("GENCOVE_EMAIL_TEST"),)
-        password = (os.getenv("GENCOVE_PASSWORD_TEST"),)
-        using_api_key = (os.getenv("USING_API_KEY"),)
+        host = os.getenv("GENCOVE_HOST")
+        api_key = os.getenv("GENCOVE_API_KEY_TEST")
+        email = os.getenv("GENCOVE_EMAIL_TEST")
+        password = os.getenv("GENCOVE_PASSWORD_TEST")
+        using_api_key = os.getenv("USING_API_KEY")
 
         def mock_get_auth(url, *args, headers, **kwargs):
             if host in url and using_api_key:

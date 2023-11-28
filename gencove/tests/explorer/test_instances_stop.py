@@ -1,4 +1,4 @@
-"""Test instances start command."""
+"""Test instances stop command."""
 # pylint: disable=wrong-import-order, import-error
 import io
 import sys
@@ -11,7 +11,7 @@ from gencove.client import (
     APIClient,
     APIClientError,
 )  # noqa: I100
-from gencove.command.explorer.instances.cli import start
+from gencove.command.explorer.instances.cli import stop
 from gencove.models import (
     ExplorerInstances,
     ExplorerInstance,
@@ -57,7 +57,7 @@ def vcr_config():
 @pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
-def test_instances_start_no_permission(mocker, credentials):
+def test_instances_stop_no_permission(mocker, credentials):
     """Test projects no permission available to show them."""
     runner = CliRunner()
     mocked_get_instances = mocker.patch.object(
@@ -68,7 +68,7 @@ def test_instances_start_no_permission(mocker, credentials):
         ),
         return_value={"detail": "Not found"},
     )
-    res = runner.invoke(start, credentials)
+    res = runner.invoke(stop, credentials)
     assert res.exit_code == 1
     mocked_get_instances.assert_called_once()
 
@@ -89,20 +89,20 @@ def test_instances_start_no_permission(mocker, credentials):
 
 @pytest.mark.vcr
 @assert_authorization
-def test_instances_start(mocker, credentials, recording, vcr):
+def test_instances_stop(mocker, credentials, recording, vcr):
     """Test instances being outputed to the shell."""
     runner = CliRunner()
     if not recording:
-        # Mock start only if using the cassettes, since we mock the
+        # Mock stop only if using the cassettes, since we mock the
         # return value.
-        get_vcr_response("/api/v2/explorer-start-instances/", vcr)
-        mocked_instances_start = mocker.patch.object(
+        get_vcr_response("/api/v2/explorer-stop-instances/", vcr)
+        mocked_instances_stop = mocker.patch.object(
             APIClient,
-            "start_explorer_instances",
+            "stop_explorer_instances",
             return_value=None,
         )
-    res = runner.invoke(start, credentials)
-    assert b"Request to start explorer instances accepted." in res.output.encode()
+    res = runner.invoke(stop, credentials)
+    assert b"Request to stop explorer instances accepted." in res.output.encode()
     assert res.exit_code == 0
     if not recording:
-        mocked_instances_start.assert_called_once()
+        mocked_instances_stop.assert_called_once()

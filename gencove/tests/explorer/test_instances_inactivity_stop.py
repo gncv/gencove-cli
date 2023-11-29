@@ -58,7 +58,7 @@ def vcr_config():
 @pytest.mark.vcr
 @assert_authorization
 def test_inactivity_stop_no_permission(mocker, credentials):
-    """Test instances no permission available to show them."""
+    """Test instances no permission available to configure stop inactivity."""
     runner = CliRunner()
     mocked_get_instances = mocker.patch.object(
         APIClient,
@@ -90,7 +90,7 @@ def test_inactivity_stop_no_permission(mocker, credentials):
 @pytest.mark.vcr
 @assert_authorization
 def test_inactivity_stop(mocker, credentials, recording, vcr):
-    """Test instances being outputed to the shell."""
+    """Test instances configured to stop after inactivity."""
     runner = CliRunner()
     if not recording:
         # Mock list_instances only if using the cassettes, since we mock the
@@ -119,7 +119,7 @@ def test_inactivity_stop(mocker, credentials, recording, vcr):
 @pytest.mark.vcr
 @assert_authorization
 def test_inactivity_stop_organization(mocker, credentials, recording, vcr):
-    """Test instances being outputed to the shell."""
+    """Test instances configured to stop after inactivity at organization level."""
     runner = CliRunner()
     if not recording:
         # Mock list_instances only if using the cassettes, since we mock the
@@ -144,7 +144,7 @@ def test_inactivity_stop_organization(mocker, credentials, recording, vcr):
 @pytest.mark.vcr
 @assert_authorization
 def test_inactivity_stop_organization_override(mocker, credentials, recording, vcr):
-    """Test instances being outputed to the shell."""
+    """Test instances configured to stop after inactivity at organization level with override."""
     runner = CliRunner()
     if not recording:
         # Mock list_instances only if using the cassettes, since we mock the
@@ -172,7 +172,7 @@ def test_inactivity_stop_organization_override(mocker, credentials, recording, v
 @pytest.mark.vcr
 @assert_authorization
 def test_inactivity_stop_instance_override(mocker, credentials, recording, vcr):
-    """Test instances being outputed to the shell."""
+    """Test instances stop inactivity config overwritten by org."""
     runner = CliRunner()
     if not recording:
         # Mock list_instances only if using the cassettes, since we mock the

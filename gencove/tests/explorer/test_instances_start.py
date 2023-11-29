@@ -54,7 +54,7 @@ def vcr_config():
 @pytest.mark.vcr
 @assert_authorization
 def test_instances_start_no_permission(mocker, credentials):
-    """Test instances no permission available to show them."""
+    """Test instances no permission available to start them."""
     runner = CliRunner()
     mocked_get_instances = mocker.patch.object(
         APIClient,
@@ -86,7 +86,7 @@ def test_instances_start_no_permission(mocker, credentials):
 @pytest.mark.vcr
 @assert_authorization
 def test_instances_start(mocker, credentials, recording, vcr):
-    """Test instances being outputed to the shell."""
+    """Test instances started."""
     runner = CliRunner()
     if not recording:
         # Mock start only if using the cassettes, since we mock the

@@ -58,16 +58,16 @@ def vcr_config():
 @pytest.mark.vcr
 @assert_authorization
 def test_list_empty(mocker, credentials):
-    """Test user organization has no projects."""
+    """Test user organization has no instances."""
     runner = CliRunner()
-    mocked_get_projects = mocker.patch.object(
+    mocked_get_instances = mocker.patch.object(
         APIClient,
         "get_explorer_instances",
         return_value=ExplorerInstances(results=[], meta=dict(next=None)),
     )
     res = runner.invoke(list_instances, credentials)
     assert res.exit_code == 0
-    mocked_get_projects.assert_called_once()
+    mocked_get_instances.assert_called_once()
     assert "" in res.output
 
 
@@ -75,7 +75,7 @@ def test_list_empty(mocker, credentials):
 @pytest.mark.vcr
 @assert_authorization
 def test_list_instances_no_permission(mocker, credentials):
-    """Test projects no permission available to show them."""
+    """Test instances no permission available to show them."""
     runner = CliRunner()
     mocked_get_instances = mocker.patch.object(
         APIClient,

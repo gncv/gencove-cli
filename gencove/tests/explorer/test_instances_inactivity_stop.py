@@ -1,4 +1,4 @@
-"""Test instances start command."""
+"""Test instances inactivity-stop command."""
 # pylint: disable=wrong-import-order, import-error
 import io
 import sys
@@ -11,7 +11,11 @@ from gencove.client import (
     APIClient,
     APIClientError,
 )  # noqa: I100
-from gencove.command.explorer.instances.cli import start
+from gencove.command.explorer.instances.cli import inactivity_stop
+from gencove.models import (
+    ExplorerInstance,
+    ExplorerInstances,
+)
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.explorer.vcr.filters import filter_list_instances_response
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
@@ -53,7 +57,7 @@ def vcr_config():
 @pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
-def test_instances_start_no_permission(mocker, credentials):
+def test_inactivity_stop_no_permission(mocker, credentials):
     """Test instances no permission available to show them."""
     runner = CliRunner()
     mocked_get_instances = mocker.patch.object(
@@ -64,7 +68,7 @@ def test_instances_start_no_permission(mocker, credentials):
         ),
         return_value={"detail": "Not found"},
     )
-    res = runner.invoke(start, credentials)
+    res = runner.invoke(inactivity_stop, credentials)
     assert res.exit_code == 1
     mocked_get_instances.assert_called_once()
 
@@ -85,50 +89,28 @@ def test_instances_start_no_permission(mocker, credentials):
 
 @pytest.mark.vcr
 @assert_authorization
-def test_instances_start(mocker, credentials, recording, vcr):
+def test_inactivity_stop(mocker, credentials, recording, vcr):
     """Test instances being outputed to the shell."""
     runner = CliRunner()
     if not recording:
-        # Mock start only if using the cassettes, since we mock the
+        # Mock list_instances only if using the cassettes, since we mock the
         # return value.
-        get_vcr_response("/api/v2/explorer-start-instances/", vcr)
-        mocked_instances_start = mocker.patch.object(
+        list_instances_response = get_vcr_response("/api/v2/explorer-instances/", vcr)
+        mocked_get_instances = mocker.patch.object(
             APIClient,
-            "start_explorer_instances",
-            return_value=None,
+            "get_explorer_instances",
+            return_value=ExplorerInstances(**list_instances_response),
         )
-    res = runner.invoke(start, credentials)
-    assert b"Request to start explorer instances accepted." in res.output.encode()
+    res = runner.invoke(inactivity_stop, ["--hours=3", *credentials])
     assert res.exit_code == 0
     if not recording:
-        mocked_instances_start.assert_called_once()
-
-
-@pytest.mark.vcr
-@assert_authorization
-def test_instances_start_not_stopped(mocker, credentials, recording, vcr):
-    """Test instances not being stopped."""
-    runner = CliRunner()
-    if not recording:
-        # Mock start only if using the cassettes, since we mock the
-        # return value.
-        response_json = get_vcr_response("/api/v2/explorer-start-instances/", vcr)
-        error_msg = "\n".join(
-            [
-                f"  {key}: {value[0] if isinstance(value, list) else str(value)}"  # noqa: E501  # pylint: disable=line-too-long
-                for key, value in response_json.items()
-            ]
-        )
-        mocked_instances_start = mocker.patch.object(
-            APIClient,
-            "start_explorer_instances",
-            side_effect=APIClientError(
-                message=f"API Client Error: Bad Request:\n{error_msg}",
-                status_code=400,
-            ),
-        )
-    res = runner.invoke(start, credentials)
-    assert b"not in stopped status" in res.output.encode()
-    assert res.exit_code == 1
-    if not recording:
-        mocked_instances_start.assert_called_once()
+        mocked_get_instances.assert_called_once()
+        instances = list_instances_response["results"]
+        output_line = io.BytesIO()
+        sys.stdout = output_line
+        echo("Inactivity stop configuration")
+        for instance in instances:
+            instance = ExplorerInstance(**instance)
+            instance_id = str(instance.id).replace("-", "")
+            echo(f"Instance {instance_id}:\thours=3")
+        assert output_line.getvalue() == res.output.encode()

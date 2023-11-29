@@ -134,7 +134,6 @@ def test_inactivity_stop_organization(mocker, credentials, recording, vcr):
     assert res.exit_code == 0
     if not recording:
         mocked_get_instances.assert_called_once()
-        instances = list_instances_response["results"]
         output_line = io.BytesIO()
         sys.stdout = output_line
         echo("Inactivity stop configuration")
@@ -167,4 +166,35 @@ def test_inactivity_stop_organization_override(mocker, credentials, recording, v
         sys.stdout = output_line
         echo("Inactivity stop configuration")
         echo("Organization:\t\t\t\t\thours=3, override=True")
+        assert output_line.getvalue() == res.output.encode()
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_inactivity_stop_instance_override(mocker, credentials, recording, vcr):
+    """Test instances being outputed to the shell."""
+    runner = CliRunner()
+    if not recording:
+        # Mock list_instances only if using the cassettes, since we mock the
+        # return value.
+        list_instances_response = get_vcr_response("/api/v2/explorer-instances/", vcr)
+        mocked_get_instances = mocker.patch.object(
+            APIClient,
+            "get_explorer_instances",
+            return_value=ExplorerInstances(**list_instances_response),
+        )
+    res = runner.invoke(inactivity_stop, ["--hours=None", *credentials])
+    assert res.exit_code == 0
+    if not recording:
+        mocked_get_instances.assert_called_once()
+        instances = list_instances_response["results"]
+        output_line = io.BytesIO()
+        sys.stdout = output_line
+        echo("Inactivity stop configuration")
+        for instance in instances:
+            instance = ExplorerInstance(**instance)
+            instance_id = str(instance.id).replace("-", "")
+            echo(
+                f"Instance {instance_id}:\thours=3 (applied from organization), instance_config[hours=None]"
+            )
         assert output_line.getvalue() == res.output.encode()

@@ -39,7 +39,7 @@ class StopInstanceInactivity(Command):
             raise ValidationError("Expected 'hours' to be a positive integer or None.")
         if self.organization and self.hours is None:
             raise ValidationError(
-                "Expected 'hours' to be a positive integer if '--organization' is provided."
+                "Expected 'hours' to be a positive integer if '--organization' is provided."  # noqa: E501, pylint: disable=line-too-long
             )
         if self.override is not None and not self.organization:
             raise ValidationError(

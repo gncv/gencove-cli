@@ -19,7 +19,7 @@ def filter_list_instances_response(response, json_response):
         for msg in json_response["instance_ids"]:
             # Replace UUIDs with a MOCK_UUID string
             uuid_pattern = re.compile(
-                r"\b[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89a-f][a-f0-9]{3}-[a-f0-9]{12}\b",
+                r"\b[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89a-f][a-f0-9]{3}-[a-f0-9]{12}\b",  # noqa: E501, pylint: disable=line-too-long
                 re.IGNORECASE,
             )
             messages.append(uuid_pattern.sub(MOCK_UUID, msg))

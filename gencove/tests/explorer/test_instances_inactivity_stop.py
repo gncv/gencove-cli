@@ -17,7 +17,7 @@ from gencove.models import (
     ExplorerInstances,
 )
 from gencove.tests.decorators import assert_authorization
-from gencove.tests.explorer.vcr.filters import (
+from gencove.tests.explorer.vcr.filters import (  # noqa: I101
     filter_list_instances_response,
     filter_instance_ids_request,
 )
@@ -148,7 +148,8 @@ def test_inactivity_stop_organization(mocker, credentials, recording, vcr):
 @pytest.mark.vcr
 @assert_authorization
 def test_inactivity_stop_organization_override(mocker, credentials, recording, vcr):
-    """Test instances configured to stop after inactivity at organization level with override."""
+    """Test instances configured to stop after inactivity at
+    organization level with override."""
     runner = CliRunner()
     if not recording:
         # Mock list_instances only if using the cassettes, since we mock the
@@ -199,6 +200,8 @@ def test_inactivity_stop_instance_override(mocker, credentials, recording, vcr):
             instance = ExplorerInstance(**instance)
             instance_id = str(instance.id).replace("-", "")
             echo(
-                f"Instance {instance_id}:\thours=3 (applied from organization), instance_config[hours=None]"
+                f"Instance {instance_id}:\thours=3 "
+                "(applied from organization), "
+                "instance_config[hours=None]"
             )
         assert output_line.getvalue() == res.output.encode()

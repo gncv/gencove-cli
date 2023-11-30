@@ -21,14 +21,12 @@ from .main import StopInstanceInactivity
 @click.option(
     "--organization",
     is_flag=True,
-    required=False,
     help="Sets the config for the entire Organization.",
 )
 @click.option(
     "--override",
     default=None,
     type=bool,
-    required=False,
     help="Organization config overrides the instances configs.",
 )
 @add_options(common_options)

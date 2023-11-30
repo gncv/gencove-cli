@@ -30,7 +30,7 @@ class StopInstanceInactivity(Command):
         """Validate command input."""
         self.echo_debug("Validating instance-inactivity command input")
 
-        self.hours_is_empty = self.hours == "placeholder"
+        self.hours_is_empty = self.hours == None
         if self.hours in ["None", "none", "null"]:
             self.hours = None
         if not self.hours_is_empty and self.hours is not None:

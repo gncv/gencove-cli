@@ -11,7 +11,7 @@ from .main import StopInstanceInactivity
 @click.command("inactivity-stop")
 @click.option(
     "--hours",
-    default="placeholder",
+    default=None,
     help=(
         "Amount of hours of inactivity to wait before stopping instances. "
         "If hours == 0 then the instances are not stopped. "

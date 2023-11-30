@@ -90,7 +90,7 @@ interactions:
       code: 200
       message: OK
 - request:
-    body: '{"instance_ids": ["c7c23d31-8260-44ae-8ef6-ab51464d4f49"]}'
+    body: '{"instance_ids": ["11111111-1111-1111-1111-111111111111"]}'
     headers:
       Accept:
       - '*/*'
@@ -106,7 +106,7 @@ interactions:
     uri: https://www.example.com/api/v2/explorer-stop-instances/
   response:
     body:
-      string: '{"instance_ids": ["Instance c7c23d31-8260-44ae-8ef6-ab51464d4f49 is
+      string: '{"instance_ids": ["Instance 11111111-1111-1111-1111-111111111111 is
         already in stopped status."]}'
     headers:
       Allow:

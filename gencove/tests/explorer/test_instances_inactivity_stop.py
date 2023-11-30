@@ -17,7 +17,10 @@ from gencove.models import (
     ExplorerInstances,
 )
 from gencove.tests.decorators import assert_authorization
-from gencove.tests.explorer.vcr.filters import filter_list_instances_response
+from gencove.tests.explorer.vcr.filters import (
+    filter_list_instances_response,
+    filter_instance_ids_request,
+)
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
 from gencove.tests.utils import get_vcr_response
@@ -45,6 +48,7 @@ def vcr_config():
         "path_transformer": VCR.ensure_suffix(".yaml"),
         "before_record_request": [
             replace_gencove_url_vcr,
+            filter_instance_ids_request,
         ],
         "before_record_response": [
             filter_jwt,

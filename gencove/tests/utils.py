@@ -25,7 +25,6 @@ def get_vcr_response(url, vcr, matches=operator.eq, just_body=True):
     response = vcr.responses_of(request)[0]
     if just_body:
         response = response["body"]["string"]
-        print("Response from vcr", response)
         try:
             response = json.loads(response)
         except json.decoder.JSONDecodeError:

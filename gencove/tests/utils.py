@@ -21,7 +21,6 @@ def get_vcr_response(url, vcr, matches=operator.eq, just_body=True):
     Returns:
         response (dict): The VCR response.
     """
-    print("Starting request")
     request = next(request for request in vcr.requests if matches(request.path, url))
     response = vcr.responses_of(request)[0]
     if just_body:

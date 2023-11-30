@@ -12,7 +12,6 @@ from .main import StopInstanceInactivity
 @click.option(
     "--hours",
     default="placeholder",
-    required=False,
     help=(
         "Amount of hours of inactivity to wait before stopping instances. "
         "If hours == 0 then the instances are not stopped. "
@@ -21,7 +20,6 @@ from .main import StopInstanceInactivity
 )
 @click.option(
     "--organization",
-    default=False,
     is_flag=True,
     required=False,
     help="Sets the config for the entire Organization.",

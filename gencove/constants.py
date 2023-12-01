@@ -45,6 +45,13 @@ class ApiEndpoints(Enum):
     PIPELINES = "/api/v2/pipeline/"
     PIPELINE = "/api/v2/pipeline/{id}"
     ORGANIZATION_MONTHLY_USAGE_REPORT = "/api/v2/organization-monthly-usage-report/"
+    EXPLORER_INSTANCES = "/api/v2/explorer-instances/"
+    EXPLORER_INSTANCES_STOP = "/api/v2/explorer-stop-instances/"
+    EXPLORER_INSTANCES_START = "/api/v2/explorer-start-instances/"
+    EXPLORER_INSTANCES_INACTIVITY_STOP = "/api/v2/explorer-instances-inactivity-stop/"
+    EXPLORER_INSTANCES_INACTIVITY_STOP_ORGANIZATION = (
+        "/api/v2/explorer-instances-inactivity-stop-organization/"
+    )
 
 
 @unique

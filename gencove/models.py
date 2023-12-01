@@ -410,3 +410,38 @@ class SampleManifests(BaseModel):
     """Sample manifests list model"""
 
     results: List[SampleManifest]
+
+
+class ExplorerInstance(BaseModel):
+    """ExplorerInstance model"""
+
+    id: UUID
+    status: str
+    stop_after_inactivity_hours: Optional[int]
+
+
+class ExplorerInstanceIds(BaseModel):
+    """ExplorerInstanceIds model"""
+
+    instance_ids: List[UUID]
+
+
+class ExplorerInstances(BaseModel):
+    """ExplorerInstances model"""
+
+    meta: ResponseMeta
+    results: List[ExplorerInstance]
+
+
+class ExplorerInstanceInactivityStop(BaseModel):
+    """ExplorerInstanceInactivityStop model"""
+
+    instance_ids: List[UUID]
+    stop_after_inactivity_hours: Optional[int]
+
+
+class ExplorerInstanceInactivityStopOrganization(BaseModel):
+    """ExplorerInstanceInactivityStopOrganization model"""
+
+    explorer_override_stop_after_inactivity_hours: bool
+    explorer_stop_after_inactivity_hours: int

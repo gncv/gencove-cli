@@ -9,6 +9,8 @@ from click_default_group import DefaultGroup
 
 import sh
 
+from .instances.cli import instances
+
 
 @click.group(
     cls=DefaultGroup,
@@ -54,3 +56,6 @@ def default(ctx):
         )
     except sh.ErrorReturnCode as exception:
         sys.exit(exception.exit_code)  # pylint: disable=E1101
+
+
+explorer.add_command(instances)

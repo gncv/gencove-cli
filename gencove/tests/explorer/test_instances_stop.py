@@ -12,6 +12,11 @@ from gencove.client import (
     APIClientError,
 )  # noqa: I100
 from gencove.command.explorer.instances.cli import stop
+from gencove.models import (
+    ExplorerInstance,
+    ExplorerInstances,
+    ResponseMeta,
+)
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.explorer.vcr.filters import (  # noqa: I101
     filter_list_instances_response,
@@ -19,7 +24,7 @@ from gencove.tests.explorer.vcr.filters import (  # noqa: I101
 )
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
-from gencove.tests.utils import get_vcr_response
+from gencove.tests.utils import get_vcr_response, MOCK_UUID
 
 import pytest
 
@@ -136,3 +141,31 @@ def test_instances_stop_already_stopped(mocker, credentials, recording, vcr):
     assert res.exit_code == 1
     if not recording:
         mocked_instances_stop.assert_called_once()
+
+
+@assert_authorization
+def test_instances_stop_update_cli(mocker, credentials):
+    """Test instances being not stopped because CLI is outdated."""
+    runner = CliRunner()
+    mocked_get_instances = mocker.patch.object(
+        APIClient,
+        "get_explorer_instances",
+        return_value=ExplorerInstances(
+            meta=ResponseMeta(count=2, next=None, previous=None),
+            results=[
+                ExplorerInstance(
+                    id=MOCK_UUID, status="running", stop_after_inactivity_hours=None
+                ),
+                ExplorerInstance(
+                    id=MOCK_UUID, status="running", stop_after_inactivity_hours=None
+                ),
+            ],
+        ),
+    )
+    res = runner.invoke(stop, credentials)
+    assert (
+        b"Command not supported. Download the latest version of the Gencove CLI."
+        in res.output.encode()
+    )
+    assert res.exit_code == 1
+    mocked_get_instances.assert_called_once()

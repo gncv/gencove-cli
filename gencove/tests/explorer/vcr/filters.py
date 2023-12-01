@@ -1,0 +1,43 @@
+"""VCR filters for explorer tests."""
+
+import json
+import re
+
+from gencove.tests.decorators import parse_response_to_json
+from gencove.tests.utils import MOCK_UUID
+
+
+@parse_response_to_json
+def filter_list_instances_response(response, json_response):
+    """Filter list instances sensitive data from response."""
+    if "results" in json_response:
+        for result in json_response["results"]:
+            if "id" in result:
+                result["id"] = MOCK_UUID
+    if "instance_ids" in json_response:
+        messages = []
+        for msg in json_response["instance_ids"]:
+            # Replace UUIDs with a MOCK_UUID string
+            uuid_pattern = re.compile(
+                r"\b[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89a-f][a-f0-9]{3}-[a-f0-9]{12}\b",  # noqa: E501, pylint: disable=line-too-long
+                re.IGNORECASE,
+            )
+            messages.append(uuid_pattern.sub(MOCK_UUID, msg))
+        json_response["instance_ids"] = messages
+
+    return response, json_response
+
+
+def filter_instance_ids_request(request):
+    """Filter sensitive data from requests that have instance_ids."""
+    if request.body is None:
+        return request
+    try:
+        body = json.loads(request.body)
+        if "instance_ids" in body:
+            samples = [MOCK_UUID for _ in body["instance_ids"]]
+            body["instance_ids"] = samples
+            request.body = json.dumps(body).encode()
+    except json.decoder.JSONDecodeError:
+        pass
+    return request

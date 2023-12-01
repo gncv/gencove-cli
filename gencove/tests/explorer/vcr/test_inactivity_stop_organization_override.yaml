@@ -1,0 +1,180 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.9.0
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '582'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Wed, 29 Nov 2023 13:23:36 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.9.0
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/explorer-instances/
+  response:
+    body:
+      string: '{"meta": {"count": 1, "next": null, "previous": null}, "results": [{"id":
+        "11111111-1111-1111-1111-111111111111", "status": "stopped", "stop_after_inactivity_hours":
+        3}]}'
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '157'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Wed, 29 Nov 2023 13:23:37 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.9.0
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/explorer-instances-inactivity-stop-organization/
+  response:
+    body:
+      string: '{"explorer_override_stop_after_inactivity_hours": false, "explorer_stop_after_inactivity_hours":
+        3}'
+    headers:
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '96'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Wed, 29 Nov 2023 13:23:38 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"explorer_override_stop_after_inactivity_hours": true, "explorer_stop_after_inactivity_hours":
+      3}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.9.0
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/explorer-instances-inactivity-stop-organization/
+  response:
+    body:
+      string: ''
+    headers:
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Wed, 29 Nov 2023 13:23:39 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 202
+      message: Accepted
+version: 1

@@ -13,14 +13,7 @@ from urllib.parse import parse_qs, urljoin, urlparse
 from uuid import UUID
 
 from pydantic import BaseModel
-
-from requests import (
-    ConnectTimeout,
-    ReadTimeout,
-    delete,
-    get,
-    post,
-)  # noqa: I201
+from requests import ConnectTimeout, ReadTimeout, delete, get, post  # noqa: I201
 
 from gencove import constants  # noqa: I100
 from gencove.constants import (
@@ -34,18 +27,20 @@ from gencove.constants import (
 )
 from gencove.exceptions import MaintenanceError
 from gencove.logger import echo_debug
-from gencove.models import (  # noqa: I101
+from gencove.models import BaseSpaceBiosample  # noqa: I101
+from gencove.models import (  # noqa: I101, I100
     AccessJWT,
-    BaseSpaceBiosample,
     BaseSpaceProject,
     BaseSpaceProjectImport,
     BatchDetail,
     CreateJWT,
+    ExplorerInstanceInactivityStopOrganization,
+    ExplorerInstances,
     FileTypesModel,
     ImportExistingSamplesModel,
     PipelineCapabilities,
-    Pipelines,
     PipelineDetail,
+    Pipelines,
     Project,
     ProjectBatches,
     ProjectBatchTypes,
@@ -61,8 +56,8 @@ from gencove.models import (  # noqa: I101
     SampleSheet,
     UploadCredentials,
     UploadSamples,
-    UploadURLImport,
     UploadsPostData,
+    UploadURLImport,
 )
 from gencove.version import version as cli_version
 
@@ -1115,3 +1110,62 @@ class APIClient:
         }
 
         return self._post(project_endpoint, payload, authorized=True, model=Project)
+
+    def get_explorer_instances(self) -> ExplorerInstances:
+        """Making a get request to retrieve explorer instances"""
+        endpoint = self.endpoints.EXPLORER_INSTANCES.value
+
+        return self._get(endpoint, authorized=True, model=ExplorerInstances)
+
+    def set_explorer_instances_activity_stop(self, instance_ids, hours):
+        """Making a post request to configure explorer instances inactivity
+        to stop after hours."""
+        endpoint = self.endpoints.EXPLORER_INSTANCES_INACTIVITY_STOP.value
+
+        payload = {
+            "instance_ids": instance_ids,
+            "stop_after_inactivity_hours": hours,
+        }
+
+        return self._post(endpoint, payload, authorized=True)
+
+    def set_explorer_instances_activity_stop_organization(self, override, hours):
+        """Making a post request to configure organization explorer instances
+        inactivity to stop after hours."""
+        endpoint = self.endpoints.EXPLORER_INSTANCES_INACTIVITY_STOP_ORGANIZATION.value
+
+        payload = {
+            "explorer_override_stop_after_inactivity_hours": override,
+            "explorer_stop_after_inactivity_hours": hours,
+        }
+
+        return self._post(endpoint, payload, authorized=True)
+
+    def get_explorer_instances_activity_stop_organization(self):
+        """Making a get request to retrieve organization explorer instances
+        inactivity to stop after hours configuration."""
+        endpoint = self.endpoints.EXPLORER_INSTANCES_INACTIVITY_STOP_ORGANIZATION.value
+
+        return self._get(
+            endpoint, authorized=True, model=ExplorerInstanceInactivityStopOrganization
+        )
+
+    def stop_explorer_instances(self, instance_ids):
+        """Making a post request to stop explorer instances."""
+        endpoint = self.endpoints.EXPLORER_INSTANCES_STOP.value
+
+        payload = {
+            "instance_ids": instance_ids,
+        }
+
+        return self._post(endpoint, payload, authorized=True)
+
+    def start_explorer_instances(self, instance_ids):
+        """Making a post request to start explorer instances."""
+        endpoint = self.endpoints.EXPLORER_INSTANCES_START.value
+
+        payload = {
+            "instance_ids": instance_ids,
+        }
+
+        return self._post(endpoint, payload, authorized=True)

@@ -24,7 +24,7 @@ from gencove.tests.explorer.vcr.filters import (  # noqa: I101
 )
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
-from gencove.tests.utils import get_vcr_response, MOCK_UUID
+from gencove.tests.utils import MOCK_UUID, get_vcr_response
 
 import pytest
 

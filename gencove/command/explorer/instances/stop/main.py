@@ -2,6 +2,7 @@
 
 
 from ....base import Command
+from .....exceptions import ValidationError
 
 
 class StopInstances(Command):
@@ -20,6 +21,11 @@ class StopInstances(Command):
 
         explorer_instances = self.api_client.get_explorer_instances()
         self.echo_debug(f"Found {len(explorer_instances.results)} explorer instances.")
+
+        if len(explorer_instances.results) != 1:
+            raise ValidationError(
+                "Command not supported. Download the latest version of the Gencove CLI."
+            )
 
         self.api_client.stop_explorer_instances(
             instance_ids=[e.id for e in explorer_instances.results]

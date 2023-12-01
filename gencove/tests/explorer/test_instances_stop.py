@@ -143,6 +143,8 @@ def test_instances_stop_already_stopped(mocker, credentials, recording, vcr):
         mocked_instances_stop.assert_called_once()
 
 
+@pytest.mark.vcr
+@pytest.mark.default_cassette("jwt-create.yaml")
 @assert_authorization
 def test_instances_stop_update_cli(mocker, credentials):
     """Test instances being not stopped because CLI is outdated."""

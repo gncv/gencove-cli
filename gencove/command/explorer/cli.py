@@ -35,6 +35,7 @@ def explorer():
         ignore_unknown_options=True,
         allow_extra_args=True,
     ),
+    add_help_option=False,
 )
 @click.pass_context
 def default(ctx):

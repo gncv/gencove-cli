@@ -12,9 +12,27 @@ import sh
 from .instances.cli import instances
 
 
+def explorer_cli_installed():
+    return shutil.which("explorer") is not None
+
+
+class CustomEpilogDefaultGroup(DefaultGroup):
+    def format_epilog(self, ctx, formatter):
+        if explorer_cli_installed():
+            try:
+                out = sh.explorer.internal(  # pylint: disable=E1101
+                    "print-commands",
+                )
+                formatter.write(out)
+            except sh.ErrorReturnCode:
+                # Ignore errors to fail gracefully if installed version of
+                # explorer CLI does not support `print-commands`
+                pass
+
+
 @click.group(
-    cls=DefaultGroup,
-    default_if_no_args=True,
+    cls=CustomEpilogDefaultGroup,
+    default_if_no_args=False,
     default="default",
 )
 def explorer():
@@ -40,7 +58,7 @@ def explorer():
 @click.pass_context
 def default(ctx):
     """Default command to execute"""
-    if shutil.which("explorer") is None:
+    if not explorer_cli_installed():
         click.echo(
             "It doesn't seem like this command has been run from the Explorer "
             "ecosystem. Please try running it again from within Explorer.",

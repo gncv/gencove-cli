@@ -13,11 +13,17 @@ from .instances.cli import instances
 
 
 def explorer_cli_installed():
+    """Function that checks if the Explorer CLI is installed and accessible on
+    the current system"""
     return shutil.which("explorer") is not None
 
 
 class CustomEpilogDefaultGroup(DefaultGroup):
+    """Click group class that inherits functionality from DefaultGroup and adds
+    a custom epilog to collect top-level Explorer CLI command help"""
+
     def format_epilog(self, ctx, formatter):
+        """Adds an epilog to describe Explorer CLI commands"""
         if explorer_cli_installed():
             try:
                 out = sh.explorer.internal(  # pylint: disable=E1101

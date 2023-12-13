@@ -10,6 +10,7 @@ from click_default_group import DefaultGroup
 import sh
 
 from .instances.cli import instances
+from .data.cli import data
 
 
 def explorer_cli_installed():
@@ -84,3 +85,4 @@ def default(ctx):
 
 
 explorer.add_command(instances)
+explorer.add_command(data)

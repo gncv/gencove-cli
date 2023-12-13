@@ -3,7 +3,6 @@ import sys
 
 from ..common import GencoveExplorerManager
 from ....base import Command
-from .....exceptions import ValidationError
 
 
 class List(Command):

@@ -445,3 +445,23 @@ class ExplorerInstanceInactivityStopOrganization(BaseModel):
 
     explorer_override_stop_after_inactivity_hours: bool
     explorer_stop_after_inactivity_hours: int
+
+
+class OrganizationDetails(GencoveBaseModel):
+    """UploadsPostData model"""
+
+    id: UUID
+    name: str
+    expire_uploads_period_days: int
+    archive_period_days: int
+    archive_restore_period_days: int
+    uploads_enabled: bool
+
+
+class UserDetails(GencoveBaseModel):
+    id: UUID
+    email: str
+    name: str
+    uploads_enabled: bool
+    explorer_enabled: bool
+    is_support: bool

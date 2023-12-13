@@ -38,6 +38,7 @@ from gencove.models import (  # noqa: I101, I100
     ExplorerInstances,
     FileTypesModel,
     ImportExistingSamplesModel,
+    OrganizationDetails,
     PipelineCapabilities,
     PipelineDetail,
     Pipelines,
@@ -58,6 +59,7 @@ from gencove.models import (  # noqa: I101, I100
     UploadSamples,
     UploadsPostData,
     UploadURLImport,
+    UserDetails,
 )
 from gencove.version import version as cli_version
 
@@ -430,6 +432,20 @@ class APIClient:
         """Log user in."""
         jwt = self.get_jwt(email, password, otp_token)
         self._set_jwt(jwt.access, jwt.refresh)
+
+    def get_user_details(self):
+        return self._get(
+            self.endpoints.USER_DETAILS.value,
+            authorized=True,
+            model=UserDetails,
+        )
+
+    def get_organization_details(self):
+        return self._get(
+            self.endpoints.ORGANIZATION_DETAILS.value,
+            authorized=True,
+            model=OrganizationDetails,
+        )
 
     def get_upload_details(self, gncv_file_path):
         """Get file upload details.

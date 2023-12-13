@@ -448,7 +448,7 @@ class ExplorerInstanceInactivityStopOrganization(BaseModel):
 
 
 class OrganizationDetails(GencoveBaseModel):
-    """UploadsPostData model"""
+    """OrganizationDetails model"""
 
     id: UUID
     name: str
@@ -459,6 +459,8 @@ class OrganizationDetails(GencoveBaseModel):
 
 
 class UserDetails(GencoveBaseModel):
+    """UserDetails model"""
+
     id: UUID
     email: str
     name: str

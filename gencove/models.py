@@ -91,8 +91,8 @@ class Project(GencoveBaseModel):
     files: Optional[List[SampleFile]]
 
 
-class UploadCredentials(BaseModel):
-    """UploadCredentials model"""
+class AWSCredentials(BaseModel):
+    """Generic AWS credentials model"""
 
     version: Optional[int]
     access_key: Optional[str]

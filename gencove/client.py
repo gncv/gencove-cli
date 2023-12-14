@@ -55,7 +55,7 @@ from gencove.models import (  # noqa: I101, I100
     SampleMetadata,
     SampleQC,
     SampleSheet,
-    UploadCredentials,
+    AWSCredentials,
     UploadSamples,
     UploadsPostData,
     UploadURLImport,
@@ -447,6 +447,15 @@ class APIClient:
             model=OrganizationDetails,
         )
 
+    def get_explorer_data_credentials(self):
+        """Get AWS credentials for user to enable Explorer S3 data access."""
+        return self._post(
+            self.endpoints.EXPLORER_DATA_CREDENTIALS.value,
+            authorized=True,
+            sensitive=True,
+            model=AWSCredentials,
+        )
+
     def get_upload_details(self, gncv_file_path):
         """Get file upload details.
         Args:
@@ -468,7 +477,7 @@ class APIClient:
             self.endpoints.GET_UPLOAD_CREDENTIALS.value,
             authorized=True,
             sensitive=True,
-            model=UploadCredentials,
+            model=AWSCredentials,
         )
 
     def get_project_samples(

@@ -1,7 +1,7 @@
 import sys
 import uuid
 from dataclasses import dataclass
-from typing import Optional, List, Tuple
+from typing import List, Optional, Tuple
 
 import sh
 
@@ -16,6 +16,7 @@ class GencoveExplorerManager:
     organization_id: str
 
     # Constants ported from Gencove Explorer package
+    # pylint: disable=invalid-name
     USERS: str = "users"
     ORG: str = "org"
     GENCOVE: str = "gencove"
@@ -28,8 +29,8 @@ class GencoveExplorerManager:
     SHARED_DIR: str = "shared"
     SCRATCH_DIR: str = "scratch"
     USERS_DIR: str = "users"
-    # Temporary directory visible to user in EOS
     TMP_DIR: str = f"{DATA_DIR}/tmp"  # nosec: B108
+    # pylint: enable=invalid-name
 
     def __post_init__(self):
         self.NAMESPACES: dict = {
@@ -125,8 +126,8 @@ class GencoveExplorerManager:
         return path is not None and path.startswith(self.EXPLORER_SCHEME)
 
     def translate_path_to_s3_path(self, path: Optional[str]) -> Optional[str]:
-        """Accepts any input path and converts `e://` path to `s3://` path if input is an
-        `e://` path
+        """Accepts any input path and converts `e://` path to `s3://` path
+         if input is an e://` path
 
         Supported paths:
             e://gencove/...
@@ -170,7 +171,7 @@ class GencoveExplorerManager:
         translated to `s3://` paths"""
         if not self.uri_ok(path):
             raise ValueError(f"Path {path} does not start with {self.EXPLORER_SCHEME}")
-        sh.aws.s3(
+        sh.aws.s3(  # pylint: disable=E1101
             cmd,
             self.translate_path_to_s3_path(path),
             *args,

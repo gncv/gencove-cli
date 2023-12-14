@@ -19,7 +19,7 @@ from .main import List
 @click.argument("path", type=click.Path(), default="e://")
 @click.pass_context
 @add_options(common_options)
-def ls(  # pylint: disable=too-many-arguments
+def ls(  # pylint: disable=too-many-arguments,invalid-name
     ctx,
     path,
     host,

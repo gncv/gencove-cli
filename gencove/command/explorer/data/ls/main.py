@@ -33,8 +33,8 @@ class List(Command):
         )
 
         if self.path == explorer_manager.EXPLORER_SCHEME:
-            for el in explorer_manager.NAMESPACE_KEYS:
-                print(f"{explorer_manager.EXPLORER_SCHEME}{el}")
+            for namespace_key in explorer_manager.NAMESPACE_KEYS:
+                print(f"{explorer_manager.EXPLORER_SCHEME}{namespace_key}")
             sys.exit(0)
         if (
             self.path.rstrip("/")

@@ -9,8 +9,8 @@ from click_default_group import DefaultGroup
 
 import sh
 
-from .instances.cli import instances
 from .data.cli import data
+from .instances.cli import instances
 
 
 def explorer_cli_installed():

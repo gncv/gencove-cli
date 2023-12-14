@@ -29,7 +29,7 @@ class GencoveExplorerManager:
     SCRATCH_DIR: str = "scratch"
     USERS_DIR: str = "users"
     # Temporary directory visible to user in EOS
-    TMP_DIR: str = f"{DATA_DIR}/tmp"
+    TMP_DIR: str = f"{DATA_DIR}/tmp"  # nosec: B108
 
     def __post_init__(self):
         self.NAMESPACES: dict = {

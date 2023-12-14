@@ -10,6 +10,8 @@ import sh
 class GencoveExplorerManager:
     """Port of Explorer GencoveClient and related functionality"""
 
+    aws_session_credentials: dict
+
     user_id: str
     organization_id: str
 
@@ -37,10 +39,19 @@ class GencoveExplorerManager:
         }
         self.NAMESPACE_KEYS: Tuple = tuple(self.NAMESPACES.keys())
 
+    @property
     def bucket_name(self) -> str:
         """Construct bucket name based on short form of org ID"""
         organization_id_short = self.organization_id.replace("-", "")[:12]
         return f"gencove-explorer-{organization_id_short}"
+
+    @property
+    def aws_env(self):
+        return {
+            "AWS_ACCESS_KEY_ID": self.aws_session_credentials["access_key"],
+            "AWS_SECRET_ACCESS_KEY": self.aws_session_credentials["secret_key"],
+            "AWS_SESSION_TOKEN": self.aws_session_credentials["token"],
+        }
 
     @property
     def users_prefix(self) -> str:
@@ -166,4 +177,5 @@ class GencoveExplorerManager:
             _in=sys.stdin,
             _out=sys.stdout,
             _err=sys.stderr,
+            _env=self.aws_env,
         )

@@ -24,7 +24,10 @@ class List(Command):
         """Make a request to start explorer instances."""
         self.echo_debug("List Explorer contents.")
 
+        aws_session_credentials = self.api_client.get_explorer_data_credentials()
+
         explorer_manager = GencoveExplorerManager(
+            aws_session_credentials=aws_session_credentials,
             user_id=self.api_client.get_user_details().id,
             organization_id=self.api_client.get_organization_details().id,
         )

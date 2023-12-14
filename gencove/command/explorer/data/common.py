@@ -30,15 +30,18 @@ class GencoveExplorerManager:
     SCRATCH_DIR: str = "scratch"
     USERS_DIR: str = "users"
     TMP_DIR: str = f"{DATA_DIR}/tmp"  # nosec: B108
+
     # pylint: enable=invalid-name
 
     def __post_init__(self):
+        # pylint: disable=invalid-name
         self.NAMESPACES: dict = {
             self.USERS: self.data_s3_prefix,
             self.ORG: self.data_org_s3_prefix,
             self.GENCOVE: self.data_gencove_s3_prefix,
         }
         self.NAMESPACE_KEYS: Tuple = tuple(self.NAMESPACES.keys())
+        # pylint: enable=invalid-name
 
     @property
     def bucket_name(self) -> str:

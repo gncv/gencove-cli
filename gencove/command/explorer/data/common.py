@@ -11,8 +11,7 @@ from gencove.models import AWSCredentials, OrganizationDetails, UserDetails
 
 
 @dataclass
-class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,
-    # too-many-public-methods
+class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,too-many-public-methods
     """Port of Explorer GencoveClient and related functionality"""
 
     aws_session_credentials: AWSCredentials

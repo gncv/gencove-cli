@@ -4,14 +4,15 @@ import uuid
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
-import sh
-
+# pylint: disable=wrong-import-order
 from gencove.exceptions import ValidationError
 from gencove.models import AWSCredentials, OrganizationDetails, UserDetails
 
+import sh
+
 
 @dataclass
-class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,too-many-public-methods
+class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,too-many-public-methods # noqa: E501
     """Port of Explorer GencoveClient and related functionality"""
 
     aws_session_credentials: AWSCredentials
@@ -20,7 +21,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
     organization_id: str
 
     # Constants ported from Gencove Explorer package
-    # https://gitlab.com/gencove/platform/explorer-sdk/-/blob/main/gencove_explorer/constants.py  # noqa
+    # https://gitlab.com/gencove/platform/explorer-sdk/-/blob/main/gencove_explorer/constants.py  # noqa: E501 # pylint: disable=line-too-long
     # pylint: disable=invalid-name
     USERS: str = "users"
     ORG: str = "org"

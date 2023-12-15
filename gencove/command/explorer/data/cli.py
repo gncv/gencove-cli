@@ -1,8 +1,8 @@
 """Commands to be executed from command line."""
 import click
 
-from .ls.cli import ls
 from .cp.cli import cp
+from .ls.cli import ls
 from .rm.cli import rm
 from .sync.cli import sync
 

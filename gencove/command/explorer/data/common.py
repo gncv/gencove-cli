@@ -5,17 +5,20 @@ from typing import List, Optional, Tuple
 
 import sh
 
+from gencove.models import AWSCredentials
+
 
 @dataclass
 class GencoveExplorerManager:
     """Port of Explorer GencoveClient and related functionality"""
 
-    aws_session_credentials: dict
+    aws_session_credentials: AWSCredentials
 
     user_id: str
     organization_id: str
 
     # Constants ported from Gencove Explorer package
+    # TODO: Point to relevant Explorer file + update Explorer SDK as well
     # pylint: disable=invalid-name
     USERS: str = "users"
     ORG: str = "org"
@@ -52,9 +55,9 @@ class GencoveExplorerManager:
     @property
     def aws_env(self):
         return {
-            "AWS_ACCESS_KEY_ID": self.aws_session_credentials["access_key"],
-            "AWS_SECRET_ACCESS_KEY": self.aws_session_credentials["secret_key"],
-            "AWS_SESSION_TOKEN": self.aws_session_credentials["token"],
+            "AWS_ACCESS_KEY_ID": self.aws_session_credentials.access_key,
+            "AWS_SECRET_ACCESS_KEY": self.aws_session_credentials.secret_key,
+            "AWS_SESSION_TOKEN": self.aws_session_credentials.token,
         }
 
     @property
@@ -164,6 +167,15 @@ class GencoveExplorerManager:
             path = f"{self.data_s3_prefix}/{path_remainder}"
         return path
 
+    def list_users(self):
+        sh.aws.s3.ls(
+            f"{self.S3_PROTOCOL}{self.bucket_name}/{self.USERS_DIR}/",
+            _in=sys.stdin,
+            _out=sys.stdout,
+            _err=sys.stderr,
+            _env=self.aws_env,
+        )
+
     def execute_aws_s3_path(
         self,
         cmd: str,
@@ -177,6 +189,26 @@ class GencoveExplorerManager:
         sh.aws.s3(  # pylint: disable=E1101
             cmd,
             self.translate_path_to_s3_path(path),
+            *args,
+            _in=sys.stdin,
+            _out=sys.stdout,
+            _err=sys.stderr,
+            _env=self.aws_env,
+        )
+
+    def execute_aws_s3_src_dst(
+        self, cmd: str, source: str, destination: str, args: list[str]
+    ) -> None:
+        """Executes the respective `aws s3` dual-path (source-to-destination) commands with
+        `e://` paths translated to `s3://` paths"""
+        if not self.uri_ok(source) and not self.uri_ok(destination):
+            raise ValueError(
+                f"At least one of source or destination must start with {self.EXPLORER_SCHEME}"
+            )
+        sh.aws.s3(
+            cmd,
+            self.translate_path_to_s3_path(source),
+            self.translate_path_to_s3_path(destination),
             *args,
             _in=sys.stdin,
             _out=sys.stdout,

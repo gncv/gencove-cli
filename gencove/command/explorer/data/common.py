@@ -54,7 +54,8 @@ class GencoveExplorerManager:
         return f"gencove-explorer-{organization_id_short}"
 
     @property
-    def aws_env(self):
+    def aws_env(self) -> dict:
+        """Dict containing AWS credentials"""
         return {
             "AWS_ACCESS_KEY_ID": self.aws_session_credentials.access_key,
             "AWS_SECRET_ACCESS_KEY": self.aws_session_credentials.secret_key,
@@ -91,45 +92,63 @@ class GencoveExplorerManager:
 
     @property
     def user_prefix(self) -> str:
+        """Base S3 prefix for user dir"""
         return f"{self.base_prefix}/{self.USER_DIR}"
 
     @property
     def tmp_prefix(self) -> str:
+        """Base S3 prefix for temp user dir"""
         return f"{self.base_prefix}/{self.TMP_DIR}"
 
     @property
     def tmp_org_prefix(self) -> str:
+        """S3 prefix for temp shared dir"""
         return f"{self.shared_prefix}/{self.TMP_DIR}"
 
     @property
     def scratch_prefix(self) -> str:
+        """Base S3 prefix for scratch dir"""
         return f"{self.base_prefix}/{self.SCRATCH_DIR}"
 
     @property
     def user_scratch_s3_prefix(self) -> str:
+        """S3 prefix for user scratch dir"""
         return f"{self.S3_PROTOCOL}{self.bucket_name}/{self.scratch_prefix}"
 
     @property
     def shared_org_s3_prefix(self) -> str:
+        """S3 prefix for org dir"""
         return f"{self.S3_PROTOCOL}{self.bucket_name}/{self.shared_prefix}"
 
     @property
     def data_gencove_s3_prefix(self) -> str:
+        """S3 prefix for gencove data dir"""
         return f"{self.S3_PROTOCOL}{self.DATA_BUCKET}/{self.DATA_DIR}"
 
     @property
     def data_org_s3_prefix(self) -> str:
+        """S3 prefix for org data dir"""
         return f"{self.S3_PROTOCOL}{self.bucket_name}/{self.data_org_prefix}"
 
     @property
     def data_s3_prefix(self) -> str:
+        """S3 prefix for user data dir"""
         return f"{self.S3_PROTOCOL}{self.bucket_name}/{self.data_prefix}"
 
     @property
     def users_s3_prefix(self) -> str:
+        """Prefix for users dir"""
         return f"{self.S3_PROTOCOL}{self.bucket_name}/{self.users_prefix}"
 
     def uri_ok(self, path: Optional[str]) -> bool:
+        """Tests if supplied path is valid
+
+        Args:
+            path (Optional[str]): Path to test
+
+        Returns:
+            True if path valid, False otherwise
+        """
         return path is not None and path.startswith(self.EXPLORER_SCHEME)
 
     def translate_path_to_s3_path(self, path: Optional[str]) -> Optional[str]:
@@ -171,6 +190,7 @@ class GencoveExplorerManager:
         return path
 
     def list_users(self):
+        """List e:// user dir"""
         sh.aws.s3.ls(
             f"{self.S3_PROTOCOL}{self.bucket_name}/{self.USERS_DIR}/",
             _in=sys.stdin,

@@ -1,4 +1,4 @@
-"""Configure inactivity stop for explorer instances subcommand."""
+"""Configure explorer data ls subcommand."""
 import sys
 
 from ..common import GencoveExplorerManager
@@ -24,12 +24,10 @@ class List(Command):
         """Make a request to start explorer instances."""
         self.echo_debug("List Explorer contents.")
 
-        aws_session_credentials = self.api_client.get_explorer_data_credentials()
-
         explorer_manager = GencoveExplorerManager(
-            aws_session_credentials=aws_session_credentials,
-            user_id=self.api_client.get_user_details().id,
-            organization_id=self.api_client.get_organization_details().id,
+            aws_session_credentials=self.api_client.get_explorer_data_credentials(),
+            user_id=str(self.api_client.get_user_details().id),
+            organization_id=str(self.api_client.get_organization_details().id),
         )
 
         if self.path == explorer_manager.EXPLORER_SCHEME:
@@ -40,8 +38,6 @@ class List(Command):
             self.path.rstrip("/")
             == f"{explorer_manager.EXPLORER_SCHEME}{explorer_manager.USERS}"
         ):
-            # list_users()
+            explorer_manager.list_users()
             sys.exit(0)
         explorer_manager.execute_aws_s3_path("ls", self.path, self.ctx.args)
-
-        print(explorer_manager)

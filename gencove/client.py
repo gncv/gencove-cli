@@ -434,6 +434,7 @@ class APIClient:
         self._set_jwt(jwt.access, jwt.refresh)
 
     def get_user_details(self):
+        """Retrieve user details"""
         return self._get(
             self.endpoints.USER_DETAILS.value,
             authorized=True,
@@ -441,6 +442,7 @@ class APIClient:
         )
 
     def get_organization_details(self):
+        """Retrieve organization details"""
         return self._get(
             self.endpoints.ORGANIZATION_DETAILS.value,
             authorized=True,

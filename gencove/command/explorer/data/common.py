@@ -1,16 +1,17 @@
+"""Common code shared across data commands is stored here"""
 import sys
 import uuid
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
-import sh
-
 from gencove.exceptions import ValidationError
-from gencove.models import AWSCredentials, UserDetails, OrganizationDetails
+from gencove.models import AWSCredentials, OrganizationDetails, UserDetails
+
+import sh
 
 
 @dataclass
-class GencoveExplorerManager:
+class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,too-many-public-methods
     """Port of Explorer GencoveClient and related functionality"""
 
     aws_session_credentials: AWSCredentials
@@ -152,8 +153,8 @@ class GencoveExplorerManager:
         return path is not None and path.startswith(self.EXPLORER_SCHEME)
 
     def translate_path_to_s3_path(self, path: Optional[str]) -> Optional[str]:
-        """Accepts any input path and converts `e://` path to `s3://` path if input is an
-        `e://` path
+        """Accepts any input path and converts `e://` path to `s3://` path if
+        input is an `e://` path
 
         Supported paths:
         e://gencove/...
@@ -180,7 +181,7 @@ class GencoveExplorerManager:
                 if user_id != self.ME:
                     try:
                         uuid.UUID(user_id)
-                    except ValueError:
+                    except ValueError:  # pylint: disable=raise-missing-from
                         raise ValueError(
                             f"User id '{user_id}' is not a valid UUID (or '{self.ME}')"
                         )
@@ -191,7 +192,7 @@ class GencoveExplorerManager:
 
     def list_users(self):
         """List e:// user dir"""
-        sh.aws.s3.ls(
+        sh.aws.s3.ls(  # pylint: disable=no-member
             f"{self.S3_PROTOCOL}{self.bucket_name}/{self.USERS_DIR}/",
             _in=sys.stdin,
             _out=sys.stdout,
@@ -209,7 +210,7 @@ class GencoveExplorerManager:
         translated to `s3://` paths"""
         if not self.uri_ok(path):
             raise ValueError(f"Path {path} does not start with {self.EXPLORER_SCHEME}")
-        sh.aws.s3(  # pylint: disable=E1101
+        sh.aws.s3(  # pylint: disable=no-member
             cmd,
             self.translate_path_to_s3_path(path),
             *args,
@@ -222,13 +223,14 @@ class GencoveExplorerManager:
     def execute_aws_s3_src_dst(
         self, cmd: str, source: str, destination: str, args: List[str]
     ) -> None:
-        """Executes the respective `aws s3` dual-path (source-to-destination) commands with
-        `e://` paths translated to `s3://` paths"""
+        """Executes the respective `aws s3` dual-path (source-to-destination)
+        commands with e://` paths translated to `s3://` paths"""
         if not self.uri_ok(source) and not self.uri_ok(destination):
             raise ValueError(
-                f"At least one of source or destination must start with {self.EXPLORER_SCHEME}"
+                f"At least one of source or destination must start with "
+                f"{self.EXPLORER_SCHEME}"
             )
-        sh.aws.s3(
+        sh.aws.s3(  # pylint: disable=no-member
             cmd,
             self.translate_path_to_s3_path(source),
             self.translate_path_to_s3_path(destination),
@@ -245,7 +247,8 @@ def validate_explorer_user_data(user: UserDetails, organization: OrganizationDet
     if not user.explorer_enabled:
         raise ValidationError(
             "Explorer is not enabled on your user account, quitting. "
-            "Please reach out to your organization owner to inquire about Gencove Explorer."
+            "Please reach out to your organization owner to inquire "
+            "about Gencove Explorer."
         )
 
     if not user or not organization:

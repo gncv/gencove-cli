@@ -1,6 +1,6 @@
 """Configure explorer data cp subcommand."""
 from gencove.exceptions import ValidationError
-from ..common import GencoveExplorerManager
+from ..common import GencoveExplorerManager, validate_explorer_user_data
 from ....base import Command
 
 
@@ -19,14 +19,7 @@ class Copy(Command):
 
     def validate(self):
         """Validate cp"""
-        if not self.user.explorer_enabled:
-            raise ValidationError(
-                "Explorer is not enabled on your user account, quitting. "
-                "Please reach out to your organization owner to inquire about Gencove Explorer."
-            )
-
-        if not self.user or not self.organization:
-            raise ValidationError("Could not retrieve user details, quitting.")
+        validate_explorer_user_data(self.user, self.organization)
 
     def initialize(self):
         """Initialize cp subcommand."""

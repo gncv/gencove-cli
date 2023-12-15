@@ -5,7 +5,8 @@ from typing import List, Optional, Tuple
 
 import sh
 
-from gencove.models import AWSCredentials
+from gencove.exceptions import ValidationError
+from gencove.models import AWSCredentials, UserDetails, OrganizationDetails
 
 
 @dataclass
@@ -217,3 +218,15 @@ class GencoveExplorerManager:
             _err=sys.stderr,
             _env=self.aws_env,
         )
+
+
+def validate_explorer_user_data(user: UserDetails, organization: OrganizationDetails):
+    """Validate user and organization data"""
+    if not user.explorer_enabled:
+        raise ValidationError(
+            "Explorer is not enabled on your user account, quitting. "
+            "Please reach out to your organization owner to inquire about Gencove Explorer."
+        )
+
+    if not user or not organization:
+        raise ValidationError("Could not retrieve user details, quitting.")

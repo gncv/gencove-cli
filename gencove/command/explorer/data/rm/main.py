@@ -1,5 +1,4 @@
 """Configure explorer data rm subcommand."""
-from gencove.exceptions import ValidationError
 from ..common import GencoveExplorerManager, validate_explorer_user_data
 from ....base import Command
 

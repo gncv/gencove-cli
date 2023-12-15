@@ -4,14 +4,15 @@ import uuid
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
+import sh
+
 from gencove.exceptions import ValidationError
 from gencove.models import AWSCredentials, OrganizationDetails, UserDetails
 
-import sh
-
 
 @dataclass
-class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,too-many-public-methods
+class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,
+    # too-many-public-methods
     """Port of Explorer GencoveClient and related functionality"""
 
     aws_session_credentials: AWSCredentials
@@ -20,7 +21,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
     organization_id: str
 
     # Constants ported from Gencove Explorer package
-    # TODO: Point to relevant Explorer file + update Explorer SDK as well
+    # https://gitlab.com/gencove/platform/explorer-sdk/-/blob/main/gencove_explorer/constants.py  # noqa
     # pylint: disable=invalid-name
     USERS: str = "users"
     ORG: str = "org"
@@ -181,8 +182,8 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
                 if user_id != self.ME:
                     try:
                         uuid.UUID(user_id)
-                    except ValueError:  # pylint: disable=raise-missing-from
-                        raise ValueError(
+                    except ValueError:
+                        raise ValueError(  # pylint: disable=raise-missing-from
                             f"User id '{user_id}' is not a valid UUID (or '{self.ME}')"
                         )
                     prefix_s3 = self.users_s3_prefix + f"/{user_id}"

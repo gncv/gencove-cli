@@ -132,14 +132,14 @@ class GencoveExplorerManager:
         return path is not None and path.startswith(self.EXPLORER_SCHEME)
 
     def translate_path_to_s3_path(self, path: Optional[str]) -> Optional[str]:
-        """Accepts any input path and converts `e://` path to `s3://` path
-         if input is an e://` path
+        """Accepts any input path and converts `e://` path to `s3://` path if input is an
+        `e://` path
 
         Supported paths:
-            e://gencove/...
-            e://org/...
-            e://users/<user-id>/...
-            e://users/me/...
+        e://gencove/...
+        e://org/...
+        e://users/<user-id>/...
+        e://users/me/...
         """
         if path is None:
             return None
@@ -151,6 +151,7 @@ class GencoveExplorerManager:
                     f"Invalid namespace '{namespace}'. Valid namespaces are: "
                     f"{', '.join(self.NAMESPACE_KEYS)}"
                 )
+            prefix_s3 = self.NAMESPACES[namespace]
             path_remainder = "/".join(path_noprefix_split[1:])
             if namespace == self.USERS:
                 if len(path_noprefix_split) <= 1:
@@ -163,8 +164,9 @@ class GencoveExplorerManager:
                         raise ValueError(
                             f"User id '{user_id}' is not a valid UUID (or '{self.ME}')"
                         )
+                    prefix_s3 = self.users_s3_prefix + f"/{user_id}"
                 path_remainder = "/".join(path_noprefix_split[2:])
-            path = f"{self.data_s3_prefix}/{path_remainder}"
+            path = f"{prefix_s3}/{path_remainder}"
         return path
 
     def list_users(self):

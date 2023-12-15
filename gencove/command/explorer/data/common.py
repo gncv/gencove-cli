@@ -220,7 +220,7 @@ class GencoveExplorerManager:
         )
 
     def execute_aws_s3_src_dst(
-        self, cmd: str, source: str, destination: str, args: list[str]
+        self, cmd: str, source: str, destination: str, args: List[str]
     ) -> None:
         """Executes the respective `aws s3` dual-path (source-to-destination) commands with
         `e://` paths translated to `s3://` paths"""

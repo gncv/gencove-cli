@@ -1,11 +1,15 @@
 """Test data ls command."""
+import io
+import sys
 
 # pylint: disable=wrong-import-order, import-error
 
+from click import echo
 from click.testing import CliRunner
 
 from gencove.client import (
     APIClient,
+    APIClientError,
 )  # noqa: I100
 from gencove.command.explorer.data.cli import ls
 from gencove.command.explorer.data.common import GencoveExplorerManager
@@ -77,3 +81,38 @@ def test_data_ls_success(mocker, credentials, recording, vcr):
         assert "cli_test_file.txt" in res.output
 
     assert res.exit_code == 0
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_data_ls_no_permission(mocker, credentials):
+    """Test no permissions for credentials endpoint."""
+    runner = CliRunner()
+    mocked_get_credentials = mocker.patch.object(
+        APIClient,
+        "get_explorer_data_credentials",
+        side_effect=APIClientError(
+            message="API Client Error: Not Found: Not found.", status_code=403
+        ),
+        return_value={"detail": "Not found"},
+    )
+
+    res = runner.invoke(ls, ["e://users/me/", *credentials])
+
+    assert res.exit_code == 1
+
+    mocked_get_credentials.assert_called_once()
+
+    output_line = io.BytesIO()
+    sys.stdout = output_line
+    echo(
+        "\n".join(
+            [
+                "ERROR: You do not have the sufficient permission "
+                "level required to perform this operation.",
+                "ERROR: API Client Error: Not Found: Not found.",
+                "Aborted!",
+            ]
+        )
+    )
+    assert output_line.getvalue() == res.output.encode()

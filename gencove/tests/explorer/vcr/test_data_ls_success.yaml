@@ -1,5 +1,49 @@
 interactions:
 - request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.11.0
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '582'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Mon, 18 Dec 2023 21:06:12 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
     body: null
     headers:
       Accept:
@@ -16,7 +60,7 @@ interactions:
     uri: https://www.example.com/api/v2/user/
   response:
     body:
-      string: '{"id": "11111111-1111-1111-1111-111111111111", "email": "cli-testing@gencove.com",
+      string: '{"id": "11111111-1111-1111-1111-111111111111", "email": "email@example.com",
         "name": "CLI Testing", "uploads_enabled": true, "explorer_enabled": true,
         "created": "2021-09-03T13:54:00Z", "is_support": false}'
     headers:
@@ -31,7 +75,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Mon, 18 Dec 2023 19:22:27 GMT
+      - Mon, 18 Dec 2023 21:06:12 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -78,7 +122,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Mon, 18 Dec 2023 19:22:28 GMT
+      - Mon, 18 Dec 2023 21:06:12 GMT
       Referrer-Policy:
       - same-origin
       Server:
@@ -123,7 +167,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Mon, 18 Dec 2023 19:22:29 GMT
+      - Mon, 18 Dec 2023 21:06:13 GMT
       Referrer-Policy:
       - same-origin
       Server:

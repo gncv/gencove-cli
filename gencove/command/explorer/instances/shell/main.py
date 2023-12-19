@@ -1,8 +1,9 @@
 """Start shell session for explorer instance subcommand."""
 
-import sh
-import sys
 import signal
+import sys
+
+import sh
 
 
 from ....base import Command
@@ -33,10 +34,10 @@ class ShellSession(Command):
         credentials = self.api_client.get_explorer_shell_session_credentials(
             instance_id=explorer_instances.results[0].id
         )
-        self.echo_debug(f"Requested explorer shell session credentials.")
+        self.echo_debug("Requested explorer shell session credentials.")
 
         try:
-            command = sh.aws.ssm(
+            command = sh.aws.ssm(  # pylint: disable=no-member
                 [
                     "start-session",
                     "--target",
@@ -54,7 +55,7 @@ class ShellSession(Command):
                 _bg=True,
             )
 
-            def signal_handler(sig, frame):
+            def signal_handler(sig, frame):  # pylint: disable=unused-argument
                 command.signal(sig)
 
             signal.signal(signal.SIGINT, signal_handler)
@@ -63,7 +64,8 @@ class ShellSession(Command):
             signal.signal(signal.SIGHUP, signal_handler)
 
             command.wait()
-        except sh.CommandNotFound:
+        except sh.CommandNotFound as ex:
             raise ValidationError(
-                "AWS CLI not available. Please follow installation instructions at https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html."
-            )
+                "AWS CLI not available. Please follow installation instructions at"
+                "https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html"
+            ) from ex

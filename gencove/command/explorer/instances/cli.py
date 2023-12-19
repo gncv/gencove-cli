@@ -3,9 +3,9 @@ import click
 
 from .inactivity_stop.cli import inactivity_stop
 from .list.cli import list_instances
+from .shell.cli import shell
 from .start.cli import start
 from .stop.cli import stop
-from .shell.cli import shell
 
 
 @click.group()

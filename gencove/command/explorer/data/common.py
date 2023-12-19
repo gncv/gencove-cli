@@ -2,7 +2,7 @@
 import sys
 import uuid
 from dataclasses import dataclass
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Literal
 
 # pylint: disable=wrong-import-order
 from gencove.exceptions import ValidationError
@@ -21,7 +21,8 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
     organization_id: str
 
     # Constants ported from Gencove Explorer package
-    # https://gitlab.com/gencove/platform/explorer-sdk/-/blob/main/gencove_explorer/constants.py  # noqa: E501 # pylint: disable=line-too-long
+    # https://gitlab.com/gencove/platform/explorer-sdk/-/blob/main/gencove_explorer/constants.py  # noqa: E501 # pylint:
+    # disable=line-too-long
     # pylint: disable=invalid-name
     USERS: str = "users"
     ORG: str = "org"
@@ -203,44 +204,71 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
 
     def execute_aws_s3_path(
         self,
-        cmd: str,
+        cmd: Literal["ls", "rm"],
         path: str,
         args: List[str],
-    ) -> None:
+    ) -> List[str]:
         """Executes the respective `aws s3` single-path commands with `e://` paths
-        translated to `s3://` paths"""
+        translated to `s3://` paths
+
+        Args:
+            cmd (Literal["ls", "rm"]): AWS S3 command to execute
+            path (str): Path to execute command against
+            args (List[str]): List of additional args to forward to AWS CLI
+
+        Returns:
+            List of args passed to AWS CLI
+        """
         if not self.uri_ok(path):
             raise ValueError(f"Path {path} does not start with {self.EXPLORER_SCHEME}")
-        sh.aws.s3(  # pylint: disable=no-member
+        s3_command = [
             cmd,
             self.translate_path_to_s3_path(path),
             *args,
+        ]
+        sh.aws.s3(  # pylint: disable=no-member
+            s3_command,
             _in=sys.stdin,
             _out=sys.stdout,
             _err=sys.stderr,
             _env=self.aws_env,
         )
+        return s3_command
 
     def execute_aws_s3_src_dst(
-        self, cmd: str, source: str, destination: str, args: List[str]
-    ) -> None:
+        self, cmd: Literal["cp", "sync"], source: str, destination: str, args: List[str]
+    ) -> List[str]:
         """Executes the respective `aws s3` dual-path (source-to-destination)
-        commands with e://` paths translated to `s3://` paths"""
+        commands with e://` paths translated to `s3://` paths
+
+        Args:
+            cmd (Literal["cp", "sync"]): AWS S3 command to execute
+            source: Source path for S3 command
+            destination: Destination path for S3 command
+            args: List of additional args to forward to AWS CLI
+
+        Returns:
+            List of args passed to AWS CLI
+        """
         if not self.uri_ok(source) and not self.uri_ok(destination):
             raise ValueError(
                 f"At least one of source or destination must start with "
                 f"{self.EXPLORER_SCHEME}"
             )
-        sh.aws.s3(  # pylint: disable=no-member
+        s3_command = [
             cmd,
             self.translate_path_to_s3_path(source),
             self.translate_path_to_s3_path(destination),
             *args,
+        ]
+        sh.aws.s3(  # pylint: disable=no-member
+            s3_command,
             _in=sys.stdin,
             _out=sys.stdout,
             _err=sys.stderr,
             _env=self.aws_env,
         )
+        return s3_command
 
 
 def validate_explorer_user_data(user: UserDetails, organization: OrganizationDetails):

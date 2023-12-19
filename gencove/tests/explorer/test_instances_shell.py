@@ -104,7 +104,7 @@ def test_instances_shell(mocker, credentials, recording, vcr):
             return_value=None,
         )
     mocked_start_ssm_session = mocker.patch(
-        "gencove.command.explorer.instances." "shell.main.start_ssm_session"
+        "gencove.command.explorer.instances.shell.main.start_ssm_session"
     )
     res = runner.invoke(shell, credentials)
     assert res.exit_code == 0

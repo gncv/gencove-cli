@@ -21,8 +21,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
     organization_id: str
 
     # Constants ported from Gencove Explorer package
-    # https://gitlab.com/gencove/platform/explorer-sdk/-/blob/main/gencove_explorer/constants.py  # noqa: E501 # pylint:
-    # disable=line-too-long
+    # https://gitlab.com/gencove/platform/explorer-sdk/-/blob/main/gencove_explorer/constants.py  # noqa: E501 # pylint: disable=line-too-long
     # pylint: disable=invalid-name
     USERS: str = "users"
     ORG: str = "org"
@@ -167,7 +166,8 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         if path is None:
             return None
         if path.startswith(self.EXPLORER_SCHEME):
-            path_noprefix_split = path.removeprefix(self.EXPLORER_SCHEME).split("/")
+            path_noprefix = path[len(self.EXPLORER_SCHEME) :]
+            path_noprefix_split = path_noprefix.split("/")
             namespace = path_noprefix_split[0]
             if namespace not in self.NAMESPACES:
                 raise ValueError(

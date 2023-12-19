@@ -1,7 +1,6 @@
 """Test data sync command."""
 import io
 import sys
-
 from pathlib import Path
 
 # pylint: disable=wrong-import-order, import-error

@@ -9,7 +9,7 @@ from .main import Sync
 
 @click.command(
     "sync",
-    help="Sync data to/from Explorer object storage",
+    help="Sync directories to/from Explorer object storage",
     context_settings=dict(
         ignore_unknown_options=True,
         allow_extra_args=True,
@@ -17,11 +17,11 @@ from .main import Sync
 )
 @click.argument(
     "source",
-    type=click.Path(),
+    type=click.Path(file_okay=False, dir_okay=True),
 )
 @click.argument(
     "destination",
-    type=click.Path(),
+    type=click.Path(file_okay=False, dir_okay=True),
 )
 @click.pass_context
 @add_options(common_options)

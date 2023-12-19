@@ -126,7 +126,7 @@ class TestGencoveExplorerManager:
         self.explorer_manager.list_users()
         mock_list_users.assert_called_once()
 
-    @patch("gencove.command.explorer.data.common.sh.aws")
+    @patch("gencove.command.explorer.data.common.sh.aws", create=True)
     def test_execute_aws_s3_src_dst(self, mocked_aws):
         cmd = "cp"
         source = "e://users/me/source"
@@ -144,7 +144,7 @@ class TestGencoveExplorerManager:
 
         assert s3_cmd == [cmd, translated_source, translated_destination, *args]
 
-    @patch("gencove.command.explorer.data.common.sh.aws")
+    @patch("gencove.command.explorer.data.common.sh.aws", create=True)
     def test_execute_aws_s3_src_dst_invalid_path(self, mocked_aws):
         cmd = "cp"
         source = "invalid"
@@ -154,7 +154,7 @@ class TestGencoveExplorerManager:
         with pytest.raises(ValueError):
             self.explorer_manager.execute_aws_s3_src_dst(cmd, source, destination, args)
 
-    @patch("gencove.command.explorer.data.common.sh.aws")
+    @patch("gencove.command.explorer.data.common.sh.aws", create=True)
     def test_execute_execute_aws_s3_path(self, mocked_aws):
         cmd = "cp"
         path = "e://users/me/source"
@@ -166,7 +166,7 @@ class TestGencoveExplorerManager:
 
         assert s3_cmd == [cmd, translated_path, *args]
 
-    @patch("gencove.command.explorer.data.common.sh.aws")
+    @patch("gencove.command.explorer.data.common.sh.aws", create=True)
     def test_execute_execute_aws_s3_path_invalid_path(self, mocked_aws):
         cmd = "cp"
         path = "invalid"

@@ -2,7 +2,7 @@
 import sys
 import uuid
 from dataclasses import dataclass
-from typing import List, Optional, Tuple, Literal
+from typing import List, Optional, Tuple
 
 # pylint: disable=wrong-import-order
 from gencove.exceptions import ValidationError
@@ -204,7 +204,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
 
     def execute_aws_s3_path(
         self,
-        cmd: Literal["ls", "rm"],
+        cmd: str,
         path: str,
         args: List[str],
     ) -> List[str]:
@@ -212,7 +212,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         translated to `s3://` paths
 
         Args:
-            cmd (Literal["ls", "rm"]): AWS S3 command to execute
+            cmd (str): AWS S3 command to execute
             path (str): Path to execute command against
             args (List[str]): List of additional args to forward to AWS CLI
 
@@ -236,13 +236,13 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         return s3_command
 
     def execute_aws_s3_src_dst(
-        self, cmd: Literal["cp", "sync"], source: str, destination: str, args: List[str]
+        self, cmd: str, source: str, destination: str, args: List[str]
     ) -> List[str]:
         """Executes the respective `aws s3` dual-path (source-to-destination)
         commands with e://` paths translated to `s3://` paths
 
         Args:
-            cmd (Literal["cp", "sync"]): AWS S3 command to execute
+            cmd (str): AWS S3 command to execute
             source: Source path for S3 command
             destination: Destination path for S3 command
             args: List of additional args to forward to AWS CLI

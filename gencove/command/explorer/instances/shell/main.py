@@ -56,7 +56,7 @@ class ShellSession(Command):
             )
 
             def signal_handler(sig, frame):  # pylint: disable=unused-argument
-                command.signal(sig)
+                command.signal_group(sig)
 
             signal.signal(signal.SIGINT, signal_handler)
             signal.signal(signal.SIGTERM, signal_handler)

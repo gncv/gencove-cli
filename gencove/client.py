@@ -36,6 +36,7 @@ from gencove.models import (  # noqa: I101, I100
     CreateJWT,
     ExplorerInstanceInactivityStopOrganization,
     ExplorerInstances,
+    ExplorerShellSessionCredentials,
     FileTypesModel,
     ImportExistingSamplesModel,
     PipelineCapabilities,
@@ -1169,3 +1170,15 @@ class APIClient:
         }
 
         return self._post(endpoint, payload, authorized=True)
+
+    def get_explorer_shell_session_credentials(
+        self, instance_id
+    ) -> ExplorerShellSessionCredentials:
+        """Making a request to obtain explorer shell session credentials"""
+        endpoint = self.endpoints.EXPLORER_SHELL_SESSION_CREDENTIALS.value
+
+        payload = {"instance_id": instance_id}
+
+        return self._post(
+            endpoint, payload, authorized=True, model=ExplorerShellSessionCredentials
+        )

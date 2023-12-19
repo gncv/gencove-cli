@@ -445,3 +445,15 @@ class ExplorerInstanceInactivityStopOrganization(BaseModel):
 
     explorer_override_stop_after_inactivity_hours: bool
     explorer_stop_after_inactivity_hours: int
+
+
+class ExplorerShellSessionCredentials(BaseModel):
+    """ExplorerShellSessionCredentials model"""
+
+    version: Optional[int]
+    access_key: Optional[str]
+    secret_key: Optional[str]
+    token: Optional[str]
+    expiry_time: Optional[str]  # needs to be str for boto3 to work
+    ec2_instance_id: Optional[str]
+    ssm_document_name: Optional[str]

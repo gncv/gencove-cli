@@ -166,7 +166,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         if path is None:
             return None
         if path.startswith(self.EXPLORER_SCHEME):
-            path_noprefix = path[len(self.EXPLORER_SCHEME) :]
+            path_noprefix = path[len(self.EXPLORER_SCHEME) :]  # noqa: E203
             path_noprefix_split = path_noprefix.split("/")
             namespace = path_noprefix_split[0]
             if namespace not in self.NAMESPACES:

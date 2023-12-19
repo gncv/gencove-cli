@@ -72,6 +72,9 @@ def test_data_rm_success(mocker, credentials, recording, vcr):
             GencoveExplorerManager, "execute_aws_s3_path", return_value=None
         )
 
+    # Assumption that CLI user has a file called rm_test_file.txt in their
+    # Explorer files dir. If the cassette must be regenerated, upload a test file to
+    # "e://users/me/rm_test_file.txt"
     res = runner.invoke(rm, ["e://users/me/rm_test_file.txt", *credentials])
 
     if not recording:

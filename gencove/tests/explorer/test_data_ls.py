@@ -72,6 +72,8 @@ def test_data_ls_success(mocker, credentials, recording, vcr):
             GencoveExplorerManager, "execute_aws_s3_path", return_value=None
         )
 
+    # Assumption that CLI user has a file called cli_test_file.txt in their
+    # Explorer files dir
     res = runner.invoke(ls, ["e://users/me/", *credentials])
 
     if not recording:

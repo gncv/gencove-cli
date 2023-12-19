@@ -8,6 +8,7 @@ import sh
 
 from ....base import Command
 from .....exceptions import ValidationError
+from .....models import ExplorerShellSessionCredentials
 
 
 class ShellSession(Command):
@@ -36,36 +37,48 @@ class ShellSession(Command):
         )
         self.echo_debug("Requested explorer shell session credentials.")
 
-        try:
-            command = sh.aws.ssm(  # pylint: disable=no-member
-                [
-                    "start-session",
-                    "--target",
-                    credentials.ec2_instance_id,
-                    "--document-name",
-                    credentials.ssm_document_name,
-                ],
-                _env={
-                    "AWS_ACCESS_KEY_ID": credentials.access_key,
-                    "AWS_SECRET_ACCESS_KEY": credentials.secret_key,
-                    "AWS_SESSION_TOKEN": credentials.token,
-                },
-                _in=sys.stdin,
-                _out=sys.stdout,
-                _bg=True,
-            )
+        start_ssm_session(credentials)
 
-            def signal_handler(sig, frame):  # pylint: disable=unused-argument
-                command.signal_group(sig)
 
-            signal.signal(signal.SIGINT, signal_handler)
-            signal.signal(signal.SIGTERM, signal_handler)
-            signal.signal(signal.SIGQUIT, signal_handler)
-            signal.signal(signal.SIGHUP, signal_handler)
+def start_ssm_session(credentials: ExplorerShellSessionCredentials):
+    """Start SSM session using AWS CLI.
 
-            command.wait()
-        except sh.CommandNotFound as ex:
-            raise ValidationError(
-                "AWS CLI not available. Please follow installation instructions at"
-                "https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html"
-            ) from ex
+    Args:
+        credentials (ExplorerShellSessionCredentials): Explorer credentials.
+
+    Raises:
+        ValidationError: If AWS CLI not available.
+    """
+    try:
+        command = sh.aws.ssm(  # pylint: disable=no-member
+            [
+                "start-session",
+                "--target",
+                credentials.ec2_instance_id,
+                "--document-name",
+                credentials.ssm_document_name,
+            ],
+            _env={
+                "AWS_ACCESS_KEY_ID": credentials.access_key,
+                "AWS_SECRET_ACCESS_KEY": credentials.secret_key,
+                "AWS_SESSION_TOKEN": credentials.token,
+            },
+            _in=sys.stdin,
+            _out=sys.stdout,
+            _bg=True,
+        )
+
+        def signal_handler(sig, frame):  # pylint: disable=unused-argument
+            command.signal_group(sig)
+
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTERM, signal_handler)
+        signal.signal(signal.SIGQUIT, signal_handler)
+        signal.signal(signal.SIGHUP, signal_handler)
+
+        command.wait()
+    except sh.CommandNotFound as ex:
+        raise ValidationError(
+            "AWS CLI not available. Please follow installation instructions at"
+            "https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html"
+        ) from ex

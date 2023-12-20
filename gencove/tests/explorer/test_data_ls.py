@@ -59,6 +59,7 @@ def vcr_config():
 def test_data_ls_success(mocker, credentials, recording, vcr):
     """Test data being output to shell."""
     runner = CliRunner()
+    mocker.patch("gencove.command.utils.user_has_aws_in_path", return_value=True)
     if not recording:
         credentials_response = get_vcr_response(
             "/api/v2/explorer-data-credentials/", vcr
@@ -90,6 +91,7 @@ def test_data_ls_success(mocker, credentials, recording, vcr):
 def test_data_ls_no_permission(mocker, credentials):
     """Test no permissions for credentials endpoint."""
     runner = CliRunner()
+    mocker.patch("gencove.command.utils.user_has_aws_in_path", return_value=True)
     mocked_get_credentials = mocker.patch.object(
         APIClient,
         "get_explorer_data_credentials",

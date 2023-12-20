@@ -25,7 +25,12 @@ from gencove.command.upload.utils import (
     upload_file,
     valid_fastq_file_name_in_url,
 )
-from gencove.command.utils import is_valid_uuid, validate_uuid, validate_uuid_list
+from gencove.command.utils import (
+    is_valid_uuid,
+    validate_uuid,
+    validate_uuid_list,
+    user_has_aws_in_path,
+)
 from gencove.constants import (
     ApiEndpoints,
     Credentials,
@@ -654,3 +659,16 @@ def test_file_name_in_url(url, expected):
 def test_looks_like_url(value, expected):
     """Test multiple cases of URL strings"""
     assert looks_like_url(value) == expected
+
+
+def test_user_has_aws_in_path(mocker):
+    """Test user_has_aws_in_path function"""
+    mocker.patch("gencove.command.utils.shutil.which", return_value=True)
+    assert user_has_aws_in_path()
+
+    mocker.patch("gencove.command.utils.shutil.which", return_value=False)
+    with pytest.raises(ValidationError):
+        user_has_aws_in_path(raise_exception=True)
+
+    mocker.patch("gencove.command.utils.shutil.which", return_value=False)
+    assert not user_has_aws_in_path(raise_exception=False)

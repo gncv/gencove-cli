@@ -1,6 +1,7 @@
 """Configure explorer data rm subcommand."""
 from ..common import GencoveExplorerManager, validate_explorer_user_data
 from ....base import Command
+from ....utils import user_has_aws_in_path
 
 
 class Remove(Command):
@@ -18,6 +19,7 @@ class Remove(Command):
     def validate(self):
         """Validate rm"""
         validate_explorer_user_data(self.user, self.organization)
+        user_has_aws_in_path(raise_exception=True)
 
     def initialize(self):
         """Initialize rm subcommand."""

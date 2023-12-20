@@ -3,6 +3,7 @@ import sys
 
 from ..common import GencoveExplorerManager, validate_explorer_user_data
 from ....base import Command
+from ....utils import user_has_aws_in_path
 
 
 class List(Command):
@@ -20,6 +21,7 @@ class List(Command):
     def validate(self):
         """Validate ls"""
         validate_explorer_user_data(self.user, self.organization)
+        user_has_aws_in_path(raise_exception=True)
 
     def initialize(self):
         """Initialize ls subcommand."""

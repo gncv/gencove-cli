@@ -153,7 +153,8 @@ def user_has_aws_in_path(raise_exception: bool = False) -> Optional[bool]:
     """Check if user has AWS CLI in PATH
 
     Args:
-        raise_exception (bool): If True, will raise ValidationError if AWS CLI not in PATH
+        raise_exception (bool): If True, will raise ValidationError if AWS CLI
+            is not in PATH
 
     Returns:
         True if AWS CLI in PATH, False if not

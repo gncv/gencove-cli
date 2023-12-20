@@ -27,9 +27,9 @@ from gencove.command.upload.utils import (
 )
 from gencove.command.utils import (
     is_valid_uuid,
+    user_has_aws_in_path,
     validate_uuid,
     validate_uuid_list,
-    user_has_aws_in_path,
 )
 from gencove.constants import (
     ApiEndpoints,

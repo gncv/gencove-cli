@@ -72,10 +72,11 @@ class ShellSession(Command):
         Raises:
             ValidationError: If AWS CLI not available.
         """
-        spoof_network_background = Process(
-            target=self.spoof_network_activity, args=(credentials, refresh_credentials)
+        network_activity_background = Process(
+            target=self.generate_network_activity,
+            args=(credentials, refresh_credentials),
         )
-        spoof_network_background.start()
+        network_activity_background.start()
         try:
             command = sh.aws.ssm(  # pylint: disable=no-member
                 [
@@ -110,11 +111,11 @@ class ShellSession(Command):
                 "https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html"
             ) from ex
         finally:
-            if spoof_network_background.is_alive():
+            if network_activity_background.is_alive():
                 # Try to gracefully stop the backgroud process
-                spoof_network_background.terminate()
+                network_activity_background.terminate()
 
-    def spoof_network_activity(
+    def generate_network_activity(
         self,
         credentials: ExplorerShellSessionCredentials,
         refresh_credentials: Callable[[], ExplorerShellSessionCredentials],

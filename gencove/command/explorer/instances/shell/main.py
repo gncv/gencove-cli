@@ -128,11 +128,11 @@ class ShellSession(Command):
             refresh_credentials (Callable[[], ExplorerShellSessionCredentials]):
                 Refresh method.
         """
+        boto3_session = get_boto_session_refreshable(refresh_credentials)
+        ssm_client = boto3_session.client("ssm")
         while True:
             time.sleep(5)
             try:
-                boto3_session = get_boto_session_refreshable(refresh_credentials)
-                ssm_client = boto3_session.client("ssm")
                 random_data = base64.b64encode(os.urandom(50_000))[:50_000]
                 self.echo_debug(
                     f"Spoofing network activity random_data_len={len(random_data)}"

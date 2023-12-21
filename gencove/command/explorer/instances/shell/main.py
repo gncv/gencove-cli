@@ -129,7 +129,7 @@ class ShellSession(Command):
                 Refresh method.
         """
         boto3_session = get_boto_session_refreshable(refresh_credentials)
-        ssm_client = boto3_session.client("ssm")
+        ssm_client = boto3_session.client("ssm", region_name=credentials.region_name)
         while True:
             time.sleep(5)
             try:

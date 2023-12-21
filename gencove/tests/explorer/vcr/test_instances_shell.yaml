@@ -61,7 +61,7 @@ interactions:
   response:
     body:
       string: '{"meta": {"count": 1, "next": null, "previous": null}, "results": [{"id":
-        "11111111-1111-1111-1111-111111111111", "status": "stopped", "stop_after_inactivity_hours":
+        "11111111-1111-1111-1111-111111111111", "status": "running", "stop_after_inactivity_hours":
         null}]}'
     headers:
       Allow:

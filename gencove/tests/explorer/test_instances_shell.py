@@ -12,6 +12,7 @@ from gencove.client import (
     APIClientError,
 )  # noqa: I100
 from gencove.command.explorer.instances.cli import shell
+from gencove.command.explorer.instances.shell.main import ShellSession
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.explorer.vcr.filters import (  # noqa: I101
     filter_list_instances_response,
@@ -103,8 +104,9 @@ def test_instances_shell(mocker, credentials, recording, vcr):
             "get_explorer_shell_session_credentials",
             return_value=None,
         )
-    mocked_start_ssm_session = mocker.patch(
-        "gencove.command.explorer.instances.shell.main.start_ssm_session"
+    mocked_start_ssm_session = mocker.patch.object(
+        ShellSession,
+        "start_ssm_session",
     )
     res = runner.invoke(shell, credentials)
     assert res.exit_code == 0

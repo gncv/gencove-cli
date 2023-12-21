@@ -456,4 +456,5 @@ class ExplorerShellSessionCredentials(BaseModel):
     token: Optional[str]
     expiry_time: Optional[str]  # needs to be str for boto3 to work
     ec2_instance_id: Optional[str]
-    ssm_document_name: Optional[str]
+    shell_session_ssm_document_name: Optional[str]
+    network_activity_ssm_document_name: Optional[str]

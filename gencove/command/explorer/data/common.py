@@ -305,5 +305,5 @@ def request_is_from_explorer_instance() -> bool:
         if expected_role_name in response["Arn"]:
             return True
     except Exception:  # noqa pylint: disable=broad-except
-        pass
+        return False
     return False

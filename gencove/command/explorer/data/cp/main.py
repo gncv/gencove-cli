@@ -1,5 +1,9 @@
 """Configure explorer data cp subcommand."""
-from ..common import GencoveExplorerManager, validate_explorer_user_data
+from ..common import (
+    GencoveExplorerManager,
+    request_is_from_explorer_instance,
+    validate_explorer_user_data,
+)
 from ....base import Command
 from ....utils import user_has_aws_in_path
 
@@ -16,6 +20,7 @@ class Copy(Command):
         # Populated after self.login() is called
         self.user = None
         self.organization = None
+        self.aws_session_credentials = None
 
     def validate(self):
         """Validate cp"""
@@ -28,12 +33,17 @@ class Copy(Command):
         self.user = self.api_client.get_user_details()
         self.organization = self.api_client.get_organization_details()
 
+        if not request_is_from_explorer_instance():
+            self.aws_session_credentials = (
+                self.api_client.get_explorer_data_credentials()
+            )
+
     def execute(self):
         """Make a request to cp."""
         self.echo_debug("Copy Explorer contents.")
 
         explorer_manager = GencoveExplorerManager(
-            aws_session_credentials=self.api_client.get_explorer_data_credentials(),
+            aws_session_credentials=self.aws_session_credentials,
             user_id=str(self.user.id),
             organization_id=str(self.organization.id),
         )

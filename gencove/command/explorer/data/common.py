@@ -1,4 +1,5 @@
 """Common code shared across data commands is stored here"""
+import os
 import sys
 import uuid
 from dataclasses import dataclass
@@ -8,17 +9,20 @@ from typing import List, Optional, Tuple
 from gencove.exceptions import ValidationError
 from gencove.models import AWSCredentials, OrganizationDetails, UserDetails
 
-import sh
+
+import boto3  # noqa: I100
+
+import sh  # noqa: I100
 
 
 @dataclass
 class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,too-many-public-methods # noqa: E501
     """Port of Explorer GencoveClient and related functionality"""
 
-    aws_session_credentials: AWSCredentials
-
     user_id: str
     organization_id: str
+
+    aws_session_credentials: Optional[AWSCredentials]
 
     # Constants ported from Gencove Explorer package
     # https://gitlab.com/gencove/platform/explorer-sdk/-/blob/main/gencove_explorer/constants.py  # noqa: E501 # pylint: disable=line-too-long
@@ -56,8 +60,10 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         return f"gencove-explorer-{organization_id_short}"
 
     @property
-    def aws_env(self) -> dict:
+    def aws_env(self) -> Optional[dict]:
         """Dict containing AWS credentials"""
+        if not self.aws_session_credentials:
+            return None
         return {
             "AWS_ACCESS_KEY_ID": self.aws_session_credentials.access_key,
             "AWS_SECRET_ACCESS_KEY": self.aws_session_credentials.secret_key,
@@ -282,3 +288,22 @@ def validate_explorer_user_data(user: UserDetails, organization: OrganizationDet
 
     if not user or not organization:
         raise ValidationError("Could not retrieve user details, quitting.")
+
+
+def request_is_from_explorer_instance() -> bool:
+    """
+    Detects whether user is executing code from an Explorer instance.
+    If check fails, we assume user is not in instance.
+
+    Returns:
+        bool: True if user in Explorer instance, False otherwise
+    """
+    try:
+        client = boto3.client("sts")
+        response = client.get_caller_identity()
+        expected_role_name = f"explorer-user-{os.environ['GENCOVE_USER_ID']}-role"
+        if expected_role_name in response["Arn"]:
+            return True
+    except Exception:  # noqa pylint: disable=broad-except
+        pass
+    return False

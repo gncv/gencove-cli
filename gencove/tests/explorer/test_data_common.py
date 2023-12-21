@@ -1,5 +1,7 @@
 """Tests for command.explorer.data.common"""
-from unittest.mock import patch
+import os
+from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 # pylint: disable=wrong-import-order, import-error
 
@@ -8,7 +10,9 @@ import pytest
 from gencove.command.explorer.data.common import (  # noqa: I100
     AWSCredentials,
     GencoveExplorerManager,
+    request_is_from_explorer_instance,
 )
+from gencove.tests.utils import MOCK_UUID
 
 
 class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
@@ -214,3 +218,46 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
 
         with pytest.raises(ValueError):
             self.explorer_manager.execute_aws_s3_path(cmd, path, args)
+
+
+class TestRequestIsFromExplorerInstance(TestCase):
+    """Test case for request_is_from_instance()"""
+
+    def setUp(self):
+        self.user_id = MOCK_UUID
+        self.account_id = "123412341234"
+
+    def from_explorer_instance(self):
+        """Test when request issued from explorer instance"""
+        with patch(
+            "gencove.command.explorer.data.common.boto3.client"
+        ) as mock_boto3, patch.dict(os.environ, {"GENCOVE_USER_ID": self.user_id}):
+            client_mock = MagicMock()
+            client_mock.get_caller_identity.return_value = {
+                "Arn": f"arn:aws:iam::{self.account_id}:role/explorer-user-{self.user_id}-role"  # noqa: E501 pylint: disable=line-too-long
+            }
+            mock_boto3.return_value = client_mock
+
+            assert request_is_from_explorer_instance() is True
+
+    def test_not_from_explorer_instance(self):
+        """Test when request not from explorer instance"""
+        with patch(
+            "gencove.command.explorer.data.common.boto3.client"
+        ) as mock_boto3, patch.dict(os.environ, {"GENCOVE_USER_ID": self.user_id}):
+            client_mock = MagicMock()
+            client_mock.get_caller_identity.return_value = {
+                "Arn": "arn:aws:iam::1111111111111111:role/some-other-role"
+            }
+            mock_boto3.return_value = client_mock
+
+            assert request_is_from_explorer_instance() is False
+
+    def test_exception(self):
+        """Test when exception is raised"""
+        with patch(
+            "gencove.command.explorer.data.common.boto3.client"
+        ) as mock_boto3, patch.dict(os.environ, {"GENCOVE_USER_ID": self.user_id}):
+            mock_boto3.side_effect = Exception("AWS error")
+
+            assert request_is_from_explorer_instance() is False

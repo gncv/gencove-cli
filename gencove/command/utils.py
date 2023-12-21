@@ -2,11 +2,13 @@
 import json
 import os
 import re
+import shutil
 import uuid
 from typing import Optional
 
 import click
 
+from gencove.exceptions import ValidationError
 from gencove.logger import dump_debug_log, echo_error
 
 map_arguments_to_human_readable = {
@@ -145,3 +147,23 @@ def extract_filename_from_headers(headers: dict) -> Optional[str]:
     if match:
         return match.group(1)
     return None
+
+
+def user_has_aws_in_path(raise_exception: bool = False) -> Optional[bool]:
+    """Check if user has AWS CLI in PATH
+
+    Args:
+        raise_exception (bool): If True, will raise ValidationError if AWS CLI
+            is not in PATH
+
+    Returns:
+        True if AWS CLI in PATH, False if not
+    """
+    if shutil.which("aws"):
+        return True
+    if raise_exception:
+        raise ValidationError(
+            "AWS CLI not available. Please follow installation instructions at "
+            "https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html"
+        )
+    return False

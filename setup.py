@@ -55,6 +55,7 @@ setup(
     entry_points="""
         [console_scripts]
         gencove=gencove.cli:cli
+        d=gencove.command.explorer.data.cli:data
     """,
     package_data={"gencove": ["version/*", "description/*"]},
 )

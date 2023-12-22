@@ -38,9 +38,27 @@ def filter_instance_ids_request(request):
             samples = [MOCK_UUID for _ in body["instance_ids"]]
             body["instance_ids"] = samples
             request.body = json.dumps(body).encode()
+        if "instance_id" in body:
+            body["instance_id"] = MOCK_UUID
+            request.body = json.dumps(body).encode()
     except json.decoder.JSONDecodeError:
         pass
     return request
+
+
+@parse_response_to_json
+def filter_session_credentials_response(response, json_response):
+    """Filter credentials secrets."""
+    for key in [
+        "access_key",
+        "secret_key",
+        "token",
+        "ec2_instance_id",
+        "ssm_document_name",
+    ]:
+        if key in json_response:
+            json_response[key] = f"mock_{key}"
+    return response, json_response
 
 
 @parse_response_to_json

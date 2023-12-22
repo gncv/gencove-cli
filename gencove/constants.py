@@ -54,6 +54,7 @@ class ApiEndpoints(Enum):
     EXPLORER_INSTANCES_INACTIVITY_STOP_ORGANIZATION = (
         "/api/v2/explorer-instances-inactivity-stop-organization/"
     )
+    EXPLORER_SHELL_SESSION_CREDENTIALS = "/api/v2/explorer-shell-session-credentials/"
     EXPLORER_DATA_CREDENTIALS = "/api/v2/explorer-data-credentials/"
 
 

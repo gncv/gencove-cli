@@ -27,8 +27,8 @@ CHUNK_SIZE = NUM_MB_IN_CHUNK * MB
 FILENAME_RE = re.compile("filename=(.+)")
 
 
-def get_s3_client_refreshable(refresh_method):
-    """Return thread-safe s3 client with refreshable credentials.
+def get_boto_session_refreshable(refresh_method):
+    """Return boto session with refreshable credentials.
 
     :param refresh_method: function that can get fresh credentials
     """
@@ -46,6 +46,16 @@ def get_s3_client_refreshable(refresh_method):
     # pylint: disable=protected-access
     session._credentials = session_credentials
     boto3_session = boto3.Session(botocore_session=session)
+    return boto3_session
+
+
+def get_s3_client_refreshable(refresh_method):
+    """Return thread-safe s3 client with refreshable credentials.
+
+    :param refresh_method: function that can get fresh credentials
+    """
+
+    boto3_session = get_boto_session_refreshable(refresh_method)
     return boto3_session.client(
         "s3",
         endpoint_url=os.environ.get("GENCOVE_LOCALSTACK_S3_ENDPOINT") or None,

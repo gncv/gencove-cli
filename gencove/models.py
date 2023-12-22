@@ -447,6 +447,20 @@ class ExplorerInstanceInactivityStopOrganization(BaseModel):
     explorer_stop_after_inactivity_hours: int
 
 
+class ExplorerShellSessionCredentials(BaseModel):
+    """ExplorerShellSessionCredentials model"""
+
+    version: Optional[int]
+    access_key: Optional[str]
+    secret_key: Optional[str]
+    token: Optional[str]
+    expiry_time: Optional[str]  # needs to be str for boto3 to work
+    region_name: Optional[str]
+    ec2_instance_id: Optional[str]
+    shell_session_ssm_document_name: Optional[str]
+    network_activity_ssm_document_name: Optional[str]
+
+
 class OrganizationDetails(GencoveBaseModel):
     """OrganizationDetails model"""
 

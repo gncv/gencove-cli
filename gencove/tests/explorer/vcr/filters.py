@@ -38,6 +38,9 @@ def filter_instance_ids_request(request):
             samples = [MOCK_UUID for _ in body["instance_ids"]]
             body["instance_ids"] = samples
             request.body = json.dumps(body).encode()
+        if "instance_id" in body:
+            body["instance_id"] = MOCK_UUID
+            request.body = json.dumps(body).encode()
     except json.decoder.JSONDecodeError:
         pass
     return request

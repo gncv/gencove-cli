@@ -91,8 +91,8 @@ class Project(GencoveBaseModel):
     files: Optional[List[SampleFile]]
 
 
-class UploadCredentials(BaseModel):
-    """UploadCredentials model"""
+class AWSCredentials(BaseModel):
+    """Generic AWS credentials model"""
 
     version: Optional[int]
     access_key: Optional[str]
@@ -445,3 +445,39 @@ class ExplorerInstanceInactivityStopOrganization(BaseModel):
 
     explorer_override_stop_after_inactivity_hours: bool
     explorer_stop_after_inactivity_hours: int
+
+
+class ExplorerShellSessionCredentials(BaseModel):
+    """ExplorerShellSessionCredentials model"""
+
+    version: Optional[int]
+    access_key: Optional[str]
+    secret_key: Optional[str]
+    token: Optional[str]
+    expiry_time: Optional[str]  # needs to be str for boto3 to work
+    region_name: Optional[str]
+    ec2_instance_id: Optional[str]
+    shell_session_ssm_document_name: Optional[str]
+    network_activity_ssm_document_name: Optional[str]
+
+
+class OrganizationDetails(GencoveBaseModel):
+    """OrganizationDetails model"""
+
+    id: UUID
+    name: str
+    expire_uploads_period_days: int
+    archive_period_days: int
+    archive_restore_period_days: int
+    uploads_enabled: bool
+
+
+class UserDetails(GencoveBaseModel):
+    """UserDetails model"""
+
+    id: UUID
+    email: str
+    name: str
+    uploads_enabled: bool
+    explorer_enabled: bool
+    is_support: bool

@@ -63,6 +63,10 @@ def vcr_config():
 def test_instances_shell_no_permission(mocker, credentials):
     """Test instances no permission available to shell them."""
     runner = CliRunner()
+    mocker.patch(
+        "gencove.command.explorer.instances.shell.main.user_has_aws_in_path",
+        return_value=True,
+    )
     mocked_get_instances = mocker.patch.object(
         APIClient,
         "get_explorer_instances",
@@ -95,6 +99,10 @@ def test_instances_shell_no_permission(mocker, credentials):
 def test_instances_shell(mocker, credentials, recording, vcr):
     """Test instances shell."""
     runner = CliRunner()
+    mocker.patch(
+        "gencove.command.explorer.instances.shell.main.user_has_aws_in_path",
+        return_value=True,
+    )
     if not recording:
         # Mock shell only if using the cassettes, since we mock the
         # return value.

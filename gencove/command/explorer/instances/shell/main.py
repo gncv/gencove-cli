@@ -15,6 +15,7 @@ import sh  # pylint: disable=wrong-import-order
 from ....base import Command
 from .....exceptions import ValidationError
 from .....models import ExplorerShellSessionCredentials
+from ....utils import user_has_aws_in_path
 
 
 class ShellSession(Command):
@@ -22,6 +23,7 @@ class ShellSession(Command):
 
     def validate(self):
         """Validate start shell sessions"""
+        user_has_aws_in_path(raise_exception=True)
 
     def initialize(self):
         """Initialize shell subcommand."""
@@ -105,11 +107,6 @@ class ShellSession(Command):
             signal.signal(signal.SIGHUP, signal_handler)
 
             command.wait()
-        except sh.CommandNotFound as ex:
-            raise ValidationError(
-                "AWS CLI not available. Please follow installation instructions at"
-                "https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html"
-            ) from ex
         finally:
             if network_activity_background.is_alive():
                 # Try to gracefully stop the backgroud process

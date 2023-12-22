@@ -15,6 +15,7 @@ class ApiEndpoints(Enum):
     REFRESH_JWT = "/api/v2/jwt-refresh/"
     UPLOAD_DETAILS = "/api/v2/uploads-post-data/"
     UPLOAD_URL = "/api/v2/uploads-url/"
+    USER_DETAILS = "/api/v2/user/"
     GET_UPLOAD_CREDENTIALS = "/api/v2/upload-credentials/"
     PROJECT_SAMPLES = "/api/v2/project-samples/{id}"
     SAMPLE_DETAILS = "/api/v2/samples/{id}"
@@ -45,6 +46,7 @@ class ApiEndpoints(Enum):
     PIPELINES = "/api/v2/pipeline/"
     PIPELINE = "/api/v2/pipeline/{id}"
     ORGANIZATION_MONTHLY_USAGE_REPORT = "/api/v2/organization-monthly-usage-report/"
+    ORGANIZATION_DETAILS = "/api/v2/organization/"
     EXPLORER_INSTANCES = "/api/v2/explorer-instances/"
     EXPLORER_INSTANCES_STOP = "/api/v2/explorer-stop-instances/"
     EXPLORER_INSTANCES_START = "/api/v2/explorer-start-instances/"
@@ -53,6 +55,7 @@ class ApiEndpoints(Enum):
         "/api/v2/explorer-instances-inactivity-stop-organization/"
     )
     EXPLORER_SHELL_SESSION_CREDENTIALS = "/api/v2/explorer-shell-session-credentials/"
+    EXPLORER_DATA_CREDENTIALS = "/api/v2/explorer-data-credentials/"
 
 
 @unique

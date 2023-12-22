@@ -39,6 +39,7 @@ from gencove.models import (  # noqa: I101, I100
     ExplorerShellSessionCredentials,
     FileTypesModel,
     ImportExistingSamplesModel,
+    OrganizationDetails,
     PipelineCapabilities,
     PipelineDetail,
     Pipelines,
@@ -55,10 +56,11 @@ from gencove.models import (  # noqa: I101, I100
     SampleMetadata,
     SampleQC,
     SampleSheet,
-    UploadCredentials,
+    AWSCredentials,
     UploadSamples,
     UploadsPostData,
     UploadURLImport,
+    UserDetails,
 )
 from gencove.version import version as cli_version
 
@@ -432,6 +434,31 @@ class APIClient:
         jwt = self.get_jwt(email, password, otp_token)
         self._set_jwt(jwt.access, jwt.refresh)
 
+    def get_user_details(self):
+        """Retrieve user details"""
+        return self._get(
+            self.endpoints.USER_DETAILS.value,
+            authorized=True,
+            model=UserDetails,
+        )
+
+    def get_organization_details(self):
+        """Retrieve organization details"""
+        return self._get(
+            self.endpoints.ORGANIZATION_DETAILS.value,
+            authorized=True,
+            model=OrganizationDetails,
+        )
+
+    def get_explorer_data_credentials(self):
+        """Get AWS credentials for user to enable Explorer S3 data access."""
+        return self._post(
+            self.endpoints.EXPLORER_DATA_CREDENTIALS.value,
+            authorized=True,
+            sensitive=True,
+            model=AWSCredentials,
+        )
+
     def get_upload_details(self, gncv_file_path):
         """Get file upload details.
         Args:
@@ -453,7 +480,7 @@ class APIClient:
             self.endpoints.GET_UPLOAD_CREDENTIALS.value,
             authorized=True,
             sensitive=True,
-            model=UploadCredentials,
+            model=AWSCredentials,
         )
 
     def get_project_samples(

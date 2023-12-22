@@ -85,6 +85,7 @@ class ShellSession(Command):
                     "AWS_ACCESS_KEY_ID": credentials.access_key,
                     "AWS_SECRET_ACCESS_KEY": credentials.secret_key,
                     "AWS_SESSION_TOKEN": credentials.token,
+                    "AWS_REGION": credentials.region_name,
                 },
                 _in=sys.stdin,
                 _out=sys.stdout,

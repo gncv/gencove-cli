@@ -13,9 +13,9 @@ from gencove.utils import get_boto_session_refreshable
 import sh  # pylint: disable=wrong-import-order
 
 from ....base import Command
+from ....utils import user_has_aws_in_path
 from .....exceptions import ValidationError
 from .....models import ExplorerShellSessionCredentials
-from ....utils import user_has_aws_in_path
 
 
 class ShellSession(Command):

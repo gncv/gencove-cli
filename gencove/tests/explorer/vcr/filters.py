@@ -58,6 +58,7 @@ def filter_session_credentials_response(response, json_response):
     return response, json_response
 
 
+@parse_response_to_json
 def filter_data_credentials_response(response, json_response):
     """Filter credentials secrets."""
     for key in ["access_key", "secret_key", "token"]:

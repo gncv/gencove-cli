@@ -6,7 +6,6 @@ import signal
 import sys
 import time
 from multiprocessing import Process
-from typing import Callable
 
 from gencove.utils import get_boto_session_refreshable
 
@@ -45,38 +44,32 @@ class ShellSession(Command):
                 "Instance is not running. Cannot start shell session."
             )
 
-        def get_credentials():
-            """Return credentials for starting an SSM session/command.
+        instance_id = str(explorer_instances.results[0].id)
+        self.echo_debug("Requested explorer shell session credentials.")
+        credentials = self.api_client.get_explorer_shell_session_credentials(
+            instance_id=instance_id
+        )
 
-            Returns:
-                ExplorerShellSessionCredentials: Credentials.
-            """
-            self.echo_debug("Requested explorer shell session credentials.")
-            return self.api_client.get_explorer_shell_session_credentials(
-                instance_id=explorer_instances.results[0].id
-            )
-
-        self.start_ssm_session(get_credentials(), get_credentials)
+        self.start_ssm_session(credentials, instance_id)
 
     def start_ssm_session(
         self,
         credentials: ExplorerShellSessionCredentials,
-        refresh_credentials: Callable[[], ExplorerShellSessionCredentials],
+        instance_id: str,
     ):
         """Start SSM session using AWS CLI.
 
         Args:
             credentials (ExplorerShellSessionCredentials): Credentials
                 to send commands to the isntance.
-            refresh_credentials (Callable[[], ExplorerShellSessionCredentials]):
-                Refresh method.
+            instance_id (str): Explorer instance id.
 
         Raises:
             ValidationError: If AWS CLI not available.
         """
         network_activity_background = Process(
             target=self.generate_network_activity,
-            args=(credentials, refresh_credentials),
+            args=(credentials, instance_id),
         )
         network_activity_background.start()
         try:
@@ -115,7 +108,7 @@ class ShellSession(Command):
     def generate_network_activity(
         self,
         credentials: ExplorerShellSessionCredentials,
-        refresh_credentials: Callable[[], ExplorerShellSessionCredentials],
+        instance_id: str,
     ):
         """Spoofs explorer instance network activity by sending random data.
         Runs forever.
@@ -123,9 +116,19 @@ class ShellSession(Command):
         Args:
             credentials (ExplorerShellSessionCredentials): Credentials
                 to send commands to the isntance.
-            refresh_credentials (Callable[[], ExplorerShellSessionCredentials]):
-                Refresh method.
+            instance_id (str): Explorer instance id.
         """
+
+        def refresh_credentials():
+            """Refresh credentials.
+
+            Returns:
+                ExplorerShellSessionCredentials: Session credentials.
+            """
+            return self.api_client.get_explorer_shell_session_credentials(
+                instance_id=instance_id
+            )
+
         boto3_session = get_boto_session_refreshable(refresh_credentials)
         ssm_client = boto3_session.client("ssm", region_name=credentials.region_name)
         while True:

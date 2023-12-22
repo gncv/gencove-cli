@@ -6,7 +6,6 @@ import signal
 import sys
 import time
 from multiprocessing import Process
-from typing import Callable
 
 from gencove.utils import get_boto_session_refreshable
 

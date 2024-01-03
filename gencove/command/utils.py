@@ -214,7 +214,9 @@ def user_has_session_manager_plugin_in_path(
         return True
     if raise_exception:
         raise ValidationError(
-            "Session Manager plugin not available. Please follow installation instructions at "
-            "https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html"
+            "Session Manager plugin not available. "
+            "Please follow installation instructions at "
+            "https://docs.aws.amazon.com/systems-manager/latest/"
+            "userguide/session-manager-working-with-install-plugin.html"
         )
     return False

@@ -12,7 +12,11 @@ from gencove.utils import get_boto_session_refreshable
 import sh  # pylint: disable=wrong-import-order
 
 from ....base import Command
-from ....utils import user_has_aws_in_path
+from ....utils import (
+    user_has_aws_in_path,
+    user_has_session_manager_plugin_in_path,
+    user_has_supported_aws_cli,
+)
 from .....exceptions import ValidationError
 from .....models import ExplorerShellSessionCredentials
 
@@ -23,6 +27,8 @@ class ShellSession(Command):
     def validate(self):
         """Validate start shell sessions"""
         user_has_aws_in_path(raise_exception=True)
+        user_has_supported_aws_cli(raise_exception=True)
+        user_has_session_manager_plugin_in_path(raise_exception=True)
 
     def initialize(self):
         """Initialize shell subcommand."""
@@ -85,7 +91,9 @@ class ShellSession(Command):
                     "AWS_ACCESS_KEY_ID": credentials.access_key,
                     "AWS_SECRET_ACCESS_KEY": credentials.secret_key,
                     "AWS_SESSION_TOKEN": credentials.token,
+                    "AWS_DEFAULT_REGION": credentials.region_name,
                     "AWS_REGION": credentials.region_name,
+                    "PATH": os.environ["PATH"],
                 },
                 _in=sys.stdin,
                 _out=sys.stdout,
@@ -135,7 +143,7 @@ class ShellSession(Command):
         while True:
             time.sleep(5)
             try:
-                random_data = base64.b64encode(os.urandom(50_000))[:50_000].decode()
+                random_data = base64.b64encode(os.urandom(50_000)).decode()[:50_000]
                 self.echo_debug(
                     f"Spoofing network activity random_data_len={len(random_data)}"
                 )

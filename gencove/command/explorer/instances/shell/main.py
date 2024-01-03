@@ -143,7 +143,7 @@ class ShellSession(Command):
         while True:
             time.sleep(5)
             try:
-                random_data = base64.b64encode(os.urandom(50_000))[:50_000].decode()
+                random_data = base64.b64encode(os.urandom(50_000)).decode()[:50_000]
                 self.echo_debug(
                     f"Spoofing network activity random_data_len={len(random_data)}"
                 )

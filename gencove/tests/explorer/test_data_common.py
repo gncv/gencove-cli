@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from gencove.command.explorer.data.common import (  # noqa: I100
-    AWSCredentials,
+    ExplorerDataCredentials,
     GencoveExplorerManager,
     request_is_from_explorer_instance,
 )
@@ -25,8 +25,11 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
         self.user_id = "11111111-1111-1111-1111-111111111111"
         self.organization_id = "11111111-1111-1111-1111-111111111111"
         self.org_id_short = self.organization_id.replace("-", "")[:12]
-        self.mock_aws_credentials = AWSCredentials(
-            access_key="mock_access", secret_key="mock_secret", token="mock_token"
+        self.mock_aws_credentials = ExplorerDataCredentials(
+            access_key="mock_access",
+            secret_key="mock_secret",
+            token="mock_token",
+            region_name="mock_region",
         )
         self.explorer_manager = GencoveExplorerManager(
             aws_session_credentials=self.mock_aws_credentials,
@@ -124,6 +127,7 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
             "AWS_ACCESS_KEY_ID": "mock_access",
             "AWS_SECRET_ACCESS_KEY": "mock_secret",
             "AWS_SESSION_TOKEN": "mock_token",
+            "AWS_REGION": "mock_region",
         }
         assert self.explorer_manager.aws_env == expected
 

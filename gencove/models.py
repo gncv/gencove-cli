@@ -101,6 +101,12 @@ class AWSCredentials(BaseModel):
     expiry_time: Optional[str]  # needs to be str for boto3 to work
 
 
+class ExplorerDataCredentials(AWSCredentials):
+    """AWS Credentials for Explorer data commands"""
+
+    region_name: Optional[str]
+
+
 class SampleDetails(GencoveBaseModel):
     """SampleDetails model"""
 

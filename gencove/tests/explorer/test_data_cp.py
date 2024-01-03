@@ -14,7 +14,7 @@ from gencove.client import (
 )  # noqa: I100
 from gencove.command.explorer.data.cli import cp
 from gencove.command.explorer.data.common import GencoveExplorerManager
-from gencove.models import AWSCredentials
+from gencove.models import ExplorerDataCredentials
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.explorer.vcr.filters import (  # noqa: I101
     filter_data_credentials_response,
@@ -70,7 +70,7 @@ def test_data_cp_success(mocker, credentials, recording, vcr):
         mocked_get_credentials = mocker.patch.object(
             APIClient,
             "get_explorer_data_credentials",
-            return_value=AWSCredentials(**credentials_response),
+            return_value=ExplorerDataCredentials(**credentials_response),
         )
         mocked_aws = mocker.patch.object(
             GencoveExplorerManager, "execute_aws_s3_src_dst", return_value=None

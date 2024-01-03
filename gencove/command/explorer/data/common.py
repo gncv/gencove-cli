@@ -7,8 +7,7 @@ from typing import List, Optional, Tuple
 
 # pylint: disable=wrong-import-order
 from gencove.exceptions import ValidationError
-from gencove.models import AWSCredentials, OrganizationDetails, UserDetails
-
+from gencove.models import ExplorerDataCredentials, OrganizationDetails, UserDetails
 
 import boto3  # noqa: I100
 
@@ -22,7 +21,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
     user_id: str
     organization_id: str
 
-    aws_session_credentials: Optional[AWSCredentials]
+    aws_session_credentials: Optional[ExplorerDataCredentials]
 
     # Constants ported from Gencove Explorer package
     # https://gitlab.com/gencove/platform/explorer-sdk/-/blob/main/gencove_explorer/constants.py  # noqa: E501 # pylint: disable=line-too-long
@@ -68,6 +67,8 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
             "AWS_ACCESS_KEY_ID": self.aws_session_credentials.access_key,
             "AWS_SECRET_ACCESS_KEY": self.aws_session_credentials.secret_key,
             "AWS_SESSION_TOKEN": self.aws_session_credentials.token,
+            "AWS_DEFAULT_REGION": self.aws_session_credentials.region_name,
+            "AWS_REGION": self.aws_session_credentials.region_name,
         }
 
     @property

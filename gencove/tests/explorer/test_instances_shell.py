@@ -72,7 +72,10 @@ def test_instances_shell_no_permission(mocker, credentials):
         return_value=True,
     )
     mocker.patch(
-        "gencove.command.explorer.instances.shell.main.user_has_session_manager_plugin_in_path",
+        (
+            "gencove.command.explorer.instances.shell.main."
+            "user_has_session_manager_plugin_in_path"
+        ),
         return_value=True,
     )
     mocked_get_instances = mocker.patch.object(
@@ -116,7 +119,10 @@ def test_instances_shell(mocker, credentials, recording, vcr):
         return_value=True,
     )
     mocker.patch(
-        "gencove.command.explorer.instances.shell.main.user_has_session_manager_plugin_in_path",
+        (
+            "gencove.command.explorer.instances.shell.main."
+            "user_has_session_manager_plugin_in_path"
+        ),
         return_value=True,
     )
     if not recording:

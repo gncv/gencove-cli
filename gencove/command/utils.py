@@ -182,7 +182,9 @@ def user_has_supported_aws_cli(raise_exception: bool = False) -> Optional[bool]:
     """
     ssm_supported_semver = "1.16.12"
     try:
-        aws_version = sh.aws("--version").split(" ")[0]
+        aws_version = sh.aws("--version",).split(  # pylint: disable=no-member
+            " "
+        )[0]
         aws_semver = aws_version.split("/")[1].strip()
         # Required AWS CLI version that supports ssm plugin
         # https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html

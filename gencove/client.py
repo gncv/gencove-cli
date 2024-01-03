@@ -247,7 +247,7 @@ class APIClient:
                     try:
                         error_msg = "\n".join(
                             [
-                                f"  {key}: {value[0] if isinstance(value, list) else str(value)}"
+                                f"  {key}: {value[0] if isinstance(value, list) else str(value)}"  # noqa: E501  # pylint: disable=line-too-long
                                 for key, value in response_json.items()
                             ]
                         )

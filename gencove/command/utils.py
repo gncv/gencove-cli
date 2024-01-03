@@ -7,9 +7,9 @@ import uuid
 from typing import Optional
 
 import click
-import sh
+import sh  # noqa: I201
 
-from gencove.exceptions import ValidationError
+from gencove.exceptions import ValidationError  # noqa: I100
 from gencove.logger import dump_debug_log, echo_error
 
 map_arguments_to_human_readable = {

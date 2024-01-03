@@ -9,7 +9,6 @@ from typing import List, Optional, Tuple
 from gencove.exceptions import ValidationError
 from gencove.models import ExplorerDataCredentials, OrganizationDetails, UserDetails
 
-
 import boto3  # noqa: I100
 
 import sh  # noqa: I100
@@ -68,6 +67,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
             "AWS_ACCESS_KEY_ID": self.aws_session_credentials.access_key,
             "AWS_SECRET_ACCESS_KEY": self.aws_session_credentials.secret_key,
             "AWS_SESSION_TOKEN": self.aws_session_credentials.token,
+            "AWS_DEFAULT_REGION": self.aws_session_credentials.region_name,
             "AWS_REGION": self.aws_session_credentials.region_name,
         }
 

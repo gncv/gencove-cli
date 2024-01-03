@@ -127,6 +127,7 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
             "AWS_ACCESS_KEY_ID": "mock_access",
             "AWS_SECRET_ACCESS_KEY": "mock_secret",
             "AWS_SESSION_TOKEN": "mock_token",
+            "AWS_DEFAULT_REGION": "mock_region",
             "AWS_REGION": "mock_region",
         }
         assert self.explorer_manager.aws_env == expected

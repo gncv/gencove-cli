@@ -101,7 +101,10 @@ class ShellSession(Command):
             )
 
             def signal_handler(sig, frame):  # pylint: disable=unused-argument
-                command.signal_group(sig)
+                if sys.version_info >= (3, 8):
+                    command.signal(sig)
+                else:
+                    command.signal_group(sig)
 
             signal.signal(signal.SIGINT, signal_handler)
             signal.signal(signal.SIGTERM, signal_handler)
@@ -127,6 +130,11 @@ class ShellSession(Command):
                 to send commands to the isntance.
             instance_id (str): Explorer instance id.
         """
+
+        def ignore_signal(sig, frame):  # pylint: disable=unused-argument
+            self.echo_debug(f"Ignoring SIGNAL in bg process: {sig}")
+
+        signal.signal(signal.SIGINT, ignore_signal)
 
         def refresh_credentials():
             """Refresh credentials.

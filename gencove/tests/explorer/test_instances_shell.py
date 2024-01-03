@@ -67,6 +67,14 @@ def test_instances_shell_no_permission(mocker, credentials):
         "gencove.command.explorer.instances.shell.main.user_has_aws_in_path",
         return_value=True,
     )
+    mocker.patch(
+        "gencove.command.explorer.instances.shell.main.user_has_supported_aws_cli",
+        return_value=True,
+    )
+    mocker.patch(
+        "gencove.command.explorer.instances.shell.main.user_has_session_manager_plugin_in_path",
+        return_value=True,
+    )
     mocked_get_instances = mocker.patch.object(
         APIClient,
         "get_explorer_instances",
@@ -101,6 +109,14 @@ def test_instances_shell(mocker, credentials, recording, vcr):
     runner = CliRunner()
     mocker.patch(
         "gencove.command.explorer.instances.shell.main.user_has_aws_in_path",
+        return_value=True,
+    )
+    mocker.patch(
+        "gencove.command.explorer.instances.shell.main.user_has_supported_aws_cli",
+        return_value=True,
+    )
+    mocker.patch(
+        "gencove.command.explorer.instances.shell.main.user_has_session_manager_plugin_in_path",
         return_value=True,
     )
     if not recording:

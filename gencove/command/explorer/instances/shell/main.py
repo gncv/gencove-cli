@@ -12,7 +12,11 @@ from gencove.utils import get_boto_session_refreshable
 import sh  # pylint: disable=wrong-import-order
 
 from ....base import Command
-from ....utils import user_has_aws_in_path
+from ....utils import (
+    user_has_aws_in_path,
+    user_has_session_manager_plugin_in_path,
+    user_has_supported_aws_cli,
+)
 from .....exceptions import ValidationError
 from .....models import ExplorerShellSessionCredentials
 
@@ -23,6 +27,8 @@ class ShellSession(Command):
     def validate(self):
         """Validate start shell sessions"""
         user_has_aws_in_path(raise_exception=True)
+        user_has_supported_aws_cli(raise_exception=True)
+        user_has_session_manager_plugin_in_path(raise_exception=True)
 
     def initialize(self):
         """Initialize shell subcommand."""

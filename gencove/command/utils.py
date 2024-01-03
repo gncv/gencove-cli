@@ -7,6 +7,7 @@ import uuid
 from typing import Optional
 
 import click
+import sh
 
 from gencove.exceptions import ValidationError
 from gencove.logger import dump_debug_log, echo_error
@@ -165,5 +166,55 @@ def user_has_aws_in_path(raise_exception: bool = False) -> Optional[bool]:
         raise ValidationError(
             "AWS CLI not available. Please follow installation instructions at "
             "https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html"
+        )
+    return False
+
+
+def user_has_supported_aws_cli(raise_exception: bool = False) -> Optional[bool]:
+    """Check if installed AWS CLI version is supported.
+
+    Args:
+        raise_exception (bool): If True, will raise ValidationError if AWS CLI
+            is not supported.
+
+    Returns:
+        True if AWS CLI version is supported, False if not
+    """
+    ssm_supported_semver = "1.16.12"
+    try:
+        aws_version = sh.aws("--version").split(" ")[0]
+        aws_semver = aws_version.split("/")[1].strip()
+        # Required AWS CLI version that supports ssm plugin
+        # https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html
+        supported = aws_semver >= ssm_supported_semver
+    except IndexError:
+        supported = False
+    if raise_exception and not supported:
+        raise ValidationError(
+            f"AWS CLI version must be >= {ssm_supported_semver}. "
+            "Please follow installation instructions at "
+            "https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html"
+        )
+    return supported
+
+
+def user_has_session_manager_plugin_in_path(
+    raise_exception: bool = False,
+) -> Optional[bool]:
+    """Check if user has ssm plugin in PATH
+
+    Args:
+        raise_exception (bool): If True, will raise ValidationError if ssm plugin
+            is not in PATH
+
+    Returns:
+        True if ssm plugin in PATH, False if not
+    """
+    if shutil.which("session-manager-plugin"):
+        return True
+    if raise_exception:
+        raise ValidationError(
+            "Session Manager plugin not available. Please follow installation instructions at "
+            "https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html"
         )
     return False

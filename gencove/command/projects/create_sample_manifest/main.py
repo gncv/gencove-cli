@@ -31,9 +31,9 @@ class CreateSampleManifest(Command):
         Raises:
             ValidationError - if something is wrong with command parameters.
         """
-        if self.sample_manifest[-4:] != ".csv":
+        if self.sample_manifest[-4:] != ".csv" and self.sample_manifest[-5:] != ".xlsx":
             raise ValidationError(
-                "sample_manifest argument must be a local path to a CSV file"
+                "sample_manifest argument must be a local path to a CSV or XLSX file"
             )
 
         if not os.path.exists(self.sample_manifest):

@@ -233,15 +233,21 @@ class APIClient:
             http_error_msg = f"API Client Error: {response.reason}"
             if response.text:
                 response_json = response.json()
-                if "detail" in response_json:
+
+                if isinstance(response_json, list):
+                    messages = []
+                    for item in response_json:
+                        messages.append(f"  {item}")
+                    http_error_msg += ":\n" + "\n".join(messages)
+
+                elif "detail" in response_json:
                     http_error_msg += f": {response_json['detail']}"
+
                 else:
                     try:
                         error_msg = "\n".join(
                             [
-                                # create-batch can return error details that
-                                # is a dict, not a list
-                                f"  {key}: {value[0] if isinstance(value, list) else str(value)}"  # noqa: E501  # pylint: disable=line-too-long
+                                f"  {key}: {value[0] if isinstance(value, list) else str(value)}"
                                 for key, value in response_json.items()
                             ]
                         )

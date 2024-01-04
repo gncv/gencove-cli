@@ -234,6 +234,7 @@ class APIClient:
             if response.text:
                 response_json = response.json()
 
+                # If response is list, join all messages
                 if isinstance(response_json, list):
                     messages = [f" {message}" for message in response_json]
                     http_error_msg += ":\n" + "\n".join(messages)

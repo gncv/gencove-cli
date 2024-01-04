@@ -233,10 +233,18 @@ class APIClient:
             http_error_msg = f"API Client Error: {response.reason}"
             if response.text:
                 response_json = response.json()
-                if "detail" in response_json:
+
+                # If response is list, join all messages
+                if isinstance(response_json, list):
+                    messages = [f" {message}" for message in response_json]
+                    http_error_msg += ":\n" + "\n".join(messages)
+
+                elif "detail" in response_json:
                     http_error_msg += f": {response_json['detail']}"
+
                 else:
                     try:
+
                         error_msg = "\n".join(
                             [
                                 # create-batch can return error details that

@@ -76,17 +76,24 @@ def test_list_file_types_bad_project_id(
 
 @pytest.mark.vcr
 @assert_authorization
-def test_list_file_types_project_doesnt_exist(mocker, credentials, recording):
+def test_list_file_types_project_doesnt_exist(mocker, credentials, recording, vcr):
     """Test file types throw an error if no project doesn't exist."""
     runner = CliRunner()
     if not recording:
+        file_types_response = get_vcr_response(
+            "/api/v2/file-types/",
+            vcr,
+            operator.contains,
+            just_body=False,
+        )
         mocked_get_file_types = mocker.patch.object(
             APIClient,
             "get_file_types",
             side_effect=APIClientError(
-                message="API Client Error: Not Found: Not found.", status_code=404
+                message="API Client Error: Not Found: Not found.",
+                status_code=file_types_response["status"]["code"],
             ),
-            return_value={"detail": "Not found"},
+            return_value=file_types_response["body"]["string"],
         )
 
     project_id = str(uuid4())

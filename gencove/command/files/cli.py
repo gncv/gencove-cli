@@ -10,14 +10,18 @@ from .main import ListFileTypes
 @click.command("file-types")
 @click.option("--project-id", required=False, help="Gencove project ID", type=str)
 @click.option(
-    "--object", required=False, help="File types of a specific object", type=str
+    "--object",
+    "object_param",
+    required=False,
+    help="File types of a specific object",
+    type=str,
 )
 @add_options(common_options)
-def list_file_types(project_id, object, host, email, password, api_key):
+def list_file_types(project_id, object_param, host, email, password, api_key):
     """List file types in Gencove's system."""
     ListFileTypes(
         project_id,
-        object,
+        object_param,
         Credentials(email=email, password=password, api_key=api_key),
         Optionals(host=host),
     ).run()

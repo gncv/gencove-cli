@@ -15,10 +15,10 @@ class ListFileTypes(Command):
     """List file types command executor."""
 
     # pylint: disable=too-many-arguments
-    def __init__(self, project_id, object, credentials, options):
+    def __init__(self, project_id, object_param, credentials, options):
         super().__init__(credentials, options)
         self.project_id = project_id
-        self.object = object
+        self.object = object_param
 
     def initialize(self):
         """Initialize list command."""

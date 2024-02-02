@@ -76,17 +76,18 @@ def test_list_file_types_bad_project_id(
 
 @pytest.mark.vcr
 @assert_authorization
-def test_list_file_types_no_project(mocker, credentials):
-    """Test file types throw an error if no project available"""
+def test_list_file_types_project_doesnt_exist(mocker, credentials, recording):
+    """Test file types throw an error if no project doesn't exist."""
     runner = CliRunner()
-    mocked_get_file_types = mocker.patch.object(
-        APIClient,
-        "get_file_types",
-        side_effect=APIClientError(
-            message="API Client Error: Not Found: Not found.", status_code=404
-        ),
-        return_value={"detail": "Not found"},
-    )
+    if not recording:
+        mocked_get_file_types = mocker.patch.object(
+            APIClient,
+            "get_file_types",
+            side_effect=APIClientError(
+                message="API Client Error: Not Found: Not found.", status_code=404
+            ),
+            return_value={"detail": "Not found"},
+        )
 
     project_id = str(uuid4())
 
@@ -95,8 +96,6 @@ def test_list_file_types_no_project(mocker, credentials):
         ["--project-id", project_id, *credentials],
     )
     assert res.exit_code == 1
-    mocked_get_file_types.assert_called_once()
-
     assert (
         "\n".join(
             [
@@ -107,11 +106,54 @@ def test_list_file_types_no_project(mocker, credentials):
         )
         == res.output
     )
+    if not recording:
+        mocked_get_file_types.assert_called_once()
 
 
 @pytest.mark.vcr
 @assert_authorization
-def test_list_file_types_by_project(mocker, credentials, project_id, recording, vcr):
+@pytest.mark.parametrize("object_param", [None, "sample"])
+def test_list_file_types_no_project(mocker, credentials, recording, vcr, object_param):
+    """Test file types returns all sample file types if no project is given."""
+    runner = CliRunner()
+    if not recording:
+        # Mock list_file_types only if using cassettes since return value is mocked.
+        file_types_response = get_vcr_response(
+            "/api/v2/file-types/", vcr, operator.contains
+        )
+        mocked_get_file_types = mocker.patch.object(
+            APIClient,
+            "get_file_types",
+            return_value=FileTypesModel(**file_types_response),
+        )
+    args = [*credentials]
+    if object_param is not None:
+        args.extend(["--object", object_param])
+    res = runner.invoke(list_file_types, [*args])
+    assert res.exit_code == 0
+    if not recording:
+        mocked_get_file_types.assert_called_once()
+        file_types = file_types_response["results"]
+        file_types = "\n".join(
+            [
+                "\t".join(
+                    [
+                        file_type["key"],
+                        file_type["description"],
+                    ]
+                )
+                for file_type in sorted(file_types, key=lambda ft: ft["key"])
+            ]
+        )
+        assert f"{file_types}\n" == res.output
+
+
+@pytest.mark.vcr
+@assert_authorization
+@pytest.mark.parametrize("object_param", [None, "sample"])
+def test_list_file_types_by_project(
+    mocker, credentials, project_id, recording, vcr, object_param
+):
     """Test file types being outputted to the shell"""
     runner = CliRunner()
 
@@ -125,7 +167,11 @@ def test_list_file_types_by_project(mocker, credentials, project_id, recording, 
             "get_file_types",
             return_value=FileTypesModel(**file_types_response),
         )
-    res = runner.invoke(list_file_types, ["--project-id", project_id, *credentials])
+    args = ["--project-id", project_id, *credentials]
+    if object_param is not None:
+        args.extend(["--object", object_param])
+    res = runner.invoke(list_file_types, [*args])
+
     assert res.exit_code == 0
 
     if not recording:
@@ -139,7 +185,85 @@ def test_list_file_types_by_project(mocker, credentials, project_id, recording, 
                         file_type["description"],
                     ]
                 )
-                for file_type in file_types
+                for file_type in sorted(file_types, key=lambda ft: ft["key"])
             ]
         )
         assert f"{file_types}\n" == res.output
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_list_file_types_no_project_reference_genome(
+    mocker, credentials, recording, vcr
+):
+    """Test file types returns all reference genome types if no project is given."""
+    runner = CliRunner()
+    if not recording:
+        # Mock list_file_types only if using cassettes since return value is mocked.
+        file_types_response = get_vcr_response(
+            "/api/v2/file-types/", vcr, operator.contains
+        )
+        mocked_get_file_types = mocker.patch.object(
+            APIClient,
+            "get_file_types",
+            return_value=FileTypesModel(**file_types_response),
+        )
+    res = runner.invoke(list_file_types, ["--object", "reference_genome", *credentials])
+    assert res.exit_code == 0
+    if not recording:
+        mocked_get_file_types.assert_called_once_with(object="reference_genome")
+        file_types = file_types_response["results"]
+        file_types = "\n".join(
+            [
+                "\t".join(
+                    [
+                        file_type["key"],
+                        file_type["description"],
+                    ]
+                )
+                for file_type in sorted(file_types, key=lambda ft: ft["key"])
+            ]
+        )
+        assert f"{file_types}\n" == res.output
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_list_file_types_by_project_reference_genome(
+    mocker, credentials, project_id, recording, vcr
+):
+    """Test that no ouput is given if Project doesn't have a Reference Genome."""
+    runner = CliRunner()
+    if not recording:
+        # Mock list_file_types only if using cassettes since return value is mocked.
+        file_types_response = get_vcr_response(
+            "/api/v2/file-types/", vcr, operator.contains
+        )
+        mocked_get_file_types = mocker.patch.object(
+            APIClient,
+            "get_file_types",
+            return_value=FileTypesModel(**file_types_response),
+        )
+    res = runner.invoke(
+        list_file_types,
+        ["--object", "reference_genome", "--project-id", project_id, *credentials],
+    )
+
+    assert res.exit_code == 0
+    if not recording:
+        mocked_get_file_types.assert_called_once_with(
+            project_id=project_id, object="reference_genome"
+        )
+        file_types = file_types_response["results"]
+        file_types = "\n".join(
+            [
+                "\t".join(
+                    [
+                        file_type["key"],
+                        file_type["description"],
+                    ]
+                )
+                for file_type in sorted(file_types, key=lambda ft: ft["key"])
+            ]
+        )
+        assert f"{file_types}" == res.output

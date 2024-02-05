@@ -60,9 +60,7 @@ class ListFileTypes(Command):
         Yields:
             list of file types
         """
-        args = {}
+        args = {"object": self.object}
         if self.project_id:
             args["project_id"] = self.project_id
-        if self.object:
-            args["object"] = self.object
         yield self.api_client.get_file_types(**args).results

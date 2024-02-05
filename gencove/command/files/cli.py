@@ -2,7 +2,8 @@
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
-from gencove.constants import Credentials, Optionals
+from gencove.constants import Credentials, FileTypesObject, Optionals
+from gencove.utils import enum_as_dict
 
 from .main import ListFileTypes
 
@@ -14,7 +15,8 @@ from .main import ListFileTypes
     "object_param",
     required=False,
     help="File types of a specific object",
-    type=str,
+    type=click.Choice(enum_as_dict(FileTypesObject).values()),
+    default=FileTypesObject.SAMPLE.value,
 )
 @add_options(common_options)
 def list_file_types(project_id, object_param, host, email, password, api_key):

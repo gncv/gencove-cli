@@ -151,6 +151,14 @@ class DownloadTemplateParts(Enum):
     DEFAULT_FILENAME = "default_filename"
 
 
+@unique
+class FileTypesObject(Enum):
+    """File Type object enum"""
+
+    SAMPLE = "sample"
+    REFERENCE_GENOME = "reference_genome"
+
+
 DOWNLOAD_TEMPLATE = (
     f"{{{DownloadTemplateParts.CLIENT_ID.value}}}/"
     f"{{{DownloadTemplateParts.GENCOVE_ID.value}}}/"

@@ -15,9 +15,10 @@ class ListFileTypes(Command):
     """List file types command executor."""
 
     # pylint: disable=too-many-arguments
-    def __init__(self, project_id, credentials, options):
+    def __init__(self, project_id, object_param, credentials, options):
         super().__init__(credentials, options)
         self.project_id = project_id
+        self.object = object_param
 
     def initialize(self):
         """Initialize list command."""
@@ -59,7 +60,7 @@ class ListFileTypes(Command):
         Yields:
             list of file types
         """
+        args = {"object_param": self.object}
         if self.project_id:
-            yield self.api_client.get_file_types(project_id=self.project_id).results
-        else:
-            yield self.api_client.get_file_types().results
+            args["project_id"] = self.project_id
+        yield self.api_client.get_file_types(**args).results

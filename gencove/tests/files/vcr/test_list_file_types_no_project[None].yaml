@@ -1,0 +1,130 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.13.0
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '582'
+      Content-Security-Policy:
+      - 'style-src ''self'' ''unsafe-inline''; default-src ''self''; img-src ''self''
+        data:'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Fri, 02 Feb 2024 13:38:16 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.13.0
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/file-types/
+  response:
+    body:
+      string: '{"meta": {"count": 41, "next": null, "previous": null}, "results":
+        [{"key": "alignment-bai", "description": ""}, {"key": "alignment-bam", "description":
+        ""}, {"key": "alignment-csi", "description": ""}, {"key": "ancestry-json",
+        "description": ""}, {"key": "call_capture-csi", "description": ""}, {"key":
+        "call_capture-forced_csi", "description": ""}, {"key": "call_capture-forced_vcf",
+        "description": ""}, {"key": "call_capture-large_indel_calls_json", "description":
+        ""}, {"key": "call_capture-vcf", "description": ""}, {"key": "call_capture-vcf_pathogenic",
+        "description": ""}, {"key": "cnv-cnr", "description": ""}, {"key": "cnv-cns",
+        "description": ""}, {"key": "cnv-pdf", "description": ""}, {"key": "cnv-png",
+        "description": ""}, {"key": "fastq-r1", "description": ""}, {"key": "fastq-r2",
+        "description": ""}, {"key": "impute-csi", "description": ""}, {"key": "impute-csv_format_a",
+        "description": ""}, {"key": "impute-csv_format_a_vcf", "description": ""},
+        {"key": "impute-subset_csi", "description": ""}, {"key": "impute-subset_override_csi",
+        "description": ""}, {"key": "impute-subset_override_tbi", "description": ""},
+        {"key": "impute-subset_override_vcf", "description": ""}, {"key": "impute-subset_tbi",
+        "description": ""}, {"key": "impute-subset_vcf", "description": ""}, {"key":
+        "impute-tbi", "description": ""}, {"key": "impute-vcf", "description": ""},
+        {"key": "kraken-report", "description": ""}, {"key": "loh-bed", "description":
+        ""}, {"key": "sex-json", "description": ""}, {"key": "traits-json", "description":
+        ""}, {"key": "wgs-aligned", "description": ""}, {"key": "wgs-called", "description":
+        ""}, {"key": "wgs-evenness", "description": ""}, {"key": "wgs-filtered_called",
+        "description": ""}, {"key": "wgs-filtered_indexed", "description": ""}, {"key":
+        "wgs-gvcf", "description": ""}, {"key": "wgs-gvcf_indexed", "description":
+        ""}, {"key": "wgs-indexed", "description": ""}, {"key": "qc", "description":
+        ""}, {"key": "metadata", "description": ""}]}'
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1802'
+      Content-Security-Policy:
+      - 'style-src ''self'' ''unsafe-inline''; default-src ''self''; img-src ''self''
+        data:'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Fri, 02 Feb 2024 13:38:17 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

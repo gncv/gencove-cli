@@ -1087,16 +1087,19 @@ class APIClient:
             model=UploadURLImport,
         )
 
-    def get_file_types(self, project_id=None):
+    def get_file_types(self, project_id=None, object_param=None):
         """List file types.
 
         Args:
             project_id (UUID, optional): project_id used to get all file types
                 for a project
+            object_param (str, optional): object type of File, defaults to Sample
         """
         params = {}
         if project_id:
             params["project_id"] = project_id
+        if object_param:
+            params["object"] = object_param
         return self._get(
             self.endpoints.FILE_TYPES.value,
             query_params=params,

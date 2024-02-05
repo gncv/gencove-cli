@@ -218,7 +218,7 @@ def test_list_file_types_no_project_reference_genome(
     res = runner.invoke(list_file_types, ["--object", "reference_genome", *credentials])
     assert res.exit_code == 0
     if not recording:
-        mocked_get_file_types.assert_called_once_with(object="reference_genome")
+        mocked_get_file_types.assert_called_once_with(object_param="reference_genome")
         file_types = file_types_response["results"]
         file_types = "\n".join(
             [
@@ -259,7 +259,7 @@ def test_list_file_types_by_project_reference_genome(
     assert res.exit_code == 0
     if not recording:
         mocked_get_file_types.assert_called_once_with(
-            project_id=project_id, object="reference_genome"
+            project_id=project_id, object_param="reference_genome"
         )
         file_types = file_types_response["results"]
         file_types = "\n".join(

@@ -33,6 +33,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
     S3_PROTOCOL: str = "s3://"
     EXPLORER_SCHEME: str = "e://"
     DATA_BUCKET: str = "gencove-explorer-data"
+    DATASETS_DIR = "datasets"
     USER_DIR: str = "files"
     DATA_DIR: str = USER_DIR
     SHARED_DIR: str = "shared"
@@ -132,7 +133,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
     @property
     def data_gencove_s3_prefix(self) -> str:
         """S3 prefix for gencove data dir"""
-        return f"{self.S3_PROTOCOL}{self.DATA_BUCKET}/{self.DATA_DIR}"
+        return f"{self.S3_PROTOCOL}{self.DATA_BUCKET}/{self.DATASETS_DIR}"
 
     @property
     def data_org_s3_prefix(self) -> str:

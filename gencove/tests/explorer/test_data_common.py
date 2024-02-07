@@ -101,7 +101,7 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
 
     def test_data_gencove_s3_prefix(self):
         """Test data_gencove_s3_prefix"""
-        expected_prefix = "s3://gencove-explorer-data/datasets"
+        expected_prefix = "s3://gencove-explorer-data/files"
         assert self.explorer_manager.data_gencove_s3_prefix == expected_prefix
 
     def test_data_org_s3_prefix(self):

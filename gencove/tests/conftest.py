@@ -69,6 +69,12 @@ def project_id_delete():
 
 
 @pytest.fixture(scope="session")
+def project_id_reference_genome():
+    """Returns the project id to be deleted."""
+    return os.getenv("GENCOVE_PROJECT_ID_REFERENCE_GENOME_TEST")
+
+
+@pytest.fixture(scope="session")
 def credentials(using_api_key):  # pylint: disable=redefined-outer-name
     """Fixture to have the appropriate credentials."""
     api_key = os.getenv("GENCOVE_API_KEY_TEST")

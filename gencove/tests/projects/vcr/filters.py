@@ -3,7 +3,10 @@ import json
 from urllib.parse import urlparse
 
 from gencove.tests.decorators import parse_response_to_json
-from gencove.tests.filters import _replace_uuid_from_url
+from gencove.tests.filters import (
+    _clean_query_params_from_filename,
+    _replace_uuid_from_url,
+)
 from gencove.tests.utils import MOCK_UUID
 
 
@@ -124,6 +127,37 @@ def filter_projects_delete(request):
         except json.decoder.JSONDecodeError:
             pass
     return request
+
+
+def filter_projects_detail_request(request):
+    """Filter sensitive data from projects request."""
+    return _replace_uuid_from_url(request, "projects")
+
+
+@parse_response_to_json
+def filter_projects_detail_response(response, json_response):
+    """Filter project detail sensitive data from response."""
+    if "id" in json_response:
+        json_response["id"] = MOCK_UUID
+    if "name" in json_response:
+        json_response["name"] = "mock name"
+    if "organization" in json_response:
+        json_response["organization"] = MOCK_UUID
+    if "pipeline_capabilities" in json_response:
+        json_response["pipeline_capabilities"] = MOCK_UUID
+    if "roles" in json_response and "organization" in json_response["roles"]:
+        json_response["roles"]["organization"]["id"] = MOCK_UUID
+    for file in json_response.get("files", []):
+        if "id" in file:
+            file["id"] = MOCK_UUID
+        if "s3_path" in file:
+            file["s3_path"] = f"mock/{file['s3_path'].split('/')[-1]}"
+        if "size" in file and file["size"]:
+            file["size"] = "1"
+        if "download_url" in file:
+            filename = _clean_query_params_from_filename(file["download_url"])
+            file["download_url"] = f"https://example.com/{filename}"
+    return response, json_response
 
 
 def filter_project_batches_request(request):

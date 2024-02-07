@@ -1,0 +1,628 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.13.0
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '582'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Wed, 07 Feb 2024 15:57:09 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.13.0
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/file-types/?project_id=11111111-1111-1111-1111-111111111111&object=reference_genome
+  response:
+    body:
+      string: '{"meta": {"count": 10, "next": null, "previous": null}, "results":
+        [{"key": "genome-dict", "description": ""}, {"key": "genome-fasta", "description":
+        ""}, {"key": "genome-fasta_amb", "description": ""}, {"key": "genome-fasta_ann",
+        "description": ""}, {"key": "genome-fasta_bwt", "description": ""}, {"key":
+        "genome-fasta_fai", "description": ""}, {"key": "genome-fasta_gzi", "description":
+        ""}, {"key": "genome-fasta_pac", "description": ""}, {"key": "genome-fasta_sa",
+        "description": ""}, {"key": "genome-fasta_vcf_header", "description": ""}]}'
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '498'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Wed, 07 Feb 2024 15:57:10 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.13.0
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/projects/11111111-1111-1111-1111-111111111111
+  response:
+    body:
+      string: '{"id": "11111111-1111-1111-1111-111111111111", "name": "mock name",
+        "description": "", "created": "2024-02-07T13:17:15.566394Z", "modified": "2024-02-07T13:17:15.566394Z",
+        "organization": "11111111-1111-1111-1111-111111111111", "sample_count": 0,
+        "pipeline_capabilities": "11111111-1111-1111-1111-111111111111", "project_modifications":
+        [{"key": "disable_qc", "value": false}, {"key": "loo", "value": false}, {"key":
+        "downsample_to_bases_max", "value": true}], "roles": {"organization": {"id":
+        "11111111-1111-1111-1111-111111111111", "name": "owner"}}, "webhook_url":
+        "", "files": [{"id": "11111111-1111-1111-1111-111111111111", "s3_path": "mock/genome.fasta.gz.vcf_header",
+        "size": "1", "download_url": "https://example.com/genome.fasta.gz.vcf_header?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-fasta_vcf_header.fasta.gz.vcf_header",
+        "file_type": "genome-fasta_vcf_header", "checksum_sha256": ""}, {"id": "11111111-1111-1111-1111-111111111111",
+        "s3_path": "mock/genome.fasta.gz.sa", "size": "1", "download_url": "https://example.com/genome.fasta.gz.sa?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-fasta_sa.fasta.gz.sa",
+        "file_type": "genome-fasta_sa", "checksum_sha256": ""}, {"id": "11111111-1111-1111-1111-111111111111",
+        "s3_path": "mock/genome.fasta.gz.pac", "size": "1", "download_url": "https://example.com/genome.fasta.gz.pac?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-fasta_pac.fasta.gz.pac",
+        "file_type": "genome-fasta_pac", "checksum_sha256": ""}, {"id": "11111111-1111-1111-1111-111111111111",
+        "s3_path": "mock/genome.fasta.gz.gzi", "size": "1", "download_url": "https://example.com/genome.fasta.gz.gzi?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-fasta_gzi.fasta.gz.gzi",
+        "file_type": "genome-fasta_gzi", "checksum_sha256": ""}, {"id": "11111111-1111-1111-1111-111111111111",
+        "s3_path": "mock/genome.fasta.gz.fai", "size": "1", "download_url": "https://example.com/genome.fasta.gz.fai?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-fasta_fai.fasta.gz.fai",
+        "file_type": "genome-fasta_fai", "checksum_sha256": ""}, {"id": "11111111-1111-1111-1111-111111111111",
+        "s3_path": "mock/genome.fasta.gz.bwt", "size": "1", "download_url": "https://example.com/genome.fasta.gz.bwt?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-fasta_bwt.fasta.gz.bwt",
+        "file_type": "genome-fasta_bwt", "checksum_sha256": ""}, {"id": "11111111-1111-1111-1111-111111111111",
+        "s3_path": "mock/genome.fasta.gz.ann", "size": "1", "download_url": "https://example.com/genome.fasta.gz.ann?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-fasta_ann.fasta.gz.ann",
+        "file_type": "genome-fasta_ann", "checksum_sha256": ""}, {"id": "11111111-1111-1111-1111-111111111111",
+        "s3_path": "mock/genome.fasta.gz.amb", "size": "1", "download_url": "https://example.com/genome.fasta.gz.amb?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-fasta_amb.fasta.gz.amb",
+        "file_type": "genome-fasta_amb", "checksum_sha256": ""}, {"id": "11111111-1111-1111-1111-111111111111",
+        "s3_path": "mock/genome.fasta.gz", "size": "1", "download_url": "https://example.com/genome.fasta.gz?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-fasta.fasta.gz",
+        "file_type": "genome-fasta", "checksum_sha256": ""}, {"id": "11111111-1111-1111-1111-111111111111",
+        "s3_path": "mock/genome.dict", "size": "1", "download_url": "https://example.com/genome.dict?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-dict.dict",
+        "file_type": "genome-dict", "checksum_sha256": ""}]}'
+    headers:
+      Allow:
+      - GET, PATCH, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '8546'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Wed, 07 Feb 2024 15:57:11 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+    method: GET
+    uri: https://s3.amazonaws.com/genome.fasta.gz.vcf_header?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-fasta_vcf_header.fasta.gz.vcf_header
+  response:
+    body:
+      string: QUFBQkJC
+    headers:
+      Accept-Ranges:
+      - bytes
+      Content-Disposition:
+      - attachment;
+      Content-Length:
+      - '123'
+      Content-Type:
+      - binary/octet-stream
+      Date:
+      - Wed, 07 Feb 2024 15:57:13 GMT
+      ETag:
+      - '"ae123108c332c2ae8e4a77243953a37d"'
+      Last-Modified:
+      - Tue, 28 Sep 2021 23:16:11 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - mock_x-amz-id-2
+      x-amz-replication-status:
+      - COMPLETED
+      x-amz-request-id:
+      - mock_x-amz-request-id
+      x-amz-server-side-encryption:
+      - AES256
+      x-amz-version-id:
+      - mock_x-amz-version-id
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+    method: GET
+    uri: https://s3.amazonaws.com/genome.fasta.gz.sa?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-fasta_sa.fasta.gz.sa
+  response:
+    body:
+      string: QUFBQkJC
+    headers:
+      Accept-Ranges:
+      - bytes
+      Content-Disposition:
+      - attachment;
+      Content-Length:
+      - '123'
+      Content-Type:
+      - binary/octet-stream
+      Date:
+      - Wed, 07 Feb 2024 15:57:13 GMT
+      ETag:
+      - '"74f3f1c2670cf8c8c59dbb017a3e80ec-185"'
+      Last-Modified:
+      - Tue, 28 Sep 2021 23:16:11 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - mock_x-amz-id-2
+      x-amz-replication-status:
+      - COMPLETED
+      x-amz-request-id:
+      - mock_x-amz-request-id
+      x-amz-server-side-encryption:
+      - AES256
+      x-amz-version-id:
+      - mock_x-amz-version-id
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+    method: GET
+    uri: https://s3.amazonaws.com/genome.fasta.gz.pac?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-fasta_pac.fasta.gz.pac
+  response:
+    body:
+      string: QUFBQkJC
+    headers:
+      Accept-Ranges:
+      - bytes
+      Content-Disposition:
+      - attachment;
+      Content-Length:
+      - '123'
+      Content-Type:
+      - binary/octet-stream
+      Date:
+      - Wed, 07 Feb 2024 15:59:40 GMT
+      ETag:
+      - '"0ec9eb83dcac1d68662679444b57de31-93"'
+      Last-Modified:
+      - Tue, 28 Sep 2021 23:16:11 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - mock_x-amz-id-2
+      x-amz-replication-status:
+      - COMPLETED
+      x-amz-request-id:
+      - mock_x-amz-request-id
+      x-amz-server-side-encryption:
+      - AES256
+      x-amz-version-id:
+      - mock_x-amz-version-id
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+    method: GET
+    uri: https://s3.amazonaws.com/genome.fasta.gz.gzi?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-fasta_gzi.fasta.gz.gzi
+  response:
+    body:
+      string: QUFBQkJC
+    headers:
+      Accept-Ranges:
+      - bytes
+      Content-Disposition:
+      - attachment;
+      Content-Length:
+      - '123'
+      Content-Type:
+      - binary/octet-stream
+      Date:
+      - Wed, 07 Feb 2024 16:01:22 GMT
+      ETag:
+      - '"4cf491132bce8938f0345b22e7669416"'
+      Last-Modified:
+      - Tue, 28 Sep 2021 23:16:11 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - mock_x-amz-id-2
+      x-amz-replication-status:
+      - COMPLETED
+      x-amz-request-id:
+      - mock_x-amz-request-id
+      x-amz-server-side-encryption:
+      - AES256
+      x-amz-version-id:
+      - mock_x-amz-version-id
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+    method: GET
+    uri: https://s3.amazonaws.com/genome.fasta.gz.fai?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-fasta_fai.fasta.gz.fai
+  response:
+    body:
+      string: QUFBQkJC
+    headers:
+      Accept-Ranges:
+      - bytes
+      Content-Disposition:
+      - attachment;
+      Content-Length:
+      - '123'
+      Content-Type:
+      - binary/octet-stream
+      Date:
+      - Wed, 07 Feb 2024 16:01:24 GMT
+      ETag:
+      - '"5fddbc109c82980f9436aa5c21a57c61"'
+      Last-Modified:
+      - Tue, 28 Sep 2021 23:16:11 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - mock_x-amz-id-2
+      x-amz-replication-status:
+      - COMPLETED
+      x-amz-request-id:
+      - mock_x-amz-request-id
+      x-amz-server-side-encryption:
+      - AES256
+      x-amz-version-id:
+      - mock_x-amz-version-id
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+    method: GET
+    uri: https://s3.amazonaws.com/genome.fasta.gz.bwt?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-fasta_bwt.fasta.gz.bwt
+  response:
+    body:
+      string: QUFBQkJC
+    headers:
+      Accept-Ranges:
+      - bytes
+      Content-Disposition:
+      - attachment;
+      Content-Length:
+      - '123'
+      Content-Type:
+      - binary/octet-stream
+      Date:
+      - Wed, 07 Feb 2024 16:01:24 GMT
+      ETag:
+      - '"7b6d2572a33db5de685d7c47d1f09c9c-370"'
+      Last-Modified:
+      - Tue, 28 Sep 2021 23:16:11 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - mock_x-amz-id-2
+      x-amz-replication-status:
+      - COMPLETED
+      x-amz-request-id:
+      - mock_x-amz-request-id
+      x-amz-server-side-encryption:
+      - AES256
+      x-amz-version-id:
+      - mock_x-amz-version-id
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+    method: GET
+    uri: https://s3.amazonaws.com/genome.fasta.gz.ann?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-fasta_ann.fasta.gz.ann
+  response:
+    body:
+      string: QUFBQkJC
+    headers:
+      Accept-Ranges:
+      - bytes
+      Content-Disposition:
+      - attachment;
+      Content-Length:
+      - '123'
+      Content-Type:
+      - binary/octet-stream
+      Date:
+      - Wed, 07 Feb 2024 16:06:42 GMT
+      ETag:
+      - '"dee21a414c8c9435c516ce51453eac69"'
+      Last-Modified:
+      - Tue, 28 Sep 2021 23:16:10 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - mock_x-amz-id-2
+      x-amz-replication-status:
+      - COMPLETED
+      x-amz-request-id:
+      - mock_x-amz-request-id
+      x-amz-server-side-encryption:
+      - AES256
+      x-amz-version-id:
+      - mock_x-amz-version-id
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+    method: GET
+    uri: https://s3.amazonaws.com/genome.fasta.gz.amb?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-fasta_amb.fasta.gz.amb
+  response:
+    body:
+      string: QUFBQkJC
+    headers:
+      Accept-Ranges:
+      - bytes
+      Content-Disposition:
+      - attachment;
+      Content-Length:
+      - '123'
+      Content-Type:
+      - binary/octet-stream
+      Date:
+      - Wed, 07 Feb 2024 16:06:44 GMT
+      ETag:
+      - '"54d052dc82eee7a34465b8e8a8989631"'
+      Last-Modified:
+      - Tue, 28 Sep 2021 23:16:11 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - mock_x-amz-id-2
+      x-amz-replication-status:
+      - COMPLETED
+      x-amz-request-id:
+      - mock_x-amz-request-id
+      x-amz-server-side-encryption:
+      - AES256
+      x-amz-version-id:
+      - mock_x-amz-version-id
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+    method: GET
+    uri: https://s3.amazonaws.com/genome.fasta.gz?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-fasta.fasta.gz
+  response:
+    body:
+      string: QUFBQkJC
+    headers:
+      Accept-Ranges:
+      - bytes
+      Content-Disposition:
+      - attachment;
+      Content-Length:
+      - '123'
+      Content-Type:
+      - binary/octet-stream
+      Date:
+      - Wed, 07 Feb 2024 16:06:45 GMT
+      ETag:
+      - '"5328bed4edeb3abc1b979d15777ee923-106"'
+      Last-Modified:
+      - Tue, 28 Sep 2021 23:16:10 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - mock_x-amz-id-2
+      x-amz-replication-status:
+      - COMPLETED
+      x-amz-request-id:
+      - mock_x-amz-request-id
+      x-amz-server-side-encryption:
+      - AES256
+      x-amz-version-id:
+      - mock_x-amz-version-id
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+    method: GET
+    uri: https://s3.amazonaws.com/genome.dict?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_genome-dict.dict
+  response:
+    body:
+      string: QUFBQkJC
+    headers:
+      Accept-Ranges:
+      - bytes
+      Content-Disposition:
+      - attachment;
+      Content-Length:
+      - '123'
+      Content-Type:
+      - binary/octet-stream
+      Date:
+      - Wed, 07 Feb 2024 16:08:10 GMT
+      ETag:
+      - '"7fe5796295a4321f5ae7b6509163bb89"'
+      Last-Modified:
+      - Tue, 28 Sep 2021 23:16:11 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - mock_x-amz-id-2
+      x-amz-replication-status:
+      - COMPLETED
+      x-amz-request-id:
+      - mock_x-amz-request-id
+      x-amz-server-side-encryption:
+      - AES256
+      x-amz-version-id:
+      - mock_x-amz-version-id
+    status:
+      code: 200
+      message: OK
+version: 1

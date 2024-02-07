@@ -1,0 +1,110 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.13.0
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '582'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Wed, 07 Feb 2024 15:07:09 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.13.0
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/file-types/?project_id=11111111-1111-1111-1111-111111111111&object=reference_genome
+  response:
+    body:
+      string: '{"meta": {"count": 10, "next": null, "previous": null}, "results":
+        [{"key": "genome-dict", "description": ""}, {"key": "genome-fasta", "description":
+        ""}, {"key": "genome-fasta_amb", "description": ""}, {"key": "genome-fasta_ann",
+        "description": ""}, {"key": "genome-fasta_bwt", "description": ""}, {"key":
+        "genome-fasta_fai", "description": ""}, {"key": "genome-fasta_gzi", "description":
+        ""}, {"key": "genome-fasta_pac", "description": ""}, {"key": "genome-fasta_sa",
+        "description": ""}, {"key": "genome-fasta_vcf_header", "description": ""}]}'
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '498'
+      Content-Security-Policy:
+      - default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Wed, 07 Feb 2024 15:07:10 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

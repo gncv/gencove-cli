@@ -1,13 +1,12 @@
 """Test project's get reference genome command."""
+# pylint: disable=import-error, wrong-import-order
+
 import os
 from unittest.mock import call
 from uuid import uuid4
 
 from click.testing import CliRunner
 
-import pytest
-
-from vcr import VCR
 
 from gencove.command.download.utils import download_file
 from gencove.command.projects.get_reference_genome.cli import get_reference_genome
@@ -15,8 +14,8 @@ from gencove.models import SampleFile
 from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import (
     filter_aws_headers,
-    filter_jwt,
     filter_file_types_request,
+    filter_jwt,
     mock_binary_response,
     replace_gencove_url_vcr,
     replace_s3_from_url,
@@ -27,6 +26,10 @@ from gencove.tests.projects.vcr.filters import (
 )
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
 from gencove.tests.utils import MOCK_UUID
+
+import pytest
+
+from vcr import VCR
 
 
 @pytest.fixture(scope="module")
@@ -81,8 +84,10 @@ def test_no_required_options(credentials, mocker):  # pylint: disable=unused-arg
 
 @pytest.mark.vcr
 @assert_authorization
-def test_get_reference_genome__not_owned_project(credentials, mocker):
-    """Test get reference genome faiks when project is not owned."""
+def test_get_reference_genome__not_owned_project(
+    credentials, mocker
+):  # pylint: disable=unused-argument
+    """Test get reference genome fails when project is not owned."""
     runner = CliRunner()
     #
     project_id = str(uuid4())
@@ -107,6 +112,7 @@ def test_get_reference_genome__not_owned_project(credentials, mocker):
 def test_get_reference_genome__success(  # pylint: disable=too-many-arguments
     credentials, mocker, project_id_reference_genome, recording, remove_hyphens
 ):
+    """Test get reference genome success."""
     mocked_download_file = mocker.patch(
         "gencove.command.projects.get_reference_genome.main.download_file",
         side_effect=download_file,
@@ -140,25 +146,31 @@ def test_get_reference_genome__success(  # pylint: disable=too-many-arguments
             ("genome-fasta_vcf_header", "fasta.gz.vcf_header"),
         ]
 
-        calls = [
-            call(
-                f"cli_test_data/{MOCK_UUID}_{file_type}.{extension}",
-                SampleFile(
-                    id=MOCK_UUID,
-                    download_url=f"https://example.com/genome.{extension}?response-content-disposition=attachment%3B+filename%3D{MOCK_UUID}_{file_type}.{extension}",
-                ).download_url,
-                no_progress=False,
+        calls = []
+        for file_type, extension in file_types:
+            filename = f"{MOCK_UUID}_{file_type}.{extension}"
+            query_param = (
+                f"response-content-disposition=attachment%3B+filename%3D{filename}"
             )
-            for file_type, extension in file_types
-        ]
+            download_url = f"https://example.com/genome.{extension}?{query_param}"
+            calls.append(
+                call(
+                    f"cli_test_data/{filename}",
+                    # We SampleFile to have a full HttpUrl pydantic attribute
+                    SampleFile(id=MOCK_UUID, download_url=download_url).download_url,
+                    no_progress=False,
+                )
+            )
         mocked_download_file.assert_has_calls(calls, any_order=True)
 
 
+# pylint: disable=too-many-arguments
 @pytest.mark.vcr
 @assert_authorization
-def test_get_reference_genome__success_specific_file_type(  # pylint: disable=too-many-arguments
+def test_get_reference_genome__success_specific_file_type(
     credentials, mocker, project_id_reference_genome, recording
 ):
+    """Test get reference genome success specifying file types."""
     mocked_download_file = mocker.patch(
         "gencove.command.projects.get_reference_genome.main.download_file",
         side_effect=download_file,
@@ -179,21 +191,28 @@ def test_get_reference_genome__success_specific_file_type(  # pylint: disable=to
         assert res.exit_code == 0
     assert mocked_download_file.call_count == 1
     if not recording:
+        filename = f"{MOCK_UUID}_genome-dict.dict"
+        query_param = (
+            f"response-content-disposition=attachment%3B+filename%3D{filename}"
+        )
+        download_url = f"https://example.com/genome.dict?{query_param}"
         mocked_download_file.assert_called_once_with(
-            f"cli_test_data/{MOCK_UUID}_genome-dict.dict",
+            f"cli_test_data/{filename}",
             SampleFile(
                 id=MOCK_UUID,
-                download_url=f"https://example.com/genome.dict?response-content-disposition=attachment%3B+filename%3D{MOCK_UUID}_genome-dict.dict",
+                download_url=download_url,
             ).download_url,
             no_progress=False,
         )
 
 
+# pylint: disable=too-many-arguments
 @pytest.mark.vcr
 @assert_authorization
-def test_get_reference_genome__success_no_progress(  # pylint: disable=too-many-arguments
+def test_get_reference_genome__success_no_progress(
     credentials, mocker, project_id_reference_genome, recording
 ):
+    """Test command doesn't show progress bar."""
     mocked_download_file = mocker.patch(
         "gencove.command.projects.get_reference_genome.main.download_file",
         side_effect=download_file,
@@ -215,11 +234,16 @@ def test_get_reference_genome__success_no_progress(  # pylint: disable=too-many-
         assert res.exit_code == 0
     assert mocked_download_file.call_count == 1
     if not recording:
+        filename = f"{MOCK_UUID}_genome-dict.dict"
+        query_param = (
+            f"response-content-disposition=attachment%3B+filename%3D{filename}"
+        )
+        download_url = f"https://example.com/genome.dict?{query_param}"
         mocked_download_file.assert_called_once_with(
-            f"cli_test_data/{MOCK_UUID}_genome-dict.dict",
+            f"cli_test_data/{filename}",
             SampleFile(
                 id=MOCK_UUID,
-                download_url=f"https://example.com/genome.dict?response-content-disposition=attachment%3B+filename%3D{MOCK_UUID}_genome-dict.dict",
+                download_url=download_url,
             ).download_url,
             no_progress=True,
         )
@@ -228,8 +252,9 @@ def test_get_reference_genome__success_no_progress(  # pylint: disable=too-many-
 @pytest.mark.vcr
 @assert_authorization
 def test_get_reference_genome__bad_file_type(  # pylint: disable=too-many-arguments
-    credentials, mocker, project_id_reference_genome, recording
+    credentials, mocker, project_id_reference_genome
 ):
+    """Fails when an invalid file type is provided."""
     mocked_download_file = mocker.patch(
         "gencove.command.projects.get_reference_genome.main.download_file",
         side_effect=download_file,
@@ -248,9 +273,9 @@ def test_get_reference_genome__bad_file_type(  # pylint: disable=too-many-argume
             ],
         )
         assert res.exit_code == 1
-        assert f"Invalid file types: bad-file-type." in res.output
+        assert "Invalid file types: bad-file-type." in res.output
         assert (
-            "Run 'gencove file-types --object reference-genome' command for a list of valid file types. "
-            in res.output
+            "Run 'gencove file-types --object reference-genome' command for a list of "
+            "valid file types. " in res.output
         )
     mocked_download_file.assert_not_called()

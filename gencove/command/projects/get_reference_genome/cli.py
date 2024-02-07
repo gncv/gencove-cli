@@ -46,12 +46,14 @@ def get_reference_genome(
 
         Download all reference genome files:
 
-            gencove projects get_reference_genome d9eaa54b-aaac-4b85-92b0-0b564be6d7db ./genome
+            gencove projects get_reference_genome d9eaa54b-aaac-4b85-92b0-0b564be6d7db
+             ./genome
 
 
         Download only fasta reference genome file:
 
-            gencove projects get_reference_genome d9eaa54b-aaac-4b85-92b0-0b564be6d7db . --file-types genome-fasta
+            gencove projects get_reference_genome d9eaa54b-aaac-4b85-92b0-0b564be6d7db
+             . --file-types genome-fasta
     """
     f_types = tuple()
     if file_types:

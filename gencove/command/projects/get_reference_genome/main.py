@@ -41,7 +41,8 @@ class GetReferenceGenome(Command):
             if invalid_file_types:
                 raise ValidationError(
                     f"Invalid file types: {', '.join(invalid_file_types)}. "
-                    "Run 'gencove file-types --object reference-genome' command for a list of valid file types. "
+                    "Run 'gencove file-types --object reference-genome' command for a "
+                    "list of valid file types. "
                     "Use with --project-id option to see project file types."
                 )
         except client.APIClientError as err:

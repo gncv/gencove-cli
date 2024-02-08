@@ -11,6 +11,7 @@ from gencove.command.download.utils import (
     get_filename_from_download_url,
 )
 from gencove.command.utils import validate_file_types
+from gencove.constants import FileTypesObject
 from gencove.exceptions import ValidationError
 
 
@@ -35,7 +36,8 @@ class GetReferenceGenome(Command):
         try:
 
             valid_file_types = self.api_client.get_file_types(
-                project_id=self.project_id, object_param="reference_genome"
+                project_id=self.project_id,
+                object_param=FileTypesObject.REFERENCE_GENOME.value,
             ).results
             invalid_file_types = validate_file_types(self.file_types, valid_file_types)
             if invalid_file_types:

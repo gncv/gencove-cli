@@ -10,6 +10,7 @@ from .delete.cli import delete_projects
 from .delete_samples.cli import delete_project_samples
 from .get_batch.cli import get_batch
 from .get_merged_vcf.cli import get_merged_vcf
+from .get_reference_genome.cli import get_reference_genome
 from .get_sample_manifests.cli import get_sample_manifests
 from .import_existing_samples.cli import import_existing_project_samples
 from .list.cli import list_projects
@@ -47,3 +48,4 @@ projects.add_command(get_merged_vcf)
 projects.add_command(delete_projects)
 projects.add_command(create_sample_manifest)
 projects.add_command(get_sample_manifests)
+projects.add_command(get_reference_genome)

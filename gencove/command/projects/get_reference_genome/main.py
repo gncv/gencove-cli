@@ -34,7 +34,6 @@ class GetReferenceGenome(Command):
     def validate(self):
         """Validate command input."""
         try:
-
             valid_file_types = self.api_client.get_file_types(
                 project_id=self.project_id,
                 object_param=FileTypesObject.REFERENCE_GENOME.value,
@@ -65,7 +64,7 @@ class GetReferenceGenome(Command):
     def execute(self):
         """Download Reference Genome files for a given project."""
         self.echo_debug(
-            f"Downloading Reference Genome files file for project {self.project_id}"
+            f"Downloading Reference Genome files for project {self.project_id}"
         )
         try:
             project = self.api_client.get_project(self.project_id)

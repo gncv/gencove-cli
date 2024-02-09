@@ -7,7 +7,6 @@ from uuid import uuid4
 
 from click.testing import CliRunner
 
-
 from gencove.command.download.utils import download_file
 from gencove.command.projects.get_reference_genome.cli import get_reference_genome
 from gencove.models import SampleFile
@@ -156,7 +155,8 @@ def test_get_reference_genome__success(  # pylint: disable=too-many-arguments
             calls.append(
                 call(
                     f"cli_test_data/{filename}",
-                    # We SampleFile to have a full HttpUrl pydantic attribute
+                    # We need to use SampleFile to have a full HttpUrl pydantic
+                    # attribute
                     SampleFile(id=MOCK_UUID, download_url=download_url).download_url,
                     no_progress=False,
                 )

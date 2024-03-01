@@ -290,6 +290,7 @@ class Upload(Command):
         backoff.expo, get_get_upload_details_retry_predicate, max_tries=10
     )
     @backoff.on_exception(backoff.expo, APIClientTooManyRequestsError, max_tries=20)
+    @backoff.on_exception(backoff.expo, APIClientError, max_tries=10)
     def get_upload_details(self, gncv_path):
         """Get upload details with retry for last status update."""
         return self.api_client.get_upload_details(gncv_path)

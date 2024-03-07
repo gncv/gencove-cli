@@ -138,9 +138,9 @@ class Download(Command):
         for sample_id in self.sample_ids:
             try:
                 self.process_sample(sample_id)
-            except DownloadTemplateError as e:
+            except DownloadTemplateError as err:
                 self.echo_error(f"Could not process sample ID {sample_id}, quitting!")
-                raise e
+                raise err
         if self.download_urls:
             self.output_list()
 

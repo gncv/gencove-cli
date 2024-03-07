@@ -142,7 +142,7 @@ class Download(Command):
                 self.echo_warning(
                     f"Could retrieve sample ID {sample_id} due to error: {err}"
                 )
-                continue
+                raise
         if self.download_urls:
             self.output_list()
 
@@ -160,6 +160,11 @@ class Download(Command):
         requests.exceptions.HTTPError,
         giveup=fatal_process_sample_error,
         max_tries=10,
+    )
+    @backoff.on_exception(
+        backoff.expo,
+        client.APIClientError,
+        max_tries=3,
     )
     @backoff.on_exception(
         backoff.expo,

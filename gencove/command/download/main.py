@@ -197,6 +197,12 @@ class Download(Command):
                 "because of timeout, trying again"
             )
             raise
+        except client.APIClientError:
+            self.echo_warning(
+                f"Sample with id {sample_id} not found due to "
+                "API error, trying again."
+            )
+            return
 
         self.echo_debug(
             f"Processing sample id {sample.id}, status {sample.last_status.status}"

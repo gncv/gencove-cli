@@ -200,9 +200,9 @@ class Download(Command):
             )
             raise
         except client.APIClientError as err:
-            self.echo_warning(
+            self.echo_debug(
                 f"Sample with id {sample_id} not accessible due to "
-                f"API error. Error: {err}"
+                f"API error, trying again. Error: {err}"
             )
             raise
 
@@ -335,11 +335,10 @@ class Download(Command):
         """
         if download_to_path in self.downloaded_files:
             self.echo_warning(
-                "Bad template! Multiple files have the same name. "
-                "Please fix the template and try again."
+                "Multiple files have the same name. "
+                f"Skipping downloading {download_to_path}."
             )
-
-            raise DownloadTemplateError
+            return
 
         download_func(*args, **kwargs)
 

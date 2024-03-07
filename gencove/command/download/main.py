@@ -138,8 +138,9 @@ class Download(Command):
         for sample_id in self.sample_ids:
             try:
                 self.process_sample(sample_id)
-            except DownloadTemplateError:
-                return
+            except DownloadTemplateError as e:
+                self.echo_error(f"Could not process sample ID {sample_id}, quitting!")
+                raise e
         if self.download_urls:
             self.output_list()
 
@@ -156,6 +157,11 @@ class Download(Command):
         backoff.expo,
         requests.exceptions.HTTPError,
         giveup=fatal_process_sample_error,
+        max_tries=10,
+    )
+    @backoff.on_exception(
+        backoff.expo,
+        client.APIClientError,
         max_tries=10,
     )
     @backoff.on_exception(
@@ -191,12 +197,6 @@ class Download(Command):
                 "because of timeout, trying again"
             )
             raise
-        except client.APIClientError:
-            self.echo_warning(
-                f"Sample with id {sample_id} not found. "
-                "Are you using client id instead of sample id?"
-            )
-            return
 
         self.echo_debug(
             f"Processing sample id {sample.id}, status {sample.last_status.status}"

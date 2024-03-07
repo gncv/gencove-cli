@@ -139,8 +139,10 @@ class Download(Command):
             try:
                 self.process_sample(sample_id)
             except DownloadTemplateError as err:
-                self.echo_error(f"Could not process sample ID {sample_id}, quitting!")
-                raise err
+                self.echo_warning(
+                    f"Could retrieve sample ID {sample_id} due to error: {err}"
+                )
+                continue
         if self.download_urls:
             self.output_list()
 
@@ -157,11 +159,6 @@ class Download(Command):
         backoff.expo,
         requests.exceptions.HTTPError,
         giveup=fatal_process_sample_error,
-        max_tries=10,
-    )
-    @backoff.on_exception(
-        backoff.expo,
-        client.APIClientError,
         max_tries=10,
     )
     @backoff.on_exception(
@@ -197,12 +194,12 @@ class Download(Command):
                 "because of timeout, trying again"
             )
             raise
-        except client.APIClientError:
+        except client.APIClientError as err:
             self.echo_warning(
-                f"Sample with id {sample_id} not found due to "
-                "API error, trying again."
+                f"Sample with id {sample_id} not accessible due to "
+                f"API error. Error: {err}"
             )
-            return
+            raise
 
         self.echo_debug(
             f"Processing sample id {sample.id}, status {sample.last_status.status}"
@@ -319,7 +316,7 @@ class Download(Command):
         """Check if this file was already downloaded, if yes - exit.
 
         Args:
-            download_to_path(str): system file path to donwload to
+            download_to_path(str): system file path to download to
             download_func(function): function that will do the download logic
             *args: arguments that will be passed to download function
             **kwargs: keyword arguments that will be passed to download func

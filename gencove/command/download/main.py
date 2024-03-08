@@ -136,13 +136,7 @@ class Download(Command):
         if self.download_to != "-":
             self.echo_info("Processing samples")
         for sample_id in self.sample_ids:
-            try:
-                self.process_sample(sample_id)
-            except DownloadTemplateError:
-                self.echo_debug(
-                    f"Could not retrieve sample ID {sample_id} due to error"
-                )
-                raise
+            self.process_sample(sample_id)
         if self.download_urls:
             self.output_list()
 

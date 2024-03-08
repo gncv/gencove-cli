@@ -136,10 +136,7 @@ class Download(Command):
         if self.download_to != "-":
             self.echo_info("Processing samples")
         for sample_id in self.sample_ids:
-            try:
-                self.process_sample(sample_id)
-            except DownloadTemplateError:
-                return
+            self.process_sample(sample_id)
         if self.download_urls:
             self.output_list()
 
@@ -157,6 +154,11 @@ class Download(Command):
         requests.exceptions.HTTPError,
         giveup=fatal_process_sample_error,
         max_tries=10,
+    )
+    @backoff.on_exception(
+        backoff.expo,
+        client.APIClientError,
+        max_tries=3,
     )
     @backoff.on_exception(
         backoff.expo,
@@ -191,12 +193,12 @@ class Download(Command):
                 "because of timeout, trying again"
             )
             raise
-        except client.APIClientError:
-            self.echo_warning(
-                f"Sample with id {sample_id} not found. "
-                "Are you using client id instead of sample id?"
+        except client.APIClientError as err:
+            self.echo_debug(
+                f"Sample with id {sample_id} not accessible due to "
+                f"API error, trying again. Error: {err}"
             )
-            return
+            raise
 
         self.echo_debug(
             f"Processing sample id {sample.id}, status {sample.last_status.status}"
@@ -313,7 +315,7 @@ class Download(Command):
         """Check if this file was already downloaded, if yes - exit.
 
         Args:
-            download_to_path(str): system file path to donwload to
+            download_to_path(str): system file path to download to
             download_func(function): function that will do the download logic
             *args: arguments that will be passed to download function
             **kwargs: keyword arguments that will be passed to download func
@@ -326,12 +328,11 @@ class Download(Command):
              list
         """
         if download_to_path in self.downloaded_files:
-            self.echo_warning(
-                "Bad template! Multiple files have the same name. "
-                "Please fix the template and try again."
+            raise DownloadTemplateError(
+                f"Bad template: {download_to_path} file already exists. "
+                "Update your template to avoid files containing the same name "
+                "and try again."
             )
-
-            raise DownloadTemplateError
 
         download_func(*args, **kwargs)
 

@@ -95,6 +95,10 @@ class APIClientError(APIError):
     """Base HTTP error."""
 
 
+class APIMissingFileChecksumError(APIError):
+    """Error on missing file checksum"""
+
+
 class APIClientTooManyRequestsError(APIClientError):
     """Too many requests (429) HTTP error."""
 
@@ -1048,16 +1052,25 @@ class APIClient:
     def get_file_checksum(self, file_id, filename=None):
         """Fetch file checksum, using the client because need to be
         authenticated.
+
+        Raises:
+            APIMissingFileChecksumError if response indicates file is missing checksum
         """
         params = {}
         if filename:
             params["filename"] = filename
-        return self._get(
-            self.endpoints.FILE_CHECKSUM.value.format(id=file_id),
-            query_params=params,
-            authorized=True,
-            raw_response=True,
-        )
+        try:
+            resp = self._get(
+                self.endpoints.FILE_CHECKSUM.value.format(id=file_id),
+                query_params=params,
+                authorized=True,
+                raw_response=True,
+            )
+        except APIClientError as err:
+            if err.status_code == 400:  # API returns bad request if checksum missing
+                raise APIMissingFileChecksumError(err.message) from err
+            raise
+        return resp
 
     def import_existing_samples(self, project_id, sample_ids, metadata):
         """Import existing samples to a project and pass metadata."""

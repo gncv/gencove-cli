@@ -1067,7 +1067,7 @@ class APIClient:
                 raw_response=True,
             )
         except APIClientError as err:
-            if "File does not have checksum" in err.message:
+            if err.status_code == 400:  # API returns bad request if checksum missing
                 raise APIMissingFileChecksumError(err.message) from err
             raise
         return resp

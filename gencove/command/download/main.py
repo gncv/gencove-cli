@@ -328,10 +328,6 @@ class Download(Command):
              list
         """
         if download_to_path in self.downloaded_files:
-            self.echo_debug(
-                "Multiple files have the same name. "
-                f"Erroneous path: {download_to_path}."
-            )
             raise DownloadTemplateError(
                 f"Bad template: {download_to_path} file already exists. "
                 "Update your template to avoid files containing the same name "

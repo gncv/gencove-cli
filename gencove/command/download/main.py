@@ -138,9 +138,9 @@ class Download(Command):
         for sample_id in self.sample_ids:
             try:
                 self.process_sample(sample_id)
-            except DownloadTemplateError as err:
+            except DownloadTemplateError:
                 self.echo_warning(
-                    f"Could retrieve sample ID {sample_id} due to error: {err}"
+                    f"Could not retrieve sample ID {sample_id} due to error"
                 )
                 raise
         if self.download_urls:
@@ -336,9 +336,9 @@ class Download(Command):
         if download_to_path in self.downloaded_files:
             self.echo_warning(
                 "Multiple files have the same name. "
-                f"Skipping downloading {download_to_path}."
+                f"Erroneous path: {download_to_path}."
             )
-            return
+            raise DownloadTemplateError(f"{download_to_path} already exists")
 
         download_func(*args, **kwargs)
 

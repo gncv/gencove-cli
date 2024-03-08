@@ -518,10 +518,7 @@ def test_create_checksum_file_exception(
             ],
         )
         assert res.exit_code == 1
-        assert (
-            "ERROR: API Client Error: Bad Request: File does not have checksum."  # noqa: E501 pylint: disable=line-too-long
-            in res.stdout
-        )
+        assert "File does not have checksum." in res.stdout
         if not recording:
             mocked_sample_details.assert_called()
             filename = f"{MOCK_UUID}_R1.fastq.gz"

@@ -9,7 +9,7 @@
         show_bases: false
         members: false
 
-Supported Python versions are 3.6 and above.
+Supported Python versions are 3.7 and above.
 
 # Quickstart
 

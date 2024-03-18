@@ -9,7 +9,7 @@ from .sync.cli import sync
 
 @click.group()
 def data():
-    """Explorer instances management commands."""
+    """Explorer data management commands."""
 
 
 data.add_command(ls)

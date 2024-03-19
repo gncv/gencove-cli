@@ -213,7 +213,6 @@ def test_import_existing_project_samples__success(
     assert "Number of samples imported into the project" in res.output
 
 
-@assert_authorization
 def test_import_existing_project_samples__batch_size(
     mocker, credentials, project_id
 ):  # pylint: disable=too-many-arguments

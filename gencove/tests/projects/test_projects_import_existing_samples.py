@@ -2,13 +2,14 @@
 
 # pylint: disable=wrong-import-order, import-error
 import operator
+from unittest import mock
 from uuid import uuid4
 
 from click.testing import CliRunner
 
 from gencove.client import APIClient, APIClientError
 from gencove.command.projects.cli import import_existing_project_samples
-from gencove.models import ImportExistingSamplesModel
+from gencove.models import ImportExistingSamplesModel, SampleImport
 from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.projects.vcr.filters import (
@@ -16,6 +17,8 @@ from gencove.tests.projects.vcr.filters import (
     filter_import_existing_samples_response,
 )
 from gencove.tests.utils import MOCK_UUID, get_vcr_response
+from gencove.constants import IMPORT_BATCH_SIZE
+from gencove.utils import batchify
 
 import pytest
 
@@ -207,4 +210,43 @@ def test_import_existing_project_samples__success(
     assert res.exit_code == 0
     if not recording:
         mocked_import_existing_samples.assert_called_once()
+    assert "Number of samples imported into the project" in res.output
+
+
+@assert_authorization
+def test_import_existing_project_samples__batch_size(
+    mocker, credentials, project_id
+):  # pylint: disable=too-many-arguments
+    """Test import existing project samples confirm batch size."""
+    runner = CliRunner()
+
+    sample_ids = [str(uuid4()) for _ in range(IMPORT_BATCH_SIZE * 2 + 1)]
+
+    mocked_import_existing_samples = mocker.patch.object(
+        APIClient,
+        "import_existing_samples",
+        return_value=ImportExistingSamplesModel(
+            project_id=project_id,
+            samples=[SampleImport(sample_id=sample_id) for sample_id in sample_ids],
+            metadata=None,
+        ),
+    )
+
+    res = runner.invoke(
+        import_existing_project_samples,
+        [
+            project_id,
+            "--sample-ids",
+            ",".join(sample_ids),
+            *credentials,
+        ],
+    )
+    assert res.exit_code == 0
+    assert mocked_import_existing_samples.call_count == 3
+    mocked_import_existing_samples.assert_has_calls(
+        [
+            mock.call(project_id, samples_batch, None)
+            for samples_batch in batchify(sample_ids, IMPORT_BATCH_SIZE)
+        ]
+    )
     assert "Number of samples imported into the project" in res.output

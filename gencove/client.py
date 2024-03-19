@@ -1072,7 +1072,9 @@ class APIClient:
             raise
         return resp
 
-    def import_existing_samples(self, project_id, sample_ids, metadata):
+    def import_existing_samples(
+        self, project_id, sample_ids, metadata
+    ) -> ImportExistingSamplesModel:
         """Import existing samples to a project and pass metadata."""
         payload = {
             "project_id": project_id,

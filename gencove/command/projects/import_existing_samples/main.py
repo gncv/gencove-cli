@@ -5,7 +5,9 @@ from .utils import get_line
 from ...base import Command
 from ...utils import is_valid_json
 from .... import client
+from ....constants import IMPORT_BATCH_SIZE
 from ....exceptions import ValidationError
+from ....utils import batchify
 
 
 class ImportExistingSamples(Command):
@@ -40,11 +42,16 @@ class ImportExistingSamples(Command):
         try:
             # Import existing samples to the project optionally
             # passing metadata.
-            import_existing_samples_response = self.api_client.import_existing_samples(
-                self.project_id, self.sample_ids, metadata
-            )
-            for imported_sample in import_existing_samples_response.samples:
-                self.echo_data(get_line(imported_sample))
+            for samples_batch in batchify(
+                self.sample_ids, batch_size=IMPORT_BATCH_SIZE
+            ):
+                import_existing_samples_response = (
+                    self.api_client.import_existing_samples(
+                        self.project_id, samples_batch, metadata
+                    )
+                )
+                for imported_sample in import_existing_samples_response.samples:
+                    self.echo_data(get_line(imported_sample))
             self.echo_info(
                 f"Number of samples imported into the project {self.project_id}: "
                 f"{len(self.sample_ids)}"

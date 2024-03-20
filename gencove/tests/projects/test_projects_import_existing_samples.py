@@ -216,10 +216,11 @@ def test_import_existing_project_samples__success(
     assert "Number of samples imported into the project" in res.output
 
 
+@pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
 def test_import_existing_project_samples__batch_size(
-    mocker, credentials, project_id
+    mocker, credentials, project_id, recording, vcr
 ):  # pylint: disable=too-many-arguments
     """Test import existing project samples confirm batch size."""
     runner = CliRunner()

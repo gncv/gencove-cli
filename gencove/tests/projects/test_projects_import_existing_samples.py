@@ -23,9 +23,6 @@ from gencove.utils import batchify
 import pytest
 
 from vcr import VCR
-import logging
-
-logging.basicConfig(level=logging.DEBUG)
 
 
 @pytest.fixture(scope="module")
@@ -246,10 +243,6 @@ def test_import_existing_project_samples__batch_size(
             *credentials,
         ],
     )
-    print("Exit Code:", res.exit_code)
-    print("Output:", res.output)
-    if res.exc_info:
-        print("Exception:", res.exc_info)
     assert res.exit_code == 0
     assert mocked_import_existing_samples.call_count == 3
     mocked_import_existing_samples.assert_has_calls(

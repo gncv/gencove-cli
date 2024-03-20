@@ -217,7 +217,7 @@ def test_import_existing_project_samples__success(
 @pytest.mark.vcr
 @assert_authorization
 def test_import_existing_project_samples__batch_size(
-    mocker, credentials, project_id, recording, vcr
+    mocker, credentials, project_id, recording, vcr  # pylint: disable=unused-argument
 ):  # pylint: disable=too-many-arguments
     """Test import existing project samples confirm batch size."""
     runner = CliRunner()

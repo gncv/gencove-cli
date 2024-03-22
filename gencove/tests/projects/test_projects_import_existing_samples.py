@@ -10,7 +10,13 @@ from click.testing import CliRunner
 from gencove.client import APIClient, APIClientError
 from gencove.command.projects.cli import import_existing_project_samples
 from gencove.constants import IMPORT_BATCH_SIZE
-from gencove.models import ImportExistingSamplesModel, SampleImport
+from gencove.models import (
+    ImportExistingSamplesModel,
+    ProjectSamples,
+    ResponseMeta,
+    SampleDetails,
+    SampleImport,
+)
 from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.projects.vcr.filters import (
@@ -102,6 +108,143 @@ def test_import_existing_project_samples__bad_sample_ids(mocker, credentials):
     assert res.exit_code == 1
     mocked_import_existing_samples.assert_not_called()
     assert "Not all sample IDs are valid" in res.output
+
+
+@pytest.mark.default_cassette("jwt-create.yaml")
+@pytest.mark.vcr
+@assert_authorization
+def test_import_existing_project_samples__bad_source_project_id(mocker, credentials):
+    """Test import existing project samples failure when non-uuid string is used as
+    source project id.
+    """
+    runner = CliRunner()
+
+    mocked_import_existing_samples = mocker.patch.object(
+        APIClient,
+        "import_existing_samples",
+    )
+
+    res = runner.invoke(
+        import_existing_project_samples,
+        [
+            str(uuid4()),
+            "--source-project-id",
+            "1111111",
+            *credentials,
+        ],
+    )
+
+    assert res.exit_code == 1
+    mocked_import_existing_samples.assert_not_called()
+    print(res.output)
+    assert "Source Project ID is not valid" in res.output
+
+
+@pytest.mark.default_cassette("jwt-create.yaml")
+@pytest.mark.vcr
+@assert_authorization
+def test_import_existing_project_samples__sample_project_id(mocker, credentials):
+    """Test import existing project samples failure when sampe project id is used
+    as source and destination.
+    """
+    runner = CliRunner()
+
+    mocked_import_existing_samples = mocker.patch.object(
+        APIClient,
+        "import_existing_samples",
+    )
+
+    project_id = str(uuid4())
+    res = runner.invoke(
+        import_existing_project_samples,
+        [
+            project_id,
+            "--source-project-id",
+            project_id,
+            *credentials,
+        ],
+    )
+
+    assert res.exit_code == 1
+    mocked_import_existing_samples.assert_not_called()
+    print(res.output)
+    assert "Source and destination project must be different" in res.output
+
+
+@pytest.mark.default_cassette("jwt-create.yaml")
+@pytest.mark.vcr
+@assert_authorization
+def test_import_existing_project_samples__both_sample_ids_and_source_project_id(
+    mocker, credentials
+):
+    """Test import existing project samples failure when both sample ids and
+    source project id are given.
+    """
+    runner = CliRunner()
+
+    mocked_import_existing_samples = mocker.patch.object(
+        APIClient,
+        "import_existing_samples",
+    )
+
+    res = runner.invoke(
+        import_existing_project_samples,
+        [
+            str(uuid4()),
+            "--source-project-id",
+            str(uuid4()),
+            "--sample-ids",
+            str(uuid4()),
+            *credentials,
+        ],
+    )
+
+    assert res.exit_code == 1
+    mocked_import_existing_samples.assert_not_called()
+    print(res.output)
+    assert "Either --source-project-id or --sample-ids" in res.output
+
+
+@pytest.mark.default_cassette("jwt-create.yaml")
+@pytest.mark.vcr
+@assert_authorization
+def test_import_existing_project_samples__import_from_source_project(
+    mocker, credentials
+):
+    """Test import existing project samples failure when both sample ids and
+    source project id are given.
+    """
+    runner = CliRunner()
+
+    project_id = str(uuid4())
+    sample_id = str(uuid4())
+
+    mocked_import_existing_samples = mocker.patch.object(
+        APIClient,
+        "import_existing_samples",
+    )
+    mocked_get_project_samples = mocker.patch.object(
+        APIClient,
+        "get_project_samples",
+        return_value=ProjectSamples(
+            meta=ResponseMeta(count=1, next=None, previous=None),
+            results=[SampleDetails(id=sample_id)],
+        ),
+    )
+
+    res = runner.invoke(
+        import_existing_project_samples,
+        [
+            project_id,
+            "--source-project-id",
+            str(uuid4()),
+            *credentials,
+        ],
+    )
+
+    assert res.exit_code == 0
+    mocked_get_project_samples.assert_called()
+    mocked_import_existing_samples.assert_called_with(project_id, [sample_id], None)
 
 
 @pytest.mark.default_cassette("jwt-create.yaml")

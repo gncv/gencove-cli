@@ -1,6 +1,6 @@
 """Import existing samples to a project subcommand."""
 import json
-from typing import Generator, Optional, List
+from typing import Generator, List, Optional
 
 import backoff
 
@@ -8,7 +8,7 @@ from .utils import get_line
 from ...base import Command
 from ...utils import is_valid_json, is_valid_uuid
 from .... import client
-from ....constants import IMPORT_BATCH_SIZE, SampleStatus, SampleArchiveStatus
+from ....constants import IMPORT_BATCH_SIZE, SampleArchiveStatus, SampleStatus
 from ....exceptions import ValidationError
 from ....models import ProjectSamples, SampleDetails
 from ....utils import batchify

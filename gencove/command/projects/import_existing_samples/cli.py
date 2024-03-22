@@ -22,7 +22,8 @@ from .main import ImportExistingSamples
     required=False,
     help=(
         "A comma separated list of sample ids to import into the provided project."
-        " Either --source-project-id or --sample-ids option must be provided, but not both."
+        " Either --source-project-id or --sample-ids option must be provided,"
+        " but not both."
     ),
     callback=validate_uuid_list,
 )

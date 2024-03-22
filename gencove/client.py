@@ -504,7 +504,7 @@ class APIClient:
         sample_archive_status=SampleArchiveStatus.ALL.value,
         sort_by=SampleSortBy.MODIFIED.value,
         sort_order=SortOrder.DESC.value,
-    ):
+    ) -> ProjectSamples:
         """List single project's associated samples."""
         project_endpoint = self.endpoints.PROJECT_SAMPLES.value.format(id=project_id)
         params = self._add_query_params(

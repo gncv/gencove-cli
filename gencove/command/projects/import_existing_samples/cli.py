@@ -16,7 +16,6 @@ from .main import ImportExistingSamples
     "--source-project-id",
     required=False,
     help="Import all succeeded and available samples from source project.",
-    callback=validate_uuid,
 )
 @click.option(
     "--sample-ids",

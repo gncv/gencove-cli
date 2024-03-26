@@ -55,15 +55,15 @@ def import_existing_project_samples(  # pylint: disable=too-many-arguments
 
         Import samples from project:
 
-            gencove project import-existing-samples d9eaa54b-aaac-4b85-92b0-0b564be6d7db --source-project-id d8eb0bb5-29ee-44ed-b681-0fc05a557183
+            gencove projects import-existing-samples d9eaa54b-aaac-4b85-92b0-0b564be6d7db --source-project-id d8eb0bb5-29ee-44ed-b681-0fc05a557183
 
         Import samples:
 
-            gencove project import-existing-samples d9eaa54b-aaac-4b85-92b0-0b564be6d7db --sample-ids 59f5c1fd-cce0-4c4c-90e2-0b6c6c525d71,7edee497-12b5-4a1d-951f-34dc8dce1c1d
+            gencove projects import-existing-samples d9eaa54b-aaac-4b85-92b0-0b564be6d7db --sample-ids 59f5c1fd-cce0-4c4c-90e2-0b6c6c525d71,7edee497-12b5-4a1d-951f-34dc8dce1c1d
 
         Import samples with metadata:
 
-            gencove project import-existing-samples d9eaa54b-aaac-4b85-92b0-0b564be6d7db --sample-ids 59f5c1fd-cce0-4c4c-90e2-0b6c6c525d71,7edee497-12b5-4a1d-951f-34dc8dce1c1d --metadata-json='{"batch": "batch1"}'
+            gencove projects import-existing-samples d9eaa54b-aaac-4b85-92b0-0b564be6d7db --sample-ids 59f5c1fd-cce0-4c4c-90e2-0b6c6c525d71,7edee497-12b5-4a1d-951f-34dc8dce1c1d --metadata-json='{"batch": "batch1"}'
     """  # noqa: E501
     echo_debug(f"Sample ids translation: {sample_ids}")
     ImportExistingSamples(

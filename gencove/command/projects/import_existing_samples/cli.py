@@ -15,7 +15,10 @@ from .main import ImportExistingSamples
 @click.option(
     "--source-project-id",
     required=False,
-    help="Import all succeeded and available samples from source project.",
+    help=(
+        "Import all available samples, in succeeded or failed_qc state that have"
+        " files, from source project."
+    ),
 )
 @click.option(
     "--sample-ids",

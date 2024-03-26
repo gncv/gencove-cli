@@ -56,11 +56,8 @@ class ImportExistingSamples(Command):
                 f" samples from source project {self.source_project_id}."
             )
             self.sample_ids = []
-            for samples in self.get_paginated_samples():
-                if not samples:
-                    continue
-                for sample in samples:
-                    self.sample_ids.append(str(sample.id))
+            for sample in self.get_paginated_samples():
+                self.sample_ids.append(str(sample.id))
             self.echo_debug(f"Samples to import from project: {len(self.sample_ids)}")
         metadata = None
         if self.metadata_json is not None:
@@ -93,18 +90,24 @@ class ImportExistingSamples(Command):
 
     def get_paginated_samples(
         self,
-    ) -> Generator[Optional[List[SampleDetails]], None, None]:
-        """Paginate over all sample sheets for the destination.
+    ) -> Generator[SampleDetails, None, None]:
+        """Paginate over all completed samples for the destination.
 
         Yields:
-            paginated lists of samples
+            Samples in succeeded or failed_qc state that have files.
         """
         more = True
         next_link = None
         while more:
-            self.echo_debug("Get sample sheet page")
+            self.echo_debug("Get all completed samples")
             resp = self.get_samples(next_link)
-            yield resp.results
+            if resp.results:
+                for sample in resp.results:
+                    if (
+                        sample.last_status.status in ["failed_qc", "succeeded"]
+                        and sample.files
+                    ):
+                        yield sample
             next_link = resp.meta.next
             more = next_link is not None
 
@@ -115,10 +118,10 @@ class ImportExistingSamples(Command):
         max_time=30,
     )
     def get_samples(self, next_link=None) -> ProjectSamples:
-        """Get sample sheet page."""
+        """Get all completed samples page."""
         return self.api_client.get_project_samples(
             project_id=self.source_project_id,
             next_link=next_link,
-            sample_status=SampleStatus.SUCCEEDED.value,
+            sample_status=SampleStatus.COMPLETED.value,
             sample_archive_status=SampleArchiveStatus.AVAILABLE.value,
         )

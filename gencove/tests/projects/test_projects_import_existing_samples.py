@@ -11,10 +11,12 @@ from gencove.client import APIClient, APIClientError
 from gencove.command.projects.cli import import_existing_project_samples
 from gencove.constants import IMPORT_BATCH_SIZE
 from gencove.models import (
+    GencoveStatus,
     ImportExistingSamplesModel,
     ProjectSamples,
     ResponseMeta,
     SampleDetails,
+    SampleFile,
     SampleImport,
 )
 from gencove.tests.decorators import assert_authorization, assert_no_requests
@@ -217,7 +219,9 @@ def test_import_existing_project_samples__import_from_source_project(
     runner = CliRunner()
 
     project_id = str(uuid4())
-    sample_id = str(uuid4())
+    sample_id_succeeded = str(uuid4())
+    sample_id_failed_qc = str(uuid4())
+    sample_id_failed_qc_with_files = str(uuid4())
 
     mocked_import_existing_samples = mocker.patch.object(
         APIClient,
@@ -227,8 +231,23 @@ def test_import_existing_project_samples__import_from_source_project(
         APIClient,
         "get_project_samples",
         return_value=ProjectSamples(
-            meta=ResponseMeta(count=1, next=None, previous=None),
-            results=[SampleDetails(id=sample_id)],
+            meta=ResponseMeta(count=3, next=None, previous=None),
+            results=[
+                SampleDetails(
+                    id=sample_id_succeeded,
+                    last_status=GencoveStatus(id=uuid4(), status="succeeded"),
+                    files=[SampleFile(id=uuid4())],
+                ),
+                SampleDetails(
+                    id=sample_id_failed_qc,
+                    last_status=GencoveStatus(id=uuid4(), status="failed_qc"),
+                ),
+                SampleDetails(
+                    id=sample_id_failed_qc_with_files,
+                    last_status=GencoveStatus(id=uuid4(), status="failed_qc"),
+                    files=[SampleFile(id=uuid4())],
+                ),
+            ],
         ),
     )
 
@@ -241,10 +260,12 @@ def test_import_existing_project_samples__import_from_source_project(
             *credentials,
         ],
     )
-
+    print(res.output)
     assert res.exit_code == 0
     mocked_get_project_samples.assert_called()
-    mocked_import_existing_samples.assert_called_with(project_id, [sample_id], None)
+    mocked_import_existing_samples.assert_called_with(
+        project_id, [sample_id_succeeded, sample_id_failed_qc_with_files], None
+    )
 
 
 @pytest.mark.default_cassette("jwt-create.yaml")

@@ -59,7 +59,7 @@ class Download(Command):
     def initialize(self):
         """Initialize download command."""
         if self.filters.project_id and self.filters.sample_ids:
-            raise ValidationError("Bad configuration. Exiting")
+            raise ValidationError("Must specify only one of: project-id or sample-ids")
 
         self.login()
 
@@ -86,10 +86,10 @@ class Download(Command):
             ValidationError : something is wrong with configuration
         """
         if not self.filters.project_id and not self.filters.sample_ids:
-            raise ValidationError("Must specify one of: project id or sample ids")
+            raise ValidationError("Must specify one of: project-id or sample-ids")
 
         if self.filters.project_id and self.filters.sample_ids:
-            raise ValidationError("Must specify only one of: project id or sample ids")
+            raise ValidationError("Must specify only one of: project-id or sample-ids")
 
         if not self.sample_ids:
             raise ValidationError("No samples to process. Exiting.")

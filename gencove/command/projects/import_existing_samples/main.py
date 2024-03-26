@@ -1,6 +1,6 @@
 """Import existing samples to a project subcommand."""
 import json
-from typing import Generator, List, Optional
+from typing import Generator
 
 import backoff
 

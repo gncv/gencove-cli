@@ -45,6 +45,7 @@ class TestFetchCredentialsFromEnv:
         assert command.credentials.api_key == "env_api_key"
         assert command.credentials.password == "env_password"
         assert command.credentials.email == ""
+        assert command.is_credentials_valid is True
 
     def test_api_key_provided_skips_env_vars(self, monkeypatch, empty_credentials):
         """Test CLI uses provided API key and ignores ENV variables"""
@@ -59,6 +60,7 @@ class TestFetchCredentialsFromEnv:
         assert command.credentials.api_key == "correct_api_key"
         assert command.credentials.email == ""
         assert command.credentials.password == ""
+        assert command.is_credentials_valid is True
 
     def test_email_password_provided_skips_env_vars(
         self, monkeypatch, empty_credentials
@@ -78,6 +80,7 @@ class TestFetchCredentialsFromEnv:
         assert command.credentials.api_key == ""
         assert command.credentials.email == "correct_email@example.com"
         assert command.credentials.password == "correct_password"
+        assert command.is_credentials_valid is True
 
     def test_no_env_vars_empty_defaults(self, empty_credentials):
         """Test CLI uses empty strings for credentials when no ENV variables set and
@@ -89,6 +92,7 @@ class TestFetchCredentialsFromEnv:
         assert command.credentials.api_key == ""
         assert command.credentials.email == ""
         assert command.credentials.password == ""
+        assert command.is_credentials_valid is True
 
     def test_email_uses_env_password(self, monkeypatch, empty_credentials):
         """Test CLI uses provided email and ENV password"""
@@ -106,14 +110,14 @@ class TestFetchCredentialsFromEnv:
         assert command.credentials.api_key == ""
         assert command.credentials.email == "provided_email@example.com"
         assert command.credentials.password == "env_password"
+        assert command.is_credentials_valid is True
 
     def test_multiple_credentials_not_allowed(self, empty_credentials):
         """Test CLI does not allow multiple credentials to be provided"""
         credentials = Credentials(
             api_key="api_key", email="email@example.com", password="password"
         )
-        with pytest.raises(ValueError) as e:
-            SimpleCommand(
-                credentials=credentials, options=Optionals(host="http://example.com")
-            )
-        assert "stonks" in str(e)
+        command = SimpleCommand(
+            credentials=credentials, options=Optionals(host="http://example.com")
+        )
+        assert command.is_credentials_valid is False

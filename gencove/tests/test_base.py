@@ -1,10 +1,10 @@
 """Test cases for base command class."""
 # pylint: disable=wrong-import-order,import-error,unused-import
 
-import pytest
-
 from gencove.command.base import Command
 from gencove.constants import Credentials, Optionals
+
+import pytest  # noqa: F401
 
 
 class SimpleCommand(Command):

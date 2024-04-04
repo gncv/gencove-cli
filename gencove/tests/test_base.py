@@ -8,17 +8,21 @@ class SimpleCommand(Command):
     """Dummy command for testing, does not extend base class functionality"""
 
     def initialize(self):
+        """Pass"""
         pass
 
     def validate(self):
+        """Pass"""
         pass
 
     def execute(self):
+        """Pass"""
         pass
 
 
 @pytest.fixture
 def empty_credentials():
+    """Return empty credentials"""
     return Credentials(api_key="", email="", password="")
 
 
@@ -28,6 +32,7 @@ class TestFetchCredentialsFromEnv:
     def test_no_credentials_provided_uses_api_env_var(
         self, monkeypatch, empty_credentials
     ):
+        """Test CLI uses API key when no creds provided and all ENV available"""
         monkeypatch.setenv("GENCOVE_API_KEY", "env_api_key")
         monkeypatch.setenv("GENCOVE_EMAIL", "env_email@example.com")
         monkeypatch.setenv("GENCOVE_PASSWORD", "env_password")
@@ -42,6 +47,7 @@ class TestFetchCredentialsFromEnv:
         assert command.credentials.email == ""
 
     def test_api_key_provided_skips_env_vars(self, monkeypatch, empty_credentials):
+        """Test CLI uses provided API key and ignores ENV variables"""
         monkeypatch.setenv("GENCOVE_API_KEY", "wrong_api_key")
         monkeypatch.setenv("GENCOVE_EMAIL", "wrong_email@example.com")
 
@@ -57,6 +63,7 @@ class TestFetchCredentialsFromEnv:
     def test_email_password_provided_skips_env_vars(
         self, monkeypatch, empty_credentials
     ):
+        """Test CLI uses provided email and password and ignores ENV variables"""
         monkeypatch.setenv("GENCOVE_API_KEY", "env_api_key")
         monkeypatch.setenv("GENCOVE_EMAIL", "wrong_email@example.com")
         monkeypatch.setenv("GENCOVE_PASSWORD", "wrong_password")
@@ -73,6 +80,8 @@ class TestFetchCredentialsFromEnv:
         assert command.credentials.password == "correct_password"
 
     def test_no_env_vars_empty_defaults(self, empty_credentials):
+        """Test CLI uses empty strings for credentials when no ENV variables set and
+        no creds provided"""
         command = SimpleCommand(
             credentials=empty_credentials, options=Optionals(host="http://example.com")
         )
@@ -82,7 +91,7 @@ class TestFetchCredentialsFromEnv:
         assert command.credentials.password == ""
 
     def test_email_uses_env_password(self, monkeypatch, empty_credentials):
-        # Set environment variables
+        """Test CLI uses provided email and ENV password"""
         monkeypatch.setenv("GENCOVE_API_KEY", "env_api_key")
         monkeypatch.setenv("GENCOVE_EMAIL", "env_email@example.com")
         monkeypatch.setenv("GENCOVE_PASSWORD", "env_password")
@@ -97,3 +106,14 @@ class TestFetchCredentialsFromEnv:
         assert command.credentials.api_key == ""
         assert command.credentials.email == "provided_email@example.com"
         assert command.credentials.password == "env_password"
+
+    def test_multiple_credentials_not_allowed(self, empty_credentials):
+        """Test CLI does not allow multiple credentials to be provided"""
+        credentials = Credentials(
+            api_key="api_key", email="email@example.com", password="password"
+        )
+        with pytest.raises(ValueError) as e:
+            SimpleCommand(
+                credentials=credentials, options=Optionals(host="http://example.com")
+            )
+        assert "stonks" in str(e)

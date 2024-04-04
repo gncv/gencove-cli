@@ -24,12 +24,12 @@ class SimpleCommand(Command):
 
 
 class TestFetchCredentialsFromEnv:
-    """Test case for fetching credentials from environment variable behavior"""
+    """Test class for fetching credentials from environment variable behavior"""
 
     def test_no_credentials_provided_uses_api_env_var(
         self, monkeypatch
     ):  # pylint: disable=redefined-outer-name,no-self-use
-        """Test CLI uses API key when no creds provided and all ENV available"""
+        """Test Command uses API key when no creds provided and all ENV available"""
         monkeypatch.setenv("GENCOVE_API_KEY", "env_api_key")
         monkeypatch.setenv("GENCOVE_EMAIL", "env_email@example.com")
         monkeypatch.setenv("GENCOVE_PASSWORD", "env_password")
@@ -49,7 +49,7 @@ class TestFetchCredentialsFromEnv:
     def test_api_key_provided_skips_env_vars(
         self, monkeypatch
     ):  # pylint: disable=redefined-outer-name,no-self-use
-        """Test CLI uses provided API key and ignores ENV variables"""
+        """Test Command uses provided API key and ignores ENV variables"""
         monkeypatch.setenv("GENCOVE_API_KEY", "wrong_api_key")
         monkeypatch.setenv("GENCOVE_EMAIL", "wrong_email@example.com")
 
@@ -66,7 +66,7 @@ class TestFetchCredentialsFromEnv:
     def test_email_password_provided_skips_env_vars(
         self, monkeypatch
     ):  # pylint: disable=redefined-outer-name,no-self-use
-        """Test CLI uses provided email and password and ignores ENV variables"""
+        """Test Command uses provided email and password and ignores ENV variables"""
         monkeypatch.setenv("GENCOVE_API_KEY", "env_api_key")
         monkeypatch.setenv("GENCOVE_EMAIL", "wrong_email@example.com")
         monkeypatch.setenv("GENCOVE_PASSWORD", "wrong_password")
@@ -86,7 +86,7 @@ class TestFetchCredentialsFromEnv:
     def test_no_env_vars_empty_defaults(
         self,
     ):  # pylint: disable=redefined-outer-name,no-self-use
-        """Test CLI uses empty strings for credentials when no ENV variables set and
+        """Test Command uses empty strings for credentials when no ENV variables set and
         no creds provided"""
         empty_credentials = Credentials(api_key="", email="", password="")
         command = SimpleCommand(
@@ -102,7 +102,7 @@ class TestFetchCredentialsFromEnv:
         self,
         monkeypatch,
     ):  # pylint: disable=redefined-outer-name,no-self-use
-        """Test CLI uses provided email and ENV password"""
+        """Test Command uses provided email and ENV password"""
         monkeypatch.setenv("GENCOVE_API_KEY", "env_api_key")
         monkeypatch.setenv("GENCOVE_EMAIL", "env_email@example.com")
         monkeypatch.setenv("GENCOVE_PASSWORD", "env_password")
@@ -122,7 +122,7 @@ class TestFetchCredentialsFromEnv:
     def test_multiple_credentials_not_allowed(
         self,
     ):  # pylint: disable=redefined-outer-name,no-self-use
-        """Test CLI does not allow multiple credentials to be provided"""
+        """Test Command does not allow multiple credentials to be provided"""
         credentials = Credentials(
             api_key="api_key", email="email@example.com", password="password"
         )

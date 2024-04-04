@@ -113,6 +113,27 @@ class Command(object):  # pylint: disable=R0205
         self.credentials = credentials
         self.options = options
         self.is_credentials_valid = validate_credentials(credentials)
+        self.fetch_credentials_from_env()
+
+    def fetch_credentials_from_env(self):
+        """Set default values for credentials from environment variables if they are
+        not directly set.
+
+        Prioritizes direct credential inputs over environment variables.
+
+        If API key is provided, does not read email from ENV.
+        Likewise, if email is provided, does not read API key from ENV.
+        """
+        if not any([self.credentials.api_key, self.credentials.email]):
+            self.credentials.api_key = os.environ.get("GENCOVE_API_KEY", "")
+
+        if not self.credentials.api_key:
+            if not self.credentials.email:
+                self.credentials.email = os.environ.get("GENCOVE_EMAIL", "")
+
+        # Always try to set password - ignored in case of API key usage.
+        if not self.credentials.password:
+            self.credentials.password = os.environ.get("GENCOVE_PASSWORD", "")
 
     def initialize(self):
         """Put any initializing logic here, such as login."""

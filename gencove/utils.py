@@ -120,11 +120,11 @@ def get_regular_progress_bar(total_size, action):
 
 def validate_credentials(credentials):
     """Validate user credentials."""
-    if credentials.email and credentials.password and credentials.api_key:
+    if credentials.email and credentials.api_key:
         echo_debug("User provided 2 sets of credentials.")
         echo_warning(
             "Multiple sets of credentials provided."
-            "Please provide either username/password or API key."
+            "Please provide either email or API key."
         )
         return False
 

@@ -29,10 +29,8 @@ class TestFetchCredentialsFromEnv:
     def test_no_credentials_provided_uses_api_env_var(
         self, monkeypatch
     ):  # pylint: disable=redefined-outer-name,no-self-use
-        """Test Command uses API key when no creds provided and all ENV available"""
+        """Test Command reads API key from env"""
         monkeypatch.setenv("GENCOVE_API_KEY", "env_api_key")
-        monkeypatch.setenv("GENCOVE_EMAIL", "env_email@example.com")
-        monkeypatch.setenv("GENCOVE_PASSWORD", "env_password")
 
         empty_credentials = Credentials(api_key="", email="", password="")
 
@@ -42,7 +40,7 @@ class TestFetchCredentialsFromEnv:
 
         # Command should prioritize API key from environment variable, ignore email
         assert command.credentials.api_key == "env_api_key"
-        assert command.credentials.password == "env_password"
+        assert command.credentials.password == ""
         assert command.credentials.email == ""
         assert command.is_credentials_valid is True
 
@@ -51,7 +49,6 @@ class TestFetchCredentialsFromEnv:
     ):  # pylint: disable=redefined-outer-name,no-self-use
         """Test Command uses provided API key and ignores ENV variables"""
         monkeypatch.setenv("GENCOVE_API_KEY", "wrong_api_key")
-        monkeypatch.setenv("GENCOVE_EMAIL", "wrong_email@example.com")
 
         credentials = Credentials(api_key="correct_api_key", email="", password="")
         command = SimpleCommand(
@@ -67,7 +64,6 @@ class TestFetchCredentialsFromEnv:
         self, monkeypatch
     ):  # pylint: disable=redefined-outer-name,no-self-use
         """Test Command uses provided email and password and ignores ENV variables"""
-        monkeypatch.setenv("GENCOVE_API_KEY", "env_api_key")
         monkeypatch.setenv("GENCOVE_EMAIL", "wrong_email@example.com")
         monkeypatch.setenv("GENCOVE_PASSWORD", "wrong_password")
 
@@ -103,7 +99,6 @@ class TestFetchCredentialsFromEnv:
         monkeypatch,
     ):  # pylint: disable=redefined-outer-name,no-self-use
         """Test Command uses provided email and ENV password"""
-        monkeypatch.setenv("GENCOVE_API_KEY", "env_api_key")
         monkeypatch.setenv("GENCOVE_EMAIL", "env_email@example.com")
         monkeypatch.setenv("GENCOVE_PASSWORD", "env_password")
 
@@ -120,13 +115,36 @@ class TestFetchCredentialsFromEnv:
         assert command.is_credentials_valid is True
 
     def test_multiple_credentials_not_allowed(
-        self,
+        self, capsys
     ):  # pylint: disable=redefined-outer-name,no-self-use
-        """Test Command does not allow multiple credentials to be provided"""
+        """Test Command does not allow multiple credentials to be provided directly"""
         credentials = Credentials(
             api_key="api_key", email="email@example.com", password="password"
         )
         command = SimpleCommand(
             credentials=credentials, options=Optionals(host="http://example.com")
         )
+        captured = capsys.readouterr()
+
         assert command.is_credentials_valid is False
+        assert "Multiple sets of credentials provided." in captured.err
+
+    def test_multiple_credentials_via_env_not_allowed(
+        self, monkeypatch, capsys
+    ):  # pylint: disable=redefined-outer-name,no-self-use
+        """Test Command does not allow multiple credentials to be provided through env
+        vars"""
+        credentials = Credentials(api_key="", email="", password="")
+        monkeypatch.setenv("GENCOVE_API_KEY", "env_api_key")
+        monkeypatch.setenv("GENCOVE_EMAIL", "env_email@example.com")
+
+        command = SimpleCommand(
+            credentials=credentials, options=Optionals(host="http://example.com")
+        )
+        captured = capsys.readouterr()
+
+        assert command.is_credentials_valid is False
+        assert (
+            "Multiple sets of credentials provided via environment variables."
+            in captured.err
+        )

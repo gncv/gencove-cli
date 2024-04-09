@@ -120,6 +120,14 @@ def get_regular_progress_bar(total_size, action):
 
 def validate_credentials(credentials):
     """Validate user credentials."""
+    if os.environ.get("GENCOVE_API_KEY") and os.environ.get("GENCOVE_EMAIL"):
+        echo_debug("User provided 2 sets of credentials via $ENV.")
+        echo_warning(
+            "Multiple sets of credentials provided via environment variables. "
+            "Please only set $GENCOVE_API_KEY or $GENCOVE_EMAIL."
+        )
+        return False
+
     if credentials.email and credentials.api_key:
         echo_debug("User provided 2 sets of credentials.")
         echo_warning(

@@ -112,8 +112,8 @@ class Command(object):  # pylint: disable=R0205
         self.is_logged_in = False
         self.credentials = credentials
         self.options = options
-        self.is_credentials_valid = validate_credentials(credentials)
         self.fetch_credentials_from_env()
+        self.is_credentials_valid = validate_credentials(credentials)
 
     def fetch_credentials_from_env(self):
         """Set default values for credentials from environment variables if they are

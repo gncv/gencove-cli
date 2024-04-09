@@ -123,7 +123,7 @@ def validate_credentials(credentials):
     if credentials.email and credentials.api_key:
         echo_debug("User provided 2 sets of credentials.")
         echo_warning(
-            "Multiple sets of credentials provided."
+            "Multiple sets of credentials provided. "
             "Please provide either API key or email."
         )
         return False

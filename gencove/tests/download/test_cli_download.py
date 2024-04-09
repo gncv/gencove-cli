@@ -560,7 +560,7 @@ def test_multiple_credentials_not_allowed(mocker):
         ],
     )
     assert res.exit_code == 1
-    assert "Please provide either email or API key." in res.output
+    assert "Please provide either API key or email." in res.output
     mocked_login.assert_not_called()
 
 

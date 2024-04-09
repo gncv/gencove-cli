@@ -80,10 +80,12 @@ class TestFetchCredentialsFromEnv:
         assert command.is_credentials_valid is True
 
     def test_no_env_vars_empty_defaults(
-        self,
+        self, capsys
     ):  # pylint: disable=redefined-outer-name,no-self-use
         """Test Command uses empty strings for credentials when no ENV variables set and
-        no creds provided"""
+        no creds provided
+
+        In this case, user is prompted for email and password."""
         empty_credentials = Credentials(api_key="", email="", password="")
         command = SimpleCommand(
             credentials=empty_credentials, options=Optionals(host="http://example.com")

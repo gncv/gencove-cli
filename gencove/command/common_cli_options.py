@@ -18,21 +18,21 @@ common_options = [  # pylint: disable=invalid-name
     ),
     click.option(
         "--email",
-        default=lambda: os.environ.get("GENCOVE_EMAIL", ""),
+        default="",
         help="Gencove user email to be used in login. "
         "Can be passed as GENCOVE_EMAIL environment variable.",
     ),
     click.option(
         "--password",
-        default=lambda: os.environ.get("GENCOVE_PASSWORD", ""),
+        default="",
         help="Gencove user password to be used in login. "
         "Can be passed as GENCOVE_PASSWORD environment variable. "
         "When MFA is configured, an MFA token will have to be provided after "
-        "the command is executed.",
+        "the command is executed. Only used if --email is provided.",
     ),
     click.option(
         "--api-key",
-        default=lambda: os.environ.get("GENCOVE_API_KEY", ""),
+        default="",
         help="Gencove api key. "
         "Can be passed as GENCOVE_API_KEY environment variable. "
         "When using the API key, an MFA token does not need to be provided.",

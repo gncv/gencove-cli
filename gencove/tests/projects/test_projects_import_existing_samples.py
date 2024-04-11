@@ -11,17 +11,15 @@ from gencove.client import APIClient, APIClientError
 from gencove.command.projects.cli import import_existing_project_samples
 from gencove.constants import IMPORT_BATCH_SIZE
 from gencove.models import (
-    GencoveStatus,
     ImportExistingSamplesModel,
     ProjectSamples,
-    ResponseMeta,
-    SampleDetails,
-    SampleFile,
     SampleImport,
 )
 from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.projects.vcr.filters import (
+    filter_get_project_samples_request,
+    filter_get_project_samples_response,
     filter_import_existing_samples_request,
     filter_import_existing_samples_response,
 )
@@ -51,10 +49,12 @@ def vcr_config():
         "path_transformer": VCR.ensure_suffix(".yaml"),
         "before_record_request": [
             replace_gencove_url_vcr,
+            filter_get_project_samples_request,
             filter_import_existing_samples_request,
         ],
         "before_record_response": [
             filter_jwt,
+            filter_get_project_samples_response,
             filter_import_existing_samples_response,
         ],
     }
@@ -210,67 +210,6 @@ def test_import_existing_project_samples__both_sample_ids_and_source_project_id(
 @pytest.mark.default_cassette("jwt-create.yaml")
 @pytest.mark.vcr
 @assert_authorization
-def test_import_existing_project_samples__import_from_source_project(
-    mocker, credentials
-):
-    """Test import existing project samples failure when both sample ids and
-    source project id are given.
-    """
-    runner = CliRunner()
-
-    project_id = str(uuid4())
-    sample_id_succeeded = str(uuid4())
-    sample_id_failed_qc = str(uuid4())
-    sample_id_failed_qc_with_files = str(uuid4())
-
-    mocked_import_existing_samples = mocker.patch.object(
-        APIClient,
-        "import_existing_samples",
-    )
-    mocked_get_project_samples = mocker.patch.object(
-        APIClient,
-        "get_project_samples",
-        return_value=ProjectSamples(
-            meta=ResponseMeta(count=3, next=None, previous=None),
-            results=[
-                SampleDetails(
-                    id=sample_id_succeeded,
-                    last_status=GencoveStatus(id=uuid4(), status="succeeded"),
-                    files=[SampleFile(id=uuid4())],
-                ),
-                SampleDetails(
-                    id=sample_id_failed_qc,
-                    last_status=GencoveStatus(id=uuid4(), status="failed_qc"),
-                ),
-                SampleDetails(
-                    id=sample_id_failed_qc_with_files,
-                    last_status=GencoveStatus(id=uuid4(), status="failed_qc"),
-                    files=[SampleFile(id=uuid4())],
-                ),
-            ],
-        ),
-    )
-
-    res = runner.invoke(
-        import_existing_project_samples,
-        [
-            project_id,
-            "--source-project-id",
-            str(uuid4()),
-            *credentials,
-        ],
-    )
-    print(res.output)
-    assert res.exit_code == 0
-    mocked_get_project_samples.assert_called()
-    mocked_import_existing_samples.assert_called_with(
-        project_id, [sample_id_succeeded, sample_id_failed_qc_with_files], None
-    )
-
-
-@pytest.mark.default_cassette("jwt-create.yaml")
-@pytest.mark.vcr
-@assert_authorization
 def test_import_existing_project_samples__bad_metadata(mocker, credentials):
     """Test import existing project samples failure when optional
     metadata-json is passed, but it has a bad value.
@@ -374,6 +313,58 @@ def test_import_existing_project_samples__success(
     assert res.exit_code == 0
     if not recording:
         mocked_import_existing_samples.assert_called_once()
+    assert "Number of samples imported into the project" in res.output
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_import_existing_project__from_source_project(
+    mocker, credentials, project_id_import, project_id_batches, recording, vcr
+):  # pylint: disable=too-many-arguments
+    """Test import existing project samples success
+    Using project_id_import as destination since configuration is Import FASTQs
+    Using project_id_batches as source since it only contains 2 samples
+    """
+    runner = CliRunner()
+
+    if not recording:
+        # Mock import_existing_samples only if using the cassettes, since we
+        # mock the return value.
+        mocked_samples = get_vcr_response(
+            "/api/v2/project-samples/", vcr, operator.contains
+        )
+        # Changing "mock status" to valid values
+        mocked_samples["results"][0]["last_status"]["status"] = "succeeded"
+        mocked_samples["results"][1]["last_status"]["status"] = "failed qc"
+        mocked_get_project_samples = mocker.patch.object(
+            APIClient,
+            "get_project_samples",
+            return_value=ProjectSamples(**mocked_samples),
+        )
+        project_samples_import_response = get_vcr_response(
+            "/api/v2/project-samples-import/", vcr, operator.contains
+        )
+        mocked_import_existing_samples = mocker.patch.object(
+            APIClient,
+            "import_existing_samples",
+            return_value=ImportExistingSamplesModel(**project_samples_import_response),
+        )
+
+    res = runner.invoke(
+        import_existing_project_samples,
+        [
+            project_id_import,
+            "--source-project-id",
+            project_id_batches,
+            *credentials,
+        ],
+    )
+    assert res.exit_code == 0
+    if not recording:
+        mocked_get_project_samples.assert_called_once()
+        mocked_import_existing_samples.assert_called_once_with(
+            project_id_import, [MOCK_UUID, MOCK_UUID], None
+        )
     assert "Number of samples imported into the project" in res.output
 
 

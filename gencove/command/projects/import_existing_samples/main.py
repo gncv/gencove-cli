@@ -103,10 +103,7 @@ class ImportExistingSamples(Command):
             resp = self.get_samples(next_link)
             if resp.results:
                 for sample in resp.results:
-                    if (
-                        sample.last_status.status in ["failed_qc", "succeeded"]
-                        and sample.files
-                    ):
+                    if sample.last_status.status in ["failed qc", "succeeded"]:
                         yield sample
             next_link = resp.meta.next
             more = next_link is not None

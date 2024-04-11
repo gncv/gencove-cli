@@ -75,6 +75,12 @@ def project_id_reference_genome():
 
 
 @pytest.fixture(scope="session")
+def project_id_import():
+    """Returns the project id to import into."""
+    return os.getenv("GENCOVE_PROJECT_ID_IMPORT_TEST")
+
+
+@pytest.fixture(scope="session")
 def credentials(using_api_key):  # pylint: disable=redefined-outer-name
     """Fixture to have the appropriate credentials."""
     api_key = os.getenv("GENCOVE_API_KEY_TEST")

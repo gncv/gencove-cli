@@ -18,10 +18,10 @@ from gencove.models import (
 from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.projects.vcr.filters import (
-    filter_import_existing_samples_request,
-    filter_import_existing_samples_response,
     filter_get_project_samples_request,
     filter_get_project_samples_response,
+    filter_import_existing_samples_request,
+    filter_import_existing_samples_response,
 )
 from gencove.tests.utils import MOCK_UUID, get_vcr_response
 from gencove.utils import batchify

@@ -27,7 +27,7 @@ from gencove.constants import (
 )
 from gencove.exceptions import MaintenanceError
 from gencove.logger import echo_debug
-from gencove.models import BaseSpaceBiosample  # noqa: I101
+from gencove.models import BaseSpaceBiosample, ExplorerDataCredentials  # noqa: I101
 from gencove.models import (  # noqa: I101, I100
     AccessJWT,
     BaseSpaceProject,
@@ -468,7 +468,7 @@ class APIClient:
             self.endpoints.EXPLORER_DATA_CREDENTIALS.value,
             authorized=True,
             sensitive=True,
-            model=AWSCredentials,
+            model=ExplorerDataCredentials,
         )
 
     def get_upload_details(self, gncv_file_path):

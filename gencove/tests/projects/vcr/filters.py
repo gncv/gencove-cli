@@ -61,6 +61,8 @@ def filter_get_project_samples_response(response, json_response):
         for result in json_response["results"]:
             if "id" in result:
                 result["id"] = MOCK_UUID
+            if "run" in result:
+                result["run"] = MOCK_UUID
             if "client_id" in result:
                 result["client_id"] = "mock client_id"
             if "physical_id" in result and result["physical_id"]:
@@ -241,7 +243,7 @@ def filter_import_existing_samples_request(request):
             body["samples"] = [
                 {"sample_id": MOCK_UUID, "client_id": "foo"} for _ in body["samples"]
             ]
-        if "metadata" in body:
+        if "metadata" in body and body["metadata"]:
             body["metadata"] = {"foo": "bar"}
         request.body = json.dumps(body).encode()
     except (json.decoder.JSONDecodeError, TypeError):
@@ -254,7 +256,7 @@ def filter_import_existing_samples_response(response, json_response):
     """Filter import_existing_samples sensitive data from response."""
     if "project_id" in json_response:
         json_response["project_id"] = MOCK_UUID
-    if "metadata" in json_response:
+    if "metadata" in json_response and json_response["metadata"]:
         json_response["metadata"] = {"foo": "bar"}
     if "samples" in json_response:
         for sample in json_response["samples"]:

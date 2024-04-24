@@ -194,7 +194,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
                         raise ValueError(  # pylint: disable=raise-missing-from
                             f"User id '{user_id}' is not a valid UUID (or '{self.ME}')"
                         )
-                    prefix_s3 = self.users_s3_prefix + f"/{user_id}"
+                    prefix_s3 = self.users_s3_prefix + f"/{user_id}/{self.USER_DIR}"
                 path_remainder = "/".join(path_noprefix_split[2:])
             path = f"{prefix_s3}/{path_remainder}"
         return path

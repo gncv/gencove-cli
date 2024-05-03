@@ -121,6 +121,22 @@ bandit:
   except:
     - tags
 
+build_docs_stage:
+  stage: deploy
+  trigger:
+    project: gencove/docs-main
+    branch: master
+  only:
+    - master
+
+build_docs_prod:
+  stage: deploy
+  trigger:
+    project: gencove/docs-main
+    branch: prod
+  only:
+    - prod
+
 production:
   stage: deploy
   script:

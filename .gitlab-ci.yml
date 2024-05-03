@@ -128,7 +128,6 @@ build_docs_stage:
     branch: master
   only:
     - master
-    - hotfix/trigger-docs
 
 build_docs_prod:
   stage: deploy

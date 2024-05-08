@@ -9,7 +9,7 @@ from .s3_import.cli import s3_import
 @click.group()
 def s3():  # pylint: disable=C0103
     """S3 imports managements commands.
-    Setup guide: https://docs.gencove.com/main/s3-imports/
+    Setup guide: https://docs.gencove.com/base/analysis/fastq-files/uploading-using-s3/
     """
 
 

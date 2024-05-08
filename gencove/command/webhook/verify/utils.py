@@ -5,7 +5,7 @@ import hmac
 import requests
 
 
-# Copied from https://docs.gencove.com/main/?python#webhook-signatures
+# Copied from https://docs.gencove.com/base/analysis/event-notifications/?h=webhook#webhook-signatures
 def calculate_signature(secret, timestamp, payload):
     """Calculates hmac signature with the given secret"""
     signature_message = f"{timestamp}.{payload}".encode("utf-8")

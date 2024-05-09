@@ -76,14 +76,6 @@ In order to do that, just run `cp gencove/tests/.env.dist gencove/tests/.env` an
 For more details, read internal CLI testing document.
 
 
-To create and run docs locally:
-
-```bash
-pip install -r requirements_docs.txt
-mkdocs build
-mkdocs serve
-```
-
 ## Release process ##
 
 1. Check for the current version by running `version-01-upgrade.sh print`

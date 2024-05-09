@@ -121,56 +121,29 @@ bandit:
   except:
     - tags
 
-docs:
-  image: python:3.10
-  stage: build
-  script:
-    - pip install -r requirements.txt
-    - pip install -r requirements_docs.txt
-    - mkdocs build
-  artifacts:
-    paths:
-      - site/
-  except:
-    - tags
-
-staging:
+build_docs_stage:
   stage: deploy
-  dependencies:
-    - docs
-  script:
-    # Install AWS CLI
-    - pip install awscli
-    # # Install twine for uploading to pypi
-    # - pip install twine
-    # Upload docs
-    - aws s3 sync site/ s3://$BUCKET_STAGING/cli/ --delete --region us-east-1
-    # Enable the aws cloudfront command
-    - aws configure set preview.cloudfront true
-    # Clear web cache
-    - aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_STAGING --paths "/*"
-    # # Upload to pypi
-    # - python setup.py sdist
-    # - python setup.py bdist_wheel --universal
-    # - twine upload dist/*
+  trigger:
+    project: gencove/docs-main
+    branch: master
   only:
     - master
 
+build_docs_prod:
+  stage: deploy
+  trigger:
+    project: gencove/docs-main
+    branch: prod
+  only:
+    - prod
+
 production:
   stage: deploy
-  dependencies:
-    - docs
   script:
     # Install AWS CLI
     - pip install awscli
     # Install twine for uploading to pypi
     - pip install twine
-    # Upload docs
-    - aws s3 sync site/ s3://$BUCKET_PRODUCTION/cli/ --delete --region us-east-1
-    # Enable the aws cloudfront command
-    - aws configure set preview.cloudfront true
-    # Clear web cache
-    - aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_PRODUCTION --paths "/*"
     # Upload to pypi
     - python setup.py sdist
     - python setup.py bdist_wheel --universal

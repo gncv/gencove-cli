@@ -13,14 +13,14 @@ The Gencove command-line interface (CLI) can be used to easily access the Gencov
 ## Main Features
 
 It is most often used for:
-* [Uploading FASTQ files](https://docs.gencove.com/main/the-gencove-cli/#uploading-fastq-files) for analysis
-* [Downloading analysis results](https://docs.gencove.com/main/the-gencove-cli/#downloading-deliverables) which include the following:
+* [Uploading FASTQ files](https://docs.gencove.com/base/analysis/fastq-files/uploading-using-the-cli/) for analysis
+* [Downloading analysis results](https://docs.gencove.com/base/analysis/samples/downloading-deliverables/) which include the following:
   * Sequence (`.fastq.gz`)
   * Alignment (`.bam`, `.bai`)
   * Imputation (`.vcf.gz`, `.vcf.gz.tbi`, `.vcf.gz.csi`)
-* [Assigning metadata](https://docs.gencove.com/main/the-gencove-cli/#assigning-sample-metadata) to Gencove samples
+* [Assigning metadata](https://docs.gencove.com/base/analysis/samples/sample-metadata-and-files/#assigning-sample-metadata) to Gencove samples
 
-Before filing a bug report, please refer to the following [link](https://docs.gencove.com/main/the-gencove-cli/#filing-a-bug-report-for-the-cli). Bugs should be reported [here](https://resources.gencove.com/hc/en-us/requests/new).
+Before filing a bug report, please refer to the following [link](https://docs.gencove.com/general/support/#filing-a-bug-report-for-the-cli). Bugs should be reported [here](https://resources.gencove.com/hc/en-us/requests/new).
 
 ## Installation
 ```
@@ -33,8 +33,8 @@ pip install -U gencove
 
 ## Documentation
 
-Online documentation (with examples) is available at [docs.gencove.com](https://docs.gencove.com/main/introduction/)
+Online documentation (with examples) is available at [docs.gencove.com](https://docs.gencove.com/base/getting-started/)
 
 API reference for publicly available endpoints: [API Reference](https://api.gencove.com/api/v2/docs/)
 
-Comprehensive CLI Documentation available: [CLI Reference](https://docs.gencove.com/cli/)
+Comprehensive CLI Documentation available: [CLI Reference](https://docs.gencove.com/base/cli-reference/)

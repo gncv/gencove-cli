@@ -133,7 +133,7 @@ build_docs_prod:
   stage: deploy
   trigger:
     project: gencove/docs-main
-    branch: prod
+    branch: production
   only:
     - prod
 

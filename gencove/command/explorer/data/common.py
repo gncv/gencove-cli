@@ -8,6 +8,7 @@ from typing import List, Optional, Tuple
 # pylint: disable=wrong-import-order
 from gencove.exceptions import ValidationError
 from gencove.models import ExplorerDataCredentials, OrganizationDetails, UserDetails
+from gencove.logger import echo_info
 
 import boto3  # noqa: I100
 
@@ -149,6 +150,28 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         """Prefix for users dir"""
         return f"{self.S3_PROTOCOL}{self.bucket_name}/{self.users_prefix}"
 
+    def run_s3_command(self, s3_command: List[str]):
+        """Run AWS S3 command while handling AWS CLI non-zero exits gracefully
+
+        Args:
+            s3_command (List[str]): List of arguments to pass to AWS CLI
+
+        Returns:
+            List of arguments passed to AWS CLI
+        """
+        try:
+            sh.aws.s3(  # pylint: disable=no-member
+                s3_command,
+                _in=sys.stdin,
+                _out=sys.stdout,
+                _err=sys.stderr,
+                _env=self.aws_env,
+            )
+        except sh.ErrorReturnCode as e:
+            # Forward AWS stderr rather than raising exception
+            echo_info(e.stderr.decode())
+        return s3_command
+
     def uri_ok(self, path: Optional[str]) -> bool:
         """Tests if supplied path is valid
 
@@ -169,6 +192,12 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         e://org/...
         e://users/<user-id>/...
         e://users/me/...
+
+        Args:
+            path (Optional[str]): Path to convert
+
+        Returns:
+            Converted path
         """
         if path is None:
             return None
@@ -233,13 +262,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
             self.translate_path_to_s3_path(path),
             *args,
         ]
-        sh.aws.s3(  # pylint: disable=no-member
-            s3_command,
-            _in=sys.stdin,
-            _out=sys.stdout,
-            _err=sys.stderr,
-            _env=self.aws_env,
-        )
+        self.run_s3_command(s3_command)
         return s3_command
 
     def execute_aws_s3_src_dst(
@@ -268,18 +291,17 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
             self.translate_path_to_s3_path(destination),
             *args,
         ]
-        sh.aws.s3(  # pylint: disable=no-member
-            s3_command,
-            _in=sys.stdin,
-            _out=sys.stdout,
-            _err=sys.stderr,
-            _env=self.aws_env,
-        )
+        self.run_s3_command(s3_command)
         return s3_command
 
 
 def validate_explorer_user_data(user: UserDetails, organization: OrganizationDetails):
-    """Validate user and organization data"""
+    """Validate user and organization data
+
+    Args:
+        user (UserDetails): User details model
+        organization (OrganizationDetails): Organization details model
+    """
     if not user.explorer_enabled:
         raise ValidationError(
             "Explorer is not enabled on your user account, quitting. "

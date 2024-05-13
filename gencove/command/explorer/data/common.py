@@ -7,8 +7,8 @@ from typing import List, Optional, Tuple
 
 # pylint: disable=wrong-import-order
 from gencove.exceptions import ValidationError
-from gencove.models import ExplorerDataCredentials, OrganizationDetails, UserDetails
 from gencove.logger import echo_info
+from gencove.models import ExplorerDataCredentials, OrganizationDetails, UserDetails
 
 import boto3  # noqa: I100
 
@@ -167,9 +167,9 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
                 _err=sys.stderr,
                 _env=self.aws_env,
             )
-        except sh.ErrorReturnCode as e:
+        except sh.ErrorReturnCode as err:
             # Forward AWS stderr rather than raising exception
-            echo_info(e.stderr.decode())
+            echo_info(err.stderr.decode())
         return s3_command
 
     def uri_ok(self, path: Optional[str]) -> bool:

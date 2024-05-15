@@ -147,12 +147,15 @@ production:
     # Upload to pypi
     - python setup.py sdist
     - python setup.py bdist_wheel --universal
-    - twine upload dist/*
+    # TEMP comment out twine to avoid pushing the same version two times
+    # - twine upload dist/*
     # Autotag
     - git config user.email "${GITLAB_USER_EMAIL}"
     - git config user.name "${GITLAB_USER_NAME}"
     - git remote add api-origin https://oauth2:${GITLAB_ACCESS_TOKEN}@gitlab.com/${CI_PROJECT_PATH}
-    - export CURRENT_VERSION="$(./version-01-upgrade.sh print | tail -1)"
+    # TEMP comment out to test pushing with the new token
+    # - export CURRENT_VERSION="$(./version-01-upgrade.sh print | tail -1)"
+    - export CURRENT_VERSION="temp-tag-1"
     - git tag -a "$CURRENT_VERSION" -m "Auto-Release"
     - git push api-origin "$CURRENT_VERSION"
   only:
@@ -161,3 +164,4 @@ production:
     # SemVer-compliant tags (with no metadata)
     # - /^v?\d+\.\d+\.\d+$/
     - prod
+    - hotfix/broken-gitlab-access-token

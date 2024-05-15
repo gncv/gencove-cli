@@ -147,7 +147,6 @@ production:
     # Upload to pypi
     - python setup.py sdist
     - python setup.py bdist_wheel --universal
-    # TEMP comment out twine to avoid pushing the same version two times
     - twine upload dist/*
     # Autotag
     - git config user.email "${GITLAB_USER_EMAIL}"
@@ -162,4 +161,3 @@ production:
     # SemVer-compliant tags (with no metadata)
     # - /^v?\d+\.\d+\.\d+$/
     - prod
-    - hotfix/broken-gitlab-access-token

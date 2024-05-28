@@ -4,7 +4,6 @@ All commands must implement this interface.
 """
 import contextlib
 import os
-import sys
 import tempfile
 import traceback
 from functools import wraps
@@ -24,8 +23,6 @@ from gencove.logger import (
 from gencove.utils import login, validate_credentials
 
 import click
-
-import sh
 
 AWS_PROFILE = "AWS_PROFILE"
 AWS_CONFIG_FILE = "AWS_CONFIG_FILE"
@@ -186,22 +183,6 @@ class Command(object):  # pylint: disable=R0205
             if LOG_LEVEL == DEBUG:
                 raise err
             raise click.Abort()
-        except sh.ErrorReturnCode as err:
-            # Explicitly catch error code 1 for `gencove explorer data ls` and forward
-            # the exit code
-            if (
-                err.exit_code == 1 and type(self).__name__ == "List"
-            ):  # pylint: disable=E1101
-                stderr = err.stderr.decode()
-                if stderr:
-                    self.echo_error(stderr)
-                sys.exit(1)
-            else:
-                self.echo_error(traceback.format_exc())
-                dump_debug_log()
-                if LOG_LEVEL == DEBUG:
-                    raise err
-                raise click.Abort()
         except Exception as err:
             self.echo_error(traceback.format_exc())
             dump_debug_log()

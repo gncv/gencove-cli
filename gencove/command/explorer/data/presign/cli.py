@@ -1,4 +1,4 @@
-"""Configure inactivity stop for explorer instances command definition.
+"""Configure presign for explorer data command definition.
 """
 import click
 

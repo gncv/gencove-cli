@@ -7,7 +7,6 @@ from typing import List, Optional, Tuple
 
 # pylint: disable=wrong-import-order
 from gencove.exceptions import ValidationError
-from gencove.logger import echo_info
 from gencove.models import ExplorerDataCredentials, OrganizationDetails, UserDetails
 
 import boto3  # noqa: I100
@@ -160,7 +159,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
             List of arguments passed to AWS CLI
         """
         try:
-            sh.aws.s3(  # pylint: disable=no-member
+            out = sh.aws.s3(  # pylint: disable=no-member
                 s3_command,
                 _in=sys.stdin,
                 _out=sys.stdout,
@@ -168,9 +167,11 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
                 _env=self.aws_env,
             )
         except sh.ErrorReturnCode as err:
-            # Forward AWS stderr rather than raising exception
-            echo_info(err.stderr.decode())
-        return s3_command
+            stderr = err.stderr.decode()
+            if stderr:
+                self.echo_error(stderr)  # pylint: disable=no-member
+            sys.exit(err.exit_code)  # pylint: disable=no-member
+        return out
 
     def uri_ok(self, path: Optional[str]) -> bool:
         """Tests if supplied path is valid

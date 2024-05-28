@@ -9,6 +9,8 @@ import traceback
 from functools import wraps
 
 import click
+import sh
+import sys
 
 from gencove.client import APIClient, APIClientError
 from gencove.exceptions import MaintenanceError, ValidationError
@@ -183,6 +185,20 @@ class Command(object):  # pylint: disable=R0205
             if LOG_LEVEL == DEBUG:
                 raise err
             raise click.Abort()
+        except sh.ErrorReturnCode_1 as err:
+            # Explicitly catch error code 1 for `gencove explorer data ls` and forward
+            # the exit code
+            if type(self).__name__ == "List":
+                stderr = err.stderr.decode()
+                if stderr:
+                    self.echo_error(stderr)
+                sys.exit(1)
+            else:
+                self.echo_error(traceback.format_exc())
+                dump_debug_log()
+                if LOG_LEVEL == DEBUG:
+                    raise err
+                raise click.Abort()
         except Exception as err:
             self.echo_error(traceback.format_exc())
             dump_debug_log()

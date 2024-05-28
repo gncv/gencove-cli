@@ -159,18 +159,14 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         Returns:
             List of arguments passed to AWS CLI
         """
-        try:
-            sh.aws.s3(  # pylint: disable=no-member
-                s3_command,
-                _in=sys.stdin,
-                _out=sys.stdout,
-                _err=sys.stderr,
-                _env=self.aws_env,
-            )
-        except sh.ErrorReturnCode as err:
-            # Forward AWS stderr rather than raising exception
-            echo_info(err.stderr.decode())
-        return s3_command
+        out = sh.aws.s3(  # pylint: disable=no-member
+            s3_command,
+            _in=sys.stdin,
+            _out=sys.stdout,
+            _err=sys.stderr,
+            _env=self.aws_env,
+        )
+        return out
 
     def uri_ok(self, path: Optional[str]) -> bool:
         """Tests if supplied path is valid

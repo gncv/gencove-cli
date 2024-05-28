@@ -3,9 +3,9 @@ import click
 
 from .cp.cli import cp
 from .ls.cli import ls
+from .presign.cli import presign
 from .rm.cli import rm
 from .sync.cli import sync
-from .presign.cli import presign
 
 
 @click.group()

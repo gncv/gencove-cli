@@ -8,6 +8,8 @@ import tempfile
 import traceback
 from functools import wraps
 
+import click
+
 from gencove.client import APIClient, APIClientError
 from gencove.exceptions import MaintenanceError, ValidationError
 from gencove.logger import (
@@ -21,8 +23,6 @@ from gencove.logger import (
     echo_warning,
 )
 from gencove.utils import login, validate_credentials
-
-import click
 
 AWS_PROFILE = "AWS_PROFILE"
 AWS_CONFIG_FILE = "AWS_CONFIG_FILE"

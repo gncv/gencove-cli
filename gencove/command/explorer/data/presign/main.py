@@ -1,4 +1,4 @@
-"""Configure explorer data ls subcommand."""
+"""Configure explorer data presign subcommand."""
 import sys
 
 import click

@@ -17,11 +17,13 @@ from ....utils import batchify
 class ImportExistingSamples(Command):
     """Import existing samples command executor."""
 
-    def __init__(self, project_id, source_project_id, sample_ids, credentials, options):
+    def __init__(
+        self, project_id, source_project_id, source_sample_ids, credentials, options
+    ):
         super().__init__(credentials, options)
         self.project_id = project_id
         self.source_project_id = source_project_id
-        self.sample_ids = sample_ids
+        self.source_sample_ids = source_sample_ids
         self.metadata_json = options.metadata_json
 
     def initialize(self):
@@ -37,9 +39,9 @@ class ImportExistingSamples(Command):
         if self.metadata_json and is_valid_json(self.metadata_json) is False:
             raise ValidationError("Metadata JSON is not valid. Exiting.")
         if self.source_project_id and not is_valid_uuid(self.source_project_id):
-            raise ValidationError("Source Project ID is not valid. Exiting.")
-        if (self.sample_ids and self.source_project_id) or (
-            not self.sample_ids and not self.source_project_id
+            raise ValidationError("Source project ID is not valid. Exiting.")
+        if (self.source_sample_ids and self.source_project_id) or (
+            not self.source_sample_ids and not self.source_project_id
         ):
             raise ValidationError(
                 "Either --source-project-id or --sample-ids option must be"
@@ -55,10 +57,12 @@ class ImportExistingSamples(Command):
                 "No samples given, importing all succeeded and available"
                 f" samples from source project {self.source_project_id}."
             )
-            self.sample_ids = []
+            self.source_sample_ids = []
             for sample in self.get_paginated_samples():
-                self.sample_ids.append(str(sample.id))
-            self.echo_debug(f"Samples to import from project: {len(self.sample_ids)}")
+                self.source_sample_ids.append(str(sample.id))
+            self.echo_debug(
+                f"Samples to import from project: {len(self.source_sample_ids)}"
+            )
         metadata = None
         if self.metadata_json is not None:
             metadata = json.loads(self.metadata_json)
@@ -68,7 +72,7 @@ class ImportExistingSamples(Command):
             # Import existing samples to the project optionally
             # passing metadata.
             for samples_batch in batchify(
-                self.sample_ids, batch_size=IMPORT_BATCH_SIZE
+                self.source_sample_ids, batch_size=IMPORT_BATCH_SIZE
             ):
                 import_existing_samples_response = (
                     self.api_client.import_existing_samples(
@@ -79,7 +83,7 @@ class ImportExistingSamples(Command):
                     self.echo_data(get_line(imported_sample))
             self.echo_info(
                 f"Number of samples imported into the project {self.project_id}: "
-                f"{len(self.sample_ids)}"
+                f"{len(self.source_sample_ids)}"
             )
             if metadata:
                 self.echo_info("Metadata attached to each sample.")

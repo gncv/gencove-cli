@@ -14,18 +14,23 @@ from .main import ImportExistingSamples
 @click.argument("project_id", callback=validate_uuid)
 @click.option(
     "--source-project-id",
+    "--project-id",
     required=False,
     help=(
         "Import all available samples, in succeeded or failed_qc state that have"
         " files, from source project."
+        " Either --source-project-id or --source-sample-ids option must be provided,"
+        " but not both."
     ),
 )
 @click.option(
+    "--source-sample-ids",
     "--sample-ids",
     required=False,
     help=(
-        "A comma separated list of sample ids to import into the provided project."
-        " Either --source-project-id or --sample-ids option must be provided,"
+        "A comma separated list of source sample ids to import into the provided"
+        " project."
+        " Either --source-project-id or --source-sample-ids option must be provided,"
         " but not both."
     ),
     callback=validate_uuid_list,
@@ -40,7 +45,7 @@ from .main import ImportExistingSamples
 def import_existing_project_samples(  # pylint: disable=too-many-arguments
     project_id,
     source_project_id,
-    sample_ids,
+    source_sample_ids,
     metadata_json,
     host,
     email,
@@ -65,11 +70,11 @@ def import_existing_project_samples(  # pylint: disable=too-many-arguments
 
             gencove projects import-existing-samples d9eaa54b-aaac-4b85-92b0-0b564be6d7db --sample-ids 59f5c1fd-cce0-4c4c-90e2-0b6c6c525d71,7edee497-12b5-4a1d-951f-34dc8dce1c1d --metadata-json='{"batch": "batch1"}'
     """  # noqa: E501
-    echo_debug(f"Sample ids translation: {sample_ids}")
+    echo_debug(f"Sample ids translation: {source_sample_ids}")
     ImportExistingSamples(
         project_id,
         source_project_id,
-        sample_ids,
+        source_sample_ids,
         Credentials(email=email, password=password, api_key=api_key),
         ImportExistingSamplesOptionals(host=host, metadata_json=metadata_json),
     ).run()

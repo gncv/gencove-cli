@@ -17,6 +17,8 @@ map_arguments_to_human_readable = {
     "pipeline_id": "Pipeline ID",
     "project_id": "Project ID",
     "sample_ids": "sample IDs",
+    "source_project_id": "Source project ID",
+    "source_sample_ids": "source sample IDs",
 }
 
 

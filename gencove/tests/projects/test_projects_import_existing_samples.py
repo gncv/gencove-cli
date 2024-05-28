@@ -109,7 +109,7 @@ def test_import_existing_project_samples__bad_sample_ids(mocker, credentials):
 
     assert res.exit_code == 1
     mocked_import_existing_samples.assert_not_called()
-    assert "Not all sample IDs are valid" in res.output
+    assert "Not all source sample IDs are valid" in res.output
 
 
 @pytest.mark.default_cassette("jwt-create.yaml")
@@ -139,7 +139,7 @@ def test_import_existing_project_samples__bad_source_project_id(mocker, credenti
     assert res.exit_code == 1
     mocked_import_existing_samples.assert_not_called()
     print(res.output)
-    assert "Source Project ID is not valid" in res.output
+    assert "Source project ID is not valid" in res.output
 
 
 @pytest.mark.default_cassette("jwt-create.yaml")

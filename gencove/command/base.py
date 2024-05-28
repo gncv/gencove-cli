@@ -185,10 +185,10 @@ class Command(object):  # pylint: disable=R0205
             if LOG_LEVEL == DEBUG:
                 raise err
             raise click.Abort()
-        except sh.ErrorReturnCode_1 as err:
+        except sh.ErrorReturnCode as err:
             # Explicitly catch error code 1 for `gencove explorer data ls` and forward
             # the exit code
-            if type(self).__name__ == "List":
+            if err.exit_code == 1 and type(self).__name__ == "List":
                 stderr = err.stderr.decode()
                 if stderr:
                     self.echo_error(stderr)

@@ -169,8 +169,8 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         except sh.ErrorReturnCode as err:
             stderr = err.stderr.decode()
             if stderr:
-                self.echo_error(stderr)
-            sys.exit(err.exit_code)
+                self.echo_error(stderr)  # pylint: disable=no-member
+            sys.exit(err.exit_code)  # pylint: disable=no-member
         return out
 
     def uri_ok(self, path: Optional[str]) -> bool:

@@ -5,6 +5,7 @@ from .cp.cli import cp
 from .ls.cli import ls
 from .rm.cli import rm
 from .sync.cli import sync
+from .presign.cli import presign
 
 
 @click.group()
@@ -16,6 +17,7 @@ data.add_command(ls)
 data.add_command(cp)
 data.add_command(rm)
 data.add_command(sync)
+data.add_command(presign)
 
 if __name__ == "__main__":
     data()

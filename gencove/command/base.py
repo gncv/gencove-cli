@@ -4,13 +4,13 @@ All commands must implement this interface.
 """
 import contextlib
 import os
+import sys
 import tempfile
 import traceback
 from functools import wraps
 
 import click
 import sh
-import sys
 
 from gencove.client import APIClient, APIClientError
 from gencove.exceptions import MaintenanceError, ValidationError

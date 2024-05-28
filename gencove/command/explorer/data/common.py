@@ -7,7 +7,6 @@ from typing import List, Optional, Tuple
 
 # pylint: disable=wrong-import-order
 from gencove.exceptions import ValidationError
-from gencove.logger import echo_info
 from gencove.models import ExplorerDataCredentials, OrganizationDetails, UserDetails
 
 import boto3  # noqa: I100

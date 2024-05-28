@@ -39,7 +39,7 @@ class ImportExistingSamples(Command):
         if self.metadata_json and is_valid_json(self.metadata_json) is False:
             raise ValidationError("Metadata JSON is not valid. Exiting.")
         if self.source_project_id and not is_valid_uuid(self.source_project_id):
-            raise ValidationError("Source Project ID is not valid. Exiting.")
+            raise ValidationError("Source project ID is not valid. Exiting.")
         if (self.source_sample_ids and self.source_project_id) or (
             not self.source_sample_ids and not self.source_project_id
         ):

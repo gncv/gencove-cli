@@ -9,9 +9,6 @@ import tempfile
 import traceback
 from functools import wraps
 
-import click
-import sh
-
 from gencove.client import APIClient, APIClientError
 from gencove.exceptions import MaintenanceError, ValidationError
 from gencove.logger import (
@@ -25,6 +22,10 @@ from gencove.logger import (
     echo_warning,
 )
 from gencove.utils import login, validate_credentials
+
+import click
+
+import sh
 
 AWS_PROFILE = "AWS_PROFILE"
 AWS_CONFIG_FILE = "AWS_CONFIG_FILE"
@@ -188,7 +189,9 @@ class Command(object):  # pylint: disable=R0205
         except sh.ErrorReturnCode as err:
             # Explicitly catch error code 1 for `gencove explorer data ls` and forward
             # the exit code
-            if err.exit_code == 1 and type(self).__name__ == "List":
+            if (
+                err.exit_code == 1 and type(self).__name__ == "List"
+            ):  # pylint: disable=E1101
                 stderr = err.stderr.decode()
                 if stderr:
                     self.echo_error(stderr)

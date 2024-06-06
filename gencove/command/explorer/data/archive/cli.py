@@ -1,24 +1,24 @@
-"""Configure explorer data ls definition."""
+"""Configure explorer data archive definition."""
 import click
 
 from gencove.command.common_cli_options import add_options, common_options
 from gencove.constants import Credentials, Optionals
 
-from .main import List
+from .main import Archive
 
 
 @click.command(
-    "ls",
-    help="List data in Explorer object storage",
+    "archive",
+    help="Archive data in Explorer object storage",
     context_settings=dict(
         ignore_unknown_options=True,
         allow_extra_args=True,
     ),
 )
-@click.argument("path", type=click.Path(), default="e://")
+@click.argument("path", type=click.Path())
 @click.pass_context
 @add_options(common_options)
-def ls(  # pylint: disable=too-many-arguments,invalid-name
+def archive(  # pylint: disable=too-many-arguments,invalid-name
     ctx,
     path,
     host,
@@ -26,8 +26,8 @@ def ls(  # pylint: disable=too-many-arguments,invalid-name
     password,
     api_key,
 ):  # pylint: disable=line-too-long
-    """Start instances."""  # noqa: E501
-    List(
+    """Archive objects."""  # noqa: E501
+    Archive(
         ctx,
         path,
         Credentials(email=email, password=password, api_key=api_key),

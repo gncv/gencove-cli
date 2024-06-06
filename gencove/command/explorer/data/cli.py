@@ -1,6 +1,7 @@
 """Commands to be executed from command line."""
 import click
 
+from .archive.cli import archive
 from .cp.cli import cp
 from .ls.cli import ls
 from .presign.cli import presign
@@ -13,6 +14,7 @@ def data():
     """Explorer data management commands."""
 
 
+data.add_command(archive)
 data.add_command(ls)
 data.add_command(cp)
 data.add_command(rm)

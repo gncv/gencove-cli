@@ -5,6 +5,7 @@ from .archive.cli import archive
 from .cp.cli import cp
 from .ls.cli import ls
 from .presign.cli import presign
+from .restore.cli import restore
 from .rm.cli import rm
 from .sync.cli import sync
 
@@ -17,6 +18,7 @@ def data():
 data.add_command(archive)
 data.add_command(ls)
 data.add_command(cp)
+data.add_command(restore)
 data.add_command(rm)
 data.add_command(sync)
 data.add_command(presign)

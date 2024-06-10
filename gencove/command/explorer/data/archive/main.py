@@ -3,7 +3,8 @@ import sys
 from typing import Optional
 from concurrent.futures import ThreadPoolExecutor
 
-import boto3
+import botocore
+import botocore.exceptions
 
 from gencove.models import ExplorerDataCredentials
 from ..common import (
@@ -54,52 +55,55 @@ class Archive(Command):
             organization_id=str(self.organization.id),
         )
 
-        if self.aws_session_credentials:
-            boto_session = boto3.Session(
-                aws_access_key_id=self.aws_session_credentials.access_key,
-                aws_secret_access_key=self.aws_session_credentials.secret_key,
-                aws_session_token=self.aws_session_credentials.token,
-                region_name=self.aws_session_credentials.region_name,
-            )
-        else:
-            boto_session = boto3.Session()
-
-        s3_client = boto_session.client("s3")
-
-        s3_path = explorer_manager.translate_path_to_s3_path(self.path)
-
-        bucket, prefix = s3_path.lstrip("s3://").split("/", 1)
-
-        paginated_response = s3_client.get_paginator("list_objects_v2").paginate(
-            Bucket=bucket,
-            Prefix=prefix,
-            PaginationConfig={
-                "PageSize": 1_000,
-            },
+        bucket, _ = (
+            explorer_manager.translate_path_to_s3_path(self.path)
+            .lstrip("s3://")
+            .split("/", 1)
         )
+        s3_client = explorer_manager.thread_safe_client("s3")
 
         def set_archive_tag(obj):
             if obj.get("StorageClass") != "STANDARD":
                 return  # skip already archived files
 
-            s3_client.put_object_tagging(
-                Bucket=bucket,
-                Key=obj["Key"],
-                Tagging={
-                    "TagSet": [
-                        {
-                            "Key": "Archive",
-                            "Value": "DEEP_ARCHIVE",
-                        }
-                    ]
-                },
-            )
-            print("archive:", obj["Key"])
+            try:
+                s3_client.put_object_tagging(
+                    Bucket=bucket,
+                    Key=obj["Key"],
+                    Tagging={
+                        "TagSet": [
+                            {
+                                "Key": "Archive",
+                                "Value": "DEEP_ARCHIVE",
+                            }
+                        ]
+                    },
+                )
+            except botocore.exceptions.ClientError as ex:
+                if (
+                    ex.response
+                    and ex.response.get("Error", {}).get("Code") == "AccessDenied"
+                ):
+                    # Check if object is already set to be archived
+                    response = s3_client.get_object_tagging(
+                        Bucket=bucket,
+                        Key=obj["Key"],
+                    )
+                    archive_tag = None
+                    for t in response.get("TagSet", []):
+                        if t["Key"] == "Archive":
+                            archive_tag = t["Value"]
+                    if archive_tag:
+                        return  # skip if file is already set to be archived
+                raise
 
+            self.echo_data(f"archive: {obj['Key']}")
+
+        paginated_response = explorer_manager.list_objects(self.path)
         obj_count = 0
         with ThreadPoolExecutor() as executor:
             for response in paginated_response:
                 for _ in executor.map(set_archive_tag, response["Contents"]):
                     obj_count += 1
 
-        print(f"Archived {obj_count} objects in {self.path}")
+        self.echo_info(f"Archived {obj_count} objects in {self.path}")

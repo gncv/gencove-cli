@@ -295,6 +295,33 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         self.run_s3_command(s3_command)
         return s3_command
 
+    def thread_safe_client(self, service_name, *args, **kwargs):
+        # Thread-safe, as per:
+        # https://boto3.amazonaws.com/v1/documentation/api/1.17.90/guide/clients.html#multithreading-or-multiprocessing-with-clients
+        if self.aws_session_credentials:
+            boto_session = boto3.Session(
+                aws_access_key_id=self.aws_session_credentials.access_key,
+                aws_secret_access_key=self.aws_session_credentials.secret_key,
+                aws_session_token=self.aws_session_credentials.token,
+                region_name=self.aws_session_credentials.region_name,
+            )
+        else:
+            boto_session = boto3.Session()
+        return boto_session.client(service_name, *args, **kwargs)
+
+    def list_objects(self, path: str):
+        s3_client = self.thread_safe_client("s3")
+        s3_path = self.translate_path_to_s3_path(path)
+        bucket, prefix = s3_path.lstrip("s3://").split("/", 1)
+        paginated_response = s3_client.get_paginator("list_objects_v2").paginate(
+            Bucket=bucket,
+            Prefix=prefix,
+            PaginationConfig={
+                "PageSize": 1_000,
+            },
+        )
+        return paginated_response
+
 
 def validate_explorer_user_data(user: UserDetails, organization: OrganizationDetails):
     """Validate user and organization data

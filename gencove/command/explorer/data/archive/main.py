@@ -11,8 +11,8 @@ from ..common import (
     validate_explorer_user_data,
 )
 from ....base import Command
-from .....models import ExplorerDataCredentials
 from ....utils import user_has_aws_in_path
+from .....models import ExplorerDataCredentials
 
 
 class Archive(Command):

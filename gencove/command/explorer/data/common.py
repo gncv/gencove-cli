@@ -296,6 +296,14 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         return s3_command
 
     def thread_safe_client(self, service_name, *args, **kwargs):
+        """Thread safe boto client with explorer session credentials.
+
+        Args:
+            service_name (str): Name of the service.
+
+        Returns:
+            BotoClient: Thread safe client.
+        """
         # Thread-safe, as per:
         # https://boto3.amazonaws.com/v1/documentation/api/1.17.90/guide/clients.html#multithreading-or-multiprocessing-with-clients
         if self.aws_session_credentials:
@@ -310,6 +318,14 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         return boto_session.client(service_name, *args, **kwargs)
 
     def list_objects(self, path: str):
+        """List S3 objects in given path.
+
+        Args:
+            path (str): Path to s3 objects.
+
+        Returns:
+            PaginatedResponse: List of objects paginated.
+        """
         s3_client = self.thread_safe_client("s3")
         s3_path = self.translate_path_to_s3_path(path)
         bucket, prefix = s3_path.lstrip("s3://").split("/", 1)

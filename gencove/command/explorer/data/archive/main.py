@@ -1,18 +1,17 @@
 """Configure explorer data archive definition."""
-import sys
-from typing import Optional
 from concurrent.futures import ThreadPoolExecutor
+from typing import Optional
 
 import botocore
 import botocore.exceptions
 
-from gencove.models import ExplorerDataCredentials
 from ..common import (
     GencoveExplorerManager,
     request_is_from_explorer_instance,
     validate_explorer_user_data,
 )
 from ....base import Command
+from .....models import ExplorerDataCredentials
 from ....utils import user_has_aws_in_path
 
 
@@ -90,9 +89,9 @@ class Archive(Command):
                         Key=obj["Key"],
                     )
                     archive_tag = None
-                    for t in response.get("TagSet", []):
-                        if t["Key"] == "Archive":
-                            archive_tag = t["Value"]
+                    for tag_set in response.get("TagSet", []):
+                        if tag_set["Key"] == "Archive":
+                            archive_tag = tag_set["Value"]
                     if archive_tag:
                         return  # skip if file is already set to be archived
                 raise

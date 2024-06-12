@@ -7,8 +7,8 @@ from ..common import (
     validate_explorer_user_data,
 )
 from ....base import Command
+from .....exceptions import ValidationError
 from ....utils import user_has_aws_in_path
-from gencove.exceptions import ValidationError
 
 
 class Restore(Command):

@@ -69,7 +69,7 @@ def test_data_restore_success(mocker, credentials, recording, vcr):
     objects_in_storage = [
         {
             "Key": f"example{i}.fastq.gz",
-            "StorageClass": "DEEP_ARCHIVE",
+            "StorageClass": "DEEP_ARCHIVE" if i % 2 == 0 else "STANDARD",
         }
         for i in range(100)
     ]
@@ -96,8 +96,9 @@ def test_data_restore_success(mocker, credentials, recording, vcr):
         mocked_get_credentials.assert_called_once()
     mocked_thread_safe_client.assert_called_with("s3")
     mocked_list_objects.assert_called_with(restore_path)
-    assert mocked_thread_safe_client.return_value.restore_object.call_count == len(
-        objects_in_storage
+    assert (
+        mocked_thread_safe_client.return_value.restore_object.call_count
+        == len(objects_in_storage) // 2
     )
 
 

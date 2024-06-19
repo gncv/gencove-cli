@@ -118,10 +118,10 @@ class Restore(Command):
         if obj_counts["restored"]:
             self.echo_info(
                 f"Restoring {obj_counts['restored']} objects in {self.path}."
-                f" They will be available for {self.days} days"
+                f" They will be available for {self.days} days."
             )
 
         if obj_counts["skipped"]:
             self.echo_info(
-                f"Skipped {obj_counts['skipped']} objects that are not archived"
+                f"Skipped {obj_counts['skipped']} objects that are not archived."
             )

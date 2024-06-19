@@ -8,6 +8,7 @@ from ..common import (
 )
 from ....base import Command
 from ....utils import user_has_aws_in_path
+from .....constants import RESTORE_TIERS_SUPPORTED
 from .....exceptions import ValidationError
 
 
@@ -38,8 +39,10 @@ class Restore(Command):
         Raises:
             ValidationError: If tier is not supported.
         """
-        if self.tier not in ["Standard", "Expedited", "Bulk"]:
-            raise ValidationError("Tier can only be one of: Standard, Expedited, Bulk.")
+        if self.tier not in RESTORE_TIERS_SUPPORTED:
+            raise ValidationError(
+                f"Tier can only be one of: {RESTORE_TIERS_SUPPORTED}."
+            )
 
     def initialize(self):
         """Initialize restore subcommand."""

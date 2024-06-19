@@ -126,5 +126,6 @@ class Archive(Command):
 
         if obj_counts["skipped"]:
             self.echo_info(
-                f"Skipped {obj_counts['skipped']} objects that were previously archived."
+                f"Skipped {obj_counts['skipped']} objects that were previously "
+                "archived."
             )

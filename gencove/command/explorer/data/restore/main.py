@@ -97,4 +97,6 @@ class Restore(Command):
                 for _ in executor.map(restore_archived, response["Contents"]):
                     obj_count += 1
 
-        self.echo_info(f"Restored {obj_count} objects in {self.path}")
+        self.echo_info(
+            f"Restoring {obj_count} objects in {self.path}. They will be available for {self.days} days"
+        )

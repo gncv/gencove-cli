@@ -317,7 +317,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
             boto_session = boto3.Session()
         return boto_session.client(service_name, *args, **kwargs)
 
-    def list_objects(self, path: str):
+    def list_s3_objects(self, path: str):
         """List S3 objects in given path.
 
         Args:

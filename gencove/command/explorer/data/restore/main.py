@@ -93,7 +93,7 @@ class Restore(Command):
 
             self.echo_data(f"restore: {obj['Key']}")
 
-        paginated_response = explorer_manager.list_objects(self.path)
+        paginated_response = explorer_manager.list_s3_objects(self.path)
         obj_count = 0
         with ThreadPoolExecutor() as executor:
             for response in paginated_response:

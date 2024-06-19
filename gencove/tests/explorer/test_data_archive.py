@@ -75,7 +75,7 @@ def test_data_archive_success(mocker, credentials, recording, vcr):
     ]
     mocked_list_objects = mocker.patch.object(
         GencoveExplorerManager,
-        "list_objects",
+        "list_s3_objects",
         return_value=[{"Contents": objects_in_storage}],
     )
     if not recording:

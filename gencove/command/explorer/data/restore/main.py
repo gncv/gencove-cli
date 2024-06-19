@@ -111,8 +111,8 @@ class Restore(Command):
         obj_counts = {"skipped": 0, "restored": 0}
         with ThreadPoolExecutor() as executor:
             for response in paginated_response:
-                for ok in executor.map(restore_archived, response["Contents"]):
-                    if ok:
+                for restored in executor.map(restore_archived, response["Contents"]):
+                    if restored:
                         obj_counts["restored"] += 1
                     else:
                         obj_counts["skipped"] += 1

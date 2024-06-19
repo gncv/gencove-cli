@@ -115,8 +115,8 @@ class Archive(Command):
         obj_counts = {"archived": 0, "skipped": 0}
         with ThreadPoolExecutor() as executor:
             for response in paginated_response:
-                for ok in executor.map(set_archive_tag, response["Contents"]):
-                    if ok:
+                for archived in executor.map(set_archive_tag, response["Contents"]):
+                    if archived:
                         obj_counts["archived"] += 1
                     else:
                         obj_counts["skipped"] += 1

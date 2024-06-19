@@ -98,5 +98,6 @@ class Restore(Command):
                     obj_count += 1
 
         self.echo_info(
-            f"Restoring {obj_count} objects in {self.path}. They will be available for {self.days} days"
+            f"Restoring {obj_count} objects in {self.path}."
+            f" They will be available for {self.days} days"
         )

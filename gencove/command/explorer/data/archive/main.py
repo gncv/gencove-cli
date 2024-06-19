@@ -71,6 +71,8 @@ class Archive(Command):
             Returns:
                 bool: False if already archived, True otherwise.
             """
+            self.echo_debug(f"set_archive_tag: {obj=}")
+
             if obj.get("StorageClass") != "STANDARD":
                 return False  # skip already archived files
 

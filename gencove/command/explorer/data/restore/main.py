@@ -83,6 +83,8 @@ class Restore(Command):
                 bool: False if the object is not archived,
                     otherwise returns True.
             """
+            self.echo_debug(f"restore_archived: {obj=}")
+
             if obj.get("StorageClass") not in [
                 "GLACIER",
                 "DEEP_ARCHIVE",

@@ -62,8 +62,17 @@ class Archive(Command):
         s3_client = explorer_manager.thread_safe_client("s3")
 
         def set_archive_tag(obj):
+            """Set Archive tag to object that will be later archived
+            by lifecycle rule.
+
+            Args:
+                obj (dict): Contains Key of the object to be archived.
+
+            Returns:
+                bool: False if already archived, True otherwise.
+            """
             if obj.get("StorageClass") != "STANDARD":
-                return  # skip already archived files
+                return False  # skip already archived files
 
             try:
                 s3_client.put_object_tagging(
@@ -93,16 +102,27 @@ class Archive(Command):
                         if tag_set["Key"] == "Archive":
                             archive_tag = tag_set["Value"]
                     if archive_tag:
-                        return  # skip if file is already set to be archived
+                        return False  # skip if file is already set to be archived
                 raise
 
             self.echo_data(f"archive: {obj['Key']}")
 
+            return True
+
         paginated_response = explorer_manager.list_s3_objects(self.path)
-        obj_count = 0
+        obj_counts = {"archived": 0, "skipped": 0}
         with ThreadPoolExecutor() as executor:
             for response in paginated_response:
-                for _ in executor.map(set_archive_tag, response["Contents"]):
-                    obj_count += 1
+                for ok in executor.map(set_archive_tag, response["Contents"]):
+                    if ok:
+                        obj_counts["archived"] += 1
+                    else:
+                        obj_counts["skipped"] += 1
 
-        self.echo_info(f"Archived {obj_count} objects in {self.path}")
+        if obj_counts["archived"]:
+            self.echo_info(f"Archived {obj_counts['archived']} objects in {self.path}")
+
+        if obj_counts["skipped"]:
+            self.echo_info(
+                f"Skipped {obj_counts['skipped']} objects that were previously archived"
+            )

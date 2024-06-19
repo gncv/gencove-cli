@@ -72,12 +72,22 @@ class Restore(Command):
         )
         s3_client = explorer_manager.thread_safe_client("s3")
 
-        def restore_archived(obj):
+        def restore_archived(obj) -> bool:
+            """Restores archived file by calling S3 API.
+
+            Args:
+                obj (dict): Contains the "Key" of the object to
+                    be restored.
+
+            Returns:
+                bool: False if the object is not archived,
+                    otherwise returns True.
+            """
             if obj.get("StorageClass") not in [
                 "GLACIER",
                 "DEEP_ARCHIVE",
             ]:
-                return  # skip non-archived files
+                return False  # skip non-archived files
 
             # If already restored it extends the availability window
             s3_client.restore_object(
@@ -93,14 +103,25 @@ class Restore(Command):
 
             self.echo_data(f"restore: {obj['Key']}")
 
+            return True
+
         paginated_response = explorer_manager.list_s3_objects(self.path)
-        obj_count = 0
+        obj_counts = {"skipped": 0, "restored": 0}
         with ThreadPoolExecutor() as executor:
             for response in paginated_response:
-                for _ in executor.map(restore_archived, response["Contents"]):
-                    obj_count += 1
+                for ok in executor.map(restore_archived, response["Contents"]):
+                    if ok:
+                        obj_counts["restored"] += 1
+                    else:
+                        obj_counts["skipped"] += 1
 
-        self.echo_info(
-            f"Restoring {obj_count} objects in {self.path}."
-            f" They will be available for {self.days} days"
-        )
+        if obj_counts["restored"]:
+            self.echo_info(
+                f"Restoring {obj_counts['restored']} objects in {self.path}."
+                f" They will be available for {self.days} days"
+            )
+
+        if obj_counts["skipped"]:
+            self.echo_info(
+                f"Skipped {obj_counts['skipped']} objects that are not archived"
+            )

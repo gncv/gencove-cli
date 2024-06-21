@@ -233,7 +233,7 @@ class TestRequestIsFromExplorerInstance(TestCase):
         self.user_id = MOCK_UUID
         self.account_id = "123412341234"
 
-    def from_explorer_instance(self):
+    def test_from_explorer_instance(self):
         """Test when request issued from explorer instance"""
         with patch(
             "gencove.command.explorer.data.common.boto3.client"
@@ -246,7 +246,7 @@ class TestRequestIsFromExplorerInstance(TestCase):
 
             assert request_is_from_explorer() is True
 
-    def from_explorer_cluster(self):
+    def test_from_explorer_cluster(self):
         """Test when request issued from explorer cluster"""
         with patch(
             "gencove.command.explorer.data.common.boto3.client"

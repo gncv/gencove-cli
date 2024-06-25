@@ -4,7 +4,7 @@
 `pip install gencove`
 
 ## Documentation ##
-Main documentation can be found here: [http://docs.gencove.com](http://docs.gencove.com)
+Main documentation can be found here: [https://docs.gencove.com](https://docs.gencove.com)
 
 ## Local Development ##
 

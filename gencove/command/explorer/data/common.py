@@ -314,19 +314,27 @@ def validate_explorer_user_data(user: UserDetails, organization: OrganizationDet
         raise ValidationError("Could not retrieve user details, quitting.")
 
 
-def request_is_from_explorer_instance() -> bool:
+def request_is_from_explorer() -> bool:
     """
-    Detects whether user is executing code from an Explorer instance.
-    If check fails, we assume user is not in instance.
+    Detects whether user is executing code from an Explorer environment.
+    If check fails, we assume user is not in environment.
 
     Returns:
-        bool: True if user in Explorer instance, False otherwise
+        bool: True if user in Explorer environment, False otherwise
     """
     try:
+        user_id = os.environ.get("GENCOVE_USER_ID", None)
+        if user_id is None:
+            return False
+        user_id_dashes = str(uuid.UUID(user_id))
+        expected_role_name_instance = f"explorer-user-{user_id}-role"
+        expected_role_name_cluster = f"explorer-{user_id_dashes}-ecs_task_role"
         client = boto3.client("sts")
         response = client.get_caller_identity()
-        expected_role_name = f"explorer-user-{os.environ['GENCOVE_USER_ID']}-role"
-        if expected_role_name in response["Arn"]:
+        if (
+            expected_role_name_instance in response["Arn"]
+            or expected_role_name_cluster in response["Arn"]
+        ):
             return True
     except Exception:  # noqa pylint: disable=broad-except
         return False

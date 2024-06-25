@@ -92,7 +92,12 @@ class Download(Command):
             raise ValidationError("Must specify only one of: project-id or sample-ids")
 
         if not self.sample_ids:
-            raise ValidationError("No samples to process. Exiting.")
+            raise ValidationError(
+                "No available samples to process. "
+                "Requested samples might be in archive; "
+                "if so use the `gencove projects restore-samples` command. "
+                "Exiting."
+            )
 
         try:
             if self.filters.project_id:

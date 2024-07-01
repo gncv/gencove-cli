@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from ..common import (
     GencoveExplorerManager,
-    request_is_from_explorer_instance,
+    request_is_from_explorer,
     validate_explorer_user_data,
 )
 from ....base import Command
@@ -50,7 +50,7 @@ class Restore(Command):
         self.user = self.api_client.get_user_details()
         self.organization = self.api_client.get_organization_details()
 
-        if not request_is_from_explorer_instance():
+        if not request_is_from_explorer():
             self.aws_session_credentials = (
                 self.api_client.get_explorer_data_credentials()
             )

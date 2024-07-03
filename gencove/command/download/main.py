@@ -104,7 +104,7 @@ class Download(Command):
                     "restore before downloading. "
                     "Exiting."
                 )
-            raise ValidationError("No available samples to process. " "Exiting.")
+            raise ValidationError("No available samples to process. Exiting.")
 
         try:
             if self.filters.project_id:

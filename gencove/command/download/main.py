@@ -50,6 +50,7 @@ class Download(Command):
         self.filters = filters
         self.options = options
         self.sample_ids = set()
+        self.archived_samples_count = 0
         self.downloaded_files = set()
         self.download_urls = download_urls
         self.download_files = []
@@ -71,7 +72,10 @@ class Download(Command):
             try:
                 samples_generator = self._get_paginated_samples()
                 for sample in samples_generator:
-                    self.sample_ids.add(sample.id)
+                    if sample.archive_last_status.status == "available":
+                        self.sample_ids.add(sample.id)
+                    else:
+                        self.archived_samples_count += 1
             except client.APIClientError as err:
                 raise ValidationError(
                     f"Project id {self.filters.project_id} not found."
@@ -92,12 +96,15 @@ class Download(Command):
             raise ValidationError("Must specify only one of: project-id or sample-ids")
 
         if not self.sample_ids:
-            raise ValidationError(
-                "No available samples to process. "
-                "Requested samples might be in archive; "
-                "if so use the `gencove projects restore-samples` command. "
-                "Exiting."
-            )
+            if self.archived_samples_count:
+                raise ValidationError(
+                    "No available samples to process. "
+                    "All samples are in archive; "
+                    "use the `gencove projects restore-samples` command to "
+                    "restore before downloading. "
+                    "Exiting."
+                )
+            raise ValidationError("No available samples to process. Exiting.")
 
         try:
             if self.filters.project_id:
@@ -152,6 +159,15 @@ class Download(Command):
             self.echo_warning(
                 f"Files not found for sample ids: {', '.join(sample_ids)} "
                 f"and file types: {', '.join(self.filters.file_types)}."
+            )
+        else:
+            self.echo_info(f"Processed {len(self.sample_ids)} samples")
+
+        if self.archived_samples_count:
+            self.echo_warning(
+                f"Skipped {self.archived_samples_count} archived samples. "
+                "Use the `gencove projects restore-samples` command to "
+                "restore before downloading."
             )
 
     @backoff.on_exception(
@@ -216,7 +232,7 @@ class Download(Command):
             )
 
         if not ALLOWED_STATUSES_RE.match(sample.last_status.status):
-            self.echo_warning(f"Sample #{sample.id} has no deliverable.")
+            self.echo_warning(f"Sample #{sample.id} has no deliverables.")
             return
 
         file_types_re = re.compile("|".join(self.filters.file_types), re.IGNORECASE)
@@ -407,7 +423,7 @@ class Download(Command):
             req = self.api_client.get_project_samples(
                 self.filters.project_id,
                 next_page,
-                sample_archive_status=SampleArchiveStatus.AVAILABLE.value,
+                sample_archive_status=SampleArchiveStatus.ALL.value,
             )
             for sample in req.results:
                 yield sample

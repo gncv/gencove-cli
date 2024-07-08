@@ -166,7 +166,8 @@ class Download(Command):
         if self.archived_samples_count:
             self.echo_warning(
                 f"Skipped {self.archived_samples_count} archived samples. "
-                "Restore samples before downloading them."
+                "Use the `gencove projects restore-samples` command to "
+                "restore before downloading."
             )
 
     @backoff.on_exception(

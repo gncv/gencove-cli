@@ -3,7 +3,7 @@
 import base64
 import os
 import signal
-import subprocess
+import subprocess  # nosec B404 (bandit subprocess import)
 import sys
 import time
 from multiprocessing import Process
@@ -87,7 +87,7 @@ class ShellSession(Command):
                 "--document-name",
                 credentials.shell_session_ssm_document_name,
             ]
-            with subprocess.Popen(
+            with subprocess.Popen(  # nosec B603 (execution of untrusted input)
                 command,
                 env={
                     "AWS_ACCESS_KEY_ID": credentials.access_key,

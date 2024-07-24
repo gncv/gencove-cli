@@ -1,6 +1,6 @@
 """Commands to be executed from command line."""
 import shutil
-import subprocess
+import subprocess  # nosec B404 (bandit subprocess import)
 import sys
 
 import click
@@ -27,7 +27,7 @@ class CustomEpilogDefaultGroup(DefaultGroup):
         """Adds an epilog to describe Explorer CLI commands"""
         if explorer_cli_installed():
             try:
-                result = subprocess.run(
+                result = subprocess.run(  # nosec B607 (start_process_with_partial_path)
                     ["explorer", "internal", "print-commands"],
                     capture_output=True,
                     text=True,
@@ -76,7 +76,7 @@ def default(ctx):
         )
         sys.exit(1)
     try:
-        subprocess.run(
+        subprocess.run(  # nosec B603 (execution of untrusted input)
             ["explorer"] + ctx.args,
             stdin=sys.stdin,
             stdout=sys.stdout,

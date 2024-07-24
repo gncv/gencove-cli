@@ -3,7 +3,7 @@ import json
 import os
 import re
 import shutil
-import subprocess
+import subprocess  # nosec B404 (bandit subprocess import)
 import uuid
 from typing import Optional
 
@@ -184,7 +184,9 @@ def user_has_supported_aws_cli(raise_exception: bool = False) -> Optional[bool]:
     """
     ssm_supported_semver = "1.16.12"
     try:
-        result = subprocess.run(
+        # Disabling Bandit warnings check for execution of untrusted input and
+        # starting a process with a partial path
+        result = subprocess.run(  # nosec B603 B607
             ["aws", "--version"], capture_output=True, text=True, check=True
         )
         aws_version = result.stderr.split()[0]  # AWS outputs version to stderr

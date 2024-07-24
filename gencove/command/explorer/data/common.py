@@ -1,6 +1,6 @@
 """Common code shared across data commands is stored here"""
 import os
-import subprocess
+import subprocess  # nosec B404 (bandit subprocess import)
 import sys
 import uuid
 from dataclasses import dataclass
@@ -156,7 +156,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         """
         command = ["aws", "s3"] + s3_command
         try:
-            subprocess.run(
+            subprocess.run(  # nosec B603 (execution of untrusted input)
                 command,
                 stdin=sys.stdin,
                 stdout=sys.stdout,
@@ -231,7 +231,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         command = ["aws", "s3", "ls", user_prefix]
 
         try:
-            subprocess.run(
+            subprocess.run(  # nosec B603 (execution of untrusted input)
                 command,
                 stdin=sys.stdin,
                 stdout=sys.stdout,

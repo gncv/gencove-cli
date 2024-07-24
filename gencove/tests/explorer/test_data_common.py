@@ -1,5 +1,6 @@
 """Tests for command.explorer.data.common"""
 import os
+import sys
 import uuid
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
@@ -168,7 +169,7 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
         self.explorer_manager.list_users()
         mock_list_users.assert_called_once()
 
-    @patch("gencove.command.explorer.data.common.sh.aws", create=True)
+    @patch("gencove.command.explorer.data.common.subprocess", create=True)
     def test_execute_aws_s3_src_dst(self, mocked_aws):  # pylint: disable= W0613
         """Test execute_aws_s3_src_dst()"""
         cmd = "cp"
@@ -186,8 +187,30 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
         )
 
         assert s3_cmd == [cmd, translated_source, translated_destination, *args]
+        user_s3_prefix = (
+            f"s3://gencove-explorer-{self.org_id_short}/users/{self.user_id}/files"
+        )
+        env = self.explorer_manager.aws_env.copy()
+        env["PATH"] = os.environ["PATH"]
+        mocked_aws.run.assert_called_once_with(
+            [
+                "aws",
+                "s3",
+                cmd,
+                f"{user_s3_prefix}/source",
+                f"{user_s3_prefix}/destination",
+                *args,
+            ],
+            stdin=sys.stdin,
+            stdout=sys.stdout,
+            stderr=sys.stderr,
+            env=env,
+            check=True,
+        )
 
-    @patch("gencove.command.explorer.data.common.sh.aws", create=True)
+    # ,
+
+    @patch("gencove.command.explorer.data.common.subprocess", create=True)
     def test_execute_aws_s3_src_dst_invalid_path(
         self, mocked_aws
     ):  # noqa: E501 pylint: disable=W0613
@@ -200,7 +223,7 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
         with pytest.raises(ValueError):
             self.explorer_manager.execute_aws_s3_src_dst(cmd, source, destination, args)
 
-    @patch("gencove.command.explorer.data.common.sh.aws", create=True)
+    @patch("gencove.command.explorer.data.common.subprocess", create=True)
     def test_execute_execute_aws_s3_path(self, mocked_aws):  # pylint: disable=W0613
         """Test execute_aws_s3_path()"""
         cmd = "cp"
@@ -212,8 +235,21 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
         s3_cmd = self.explorer_manager.execute_aws_s3_path(cmd, path, args)
 
         assert s3_cmd == [cmd, translated_path, *args]
+        user_s3_prefix = (
+            f"s3://gencove-explorer-{self.org_id_short}/users/{self.user_id}/files"
+        )
+        env = self.explorer_manager.aws_env.copy()
+        env["PATH"] = os.environ["PATH"]
+        mocked_aws.run.assert_called_once_with(
+            ["aws", "s3", cmd, f"{user_s3_prefix}/source", *args],
+            stdin=sys.stdin,
+            stdout=sys.stdout,
+            stderr=sys.stderr,
+            env=env,
+            check=True,
+        )
 
-    @patch("gencove.command.explorer.data.common.sh.aws", create=True)
+    @patch("gencove.command.explorer.data.common.subprocess", create=True)
     def test_execute_execute_aws_s3_path_invalid_path(
         self, mocked_aws
     ):  # noqa: E501 pylint: disable=W0613

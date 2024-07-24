@@ -3,11 +3,11 @@ import json
 import os
 import re
 import shutil
+import subprocess  # nosec B404 (bandit subprocess import)
 import uuid
 from typing import Optional
 
 import click
-import sh  # noqa: I201
 
 from gencove.exceptions import ValidationError  # noqa: I100
 from gencove.logger import dump_debug_log, echo_error
@@ -184,12 +184,21 @@ def user_has_supported_aws_cli(raise_exception: bool = False) -> Optional[bool]:
     """
     ssm_supported_semver = "1.16.12"
     try:
-        aws_version = sh.aws("--version").split()[0]  # pylint: disable=no-member
+        # Disabling Bandit warnings check for execution of untrusted input and
+        # starting a process with a partial path
+        result = subprocess.run(  # nosec B603 B607
+            ["aws", "--version"], capture_output=True, text=True, check=True
+        )
+        aws_version = result.stdout.split()[0]
         aws_semver = aws_version.split("/")[1].strip()
         # Required AWS CLI version that supports ssm plugin
         # https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html
         supported = aws_semver >= ssm_supported_semver
-    except IndexError:
+    except subprocess.CalledProcessError:
+        # Handle the case where the AWS CLI is not installed or the command fails
+        supported = False
+    except (IndexError, AttributeError):
+        # Handle unexpected output format
         supported = False
     if raise_exception and not supported:
         raise ValidationError(

@@ -1,5 +1,6 @@
 """Common code shared across data commands is stored here"""
 import os
+import subprocess  # nosec B404 (bandit subprocess import)
 import sys
 import uuid
 from dataclasses import dataclass
@@ -10,8 +11,6 @@ from gencove.exceptions import ValidationError
 from gencove.models import ExplorerDataCredentials, OrganizationDetails, UserDetails
 
 import boto3  # noqa: I100
-
-import sh  # noqa: I100
 
 
 @dataclass
@@ -149,29 +148,28 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         """Prefix for users dir"""
         return f"{self.S3_PROTOCOL}{self.bucket_name}/{self.users_prefix}"
 
-    def run_s3_command(self, s3_command: List[str]):
+    def run_s3_command(self, s3_command: List[str]) -> None:
         """Run AWS S3 command while handling AWS CLI non-zero exits gracefully
 
         Args:
             s3_command (List[str]): List of arguments to pass to AWS CLI
-
-        Returns:
-            List of arguments passed to AWS CLI
         """
+        command = ["aws", "s3"] + s3_command
+        env = self.aws_env.copy()
+        env["PATH"] = os.environ["PATH"]
         try:
-            out = sh.aws.s3(  # pylint: disable=no-member
-                s3_command,
-                _in=sys.stdin,
-                _out=sys.stdout,
-                _err=sys.stderr,
-                _env=self.aws_env,
+            subprocess.run(  # nosec B603 (execution of untrusted input)
+                command,
+                stdin=sys.stdin,
+                stdout=sys.stdout,
+                stderr=sys.stderr,
+                env=env,
+                check=True,
             )
-        except sh.ErrorReturnCode as err:
-            stderr = err.stderr.decode()
-            if stderr:
-                self.echo_error(stderr)  # pylint: disable=no-member
-            sys.exit(err.exit_code)  # pylint: disable=no-member
-        return out
+        except subprocess.CalledProcessError as err:
+            if err.stderr:
+                self.echo_error(err.stderr.decode())  # pylint: disable=no-member
+            sys.exit(err.returncode)
 
     def uri_ok(self, path: Optional[str]) -> bool:
         """Tests if supplied path is valid
@@ -231,13 +229,22 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
 
     def list_users(self):
         """List e:// user dir"""
-        sh.aws.s3.ls(  # pylint: disable=no-member
-            f"{self.S3_PROTOCOL}{self.bucket_name}/{self.USERS_DIR}/",
-            _in=sys.stdin,
-            _out=sys.stdout,
-            _err=sys.stderr,
-            _env=self.aws_env,
-        )
+        user_prefix = f"{self.S3_PROTOCOL}{self.bucket_name}/{self.USERS_DIR}/"
+        command = ["aws", "s3", "ls", user_prefix]
+        env = self.aws_env.copy()
+        env["PATH"] = os.environ["PATH"]
+        try:
+            subprocess.run(  # nosec B603 (execution of untrusted input)
+                command,
+                stdin=sys.stdin,
+                stdout=sys.stdout,
+                stderr=sys.stderr,
+                env=env,
+                check=True,
+            )
+        except subprocess.CalledProcessError as err:
+            sys.stderr.write(f"Error listing users: {err}\n")
+            sys.exit(err.returncode)
 
     def execute_aws_s3_path(
         self,

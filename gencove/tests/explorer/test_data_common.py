@@ -190,6 +190,8 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
         user_s3_prefix = (
             f"s3://gencove-explorer-{self.org_id_short}/users/{self.user_id}/files"
         )
+        env = self.explorer_manager.aws_env.copy()
+        env["PATH"] = os.environ["PATH"]
         mocked_aws.run.assert_called_once_with(
             [
                 "aws",
@@ -202,7 +204,7 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
             stdin=sys.stdin,
             stdout=sys.stdout,
             stderr=sys.stderr,
-            env=self.explorer_manager.aws_env,
+            env=env,
             check=True,
         )
 
@@ -236,12 +238,14 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
         user_s3_prefix = (
             f"s3://gencove-explorer-{self.org_id_short}/users/{self.user_id}/files"
         )
+        env = self.explorer_manager.aws_env.copy()
+        env["PATH"] = os.environ["PATH"]
         mocked_aws.run.assert_called_once_with(
             ["aws", "s3", cmd, f"{user_s3_prefix}/source", *args],
             stdin=sys.stdin,
             stdout=sys.stdout,
             stderr=sys.stderr,
-            env=self.explorer_manager.aws_env,
+            env=env,
             check=True,
         )
 

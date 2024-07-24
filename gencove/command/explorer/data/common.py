@@ -155,13 +155,15 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
             s3_command (List[str]): List of arguments to pass to AWS CLI
         """
         command = ["aws", "s3"] + s3_command
+        env = self.aws_env.copy()
+        env["PATH"] = os.environ["PATH"]
         try:
             subprocess.run(  # nosec B603 (execution of untrusted input)
                 command,
                 stdin=sys.stdin,
                 stdout=sys.stdout,
                 stderr=sys.stderr,
-                env=self.aws_env,
+                env=env,
                 check=True,
             )
         except subprocess.CalledProcessError as err:
@@ -229,14 +231,15 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         """List e:// user dir"""
         user_prefix = f"{self.S3_PROTOCOL}{self.bucket_name}/{self.USERS_DIR}/"
         command = ["aws", "s3", "ls", user_prefix]
-
+        env = self.aws_env.copy()
+        env["PATH"] = os.environ["PATH"]
         try:
             subprocess.run(  # nosec B603 (execution of untrusted input)
                 command,
                 stdin=sys.stdin,
                 stdout=sys.stdout,
                 stderr=sys.stderr,
-                env=self.aws_env,
+                env=env,
                 check=True,
             )
         except subprocess.CalledProcessError as err:

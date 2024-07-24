@@ -189,7 +189,7 @@ def user_has_supported_aws_cli(raise_exception: bool = False) -> Optional[bool]:
         result = subprocess.run(  # nosec B603 B607
             ["aws", "--version"], capture_output=True, text=True, check=True
         )
-        aws_version = result.stderr.split()[0]  # AWS outputs version to stderr
+        aws_version = result.stdout.split()[0]
         aws_semver = aws_version.split("/")[1].strip()
         # Required AWS CLI version that supports ssm plugin
         # https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html

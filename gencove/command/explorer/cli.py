@@ -1,5 +1,6 @@
 """Commands to be executed from command line."""
 import shutil
+import subprocess  # nosec B404 (bandit subprocess import)
 import sys
 
 import click
@@ -7,7 +8,6 @@ import click
 # This package enables Click to default to a command if it is not specified.
 from click_default_group import DefaultGroup
 
-import sh
 
 from .data.cli import data
 from .instances.cli import instances
@@ -27,11 +27,14 @@ class CustomEpilogDefaultGroup(DefaultGroup):
         """Adds an epilog to describe Explorer CLI commands"""
         if explorer_cli_installed():
             try:
-                out = sh.explorer.internal(  # pylint: disable=E1101
-                    "print-commands",
+                result = subprocess.run(  # nosec B607 (start_process_with_partial_path)
+                    ["explorer", "internal", "print-commands"],
+                    capture_output=True,
+                    text=True,
+                    check=True,
                 )
-                formatter.write(out)
-            except sh.ErrorReturnCode:
+                formatter.write(result.stdout)
+            except subprocess.CalledProcessError:
                 # Ignore errors to fail gracefully if installed version of
                 # explorer CLI does not support `print-commands`
                 pass
@@ -72,16 +75,16 @@ def default(ctx):
             err=True,
         )
         sys.exit(1)
-
     try:
-        sh.explorer(  # pylint: disable=E1101
-            *ctx.args,
-            _in=sys.stdin,
-            _out=sys.stdout,
-            _err=sys.stderr,
+        subprocess.run(  # nosec B603 (execution of untrusted input)
+            ["explorer"] + ctx.args,
+            stdin=sys.stdin,
+            stdout=sys.stdout,
+            stderr=sys.stderr,
+            check=True,
         )
-    except sh.ErrorReturnCode as exception:
-        sys.exit(exception.exit_code)  # pylint: disable=E1101
+    except subprocess.CalledProcessError as exception:
+        sys.exit(exception.returncode)
 
 
 explorer.add_command(instances)

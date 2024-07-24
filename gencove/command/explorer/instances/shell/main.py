@@ -3,13 +3,12 @@
 import base64
 import os
 import signal
+import subprocess  # nosec B404 (bandit subprocess import)
 import sys
 import time
 from multiprocessing import Process
 
 from gencove.utils import get_boto_session_refreshable
-
-import sh  # pylint: disable=wrong-import-order
 
 from ....base import Command
 from ....utils import (
@@ -79,15 +78,18 @@ class ShellSession(Command):
         )
         network_activity_background.start()
         try:
-            command = sh.aws.ssm(  # pylint: disable=no-member
-                [
-                    "start-session",
-                    "--target",
-                    credentials.ec2_instance_id,
-                    "--document-name",
-                    credentials.shell_session_ssm_document_name,
-                ],
-                _env={
+            command = [
+                "aws",
+                "ssm",
+                "start-session",
+                "--target",
+                credentials.ec2_instance_id,
+                "--document-name",
+                credentials.shell_session_ssm_document_name,
+            ]
+            with subprocess.Popen(  # nosec B603 (execution of untrusted input)
+                command,
+                env={
                     "AWS_ACCESS_KEY_ID": credentials.access_key,
                     "AWS_SECRET_ACCESS_KEY": credentials.secret_key,
                     "AWS_SESSION_TOKEN": credentials.token,
@@ -95,23 +97,21 @@ class ShellSession(Command):
                     "AWS_REGION": credentials.region_name,
                     "PATH": os.environ["PATH"],
                 },
-                _in=sys.stdin,
-                _out=sys.stdout,
-                _bg=True,
-            )
+                stdin=sys.stdin,
+                stdout=sys.stdout,
+                stderr=sys.stderr,
+            ) as process:
 
-            def signal_handler(sig, frame):  # pylint: disable=unused-argument
-                if sys.version_info >= (3, 8):
-                    command.signal(sig)
-                else:
-                    command.signal_group(sig)
+                def signal_handler(sig, frame):  # pylint: disable=unused-argument
+                    if process.poll() is None:  # Check if the process is still running
+                        process.send_signal(sig)
 
-            signal.signal(signal.SIGINT, signal_handler)
-            signal.signal(signal.SIGTERM, signal_handler)
-            signal.signal(signal.SIGQUIT, signal_handler)
-            signal.signal(signal.SIGHUP, signal_handler)
+                signal.signal(signal.SIGINT, signal_handler)
+                signal.signal(signal.SIGTERM, signal_handler)
+                signal.signal(signal.SIGQUIT, signal_handler)
+                signal.signal(signal.SIGHUP, signal_handler)
 
-            command.wait()
+                process.wait()
         finally:
             if network_activity_background.is_alive():
                 # Try to gracefully stop the backgroud process

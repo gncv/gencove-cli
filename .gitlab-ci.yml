@@ -14,6 +14,22 @@ before_script:
   # Setup package and it's requirements
   - pip install -e .
 
+test_windows:
+  stage: test
+  tags:
+    - windows
+  image: mcr.microsoft.com/windows/servercore:ltsc2022
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+    PYTHON_VERSION: "3.10"
+  before_script:
+    - powershell -Command "Invoke-WebRequest -Uri https://www.python.org/ftp/python/$env:PYTHON_VERSION/python-$env:PYTHON_VERSION-amd64.exe -OutFile python-installer.exe"
+    - Start-Process -Wait -FilePath python-installer.exe -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1'
+    - pip install --upgrade pip
+    - pip install gencove
+  script:
+    - gencove --version
+
 python37_api_key:
   stage: test
   script: tox -e py37-api_key

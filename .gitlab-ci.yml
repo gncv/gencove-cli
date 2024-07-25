@@ -17,8 +17,7 @@ before_script:
 test_windows:
   stage: test
   tags:
-    - windows
-  image: mcr.microsoft.com/windows/servercore:ltsc2022
+    - saas-windows-medium-amd64
   variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
     PYTHON_VERSION: "3.10"

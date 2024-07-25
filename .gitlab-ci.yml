@@ -24,6 +24,7 @@ test_windows:
   before_script:
     - powershell -Command "Invoke-WebRequest -Uri https://www.python.org/ftp/python/$env:PYTHON_VERSION/python-$env:PYTHON_VERSION-amd64.exe -OutFile python-installer.exe"
     - Start-Process -Wait -FilePath python-installer.exe -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1'
+    - $env:Path += ';C:\Python310;C:\Python310\Scripts'
     - pip install --upgrade pip
     - pip install gencove
   script:

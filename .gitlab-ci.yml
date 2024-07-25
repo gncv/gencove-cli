@@ -23,7 +23,9 @@ test_windows:
     PYTHON_VERSION: "3.10.11"
   before_script:
     - choco install python -y --version $env:PYTHON_VERSION
+    - refreshenv
     - py -m pip install gencove
+    - set PATH=C:\Python310;C:\Python310\Scripts;%PATH%
   script:
     - gencove --version
 

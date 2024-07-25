@@ -72,7 +72,9 @@ class Download(Command):
             try:
                 samples_generator = self._get_paginated_samples()
                 for sample in samples_generator:
-                    if sample.archive_last_status.status == "available":
+                    if ALLOWED_ARCHIVE_STATUSES_RE.match(
+                        sample.archive_last_status.status
+                    ):
                         self.sample_ids.add(sample.id)
                     else:
                         self.archived_samples_count += 1

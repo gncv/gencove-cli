@@ -22,13 +22,13 @@ test_windows:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
     PYTHON_VERSION: "3.10.11"
   before_script:
-    - Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-    - choco install python -y --version $env:PYTHON_VERSION
-    - refreshenv
-    - py -m pip install gencove
-    - set PATH=C:\Python310;C:\Python310\Scripts;%PATH%
+    - powershell -Command "Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1; refreshenv"
+    - powershell -Command "choco install python -y --version $env:PYTHON_VERSION"
+    - powershell -Command "[System.Environment]::SetEnvironmentVariable('Path', $env:Path + ';C:\Python310;C:\Python310\Scripts', [System.EnvironmentVariableTarget]::Machine)"
+    - powershell -Command "pip install --upgrade pip"
+    - powershell -Command "pip install gencove"
   script:
-    - gencove --version
+    - powershell -Command "gencove --version"
 
 # python37_api_key:
 #   stage: test

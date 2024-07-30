@@ -20,10 +20,11 @@ test_windows:
     - saas-windows-medium-amd64
   variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-    PYTHON_VERSION: "3.10.11"
+    PYTHON_VERSION_MAJOR_MINOR: "3.10"
+    PYTHON_VERSION_PATCH: "11"
   before_script:
     - powershell -Command "Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1; refreshenv"
-    - powershell -Command "choco install python -y --version $env:PYTHON_VERSION"
+    - powershell -Command "choco install python -y --version $env:PYTHON_VERSION_MAJOR_MINOR.$env:PYTHON_VERSION_PATCH"
     # - powershell -Command "[System.Environment]::SetEnvironmentVariable('Path', '$env:Path' + ';C:\\Python310;C:\\Python310\\Scripts', [System.EnvironmentVariableTarget]::Process)"
     # - powershell -Command "[System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable('Path', 'Process') + ';C:\\Python310;C:\\Python310\\Scripts', [System.EnvironmentVariableTarget]::Process)"
     # - powershell -Command "[System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable('Path', 'User') + ';C:\\Python310;C:\\Python310\\Scripts', [System.EnvironmentVariableTarget]::User)"
@@ -39,10 +40,10 @@ test_windows:
     # - powershell -Command "$machinePath = [System.Environment]::GetEnvironmentVariable('Path', [System.EnvironmentVariableTarget]::User)"
     # - powershell -Command "echo '$machinePath'"
     # - powershell -Command "pip install --upgrade pip"
-    - powershell -Command "C:\\Python310\\python.exe -m pip install --upgrade pip"
-    - powershell -Command "C:\\Python310\\python.exe -m pip install -e ."
+    - powershell -Command "C:\\Python$env:PYTHON_VERSION_MAJOR_MINOR\\python.exe -m pip install --upgrade pip"
+    - powershell -Command "C:\\Python$env:PYTHON_VERSION_MAJOR_MINOR\\python.exe -m pip install -e ."
   script:
-    - powershell -Command "C:\\Python310\\Scripts\\gencove --version"
+    - powershell -Command "C:\\Python$env:PYTHON_VERSION_MAJOR_MINOR\\Scripts\\gencove --version"
 
 # python37_api_key:
 #   stage: test

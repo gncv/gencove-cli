@@ -40,7 +40,7 @@ test_windows:
     # - powershell -Command "echo '$machinePath'"
     # - powershell -Command "pip install --upgrade pip"
     - powershell -Command "C:\\Python310\\python.exe -m pip install --upgrade pip"
-    - powershell -Command "C:\\Python310\\python.exe -m pip install gencove"
+    - powershell -Command "C:\\Python310\\python.exe -m pip install -e ."
   script:
     - powershell -Command "C:\\Python310\\Scripts\\gencove --version"
 

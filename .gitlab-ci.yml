@@ -31,150 +31,150 @@ test_windows:
   script:
     - powershell -Command "C:\\Python$env:PYTHON_VERSION_MAJOR$env:PYTHON_VERSION_MINOR\\Scripts\\gencove --version"
 
-# python37_api_key:
-#   stage: test
-#   script: tox -e py37-api_key
-#   except:
-#     - tags
+python37_api_key:
+  stage: test
+  script: tox -e py37-api_key
+  except:
+    - tags
 
-# python37_user_pass:
-#   stage: test
-#   script: tox -e py37-user_pass
-#   except:
-#     - tags
-#   coverage: /^TOTAL.+?(\d+\.\d+\%)$/
+python37_user_pass:
+  stage: test
+  script: tox -e py37-user_pass
+  except:
+    - tags
+  coverage: /^TOTAL.+?(\d+\.\d+\%)$/
 
-# python38_api_key:
-#   image: python:3.8
-#   stage: test
-#   script: tox -e py38-api_key
-#   except:
-#     - tags
+python38_api_key:
+  image: python:3.8
+  stage: test
+  script: tox -e py38-api_key
+  except:
+    - tags
 
-# python38_user_pass:
-#   image: python:3.8
-#   stage: test
-#   script: tox -e py38-user_pass
-#   except:
-#     - tags
+python38_user_pass:
+  image: python:3.8
+  stage: test
+  script: tox -e py38-user_pass
+  except:
+    - tags
 
-# python39_api_key:
-#   image: python:3.9
-#   stage: test
-#   script: tox -e py39-api_key
-#   except:
-#     - tags
+python39_api_key:
+  image: python:3.9
+  stage: test
+  script: tox -e py39-api_key
+  except:
+    - tags
 
-# python39_user_pass:
-#   image: python:3.9
-#   stage: test
-#   script: tox -e py39-user_pass
-#   except:
-#     - tags
+python39_user_pass:
+  image: python:3.9
+  stage: test
+  script: tox -e py39-user_pass
+  except:
+    - tags
 
-# python310_api_key:
-#   image: python:3.10
-#   stage: test
-#   script: tox -e py310-api_key
-#   except:
-#     - tags
+python310_api_key:
+  image: python:3.10
+  stage: test
+  script: tox -e py310-api_key
+  except:
+    - tags
 
-# python310_user_pass:
-#   image: python:3.10
-#   stage: test
-#   script: tox -e py310-user_pass
-#   except:
-#     - tags
+python310_user_pass:
+  image: python:3.10
+  stage: test
+  script: tox -e py310-user_pass
+  except:
+    - tags
 
-# python311_api_key:
-#   image: python:3.11
-#   stage: test
-#   script: tox -e py311-api_key
-#   except:
-#     - tags
+python311_api_key:
+  image: python:3.11
+  stage: test
+  script: tox -e py311-api_key
+  except:
+    - tags
 
-# python311_user_pass:
-#   image: python:3.11
-#   stage: test
-#   script: tox -e py311-user_pass
-#   except:
-#     - tags
+python311_user_pass:
+  image: python:3.11
+  stage: test
+  script: tox -e py311-user_pass
+  except:
+    - tags
 
-# python312_api_key:
-#   image: python:3.12
-#   stage: test
-#   script: tox -e py312-api_key
-#   except:
-#     - tags
+python312_api_key:
+  image: python:3.12
+  stage: test
+  script: tox -e py312-api_key
+  except:
+    - tags
 
-# python312_user_pass:
-#   image: python:3.12
-#   stage: test
-#   script: tox -e py312-user_pass
-#   except:
-#     - tags
+python312_user_pass:
+  image: python:3.12
+  stage: test
+  script: tox -e py312-user_pass
+  except:
+    - tags
 
-# black:
-#   stage: test
-#   script: tox -e black_checker
-#   except:
-#     - tags
+black:
+  stage: test
+  script: tox -e black_checker
+  except:
+    - tags
 
-# flake8:
-#   stage: test
-#   script: tox -e flake8
-#   except:
-#     - tags
+flake8:
+  stage: test
+  script: tox -e flake8
+  except:
+    - tags
 
-# pylint:
-#   stage: test
-#   script: tox -e pylint
-#   except:
-#     - tags
+pylint:
+  stage: test
+  script: tox -e pylint
+  except:
+    - tags
 
-# bandit:
-#   stage: test
-#   script: tox -e bandit
-#   except:
-#     - tags
+bandit:
+  stage: test
+  script: tox -e bandit
+  except:
+    - tags
 
-# build_docs_stage:
-#   stage: deploy
-#   trigger:
-#     project: gencove/docs-main
-#     branch: master
-#   only:
-#     - master
+build_docs_stage:
+  stage: deploy
+  trigger:
+    project: gencove/docs-main
+    branch: master
+  only:
+    - master
 
-# build_docs_prod:
-#   stage: deploy
-#   trigger:
-#     project: gencove/docs-main
-#     branch: production
-#   only:
-#     - prod
+build_docs_prod:
+  stage: deploy
+  trigger:
+    project: gencove/docs-main
+    branch: production
+  only:
+    - prod
 
-# production:
-#   stage: deploy
-#   script:
-#     # Install AWS CLI
-#     - pip install awscli
-#     # Install twine for uploading to pypi
-#     - pip install twine
-#     # Upload to pypi
-#     - python setup.py sdist
-#     - python setup.py bdist_wheel --universal
-#     - twine upload dist/*
-#     # Autotag
-#     - git config user.email "${GITLAB_USER_EMAIL}"
-#     - git config user.name "${GITLAB_USER_NAME}"
-#     - git remote add api-origin https://gencove-deploy-bot:${GITLAB_ACCESS_TOKEN}@gitlab.com/${CI_PROJECT_PATH}
-#     - export CURRENT_VERSION="$(./version-01-upgrade.sh print | tail -1)"
-#     - git tag -a "$CURRENT_VERSION" -m "Auto-Release"
-#     - git push api-origin "$CURRENT_VERSION"
-#   only:
-#     # - tags
-#     #
-#     # SemVer-compliant tags (with no metadata)
-#     # - /^v?\d+\.\d+\.\d+$/
-#     - prod
+production:
+  stage: deploy
+  script:
+    # Install AWS CLI
+    - pip install awscli
+    # Install twine for uploading to pypi
+    - pip install twine
+    # Upload to pypi
+    - python setup.py sdist
+    - python setup.py bdist_wheel --universal
+    - twine upload dist/*
+    # Autotag
+    - git config user.email "${GITLAB_USER_EMAIL}"
+    - git config user.name "${GITLAB_USER_NAME}"
+    - git remote add api-origin https://gencove-deploy-bot:${GITLAB_ACCESS_TOKEN}@gitlab.com/${CI_PROJECT_PATH}
+    - export CURRENT_VERSION="$(./version-01-upgrade.sh print | tail -1)"
+    - git tag -a "$CURRENT_VERSION" -m "Auto-Release"
+    - git push api-origin "$CURRENT_VERSION"
+  only:
+    # - tags
+    #
+    # SemVer-compliant tags (with no metadata)
+    # - /^v?\d+\.\d+\.\d+$/
+    - prod

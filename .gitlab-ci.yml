@@ -30,7 +30,12 @@ test_windows:
     - powershell -Command "[System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable('Path', 'Machine') + ';C:\\Python310;C:\\Python310\\Scripts', [System.EnvironmentVariableTarget]::Machine)"
     - powershell -Command "echo '$env:Path'"
     - powershell -Command "Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1; refreshenv"
-    - powershell -Command "echo '$env:Path'"
+    - powershell -Command "echo Process Path:"
+    - powershell -Command "Write-Output '$env:Path'"
+    - powershell -Command "echo User Path:"
+    - powershell -Command "echo [System.Environment]::GetEnvironmentVariable('Path', [System.EnvironmentVariableTarget]::User)"
+    - powershell -Command "echo Machine Path:"
+    - powershell -Command "echo [System.Environment]::GetEnvironmentVariable('Path', [System.EnvironmentVariableTarget]::Machine)"
     - powershell -Command "pip install --upgrade pip"
     - powershell -Command "pip install gencove"
   script:

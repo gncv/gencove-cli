@@ -24,7 +24,7 @@ test_windows:
   before_script:
     - powershell -Command "Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1; refreshenv"
     - powershell -Command "choco install python -y --version $env:PYTHON_VERSION"
-    - powershell -Command "[System.Environment]::SetEnvironmentVariable('Path', \'$env:Path\' + ';C:\\Python310;C:\\Python310\\Scripts', [System.EnvironmentVariableTarget]::Process)"
+    - powershell -Command "[System.Environment]::SetEnvironmentVariable('Path', '$env:Path' + ';C:\\Python310;C:\\Python310\\Scripts', [System.EnvironmentVariableTarget]::Process)"
     - powershell -Command "pip install --upgrade pip"
     - powershell -Command "pip install gencove"
   script:

@@ -25,7 +25,7 @@ test_windows:
     - powershell -Command "Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1; refreshenv"
     - powershell -Command "choco install python -y --version $env:PYTHON_VERSION"
     # - powershell -Command "[System.Environment]::SetEnvironmentVariable('Path', '$env:Path' + ';C:\\Python310;C:\\Python310\\Scripts', [System.EnvironmentVariableTarget]::Process)"
-    - powershell -Command "[System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable('Path', 'Process') + ';C:\\Python310;C:\\Python310\\Scripts', 'Process')"
+    - powershell -Command "[System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable('Path', 'Process') + ';C:\\Python310;C:\\Python310\\Scripts', [System.EnvironmentVariableTarget]::Machine)"
     # - powershell -Command "Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1; refreshenv"
     - powershell -Command "echo '$env:Path'"
     - powershell -Command "pip install --upgrade pip"

@@ -87,16 +87,20 @@ class ShellSession(Command):
                 "--document-name",
                 credentials.shell_session_ssm_document_name,
             ]
-            with subprocess.Popen(  # nosec B603 (execution of untrusted input)
-                command,
-                env={
+            env = os.environ.copy()
+            env.update(
+                {
                     "AWS_ACCESS_KEY_ID": credentials.access_key,
                     "AWS_SECRET_ACCESS_KEY": credentials.secret_key,
                     "AWS_SESSION_TOKEN": credentials.token,
                     "AWS_DEFAULT_REGION": credentials.region_name,
                     "AWS_REGION": credentials.region_name,
                     "PATH": os.environ["PATH"],
-                },
+                }
+            )
+            with subprocess.Popen(  # nosec B603 (execution of untrusted input)
+                command,
+                env=env,
                 stdin=sys.stdin,
                 stdout=sys.stdout,
                 stderr=sys.stderr,

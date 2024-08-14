@@ -14,6 +14,23 @@ before_script:
   # Setup package and it's requirements
   - pip install -e .
 
+test_windows:
+  stage: test
+  tags:
+    - saas-windows-medium-amd64
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+    PYTHON_VERSION_MAJOR: "3"
+    PYTHON_VERSION_MINOR: "10"
+    PYTHON_VERSION_PATCH: "11"
+  before_script:
+    - powershell -Command "Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1; refreshenv"
+    - powershell -Command "choco install python -y --version $env:PYTHON_VERSION_MAJOR.$env:PYTHON_VERSION_MINOR.$env:PYTHON_VERSION_PATCH"
+    - powershell -Command "C:\\Python$env:PYTHON_VERSION_MAJOR$env:PYTHON_VERSION_MINOR\\python.exe -m pip install --upgrade pip"
+    - powershell -Command "C:\\Python$env:PYTHON_VERSION_MAJOR$env:PYTHON_VERSION_MINOR\\python.exe -m pip install -e ."
+  script:
+    - powershell -Command "C:\\Python$env:PYTHON_VERSION_MAJOR$env:PYTHON_VERSION_MINOR\\Scripts\\gencove --version"
+
 python37_api_key:
   stage: test
   script: tox -e py37-api_key

@@ -141,6 +141,7 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
             user_id=self.user_id,
             organization_id=self.organization_id,
         )
+        # pylint: disable=C1803 use-implicit-booleaness-not-comparison
         assert explorer_manager.aws_env == {}
 
     @pytest.mark.parametrize(

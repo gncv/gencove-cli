@@ -134,6 +134,15 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
         }
         assert self.explorer_manager.aws_env == expected
 
+    def test_empty_aws_env(self):
+        """Test that aws_env returns an empty dict when no aws_session_credentials."""
+        explorer_manager = GencoveExplorerManager(
+            aws_session_credentials=None,
+            user_id=self.user_id,
+            organization_id=self.organization_id,
+        )
+        assert explorer_manager.aws_env == {}
+
     @pytest.mark.parametrize(
         "path, expected",
         [

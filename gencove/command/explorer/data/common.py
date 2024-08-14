@@ -58,17 +58,18 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         return f"gencove-explorer-{organization_id_short}"
 
     @property
-    def aws_env(self) -> Optional[dict]:
+    def aws_env(self) -> dict:
         """Dict containing AWS credentials"""
-        if not self.aws_session_credentials:
-            return None
-        return {
-            "AWS_ACCESS_KEY_ID": self.aws_session_credentials.access_key,
-            "AWS_SECRET_ACCESS_KEY": self.aws_session_credentials.secret_key,
-            "AWS_SESSION_TOKEN": self.aws_session_credentials.token,
-            "AWS_DEFAULT_REGION": self.aws_session_credentials.region_name,
-            "AWS_REGION": self.aws_session_credentials.region_name,
-        }
+        aws_env = {}
+        if self.aws_session_credentials:
+            aws_env = {
+                "AWS_ACCESS_KEY_ID": self.aws_session_credentials.access_key,
+                "AWS_SECRET_ACCESS_KEY": self.aws_session_credentials.secret_key,
+                "AWS_SESSION_TOKEN": self.aws_session_credentials.token,
+                "AWS_DEFAULT_REGION": self.aws_session_credentials.region_name,
+                "AWS_REGION": self.aws_session_credentials.region_name,
+            }
+        return aws_env
 
     @property
     def users_prefix(self) -> str:

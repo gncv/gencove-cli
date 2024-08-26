@@ -467,6 +467,12 @@ class ExplorerShellSessionCredentials(BaseModel):
     network_activity_ssm_document_name: Optional[str]
 
 
+class ExplorerAccessURL(BaseModel):
+    """ExplorerAccessURL model"""
+
+    url: str
+
+
 class OrganizationDetails(GencoveBaseModel):
     """OrganizationDetails model"""
 

@@ -37,6 +37,7 @@ from gencove.models import (  # noqa: I101, I100
     ExplorerInstanceInactivityStopOrganization,
     ExplorerInstances,
     ExplorerShellSessionCredentials,
+    ExplorerAccessURL,
     FileTypesModel,
     ImportExistingSamplesModel,
     OrganizationDetails,
@@ -1235,3 +1236,11 @@ class APIClient:
         return self._post(
             endpoint, payload, authorized=True, model=ExplorerShellSessionCredentials
         )
+
+    def get_explorer_access_url(self, instance_id) -> ExplorerAccessURL:
+        """Making a request to obtain explorer access URL"""
+        endpoint = self.endpoints.EXPLORER_ACCESS_URL.value
+
+        payload = {"id": instance_id}
+
+        return self._post(endpoint, payload, authorized=True, model=ExplorerAccessURL)

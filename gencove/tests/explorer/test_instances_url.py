@@ -3,6 +3,7 @@
 import io
 import sys
 
+
 from click import echo
 from click.testing import CliRunner
 
@@ -19,7 +20,6 @@ from gencove.models import (
 )
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.explorer.vcr.filters import (  # noqa: I101
-    filter_explorer_access_url_response,
     filter_list_instances_response,
     filter_instance_ids_request,
 )
@@ -55,7 +55,6 @@ def vcr_config():
         "before_record_response": [
             filter_jwt,
             filter_volatile_dates,
-            filter_explorer_access_url_response,
             filter_list_instances_response,
         ],
     }
@@ -107,7 +106,7 @@ def test_instances_url(mocker, credentials, recording, vcr):
             APIClient,
             "get_explorer_access_url",
             return_value=ExplorerAccessURL(
-                url="https://mock-url.com/gncv-explorer/signin?access_token=123"
+                url="https://explorer.gencove.com/instance/1234"
             ),
         )
     res = runner.invoke(url, credentials)

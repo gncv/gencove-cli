@@ -34,4 +34,4 @@ class GetInstanceURL(Command):
         instance_id = str(explorer_instances.results[0].id)
         self.echo_info("Request to generate explorer access URL accepted.")
         url = self.api_client.get_explorer_access_url(instance_id=instance_id)
-        self.echo_info(f"Explorer access URL: {url.url}")
+        self.echo_info(f"Explorer access URL (valid for 5 minutes): {url.url}")

@@ -56,6 +56,7 @@ class ApiEndpoints(Enum):
     )
     EXPLORER_SHELL_SESSION_CREDENTIALS = "/api/v2/explorer-shell-session-credentials/"
     EXPLORER_DATA_CREDENTIALS = "/api/v2/explorer-data-credentials/"
+    EXPLORER_ACCESS_URL = "/api/v2/explorer-access-url/"
 
 
 @unique

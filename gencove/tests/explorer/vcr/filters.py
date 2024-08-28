@@ -41,6 +41,9 @@ def filter_instance_ids_request(request):
         if "instance_id" in body:
             body["instance_id"] = MOCK_UUID
             request.body = json.dumps(body).encode()
+        if "id" in body:
+            body["id"] = MOCK_UUID
+            request.body = json.dumps(body).encode()
     except json.decoder.JSONDecodeError:
         pass
     return request
@@ -77,4 +80,14 @@ def filter_data_credentials_response(response, json_response):
         json_response["roles"]["organization"]["id"] = MOCK_UUID
     if "email" in json_response:
         json_response["email"] = "email@example.com"
+    return response, json_response
+
+
+@parse_response_to_json
+def filter_explorer_access_url_response(response, json_response):
+    """Filter url response."""
+    if "url" in json_response:
+        json_response[
+            "url"
+        ] = "https://mock-url.com/gncv-explorer/signin?access_token=123"
     return response, json_response

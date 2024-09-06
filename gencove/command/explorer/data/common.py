@@ -235,14 +235,40 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         env = os.environ.copy()
         env.update(self.aws_env)
         try:
-            subprocess.run(  # nosec B603 (execution of untrusted input)
+            user_ids = []
+            result = subprocess.run(
                 command,
                 stdin=sys.stdin,
-                stdout=sys.stdout,
+                stdout=subprocess.PIPE,
                 stderr=sys.stderr,
                 env=env,
                 check=True,
+                text=True,
             )
+
+            # populate user_ids
+            for line in result.stdout.splitlines():
+                user_ids.append(line.decode("utf-8").split("PRE ")[1].split("/")[0])
+            sorted_dict = []
+            uids = ping_users()
+
+            for uid in user_ids:
+                d = next((item for item in uids if item["id"] == uid), None)
+                if d is None:
+                    print(f"user_id: {uid} not a member of this organization.")
+                    continue
+                sorted_dict.append({"id": d["id"], "email": d["email"]})
+            # Find the maximum length of email in the list
+            max_email_length = max(len(item["email"]) for item in sorted_dict)
+
+            # Format and print the output with proper alignment
+            for item in sorted_dict:
+                email = item["email"]
+                user_id = item["id"]
+                # Format the string such that the email is left-aligned with padding to the maximum length
+                formatted_string = f"                           PRE {email:<{max_email_length}} ({user_id}/)"
+                print(formatted_string)
+
         except subprocess.CalledProcessError as err:
             sys.stderr.write(f"Error listing users: {err}\n")
             sys.exit(err.returncode)

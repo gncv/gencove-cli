@@ -236,7 +236,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         env.update(self.aws_env)
         try:
             user_ids = []
-            result = subprocess.run(
+            result = subprocess.run(  # nosec B603 (execution of untrusted input)
                 command,
                 stdin=sys.stdin,
                 stdout=subprocess.PIPE,

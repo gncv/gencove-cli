@@ -31,6 +31,8 @@ class ApiEndpoints(Enum):
     PROJECT_MERGE_VCFS = "/api/v2/project-merge-vcfs/{id}"
     SAMPLE_METADATA = "/api/v2/sample-metadata/{id}"
     PROJECTS_DELETE = "/api/v2/projects-delete/"
+    PROJECTS_HIDE = "/api/v2/projects-hide/"
+    PROJECTS_UNHIDE = "/api/v2/projects-unhide/"
     PROJECT_DELETE_SAMPLES = "/api/v2/project-delete-samples/{id}"
     PROJECT_RESTORE_SAMPLES = "/api/v2/project-restore-samples/{id}"
     PROJECT_QC_REPORT = "/api/v2/project-qc-report/{id}"

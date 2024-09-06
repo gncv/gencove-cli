@@ -12,6 +12,7 @@ from .get_batch.cli import get_batch
 from .get_merged_vcf.cli import get_merged_vcf
 from .get_reference_genome.cli import get_reference_genome
 from .get_sample_manifests.cli import get_sample_manifests
+from .hide.cli import hide_projects
 from .import_existing_samples.cli import import_existing_project_samples
 from .list.cli import list_projects
 from .list_batch_types.cli import list_project_batch_types
@@ -22,6 +23,7 @@ from .restore_samples.cli import restore_project_samples
 from .run_prefix.cli import run_prefix
 from .samples.cli import list_project_samples
 from .status_merged_vcf.cli import status_merged_vcf
+from .unhide.cli import unhide_projects
 
 
 @click.group()
@@ -49,3 +51,5 @@ projects.add_command(delete_projects)
 projects.add_command(create_sample_manifest)
 projects.add_command(get_sample_manifests)
 projects.add_command(get_reference_genome)
+projects.add_command(hide_projects)
+projects.add_command(unhide_projects)

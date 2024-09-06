@@ -11,6 +11,7 @@ from gencove.exceptions import ValidationError
 from gencove.models import ExplorerDataCredentials, OrganizationDetails, UserDetails
 
 import boto3  # noqa: I100
+import requests
 
 
 @dataclass
@@ -250,7 +251,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
             for line in result.stdout.splitlines():
                 user_ids.append(line.decode("utf-8").split("PRE ")[1].split("/")[0])
             sorted_dict = []
-            uids = ping_users()
+            uids = get_organization_users()
 
             for uid in user_ids:
                 d = next((item for item in uids if item["id"] == uid), None)
@@ -416,3 +417,29 @@ def request_is_from_explorer() -> bool:
     except Exception:  # noqa pylint: disable=broad-except
         return False
     return False
+
+
+def get_organization_users():
+    # Fetch the API key from environment variables
+    gencove_api_key = os.getenv("GENCOVE_API_KEY")
+    gencove_host = os.getenv("GENCOVE_HOST")
+
+    if gencove_api_key is None:
+        raise ValueError("GENCOVE_API_KEY environment variable is not set")
+
+    # limit=100 because I do not want to paginate at this time
+    url = f"{gencove_host}/api/v2/organization-users/?limit=100"
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Api-Key {gencove_api_key}",
+    }
+
+    # Send the GET request
+    response = requests.get(url, headers=headers)
+
+    # Check the response status and print the response
+    if response.status_code == 200:
+        data = response.json()
+        return data["results"]
+    else:
+        print(f"Request failed with status code {response.status_code}")

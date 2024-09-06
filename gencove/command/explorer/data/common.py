@@ -11,7 +11,8 @@ from gencove.exceptions import ValidationError
 from gencove.models import ExplorerDataCredentials, OrganizationDetails, UserDetails
 
 import boto3  # noqa: I100
-import requests
+
+import requests  # noqa: I100
 
 
 @dataclass
@@ -266,8 +267,9 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
             for item in sorted_dict:
                 email = item["email"]
                 user_id = item["id"]
-                # Format the string such that the email is left-aligned with padding to the maximum length
-                formatted_string = f"                           PRE {email:<{max_email_length}} ({user_id}/)"
+                # Format the string such that the email is left-aligned
+                # with padding to the maximum length
+                formatted_string = f"                           PRE {email:<{max_email_length}} ({user_id}/)"  # noqa E501
                 print(formatted_string)
 
         except subprocess.CalledProcessError as err:

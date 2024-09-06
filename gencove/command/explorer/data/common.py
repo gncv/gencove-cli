@@ -230,6 +230,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
             path = f"{prefix_s3}/{path_remainder}"
         return path
 
+    # pylint: disable=too-many-locals
     def list_users(self):
         """List e:// user dir"""
         user_prefix = f"{self.S3_PROTOCOL}{self.bucket_name}/{self.USERS_DIR}/"
@@ -255,11 +256,13 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
             uids = get_organization_users()
 
             for uid in user_ids:
-                d = next((item for item in uids if item["id"] == uid), None)
-                if d is None:
+                dict_match = next((item for item in uids if item["id"] == uid), None)
+                if dict_match is None:
                     print(f"user_id: {uid} not a member of this organization.")
                     continue
-                sorted_dict.append({"id": d["id"], "email": d["email"]})
+                sorted_dict.append(
+                    {"id": dict_match["id"], "email": dict_match["email"]}
+                )  # noqa E501
             # Find the maximum length of email in the list
             max_email_length = max(len(item["email"]) for item in sorted_dict)
 
@@ -270,7 +273,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
                 # Format the string such that the email is left-aligned
                 # with padding to the maximum length
                 formatted_string = f"                           PRE {email:<{max_email_length}} ({user_id}/)"  # noqa E501
-                print(formatted_string)
+                sys.stdout.write(formatted_string)
 
         except subprocess.CalledProcessError as err:
             sys.stderr.write(f"Error listing users: {err}\n")
@@ -421,7 +424,10 @@ def request_is_from_explorer() -> bool:
     return False
 
 
-def get_organization_users():
+def get_organization_users() -> List[dict]:
+    """
+    ping organization-users endpoint and return results list
+    """
     # Fetch the API key from environment variables
     gencove_api_key = os.getenv("GENCOVE_API_KEY")
     gencove_host = os.getenv("GENCOVE_HOST")
@@ -443,5 +449,5 @@ def get_organization_users():
     if response.status_code == 200:
         data = response.json()
         return data["results"]
-    else:
-        print(f"Request failed with status code {response.status_code}")
+    print(f"Request failed with status code {response.status_code}")
+    return None

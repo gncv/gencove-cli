@@ -60,6 +60,15 @@ class ApiEndpoints(Enum):
 
 
 @unique
+class HiddenStatus(Enum):
+    """HiddenStatus enum"""
+
+    VISIBLE = "visible"
+    HIDDEN = "hidden"
+    ALL = "all"
+
+
+@unique
 class SampleAssignmentStatus(Enum):
     """SampleAssignmentStatus enum"""
 

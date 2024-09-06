@@ -4,6 +4,7 @@ import backoff
 # pylint: disable=wrong-import-order
 from gencove.client import APIClientError, APIClientTimeout  # noqa: I100
 from gencove.command.base import Command
+from gencove.constants import HiddenStatus
 
 from .utils import get_line
 
@@ -18,6 +19,7 @@ class ListSamples(Command):
         self.sample_archive_status = options.archive_status
         self.search_term = options.search
         self.include_run = options.include_run
+        self.include_hidden = options.include_hidden
 
     def initialize(self):
         """Initialize list subcommand."""
@@ -69,10 +71,14 @@ class ListSamples(Command):
     )
     def get_samples(self, next_link=None):
         """Get sample sheet page."""
+        hidden_status = HiddenStatus.VISIBLE.value
+        if self.include_hidden:
+            hidden_status = HiddenStatus.ALL.value
         return self.api_client.get_project_samples(
             project_id=self.project_id,
             next_link=next_link,
             search=self.search_term,
             sample_status=self.sample_status,
             sample_archive_status=self.sample_archive_status,
+            hidden_status=hidden_status,
         )

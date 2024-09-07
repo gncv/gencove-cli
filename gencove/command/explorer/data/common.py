@@ -238,7 +238,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         env = os.environ.copy()
         env.update(self.aws_env)
         try:
-            user_ids = []
+            sorted_dict = []
             result = subprocess.run(  # nosec B603 (execution of untrusted input)
                 command,
                 stdin=sys.stdin,
@@ -249,29 +249,27 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
                 text=True,
             )
 
-            # populate user_ids
-            for line in result.stdout.splitlines():
-                user_ids.append(line.decode("utf-8").split("PRE ")[1].split("/")[0])
-            sorted_dict = []
+            # ping organization-users endpoint
             uids = get_organization_users()
 
-            for uid in user_ids:
-                dict_match = next((item for item in uids if item["id"] == uid), None)
-                if dict_match is None:
-                    print(f"user_id: {uid} not a member of this organization.")
-                    continue
-                sorted_dict.append(
-                    {"id": dict_match["id"], "email": dict_match["email"]}
-                )  # noqa E501
-            # Find the maximum length of email in the list
+            # iterate across s3_uids returned by s3api
+            for line in result.stdout.splitlines():
+                s3_uid = line.split("PRE ")[1].split("/")[0]
+                # translate user_id to email
+                email = uid2email(s3_uid, uids)
+                if email is None:
+                    print(f"user_id: {s3_uid} not a member of this organization.")
+                else:
+                    sorted_dict.append({"id": s3_uid, "email": email})  # noqa E501
+
+            # maximum email length in set
             max_email_length = max(len(item["email"]) for item in sorted_dict)
 
-            # Format and print the output with proper alignment
             for item in sorted_dict:
                 email = item["email"]
                 user_id = item["id"]
-                # Format the string such that the email is left-aligned
-                # with padding to the maximum length
+                # Format the string such that the email is
+                # left-aligned with padding to the maximum length
                 formatted_string = f"                           PRE {email:<{max_email_length}} ({user_id}/)"  # noqa E501
                 sys.stdout.write(formatted_string)
 
@@ -426,14 +424,16 @@ def request_is_from_explorer() -> bool:
 
 def get_organization_users() -> List[dict]:
     """
-    ping organization-users endpoint and return results list
+    ping organization-users endpoint and return results List[dict]
     """
-    # Fetch the API key from environment variables
     gencove_api_key = os.getenv("GENCOVE_API_KEY")
     gencove_host = os.getenv("GENCOVE_HOST")
 
     if gencove_api_key is None:
         raise ValueError("GENCOVE_API_KEY environment variable is not set")
+
+    if gencove_host is None:
+        raise ValueError("GENCOVE_HOST environment variable is not set")
 
     # limit=100 because I do not want to paginate at this time
     url = f"{gencove_host}/api/v2/organization-users/?limit=100"
@@ -442,12 +442,30 @@ def get_organization_users() -> List[dict]:
         "Authorization": f"Api-Key {gencove_api_key}",
     }
 
-    # Send the GET request
     response = requests.get(url, headers=headers)
 
-    # Check the response status and print the response
     if response.status_code == 200:
         data = response.json()
         return data["results"]
     print(f"Request failed with status code {response.status_code}")
     return None
+
+
+def uid2email(uid: str, organization_users: List[dict], no_match_value=None) -> str:
+    """
+    Convert gencove user-id to corresponding email address
+
+    Args:
+        uid (str): gencove user-id (assumption: in gencove organization)
+        organization_users(List[dict]): payload from organization-users endpoint.
+        no_match_value: default None; value returned if no email matches uid.
+
+    Returns:
+        str: email corresponding to user_id, otherwise no_match_value
+    """
+    dict_match = next(
+        (item for item in organization_users if item["id"] == uid), no_match_value
+    )  # noqa E501
+    if dict_match is not no_match_value:
+        return dict_match["email"]
+    return no_match_value

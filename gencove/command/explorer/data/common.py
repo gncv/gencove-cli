@@ -1,5 +1,6 @@
 """Common code shared across data commands is stored here"""
 import os
+import re
 import subprocess  # nosec B404 (bandit subprocess import)
 import sys
 import uuid
@@ -222,9 +223,14 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
                     try:
                         uuid.UUID(user_id)
                     except ValueError:
-                        raise ValueError(  # pylint: disable=raise-missing-from
-                            f"User id '{user_id}' is not a valid UUID (or '{self.ME}')"
-                        )
+                        # check to see if the user supplied email instead of user_id
+                        if is_valid_email(user_id):
+                            org_users = get_organization_users()
+                            user_id = email2uid(user_id, org_users)
+                        else:
+                            raise ValueError(  # pylint: disable=raise-missing-from
+                                f"User id '{user_id}' is not a valid UUID, email, nor '{self.ME}'"  # noqa E501
+                            )
                     prefix_s3 = self.users_s3_prefix + f"/{user_id}/{self.USER_DIR}"
                 path_remainder = "/".join(path_noprefix_split[2:])
             path = f"{prefix_s3}/{path_remainder}"
@@ -469,3 +475,33 @@ def uid2email(uid: str, organization_users: List[dict], no_match_value=None) -> 
     if dict_match is not no_match_value:
         return dict_match["email"]
     return no_match_value
+
+
+def email2uid(email: str, organization_users: List[dict], no_match_value=None) -> str:
+    """
+    Convert gencove user_id to corresponding email address
+
+    Args:
+        email (str): gencove email (assumption: in gencove organization)
+        organization_users(List[dict]): payload from organization-users endpoint.
+        no_match_value: default None; value returned if no user_id matches email.
+
+    Returns:
+        str: user_id corresponding to email, otherwise no_match_value
+    """
+    dict_match = next(
+        (item for item in organization_users if item["email"] == email), no_match_value
+    )  # noqa E501
+    if dict_match is not no_match_value:
+        return dict_match["id"]
+    return no_match_value
+
+
+def is_valid_email(input_string) -> bool:
+    """
+    Base check for whether an input string is an email address
+
+    returns: True if input string looks like an email, otherwise False
+    """
+    pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+    return bool(re.match(pattern, input_string))

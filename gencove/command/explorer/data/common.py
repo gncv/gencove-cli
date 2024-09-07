@@ -276,7 +276,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
                 user_id = item["id"]
                 # Format the string such that the email is
                 # left-aligned with padding to the maximum length
-                formatted_string = f"                           PRE {email:<{max_email_length}} ({user_id}/)"  # noqa E501
+                formatted_string = f"                           PRE {email:<{max_email_length}} ({user_id}/)\n"  # noqa E501
                 sys.stdout.write(formatted_string)
 
         except subprocess.CalledProcessError as err:

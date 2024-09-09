@@ -6,14 +6,21 @@ import sys
 import uuid
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
+from urllib.parse import urljoin
+
+import boto3
+
+import requests
+from requests import RequestException
+from requests.adapters import HTTPAdapter
+
+from urllib3 import Retry
 
 # pylint: disable=wrong-import-order
-from gencove.exceptions import ValidationError
+from gencove.exceptions import ValidationError  # noqa I100
 from gencove.models import ExplorerDataCredentials, OrganizationDetails, UserDetails
 
-import boto3  # noqa: I100
-
-import requests  # noqa: I100
+# Ensure there are two blank lines before any class or function definition
 
 
 @dataclass
@@ -428,9 +435,41 @@ def request_is_from_explorer() -> bool:
     return False
 
 
-def get_organization_users() -> List[dict]:
+# def get_organization_users() -> List[dict]:
+#     """
+#     ping organization-users endpoint and return results List[dict]
+#     """
+#     gencove_api_key = os.getenv("GENCOVE_API_KEY")
+#     gencove_host = os.getenv("GENCOVE_HOST")
+
+#     if gencove_api_key is None:
+#         raise ValueError("GENCOVE_API_KEY environment variable is not set")
+
+#     if gencove_host is None:
+#         raise ValueError("GENCOVE_HOST environment variable is not set")
+
+#     # limit=100 because I do not want to paginate at this time
+#     url = f"{gencove_host}/api/v2/organization-users/?limit=100"
+#     headers = {
+#         "accept": "application/json",
+#         "Authorization": f"Api-Key {gencove_api_key}",
+#     }
+
+#     response = requests.get(url, headers=headers)
+
+#     if response.status_code == 200:
+#         data = response.json()
+#         return data["results"]
+#     print(f"Request failed with status code {response.status_code}")
+#     return None
+
+
+def get_organization_users() -> str:
     """
-    ping organization-users endpoint and return results List[dict]
+    Retrieves organization user information from Gencove API
+
+    Returns:
+        List[dict]
     """
     gencove_api_key = os.getenv("GENCOVE_API_KEY")
     gencove_host = os.getenv("GENCOVE_HOST")
@@ -438,23 +477,37 @@ def get_organization_users() -> List[dict]:
     if gencove_api_key is None:
         raise ValueError("GENCOVE_API_KEY environment variable is not set")
 
-    if gencove_host is None:
-        raise ValueError("GENCOVE_HOST environment variable is not set")
-
-    # limit=100 because I do not want to paginate at this time
-    url = f"{gencove_host}/api/v2/organization-users/?limit=100"
     headers = {
         "accept": "application/json",
         "Authorization": f"Api-Key {gencove_api_key}",
     }
 
-    response = requests.get(url, headers=headers)
+    if gencove_host is None:
+        raise ValueError("GENCOVE_HOST environment variable is not set")
 
-    if response.status_code == 200:
-        data = response.json()
-        return data["results"]
-    print(f"Request failed with status code {response.status_code}")
-    return None
+    # limit=100 because I do not want to paginate at this time
+    user_endpoint = urljoin(gencove_host, "/api/v2/organization-users/?limit=100")
+
+    retry_strategy = Retry(
+        total=3,
+        backoff_factor=1,
+        status_forcelist=[204, 429, 500, 502, 503, 504],
+        method_whitelist=["GET"],
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    http = requests.Session()
+    http.mount("https://", adapter)
+
+    try:
+        resp = http.get(url=user_endpoint, headers=headers)
+        resp.raise_for_status()
+        payload = resp.json()["results"]
+    except RequestException:
+        raise RuntimeError(
+            f"Max retries reached: Empty response from '{user_endpoint}'"
+        ) from None
+
+    return payload
 
 
 def uid2email(uid: str, organization_users: List[dict], no_match_value=None) -> str:

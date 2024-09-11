@@ -61,15 +61,23 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v4
         with:
           name: gencove-Linux
-      - uses: actions/download-artifact@v4
+          path: gencove-Linux
+
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v4
         with:
           name: gencove-macOS
-      - uses: actions/download-artifact@v4
+          path: gencove-macOS
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
         with:
           name: gencove-Windows
+          path: gencove-Windows
 
       - name: Create Release
         id: create_release

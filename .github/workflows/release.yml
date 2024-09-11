@@ -4,7 +4,7 @@ on:
   push:
     tags:
       - "*.*.*"
-      - "hotfix/*"
+      - "hotfix/*"  # TODO: remove
 
 jobs:
   build:

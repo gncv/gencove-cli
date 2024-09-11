@@ -2,9 +2,8 @@ name: Release Gencove CLI
 
 on:
   push:
-    tags:
-      - "*.*.*"
-      - "hotfix/*"  # TODO: remove
+    branches:
+      - "hotfix/*"  # TODO: revert to tags: "*.*.*" after testing
 
 jobs:
   build:

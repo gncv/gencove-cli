@@ -1237,10 +1237,15 @@ class APIClient:
             endpoint, payload, authorized=True, model=ExplorerShellSessionCredentials
         )
 
-    def get_explorer_access_url(self, instance_id) -> ExplorerAccessURL:
+    def get_explorer_access_url(
+        self, instance_id: str, access_token_expiration: int
+    ) -> ExplorerAccessURL:
         """Making a request to obtain explorer access URL"""
         endpoint = self.endpoints.EXPLORER_ACCESS_URL.value
 
-        payload = {"id": instance_id}
+        payload = {
+            "id": instance_id,
+            "access_token_expiration": access_token_expiration,
+        }
 
         return self._post(endpoint, payload, authorized=True, model=ExplorerAccessURL)

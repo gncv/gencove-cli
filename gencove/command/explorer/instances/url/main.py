@@ -42,5 +42,6 @@ class GetInstanceURL(Command):
             access_token_expiration=self.expiration_seconds,
         )
         self.echo_info(
-            f"Explorer access URL (valid for {self.expiration_seconds} seconds):\n{url.url}"
+            f"Explorer access URL "
+            f"(valid for {self.expiration_seconds} seconds):\n{url.url}"
         )

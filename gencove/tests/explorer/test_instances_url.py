@@ -181,13 +181,12 @@ def test_instances_url_with_invalid_expiration(mocker, credentials, recording, v
     if not recording:
         # Mock url only if using the cassettes, since we mock the
         # return value.
-        get_vcr_response("/api/v2/explorer-access-url/", vcr)
+        access_url_response = get_vcr_response("/api/v2/explorer-access-url/", vcr)
         mocked_instances_url = mocker.patch.object(
             APIClient,
             "get_explorer_access_url",
-            return_value=ExplorerAccessURL(
-                url="https://mock-url.com/gncv-explorer/signin?access_token=123",
-                access_token_expiration=1000000,
+            side_effect=APIClientError(
+                message=access_url_response["access_token_expiration"], status_code=400
             ),
         )
 

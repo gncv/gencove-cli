@@ -471,6 +471,7 @@ class ExplorerAccessURL(BaseModel):
     """ExplorerAccessURL model"""
 
     url: str
+    access_token_expiration: Optional[int]
 
 
 class OrganizationDetails(GencoveBaseModel):

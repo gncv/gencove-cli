@@ -1,0 +1,158 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.20.1
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '582'
+      Content-Security-Policy:
+      - style-src 'self' 'unsafe-inline'; img-src 'self' data:; default-src 'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Tue, 17 Sep 2024 15:23:18 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.20.1
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/explorer-instances/
+  response:
+    body:
+      string: '{"meta": {"count": 1, "next": null, "previous": null}, "results": [{"id":
+        "11111111-1111-1111-1111-111111111111", "status": "running", "stop_after_inactivity_hours":
+        null}]}'
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '160'
+      Content-Security-Policy:
+      - img-src 'self' data:; default-src 'self'; style-src 'self' 'unsafe-inline'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Tue, 17 Sep 2024 15:23:19 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"id": "11111111-1111-1111-1111-111111111111", "access_token_expiration":
+      3600}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.20.1
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/explorer-access-url/
+  response:
+    body:
+      string: '{"url": "https://mock-url.com/gncv-explorer/signin?access_token=123"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1825'
+      Content-Security-Policy:
+      - style-src 'self' 'unsafe-inline'; img-src 'self' data:; default-src 'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Tue, 17 Sep 2024 15:23:19 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 202
+      message: Accepted
+version: 1

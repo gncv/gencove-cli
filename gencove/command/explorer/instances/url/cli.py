@@ -11,7 +11,8 @@ from .main import GetInstanceURL
 @click.option(
     "--expiration-hours",
     default=24,
-    help="Number of hours before the URL expires. Maximum is 24h. Default is 24h.",
+    help="Number of hours before the URL expires. Maximum is 24h. ",
+    show_default=True,
 )
 @add_options(common_options)
 def url(  # pylint: disable=too-many-arguments

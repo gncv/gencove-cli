@@ -7,9 +7,9 @@ from .....exceptions import ValidationError
 class GetInstanceURL(Command):
     """Get explorer instance URL command executor."""
 
-    def __init__(self, expiration_hours, credentials, options):
+    def __init__(self, expiration_seconds, credentials, options):
         super().__init__(credentials, options)
-        self.expiration_hours = expiration_hours
+        self.expiration_seconds = expiration_seconds
 
     def validate(self):
         """Validate get URL"""
@@ -39,6 +39,8 @@ class GetInstanceURL(Command):
         self.echo_info("Request to generate explorer access URL accepted.")
         url = self.api_client.get_explorer_access_url(
             instance_id=instance_id,
-            access_token_expiration=(self.expiration_hours * 60 * 60),  # seconds
+            access_token_expiration=self.expiration_seconds,
         )
-        self.echo_info(f"Explorer access URL (valid for 5 minutes): {url.url}")
+        self.echo_info(
+            f"Explorer access URL (valid for {self.expiration_seconds} seconds):\n{url.url}"
+        )

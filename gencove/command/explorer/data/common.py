@@ -271,9 +271,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
                 s3_uid = line.split("PRE ")[1].split("/")[0]
                 # translate user_id to email
                 email = uid2email(s3_uid, uids)
-                if email is None:
-                    print(f"user_id: {s3_uid} not a member of this organization.")
-                else:
+                if email is not None:
                     sorted_dict.append({"id": s3_uid, "email": email})  # noqa E501
 
             # maximum email length in set

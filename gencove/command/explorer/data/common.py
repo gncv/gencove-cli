@@ -435,35 +435,6 @@ def request_is_from_explorer() -> bool:
     return False
 
 
-# def get_organization_users() -> List[dict]:
-#     """
-#     ping organization-users endpoint and return results List[dict]
-#     """
-#     gencove_api_key = os.getenv("GENCOVE_API_KEY")
-#     gencove_host = os.getenv("GENCOVE_HOST")
-
-#     if gencove_api_key is None:
-#         raise ValueError("GENCOVE_API_KEY environment variable is not set")
-
-#     if gencove_host is None:
-#         raise ValueError("GENCOVE_HOST environment variable is not set")
-
-#     # limit=100 because I do not want to paginate at this time
-#     url = f"{gencove_host}/api/v2/organization-users/?limit=100"
-#     headers = {
-#         "accept": "application/json",
-#         "Authorization": f"Api-Key {gencove_api_key}",
-#     }
-
-#     response = requests.get(url, headers=headers)
-
-#     if response.status_code == 200:
-#         data = response.json()
-#         return data["results"]
-#     print(f"Request failed with status code {response.status_code}")
-#     return None
-
-
 def get_organization_users() -> str:
     """
     Retrieves organization user information from Gencove API
@@ -492,7 +463,7 @@ def get_organization_users() -> str:
         total=3,
         backoff_factor=1,
         status_forcelist=[204, 429, 500, 502, 503, 504],
-        method_whitelist=["GET"],
+        allowed_methods=["GET"],
     )
     adapter = HTTPAdapter(max_retries=retry_strategy)
     http = requests.Session()

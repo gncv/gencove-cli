@@ -118,6 +118,32 @@ def test_instances_url(mocker, credentials, recording, vcr):
 
 
 @pytest.mark.vcr
+@assert_authorization
+def test_instances_url_with_expiration(mocker, credentials, recording, vcr):
+    """Test instances url with custom expiration."""
+    runner = CliRunner()
+    if not recording:
+        # Mock url only if using the cassettes, since we mock the
+        # return value.
+        get_vcr_response("/api/v2/explorer-access-url/", vcr)
+        mocked_instances_url = mocker.patch.object(
+            APIClient,
+            "get_explorer_access_url",
+            return_value=ExplorerAccessURL(
+                url="https://mock-url.com/gncv-explorer/signin?access_token=123",
+                access_token_expiration=3600,
+            ),
+        )
+
+    # Add expiration seconds parameter
+    res = runner.invoke(url, credentials + ["--expiration-seconds", 3600])
+    assert b"Request to generate explorer access URL accepted." in res.output.encode()
+    assert res.exit_code == 0
+    if not recording:
+        mocked_instances_url.assert_called_once()
+
+
+@pytest.mark.vcr
 @pytest.mark.default_cassette("jwt-create.yaml")
 @assert_authorization
 def test_instances_url_update_cli(mocker, credentials):
@@ -145,3 +171,29 @@ def test_instances_url_update_cli(mocker, credentials):
     )
     assert res.exit_code == 1
     mocked_get_instances.assert_called_once()
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_instances_url_with_invalid_expiration(mocker, credentials, recording, vcr):
+    """Test instances url with invalid expiration."""
+    runner = CliRunner()
+    if not recording:
+        # Mock url only if using the cassettes, since we mock the
+        # return value.
+        access_url_response = get_vcr_response("/api/v2/explorer-access-url/", vcr)
+        mocked_instances_url = mocker.patch.object(
+            APIClient,
+            "get_explorer_access_url",
+            side_effect=APIClientError(
+                message=access_url_response["access_token_expiration"], status_code=400
+            ),
+        )
+
+    # Add invalid expiration seconds parameter
+    res = runner.invoke(url, credentials + ["--expiration-seconds", 1000000])
+    assert b"Request to generate explorer access URL accepted." in res.output.encode()
+    assert res.exit_code == 1
+    assert "Ensure this value is less than" in res.output
+    if not recording:
+        mocked_instances_url.assert_called_once()

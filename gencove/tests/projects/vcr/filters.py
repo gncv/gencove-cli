@@ -6,6 +6,7 @@ from gencove.tests.decorators import parse_response_to_json
 from gencove.tests.filters import (
     _clean_query_params_from_filename,
     _replace_uuid_from_url,
+    _replace_uuid_from_url_and_body,
 )
 from gencove.tests.utils import MOCK_UUID
 
@@ -91,44 +92,45 @@ def filter_get_project_batch_types_request(request):
 
 def filter_post_project_restore_samples(request):
     """Filter project restore samples sensitive data from request."""
-    if "project-restore-samples" in request.path:
-        request = _replace_uuid_from_url(request, "project-restore-samples")
-        try:
-            body = json.loads(request.body)
-            samples = [MOCK_UUID for _ in body["sample_ids"]]
-            body["sample_ids"] = samples
-            request.body = json.dumps(body).encode()
-        except json.decoder.JSONDecodeError:
-            pass
-    return request
+    return _replace_uuid_from_url_and_body(
+        request, "project-restore-samples", "sample_ids"
+    )
 
 
 def filter_project_delete_samples(request):
     """Filter sensitive data from project-delete-samples request."""
-    if "project-delete-samples" in request.path:
-        request = _replace_uuid_from_url(request, "project-delete-samples")
-        try:
-            body = json.loads(request.body)
-            samples = [MOCK_UUID for _ in body["sample_ids"]]
-            body["sample_ids"] = samples
-            request.body = json.dumps(body).encode()
-        except json.decoder.JSONDecodeError:
-            pass
-    return request
+    return _replace_uuid_from_url_and_body(
+        request, "project-delete-samples", "sample_ids"
+    )
 
 
 def filter_projects_delete(request):
     """Filter sensitive data from projects-delete request."""
-    if "projects-delete" in request.path:
-        request = _replace_uuid_from_url(request, "projects-delete")
-        try:
-            body = json.loads(request.body)
-            projects = [MOCK_UUID for _ in body["project_ids"]]
-            body["project_ids"] = projects
-            request.body = json.dumps(body).encode()
-        except json.decoder.JSONDecodeError:
-            pass
-    return request
+    return _replace_uuid_from_url_and_body(request, "project-delete", "project_ids")
+
+
+def filter_project_hide_samples(request):
+    """Filter sensitive data from project-hide-samples request."""
+    return _replace_uuid_from_url_and_body(
+        request, "project-hide-samples", "sample_ids"
+    )
+
+
+def filter_project_unhide_samples(request):
+    """Filter sensitive data from project-unhide-samples request."""
+    return _replace_uuid_from_url_and_body(
+        request, "project-unhide-samples", "sample_ids"
+    )
+
+
+def filter_projects_hide(request):
+    """Filter sensitive data from projects-hide request."""
+    return _replace_uuid_from_url_and_body(request, "projects-hide", "project_ids")
+
+
+def filter_projects_unhide(request):
+    """Filter sensitive data from projects-unhide request."""
+    return _replace_uuid_from_url_and_body(request, "projects-unhide", "project_ids")
 
 
 def filter_projects_detail_request(request):

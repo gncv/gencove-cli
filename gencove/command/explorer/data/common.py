@@ -478,7 +478,7 @@ def get_organization_users() -> str:
             resp.raise_for_status()
             data = resp.json()
             all_users.extend(data["results"])
-            next_url = data.get("next")
+            next_url = data["meta"].get("next")
 
     except RequestException:
         raise RuntimeError(

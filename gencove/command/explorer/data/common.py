@@ -458,8 +458,7 @@ def get_organization_users() -> str:
     if gencove_host is None:
         raise ValueError("GENCOVE_HOST environment variable is not set")
 
-    # limit=100 because I do not want to paginate at this time
-    user_endpoint = urljoin(gencove_host, "/api/v2/organization-users/?limit=100")
+    user_endpoint = urljoin(gencove_host, "/api/v2/organization-users/")
 
     retry_strategy = Retry(
         total=3,
@@ -470,17 +469,23 @@ def get_organization_users() -> str:
     adapter = HTTPAdapter(max_retries=retry_strategy)
     http = requests.Session()
     http.mount("https://", adapter)
+    all_users = []
+    next_url = user_endpoint
 
     try:
-        resp = http.get(url=user_endpoint, headers=headers)
-        resp.raise_for_status()
-        payload = resp.json()["results"]
+        while next_url:
+            resp = http.get(url=next_url, headers=headers)
+            resp.raise_for_status()
+            data = resp.json()
+            all_users.extend(data["results"])
+            next_url = data.get("next")
+
     except RequestException:
         raise RuntimeError(
-            f"Max retries reached: Empty response from '{user_endpoint}'"
+            f"Max retries reached: Error fetching data from '{next_url}'"
         ) from None
 
-    return payload
+    return all_users
 
 
 def uid2email(uid: str, organization_users: List[dict], no_match_value=None) -> str:

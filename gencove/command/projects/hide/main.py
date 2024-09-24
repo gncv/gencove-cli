@@ -43,12 +43,13 @@ class Hide(Command):
         except client.APIClientError as err:
             self.echo_debug(err)
             if err.status_code == 400:
-                self.echo_warning("There was an error requesting hide projects.")
+                self.echo_warning("There was an error with the hide projects request.")
                 self.echo_info("The following error was returned:")
                 self.echo_info(err.message)
             elif err.status_code == 404:
                 self.echo_warning(
-                    f"Some of the projects {self.project_ids} do not exist."
+                    f"Some of the projects in the provided list {self.project_ids} "
+                    f"do not exist."
                 )
             else:
                 raise

@@ -47,6 +47,8 @@ def filter_pipeline_capabilities_response(response, json_response):
         json_response["id"] = MOCK_UUID
     if "name" in json_response:
         json_response["name"] = "mock name"
+    if "description_markdown" in json_response:
+        json_response["description_markdown"] = "mock description_markdown"
     return response, json_response
 
 

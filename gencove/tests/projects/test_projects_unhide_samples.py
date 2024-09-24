@@ -27,7 +27,7 @@ from vcr import VCR
 def vcr_config():
     """VCR configuration."""
     return {
-        "cassette_library_dir": "gencove/tests/projects/vcr/hide-unhide",
+        "cassette_library_dir": "gencove/tests/projects/vcr/hide_unhide",
         "filter_headers": [
             "Authorization",
             "Content-Length",

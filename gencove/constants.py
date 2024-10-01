@@ -47,6 +47,7 @@ class ApiEndpoints(Enum):
     PIPELINE = "/api/v2/pipeline/{id}"
     ORGANIZATION_MONTHLY_USAGE_REPORT = "/api/v2/organization-monthly-usage-report/"
     ORGANIZATION_DETAILS = "/api/v2/organization/"
+    ORGANIZATION_USERS = "/api/v2/organization-users/"
     EXPLORER_INSTANCES = "/api/v2/explorer-instances/"
     EXPLORER_INSTANCES_STOP = "/api/v2/explorer-stop-instances/"
     EXPLORER_INSTANCES_START = "/api/v2/explorer-start-instances/"

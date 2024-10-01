@@ -19,6 +19,7 @@ from urllib3 import Retry
 # pylint: disable=wrong-import-order
 from gencove.exceptions import ValidationError  # noqa I100
 from gencove.models import ExplorerDataCredentials, OrganizationDetails, UserDetails
+from gencove.client import APIClient
 
 # Ensure there are two blank lines before any class or function definition
 
@@ -263,8 +264,9 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
                 text=True,
             )
 
+            client = APIClient()
             # ping organization-users endpoint
-            uids = get_organization_users()
+            uids = client.get_organization_users()
 
             # iterate across s3_uids returned by s3api
             for line in result.stdout.splitlines():

@@ -1249,3 +1249,11 @@ class APIClient:
         }
 
         return self._post(endpoint, payload, authorized=True, model=ExplorerAccessURL)
+
+    def get_organization_users(self) -> List[dict]:
+        """Making a request for organization user information"""
+        return self._get(
+            self.endpoints.ORGANIZATION_USERS.value,
+            authorized=True,
+            model=OrganizationUsers,
+        )

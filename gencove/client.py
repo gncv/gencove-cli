@@ -11,6 +11,7 @@ import time
 from builtins import str as text  # noqa
 from urllib.parse import parse_qs, urljoin, urlparse
 from uuid import UUID
+from typing import List
 
 from pydantic import BaseModel
 from requests import ConnectTimeout, ReadTimeout, delete, get, post  # noqa: I201

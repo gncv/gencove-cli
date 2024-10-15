@@ -81,6 +81,18 @@ def project_id_import():
 
 
 @pytest.fixture(scope="session")
+def project_id_hide_unhide():
+    """Returns the project id to hide and unhide."""
+    return os.getenv("GENCOVE_PROJECT_ID_HIDE_TEST")
+
+
+@pytest.fixture(scope="session")
+def sample_id_hide_unhide():
+    """Returns the sample id to hide and unhide."""
+    return os.getenv("GENCOVE_SAMPLE_ID_HIDE_TEST")
+
+
+@pytest.fixture(scope="session")
 def credentials(using_api_key):  # pylint: disable=redefined-outer-name
     """Fixture to have the appropriate credentials."""
     api_key = os.getenv("GENCOVE_API_KEY_TEST")

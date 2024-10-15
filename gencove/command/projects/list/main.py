@@ -4,6 +4,7 @@ import backoff
 # pylint: disable=wrong-import-order
 from gencove.client import APIClientError, APIClientTimeout  # noqa: I100
 from gencove.command.base import Command
+from gencove.constants import HiddenStatus
 from gencove.models import Project
 
 from .utils import get_line
@@ -12,8 +13,9 @@ from .utils import get_line
 class List(Command):
     """List projects command executor."""
 
-    def __init__(self, include_capability, credentials, options):
+    def __init__(self, include_hidden, include_capability, credentials, options):
         super().__init__(credentials, options)
+        self.include_hidden = include_hidden
         self.include_capability = include_capability
 
     def initialize(self):
@@ -69,7 +71,10 @@ class List(Command):
     )
     def get_projects(self, next_link=None):
         """Get projects page."""
-        return self.api_client.list_projects(next_link)
+        hidden_status = HiddenStatus.VISIBLE.value
+        if self.include_hidden:
+            hidden_status = HiddenStatus.ALL.value
+        return self.api_client.list_projects(next_link, hidden_status=hidden_status)
 
     @backoff.on_exception(
         backoff.expo,

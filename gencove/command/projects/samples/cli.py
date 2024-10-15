@@ -34,6 +34,12 @@ from .main import ListSamples
     help="Include run id",
     default=False,
 )
+@click.option(
+    "--hidden",
+    "include_hidden",
+    help="Include hidden projects",
+    is_flag=True,
+)
 @add_options(common_options)
 def list_project_samples(  # pylint: disable=E0012,C0330,R0913
     project_id,
@@ -41,6 +47,7 @@ def list_project_samples(  # pylint: disable=E0012,C0330,R0913
     status,
     archive_status,
     include_run,
+    include_hidden,
     host,
     email,
     password,
@@ -59,5 +66,6 @@ def list_project_samples(  # pylint: disable=E0012,C0330,R0913
             archive_status=archive_status,
             search=search,
             include_run=include_run,
+            include_hidden=include_hidden,
         ),
     ).run()

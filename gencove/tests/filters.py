@@ -1,5 +1,6 @@
 """General filters for VCR cassettes."""
 import copy
+import json
 import re
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
@@ -39,6 +40,20 @@ def _replace_uuid_from_url(request, endpoint):
     request = copy.deepcopy(request)
     if endpoint in request.path:
         request.uri = uuid_regex().sub(MOCK_UUID, request.uri)
+    return request
+
+
+def _replace_uuid_from_url_and_body(request, endpoint, param_name):
+    """Removes the id from the last part of the URL and body param."""
+    if endpoint in request.path:
+        request = _replace_uuid_from_url(request, endpoint)
+        try:
+            body = json.loads(request.body)
+            param_objects = [MOCK_UUID for _ in body[param_name]]
+            body[param_name] = param_objects
+            request.body = json.dumps(body).encode()
+        except json.decoder.JSONDecodeError:
+            pass
     return request
 
 

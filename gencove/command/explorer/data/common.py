@@ -1,16 +1,26 @@
 """Common code shared across data commands is stored here"""
 import os
+import re
 import subprocess  # nosec B404 (bandit subprocess import)
 import sys
 import uuid
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
+from urllib.parse import urljoin
+
+import boto3
+
+import requests
+from requests import RequestException
+from requests.adapters import HTTPAdapter
+
+from urllib3 import Retry
 
 # pylint: disable=wrong-import-order
-from gencove.exceptions import ValidationError
+from gencove.exceptions import ValidationError  # noqa I100
 from gencove.models import ExplorerDataCredentials, OrganizationDetails, UserDetails
 
-import boto3  # noqa: I100
+# Ensure there are two blank lines before any class or function definition
 
 
 @dataclass
@@ -192,6 +202,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         e://org/...
         e://users/<user-id>/...
         e://users/me/...
+        e://users/<user-email>/...
 
         Args:
             path (Optional[str]): Path to convert
@@ -220,14 +231,20 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
                     try:
                         uuid.UUID(user_id)
                     except ValueError:
-                        raise ValueError(  # pylint: disable=raise-missing-from
-                            f"User id '{user_id}' is not a valid UUID (or '{self.ME}')"
-                        )
+                        # check to see if the user supplied email instead of user_id
+                        if is_valid_email(user_id):
+                            org_users = get_organization_users()
+                            user_id = email2uid(user_id, org_users)
+                        else:
+                            raise ValueError(  # pylint: disable=raise-missing-from
+                                f"User id '{user_id}' is not a valid UUID, email, nor '{self.ME}'"  # noqa E501
+                            )
                     prefix_s3 = self.users_s3_prefix + f"/{user_id}/{self.USER_DIR}"
                 path_remainder = "/".join(path_noprefix_split[2:])
             path = f"{prefix_s3}/{path_remainder}"
         return path
 
+    # pylint: disable=too-many-locals
     def list_users(self):
         """List e:// user dir"""
         user_prefix = f"{self.S3_PROTOCOL}{self.bucket_name}/{self.USERS_DIR}/"
@@ -235,14 +252,42 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         env = os.environ.copy()
         env.update(self.aws_env)
         try:
-            subprocess.run(  # nosec B603 (execution of untrusted input)
+            sorted_dict = []
+            result = subprocess.run(  # nosec B603 (execution of untrusted input)
                 command,
                 stdin=sys.stdin,
-                stdout=sys.stdout,
+                stdout=subprocess.PIPE,
                 stderr=sys.stderr,
                 env=env,
                 check=True,
+                text=True,
             )
+
+            # ping organization-users endpoint
+            uids = get_organization_users()
+
+            # iterate across s3_uids returned by s3api
+            for line in result.stdout.splitlines():
+                s3_uid = line.split("PRE ")[1].split("/")[0]
+                # translate user_id to email
+                email = uid2email(s3_uid, uids)
+                if email is not None:
+                    sorted_dict.append({"id": s3_uid, "email": email})  # noqa E501
+
+            # maximum email length in set
+            max_email_length = max(len(item["email"]) for item in sorted_dict)
+
+            for item in sorted_dict:
+                email = item["email"]
+                user_id = item["id"]
+                # Format the string such that the email is
+                # left-aligned with padding to the maximum length
+                spacing = " " * 27
+                formatted_string = (
+                    f"{spacing}PRE {email:<{max_email_length}} ({user_id}/)\n"
+                )
+                sys.stdout.write(formatted_string)
+
         except subprocess.CalledProcessError as err:
             sys.stderr.write(f"Error listing users: {err}\n")
             sys.exit(err.returncode)
@@ -390,3 +435,104 @@ def request_is_from_explorer() -> bool:
     except Exception:  # noqa pylint: disable=broad-except
         return False
     return False
+
+
+def get_organization_users() -> str:
+    """
+    Retrieves organization user information from Gencove API
+
+    Returns:
+        List[dict]
+    """
+    gencove_api_key = os.getenv("GENCOVE_API_KEY")
+    gencove_host = os.getenv("GENCOVE_HOST")
+
+    if gencove_api_key is None:
+        raise ValueError("GENCOVE_API_KEY environment variable is not set")
+
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Api-Key {gencove_api_key}",
+    }
+
+    if gencove_host is None:
+        raise ValueError("GENCOVE_HOST environment variable is not set")
+
+    user_endpoint = urljoin(gencove_host, "/api/v2/organization-users/")
+
+    retry_strategy = Retry(
+        total=3,
+        backoff_factor=1,
+        status_forcelist=[204, 429, 500, 502, 503, 504],
+        allowed_methods=["GET"],
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    http = requests.Session()
+    http.mount("https://", adapter)
+    all_users = []
+    next_url = user_endpoint
+
+    try:
+        while next_url:
+            resp = http.get(url=next_url, headers=headers)
+            resp.raise_for_status()
+            data = resp.json()
+            all_users.extend(data["results"])
+            next_url = data["meta"].get("next")
+
+    except RequestException:
+        raise RuntimeError(
+            f"Max retries reached: Error fetching data from '{next_url}'"
+        ) from None
+
+    return all_users
+
+
+def uid2email(uid: str, organization_users: List[dict], no_match_value=None) -> str:
+    """
+    Convert gencove user-id to corresponding email address
+
+    Args:
+        uid (str): gencove user-id (assumption: in gencove organization)
+        organization_users(List[dict]): payload from organization-users endpoint.
+        no_match_value: default None; value returned if no email matches uid.
+
+    Returns:
+        str: email corresponding to user_id, otherwise no_match_value
+    """
+    dict_match = next(
+        (item for item in organization_users if item["id"] == uid), no_match_value
+    )  # noqa E501
+    if dict_match is not no_match_value:
+        return dict_match["email"]
+    return no_match_value
+
+
+def email2uid(email: str, organization_users: List[dict], no_match_value=None) -> str:
+    """
+    Convert gencove user_id to corresponding email address
+
+    Args:
+        email (str): gencove email (assumption: in gencove organization)
+        organization_users(List[dict]): payload from organization-users endpoint.
+        no_match_value: default None; value returned if no user_id matches email.
+
+    Returns:
+        str: user_id corresponding to email, otherwise no_match_value
+    """
+    dict_match = next(
+        (item for item in organization_users if item["email"] == email), no_match_value
+    )  # noqa E501
+    if dict_match is not no_match_value:
+        return dict_match["id"]
+    return no_match_value
+
+
+def is_valid_email(input_string) -> bool:
+    """
+    Base check for whether an input string is an email address
+
+    returns: True if input string looks like an email, otherwise False
+    """
+    pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+    return bool(re.match(pattern, input_string))

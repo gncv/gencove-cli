@@ -261,6 +261,53 @@ def test_list_projects(mocker, credentials, recording, vcr):
 
 @pytest.mark.vcr
 @assert_authorization
+def test_list_projects_include_hidden(mocker, credentials, recording, vcr):
+    """Test hidden projects being outputed to the shell."""
+    runner = CliRunner()
+    if not recording:
+        # Mock list_projects only if using the cassettes, since we mock the
+        # return value.
+        list_projects_response = get_vcr_response("/api/v2/projects/", vcr)
+        mocked_get_projects = mocker.patch.object(
+            APIClient,
+            "list_projects",
+            return_value=Projects(**list_projects_response),
+        )
+        get_pipeline_capabilities_response = get_vcr_response(
+            "/api/v2/pipeline-capabilities/", vcr, operator.contains
+        )
+        mocked_get_pipeline_capabilities = mocker.patch.object(
+            APIClient,
+            "get_pipeline_capabilities",
+            return_value=PipelineCapabilities(**get_pipeline_capabilities_response),
+        )
+    res = runner.invoke(list_projects, ["--hidden", *credentials])
+    assert res.exit_code == 0
+    if not recording:
+        mocked_get_projects.assert_called_once()
+        projects = list_projects_response["results"]
+        # at least one hidden project
+        assert any(project["hidden"] for project in projects)
+        assert mocked_get_pipeline_capabilities.call_count == len(projects)
+        output_line = io.BytesIO()
+        sys.stdout = output_line
+        for project in projects:
+            project = Project(**project)
+            echo(
+                "\t".join(
+                    [
+                        str(project.created),
+                        str(project.id),
+                        project.name.replace("\t", " "),
+                        get_pipeline_capabilities_response["name"],
+                    ]
+                )
+            )
+        assert output_line.getvalue() == res.output.encode()
+
+
+@pytest.mark.vcr
+@assert_authorization
 def test_list_projects_with_capabilities(mocker, credentials, recording, vcr):
     """Test projects being outputed to the shell."""
     runner = CliRunner()

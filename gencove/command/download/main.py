@@ -353,9 +353,8 @@ class Download(Command):
         if download_to_path in self.downloaded_files and self.options.skip_existing:
             self.echo_debug(f"file path: {download_to_path} already exists, skipping")
             return
-        elif (
-            download_to_path in self.downloaded_files and not self.options.skip_existing
-        ):
+
+        if download_to_path in self.downloaded_files and not self.options.skip_existing:
             raise DownloadTemplateError(
                 f"Bad template: {download_to_path} file already exists. "
                 "Update your template to avoid files containing the same name "

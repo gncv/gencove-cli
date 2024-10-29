@@ -56,6 +56,7 @@ class Download(Command):
         self.download_files = []
         self.no_progress = no_progress
         self.checksums = checksums
+        self.in_retry = False  # track whether we are in a retry
 
     def initialize(self):
         """Initialize download command."""
@@ -172,26 +173,35 @@ class Download(Command):
                 "restore before downloading."
             )
 
+    def _on_backoff(self, details):
+        """Handler called when backoff decorator triggers a retry"""
+        self.in_retry = True
+        self.echo_debug(f"Retrying after {details['tries']} attempts...")
+
     @backoff.on_exception(
         backoff.expo,
         requests.exceptions.HTTPError,
         giveup=fatal_process_sample_error,
         max_tries=10,
+        on_backoff=_on_backoff,
     )
     @backoff.on_exception(
         backoff.expo,
         client.APIClientError,
         max_tries=3,
+        on_backoff=_on_backoff,
     )
     @backoff.on_exception(
         backoff.expo,
         client.APIClientTooManyRequestsError,
         max_tries=20,
+        on_backoff=_on_backoff,
     )
     @backoff.on_exception(
         backoff.expo,
         client.APIClientTimeout,
         max_tries=20,
+        on_backoff=_on_backoff,
     )
     def process_sample(self, sample_id):
         """Process sample.
@@ -317,6 +327,8 @@ class Download(Command):
                 "download_url": sample_file.download_url,
                 "checksum_sha256": sample_file.checksum_sha256,
             }
+            # Reset in_retry as we have successfully downloaded the files
+            self.in_retry = False
 
     def create_checksum_file(self, file_path, checksum_sha256):
         """Create checksum file.
@@ -350,11 +362,15 @@ class Download(Command):
             DownloadTemplateError: if the file was found in already downloaded
              list
         """
-        if download_to_path in self.downloaded_files and self.options.skip_existing:
-            self.echo_debug(f"file path: {download_to_path} already exists, skipping")
+
+        if download_to_path in self.downloaded_files and self.in_retry:
+            self.echo_debug(
+                f"file path: {download_to_path} already exists and code is "
+                "in in retry status, skipping"
+            )
             return
 
-        if download_to_path in self.downloaded_files and not self.options.skip_existing:
+        if download_to_path in self.downloaded_files:
             raise DownloadTemplateError(
                 f"Bad template: {download_to_path} file already exists. "
                 "Update your template to avoid files containing the same name "

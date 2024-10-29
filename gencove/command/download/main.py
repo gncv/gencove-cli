@@ -384,16 +384,14 @@ class Download(Command):
             self.download_to,
             f"{sample_id}_{QC_FILE_TYPE}.json",
         )
-        if file_path not in self.current_sample_downloads:
-            self.validate_and_download(
-                file_path,
-                save_qc_file,
-                file_path,
-                self.api_client,
-                sample_id,
-                self.options.skip_existing,
-            )
-        return file_path
+        self.validate_and_download(
+            file_path,
+            save_qc_file,
+            file_path,
+            self.api_client,
+            sample_id,
+            self.options.skip_existing,
+        )
 
     def download_sample_metadata(self, file_with_prefix, sample_id):
         """Get metadata and save to file on user file system.

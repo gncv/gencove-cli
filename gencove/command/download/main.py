@@ -178,30 +178,38 @@ class Download(Command):
         self.in_retry = True
         self.echo_debug(f"Retrying after {details['tries']} attempts...")
 
+    def _on_success(self, details):
+        """Handler called when the decorated function succeeds"""
+        self.in_retry = False
+
     @backoff.on_exception(
         backoff.expo,
         requests.exceptions.HTTPError,
         giveup=fatal_process_sample_error,
         max_tries=10,
         on_backoff=_on_backoff,
+        on_success=_on_success,
     )
     @backoff.on_exception(
         backoff.expo,
         client.APIClientError,
         max_tries=3,
         on_backoff=_on_backoff,
+        on_success=_on_success,
     )
     @backoff.on_exception(
         backoff.expo,
         client.APIClientTooManyRequestsError,
         max_tries=20,
         on_backoff=_on_backoff,
+        on_success=_on_success,
     )
     @backoff.on_exception(
         backoff.expo,
         client.APIClientTimeout,
         max_tries=20,
         on_backoff=_on_backoff,
+        on_success=_on_success,
     )
     def process_sample(self, sample_id):
         """Process sample.
@@ -327,8 +335,6 @@ class Download(Command):
                 "download_url": sample_file.download_url,
                 "checksum_sha256": sample_file.checksum_sha256,
             }
-            # Reset in_retry as we have successfully downloaded the files
-            self.in_retry = False
 
     def create_checksum_file(self, file_path, checksum_sha256):
         """Create checksum file.

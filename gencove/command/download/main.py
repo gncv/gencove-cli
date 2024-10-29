@@ -350,7 +350,12 @@ class Download(Command):
             DownloadTemplateError: if the file was found in already downloaded
              list
         """
-        if download_to_path in self.downloaded_files:
+        if download_to_path in self.downloaded_files and self.options.skip_existing:
+            self.echo_debug(f"file path: {download_to_path} already exists, skipping")
+            return
+        elif (
+            download_to_path in self.downloaded_files and not self.options.skip_existing
+        ):
             raise DownloadTemplateError(
                 f"Bad template: {download_to_path} file already exists. "
                 "Update your template to avoid files containing the same name "
@@ -379,15 +384,16 @@ class Download(Command):
             self.download_to,
             f"{sample_id}_{QC_FILE_TYPE}.json",
         )
-
-        self.validate_and_download(
-            file_path,
-            save_qc_file,
-            file_path,
-            self.api_client,
-            sample_id,
-            self.options.skip_existing,
-        )
+        if file_path not in self.current_sample_downloads:
+            self.validate_and_download(
+                file_path,
+                save_qc_file,
+                file_path,
+                self.api_client,
+                sample_id,
+                self.options.skip_existing,
+            )
+        return file_path
 
     def download_sample_metadata(self, file_with_prefix, sample_id):
         """Get metadata and save to file on user file system.

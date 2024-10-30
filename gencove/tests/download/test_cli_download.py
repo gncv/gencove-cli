@@ -1122,8 +1122,12 @@ def test_download_retry_skips_existing(
         # Capture debug messages
         debug_messages = []
         mocker.patch.object(
-            Command, "echo_debug", side_effect=lambda msg: debug_messages.append(msg)
-        )  # pylint: disable=unnecessary-lambda
+            Command,
+            "echo_debug",
+            side_effect=lambda msg: debug_messages.append(
+                msg
+            ),  # pylint: disable=unnecessary-lambda
+        )
 
         download_attempts = []
 
@@ -1132,7 +1136,9 @@ def test_download_retry_skips_existing(
             download_attempts.append(path)
             if len(download_attempts) == 1:
                 # First attempt succeeds
-                with open(path, "w", encoding="utf-8") as fp:
+                with open(
+                    path, "w", encoding="utf-8"
+                ) as fp:  # pylint: disable=invalid-name
                     fp.write("test content")
 
         mocker.patch(

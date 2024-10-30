@@ -31,7 +31,11 @@ class ApiEndpoints(Enum):
     PROJECT_MERGE_VCFS = "/api/v2/project-merge-vcfs/{id}"
     SAMPLE_METADATA = "/api/v2/sample-metadata/{id}"
     PROJECTS_DELETE = "/api/v2/projects-delete/"
+    PROJECTS_HIDE = "/api/v2/projects-hide/"
+    PROJECTS_UNHIDE = "/api/v2/projects-unhide/"
     PROJECT_DELETE_SAMPLES = "/api/v2/project-delete-samples/{id}"
+    PROJECT_HIDE_SAMPLES = "/api/v2/project-hide-samples/{id}"
+    PROJECT_UNHIDE_SAMPLES = "/api/v2/project-unhide-samples/{id}"
     PROJECT_RESTORE_SAMPLES = "/api/v2/project-restore-samples/{id}"
     PROJECT_QC_REPORT = "/api/v2/project-qc-report/{id}"
     BASESPACE_PROJECTS_IMPORT = "/api/v2/basespace-projects-import/"
@@ -58,6 +62,15 @@ class ApiEndpoints(Enum):
     EXPLORER_SHELL_SESSION_CREDENTIALS = "/api/v2/explorer-shell-session-credentials/"
     EXPLORER_DATA_CREDENTIALS = "/api/v2/explorer-data-credentials/"
     EXPLORER_ACCESS_URL = "/api/v2/explorer-access-url/"
+
+
+@unique
+class HiddenStatus(Enum):
+    """HiddenStatus enum"""
+
+    VISIBLE = "visible"
+    HIDDEN = "hidden"
+    ALL = "all"
 
 
 @unique

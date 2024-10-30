@@ -18,6 +18,7 @@ from requests import ConnectTimeout, ReadTimeout, delete, get, post  # noqa: I20
 
 from gencove import constants  # noqa: I100
 from gencove.constants import (
+    HiddenStatus,
     PipelineSortBy,
     SampleArchiveStatus,
     SampleAssignmentStatus,
@@ -506,6 +507,7 @@ class APIClient:
         search="",
         sample_status=SampleStatus.ALL.value,
         sample_archive_status=SampleArchiveStatus.ALL.value,
+        hidden_status=HiddenStatus.VISIBLE.value,
         sort_by=SampleSortBy.MODIFIED.value,
         sort_order=SortOrder.DESC.value,
     ) -> ProjectSamples:
@@ -519,6 +521,7 @@ class APIClient:
                 "sort_order": sort_order,
                 "status": sample_status,
                 "archive_status": sample_archive_status,
+                "hidden_status": hidden_status,
             },
         )
         return self._get(
@@ -609,13 +612,14 @@ class APIClient:
             model=SampleSheet,
         )
 
-    def list_projects(self, next_link=None):
+    def list_projects(self, next_link=None, hidden_status=HiddenStatus.VISIBLE.value):
         """Fetch projects.
 
         Args:
             next_link (str, optional): url from previous
                 response['meta']['next'].
-
+            hidden_status (str, optional, default 'visible'): filter projects by
+                hidden status. One of HiddenStatus.
         Returns:
             api response (dict):
                 {
@@ -627,7 +631,9 @@ class APIClient:
                     "results": [...]
                 }
         """
-        params = self._add_query_params(next_link)
+        params = self._add_query_params(
+            next_link, query_params={"hidden_status": hidden_status}
+        )
         return self._get(
             self.endpoints.PROJECTS.value,
             query_params=params,
@@ -1041,6 +1047,36 @@ class APIClient:
 
         return self._delete(delete_project_samples_endpoint, payload, authorized=True)
 
+    def hide_project_samples(self, project_id, sample_ids):
+        """Make a request to hide samples in given project.
+
+        Args:
+            project_id (str): project to which to assign the samples
+            sample_ids (list of strings): sample_ids to hide
+        """
+        hide_project_samples_endpoint = (
+            self.endpoints.PROJECT_HIDE_SAMPLES.value.format(id=project_id)
+        )
+
+        payload = {"sample_ids": sample_ids}
+
+        return self._post(hide_project_samples_endpoint, payload, authorized=True)
+
+    def unhide_project_samples(self, project_id, sample_ids):
+        """Make a request to unhide samples in given project.
+
+        Args:
+            project_id (str): project to which to assign the samples
+            sample_ids (list of strings): sample_ids to unhide
+        """
+        unhide_project_samples_endpoint = (
+            self.endpoints.PROJECT_UNHIDE_SAMPLES.value.format(id=project_id)
+        )
+
+        payload = {"sample_ids": sample_ids}
+
+        return self._post(unhide_project_samples_endpoint, payload, authorized=True)
+
     def delete_projects(self, project_ids):
         """Make a request to delete projects.
 
@@ -1052,6 +1088,30 @@ class APIClient:
         payload = {"project_ids": project_ids}
 
         return self._delete(delete_projects_endpoint, payload, authorized=True)
+
+    def hide_projects(self, project_ids):
+        """Make a request to hide projects.
+
+        Args:
+            project_ids (List[str]): projects to hide
+        """
+        hide_projects_endpoint = self.endpoints.PROJECTS_HIDE.value
+
+        payload = {"project_ids": project_ids}
+
+        return self._post(hide_projects_endpoint, payload, authorized=True)
+
+    def unhide_projects(self, project_ids):
+        """Make a request to unhide projects.
+
+        Args:
+            project_ids (List[str]): projects to unhide
+        """
+        unhide_projects_endpoint = self.endpoints.PROJECTS_UNHIDE.value
+
+        payload = {"project_ids": project_ids}
+
+        return self._post(unhide_projects_endpoint, payload, authorized=True)
 
     def get_file_checksum(self, file_id, filename=None):
         """Fetch file checksum, using the client because need to be

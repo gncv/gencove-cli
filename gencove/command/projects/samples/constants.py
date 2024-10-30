@@ -12,3 +12,4 @@ class SamplesOptions(Optionals):
     archive_status: Optional[str]
     search: Optional[str]
     include_run: Optional[bool]
+    include_hidden: Optional[bool]

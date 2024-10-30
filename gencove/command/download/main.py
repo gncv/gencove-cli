@@ -30,6 +30,19 @@ from .utils import (
 )
 
 
+def download_backoff_handler(details):
+    """Set in_retry flag on backoff"""
+    instance = details["args"][0]
+    instance.in_retry = True
+    instance.echo_debug("Backoff triggered, retrying")
+
+
+def download_success_handler(details):
+    """Reset in_retry flag on success"""
+    instance = details["args"][0]
+    instance.in_retry = False
+
+
 # pylint: disable=too-many-instance-attributes
 class Download(Command):
     """Download command executor."""
@@ -56,6 +69,7 @@ class Download(Command):
         self.download_files = []
         self.no_progress = no_progress
         self.checksums = checksums
+        self.in_retry = False  # track whether we are in a retry
 
     def initialize(self):
         """Initialize download command."""
@@ -182,16 +196,22 @@ class Download(Command):
         backoff.expo,
         client.APIClientError,
         max_tries=3,
+        on_backoff=download_backoff_handler,
+        on_success=download_success_handler,
     )
     @backoff.on_exception(
         backoff.expo,
         client.APIClientTooManyRequestsError,
         max_tries=20,
+        on_backoff=download_backoff_handler,
+        on_success=download_success_handler,
     )
     @backoff.on_exception(
         backoff.expo,
         client.APIClientTimeout,
         max_tries=20,
+        on_backoff=download_backoff_handler,
+        on_success=download_success_handler,
     )
     def process_sample(self, sample_id):
         """Process sample.
@@ -350,6 +370,14 @@ class Download(Command):
             DownloadTemplateError: if the file was found in already downloaded
              list
         """
+
+        if download_to_path in self.downloaded_files and self.in_retry:
+            self.echo_debug(
+                f"file path: {download_to_path} already exists and code is "
+                "in retry status, skipping"
+            )
+            return
+
         if download_to_path in self.downloaded_files:
             raise DownloadTemplateError(
                 f"Bad template: {download_to_path} file already exists. "
@@ -379,7 +407,6 @@ class Download(Command):
             self.download_to,
             f"{sample_id}_{QC_FILE_TYPE}.json",
         )
-
         self.validate_and_download(
             file_path,
             save_qc_file,

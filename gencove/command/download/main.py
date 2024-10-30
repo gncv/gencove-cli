@@ -30,6 +30,18 @@ from .utils import (
 )
 
 
+def download_backoff_handler(details):
+    """Set in_retry flag on backoff"""
+    instance = details["args"][0]
+    instance.in_retry = True
+
+
+def download_success_handler(details):
+    """Reset in_retry flag on success"""
+    instance = details["args"][0]
+    instance.in_retry = False
+
+
 # pylint: disable=too-many-instance-attributes
 class Download(Command):
     """Download command executor."""
@@ -173,43 +185,32 @@ class Download(Command):
                 "restore before downloading."
             )
 
-    def _on_backoff(self, details):
-        """Handler called when backoff decorator triggers a retry"""
-        self.in_retry = True
-        self.echo_debug(f"Retrying after {details['tries']} attempts...")
-
-    def _on_success(self, details):
-        """Handler called when the decorated function succeeds"""
-        self.in_retry = False
-
     @backoff.on_exception(
         backoff.expo,
         requests.exceptions.HTTPError,
         giveup=fatal_process_sample_error,
         max_tries=10,
-        on_backoff=_on_backoff,
-        on_success=_on_success,
     )
     @backoff.on_exception(
         backoff.expo,
         client.APIClientError,
         max_tries=3,
-        on_backoff=_on_backoff,
-        on_success=_on_success,
+        on_backoff=download_backoff_handler,
+        on_success=download_success_handler,
     )
     @backoff.on_exception(
         backoff.expo,
         client.APIClientTooManyRequestsError,
         max_tries=20,
-        on_backoff=_on_backoff,
-        on_success=_on_success,
+        on_backoff=download_backoff_handler,
+        on_success=download_success_handler,
     )
     @backoff.on_exception(
         backoff.expo,
         client.APIClientTimeout,
         max_tries=20,
-        on_backoff=_on_backoff,
-        on_success=_on_success,
+        on_backoff=download_backoff_handler,
+        on_success=download_success_handler,
     )
     def process_sample(self, sample_id):
         """Process sample.
@@ -372,7 +373,7 @@ class Download(Command):
         if download_to_path in self.downloaded_files and self.in_retry:
             self.echo_debug(
                 f"file path: {download_to_path} already exists and code is "
-                "in in retry status, skipping"
+                "in retry status, skipping"
             )
             return
 

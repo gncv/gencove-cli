@@ -6,20 +6,17 @@ import sys
 import uuid
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
-from urllib.parse import urljoin
 
 import boto3
 
-import requests
-from requests import RequestException
-from requests.adapters import HTTPAdapter
-
-from urllib3 import Retry
-
 # pylint: disable=wrong-import-order
 from gencove.exceptions import ValidationError  # noqa I100
-from gencove.models import ExplorerDataCredentials, OrganizationDetails, UserDetails
-from gencove.client import APIClient
+from gencove.models import (
+    ExplorerDataCredentials,
+    OrganizationDetails,
+    OrganizationUser,
+    UserDetails,
+)
 
 # Ensure there are two blank lines before any class or function definition
 
@@ -32,6 +29,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
     organization_id: str
 
     aws_session_credentials: Optional[ExplorerDataCredentials]
+    organization_users: Optional[List[OrganizationUser]]
 
     # Constants ported from Gencove Explorer package
     # https://gitlab.com/gencove/platform/explorer-sdk/-/blob/main/gencove_explorer/constants.py  # noqa: E501 # pylint: disable=line-too-long
@@ -234,8 +232,8 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
                     except ValueError:
                         # check to see if the user supplied email instead of user_id
                         if is_valid_email(user_id):
-                            org_users = get_organization_users()
-                            user_id = email2uid(user_id, org_users)
+                            # only open client with valid email
+                            user_id = email2uid(user_id, self.organization_users)
                         else:
                             raise ValueError(  # pylint: disable=raise-missing-from
                                 f"User id '{user_id}' is not a valid UUID, email, nor '{self.ME}'"  # noqa E501
@@ -253,7 +251,8 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         env = os.environ.copy()
         env.update(self.aws_env)
         try:
-            sorted_dict = []
+            # list that serves to preserve the order of user_ids from s3api
+            s3api_uids = []
             result = subprocess.run(  # nosec B603 (execution of untrusted input)
                 command,
                 stdin=sys.stdin,
@@ -264,22 +263,18 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
                 text=True,
             )
 
-            client = APIClient()
-            # ping organization-users endpoint
-            uids = client.get_organization_users()
-
             # iterate across s3_uids returned by s3api
             for line in result.stdout.splitlines():
                 s3_uid = line.split("PRE ")[1].split("/")[0]
                 # translate user_id to email
-                email = uid2email(s3_uid, uids)
+                email = uid2email(s3_uid, self.organization_users)
                 if email is not None:
-                    sorted_dict.append({"id": s3_uid, "email": email})  # noqa E501
+                    s3api_uids.append({"id": s3_uid, "email": email})  # noqa E501
 
             # maximum email length in set
-            max_email_length = max(len(item["email"]) for item in sorted_dict)
+            max_email_length = max(len(item["email"]) for item in s3api_uids)
 
-            for item in sorted_dict:
+            for item in s3api_uids:
                 email = item["email"]
                 user_id = item["id"]
                 # Format the string such that the email is
@@ -307,6 +302,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
             cmd (str): AWS S3 command to execute
             path (str): Path to execute command against
             args (List[str]): List of additional args to forward to AWS CLI
+            organization_user (List[OrganizationUser]): List to map email to user_id
 
         Returns:
             List of args passed to AWS CLI
@@ -439,58 +435,9 @@ def request_is_from_explorer() -> bool:
     return False
 
 
-def get_organization_users() -> str:
-    """
-    Retrieves organization user information from Gencove API
-
-    Returns:
-        List[dict]
-    """
-    gencove_api_key = os.getenv("GENCOVE_API_KEY")
-    gencove_host = os.getenv("GENCOVE_HOST")
-
-    if gencove_api_key is None:
-        raise ValueError("GENCOVE_API_KEY environment variable is not set")
-
-    headers = {
-        "accept": "application/json",
-        "Authorization": f"Api-Key {gencove_api_key}",
-    }
-
-    if gencove_host is None:
-        raise ValueError("GENCOVE_HOST environment variable is not set")
-
-    user_endpoint = urljoin(gencove_host, "/api/v2/organization-users/")
-
-    retry_strategy = Retry(
-        total=3,
-        backoff_factor=1,
-        status_forcelist=[204, 429, 500, 502, 503, 504],
-        allowed_methods=["GET"],
-    )
-    adapter = HTTPAdapter(max_retries=retry_strategy)
-    http = requests.Session()
-    http.mount("https://", adapter)
-    all_users = []
-    next_url = user_endpoint
-
-    try:
-        while next_url:
-            resp = http.get(url=next_url, headers=headers)
-            resp.raise_for_status()
-            data = resp.json()
-            all_users.extend(data["results"])
-            next_url = data["meta"].get("next")
-
-    except RequestException:
-        raise RuntimeError(
-            f"Max retries reached: Error fetching data from '{next_url}'"
-        ) from None
-
-    return all_users
-
-
-def uid2email(uid: str, organization_users: List[dict], no_match_value=None) -> str:
+def uid2email(
+    uid: str, organization_users: List[OrganizationUser], no_match_value=None
+) -> str:
     """
     Convert gencove user-id to corresponding email address
 
@@ -503,14 +450,16 @@ def uid2email(uid: str, organization_users: List[dict], no_match_value=None) -> 
         str: email corresponding to user_id, otherwise no_match_value
     """
     dict_match = next(
-        (item for item in organization_users if item["id"] == uid), no_match_value
+        (item for item in organization_users if str(item.id) == uid), no_match_value
     )  # noqa E501
     if dict_match is not no_match_value:
-        return dict_match["email"]
+        return dict_match.email
     return no_match_value
 
 
-def email2uid(email: str, organization_users: List[dict], no_match_value=None) -> str:
+def email2uid(
+    email: str, organization_users: List[OrganizationUser], no_match_value=None
+) -> str:
     """
     Convert gencove user_id to corresponding email address
 
@@ -523,10 +472,10 @@ def email2uid(email: str, organization_users: List[dict], no_match_value=None) -
         str: user_id corresponding to email, otherwise no_match_value
     """
     dict_match = next(
-        (item for item in organization_users if item["email"] == email), no_match_value
+        (item for item in organization_users if item.email == email), no_match_value
     )  # noqa E501
     if dict_match is not no_match_value:
-        return dict_match["id"]
+        return dict_match.id
     return no_match_value
 
 

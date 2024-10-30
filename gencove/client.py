@@ -9,9 +9,9 @@ import json
 import os
 import time
 from builtins import str as text  # noqa
+from typing import List
 from urllib.parse import parse_qs, urljoin, urlparse
 from uuid import UUID
-from typing import List
 
 from pydantic import BaseModel
 from requests import ConnectTimeout, ReadTimeout, delete, get, post  # noqa: I201
@@ -42,6 +42,8 @@ from gencove.models import (  # noqa: I101, I100
     FileTypesModel,
     ImportExistingSamplesModel,
     OrganizationDetails,
+    OrganizationUser,
+    OrganizationUsers,
     PipelineCapabilities,
     PipelineDetail,
     Pipelines,
@@ -1251,10 +1253,28 @@ class APIClient:
 
         return self._post(endpoint, payload, authorized=True, model=ExplorerAccessURL)
 
-    def get_organization_users(self) -> List[dict]:
-        """Making a request for organization user information"""
-        return self._get(
-            self.endpoints.ORGANIZATION_USERS.value,
-            authorized=True,
-            model=OrganizationUsers,
-        )
+    def get_organization_users(self) -> List[OrganizationUser]:
+        """Retrieve all organization users, handling pagination."""
+        endpoint = self.endpoints.ORGANIZATION_USERS.value
+        query_params = {}
+        all_users = []
+
+        while endpoint:
+            response = self._get(
+                endpoint,
+                query_params=query_params,
+                authorized=True,
+                model=OrganizationUsers,
+            )
+            all_users.extend(response.results)
+
+            next_url = response.meta.next
+            if next_url:
+                parsed_url = urlparse(next_url)
+                endpoint = parsed_url.path
+                query_params = parse_qs(parsed_url.query)
+                query_params = {k: v[0] for k, v in query_params.items()}
+            else:
+                endpoint = None
+
+        return all_users

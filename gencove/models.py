@@ -496,13 +496,20 @@ class UserDetails(GencoveBaseModel):
     is_support: bool
 
 
-class OrganizationUsers(GencoveBaseModel):
-    """OrganizationUsers model"""
+class OrganizationUser(GencoveBaseModel):
+    """OrganizationUser model"""
 
     id: UUID
     name: str
     email: str
     is_active: Optional[bool]
     has_mfa_device: Optional[bool]
-    roles: Optional[list]
+    roles: Optional[dict]
     is_support: Optional[bool]
+
+
+class OrganizationUsers(BaseModel):
+    """OrganizationUsers model"""
+
+    meta: ResponseMeta
+    results: List[OrganizationUser]

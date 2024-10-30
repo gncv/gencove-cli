@@ -13,6 +13,8 @@ from click.testing import CliRunner
 
 from gencove.cli import download
 from gencove.client import APIClient
+from gencove.command.base import Command
+from gencove.command.download.main import Download
 from gencove.command.download.utils import download_file
 from gencove.models import (
     ProjectSamples,
@@ -1095,3 +1097,84 @@ def test_invalid_file_types_sample_ids_provided(
         mocked_qc_metrics.assert_not_called()
         mocked_get_metadata.assert_not_called()
         mocked_download_file.assert_not_called()
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_download_retry_skips_existing(
+    credentials, mocker, recording, sample_id_download, vcr
+):
+    """Test that download skips existing files when in retry state."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        if not recording:
+            get_sample_details_response = get_vcr_response(
+                "/api/v2/samples/", vcr, operator.contains
+            )
+            mocked_details = SampleDetails(**get_sample_details_response)
+
+            mocked_sample_details = mocker.patch.object(
+                APIClient, "get_sample_details", return_value=mocked_details
+            )
+
+        # Capture debug messages
+        debug_messages = []
+        mocker.patch.object(
+            Command, "echo_debug", side_effect=lambda msg: debug_messages.append(msg)
+        )
+
+        download_attempts = []
+
+        def mock_download(*args, **kwargs):
+            path = args[0]
+            download_attempts.append(path)
+            if len(download_attempts) == 1:
+                # First attempt succeeds
+                with open(path, "w") as f:
+                    f.write("test content")
+
+        mocked_download = mocker.patch(
+            "gencove.command.download.main.download_file", side_effect=mock_download
+        )
+
+        original_process_sample = Download.process_sample
+
+        def mock_process_sample(self, sample_id):
+            try:
+                return original_process_sample(self, sample_id)
+            finally:
+                # Force retry after first success
+                self.in_retry = True
+                self.downloaded_files.add(download_attempts[0])
+                # call process_sample again to trigger retry logic
+                original_process_sample(self, sample_id)
+
+        mocker.patch.object(
+            Download, "process_sample", side_effect=mock_process_sample, autospec=True
+        )
+
+        res = runner.invoke(
+            download,
+            [
+                "cli_test_data",
+                "--sample-ids",
+                sample_id_download,
+                "--file-types",
+                "fastq-r1",
+                *credentials,
+            ],
+        )
+
+        if not recording:
+            expected_path = (
+                f"cli_test_data/mock-client-id/{MOCK_UUID}/{MOCK_UUID}_R1.fastq.gz"
+            )
+            retry_msg = (
+                f"file path: {expected_path} already exists and code is in retry "
+                "status, skipping"
+            )
+
+            # verify retry message logged
+            assert any(retry_msg in msg for msg in debug_messages)
+            assert os.path.exists(expected_path)
+            assert len(download_attempts) > 0

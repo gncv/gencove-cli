@@ -1121,13 +1121,7 @@ def test_download_retry_skips_existing(
 
         # Capture debug messages
         debug_messages = []
-        mocker.patch.object(
-            Command,
-            "echo_debug",
-            side_effect=lambda msg: debug_messages.append(
-                msg
-            ),  # pylint: disable=unnecessary-lambda
-        )
+        mocker.patch.object(Command, "echo_debug", side_effect=debug_messages.append)
 
         download_attempts = []
 

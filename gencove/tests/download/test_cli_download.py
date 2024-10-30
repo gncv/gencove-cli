@@ -1105,6 +1105,8 @@ def test_download_retry_skips_existing(
     credentials, mocker, recording, sample_id_download, vcr
 ):
     """Test that download skips existing files when in retry state."""
+    # pylint: disable=too-many-locals
+
     runner = CliRunner()
     with runner.isolated_filesystem():
         if not recording:
@@ -1113,7 +1115,7 @@ def test_download_retry_skips_existing(
             )
             mocked_details = SampleDetails(**get_sample_details_response)
 
-            mocked_sample_details = mocker.patch.object(
+            mocker.patch.object(
                 APIClient, "get_sample_details", return_value=mocked_details
             )
 
@@ -1121,19 +1123,19 @@ def test_download_retry_skips_existing(
         debug_messages = []
         mocker.patch.object(
             Command, "echo_debug", side_effect=lambda msg: debug_messages.append(msg)
-        )
+        )  # pylint: disable=unnecessary-lambda
 
         download_attempts = []
 
-        def mock_download(*args, **kwargs):
+        def mock_download(*args, **kwargs):  # pylint: disable=unused-argument
             path = args[0]
             download_attempts.append(path)
             if len(download_attempts) == 1:
                 # First attempt succeeds
-                with open(path, "w") as f:
-                    f.write("test content")
+                with open(path, "w", encoding="utf-8") as fp:
+                    fp.write("test content")
 
-        mocked_download = mocker.patch(
+        mocker.patch(
             "gencove.command.download.main.download_file", side_effect=mock_download
         )
 
@@ -1153,7 +1155,7 @@ def test_download_retry_skips_existing(
             Download, "process_sample", side_effect=mock_process_sample, autospec=True
         )
 
-        res = runner.invoke(
+        runner.invoke(
             download,
             [
                 "cli_test_data",

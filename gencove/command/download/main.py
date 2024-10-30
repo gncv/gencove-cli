@@ -34,6 +34,7 @@ def download_backoff_handler(details):
     """Set in_retry flag on backoff"""
     instance = details["args"][0]
     instance.in_retry = True
+    instance.echo_debug("Backoff triggered, retrying")
 
 
 def download_success_handler(details):

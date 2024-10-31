@@ -2,9 +2,9 @@
 import os
 import sys
 import uuid
-from uuid import UUID
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
+from uuid import UUID
 
 # pylint: disable=wrong-import-order, import-error
 
@@ -15,8 +15,8 @@ from gencove.command.explorer.data.common import (  # noqa: I100
     GencoveExplorerManager,
     request_is_from_explorer,
 )
-from gencove.tests.utils import MOCK_UUID
 from gencove.models import OrganizationUser
+from gencove.tests.utils import MOCK_UUID
 
 
 class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
@@ -220,7 +220,7 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
     def test_translate_path_to_s3_path_with_null_email(self):
         """Test translate_path_to_s3_path using an invalid email expecting None"""
         translated_path = self.explorer_manager.translate_path_to_s3_path(
-            path=f"e://users/invalid@example.com"
+            path="e://users/invalid@example.com"
         )
         assert (
             translated_path

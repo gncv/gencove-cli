@@ -78,14 +78,13 @@ def test_data_cp_success(mocker, credentials, recording, vcr):
 
     test_file = Path(__file__).parent / "test_cp.txt"
     res = runner.invoke(cp, [str(test_file), "e://users/me/test_cp.txt", *credentials])
+    assert res.exit_code == 0
 
     if not recording:
         mocked_get_credentials.assert_called_once()
         mocked_aws.assert_called_once()
     else:
         assert "test_cp.txt" in res.output
-
-    assert res.exit_code == 0
 
 
 @pytest.mark.vcr

@@ -4,6 +4,7 @@ import sys
 import uuid
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
+from uuid import UUID
 
 # pylint: disable=wrong-import-order, import-error
 
@@ -14,6 +15,7 @@ from gencove.command.explorer.data.common import (  # noqa: I100
     GencoveExplorerManager,
     request_is_from_explorer,
 )
+from gencove.models import OrganizationUser
 from gencove.tests.utils import MOCK_UUID
 
 
@@ -27,6 +29,37 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
         self.user_id = "11111111-1111-1111-1111-111111111111"
         self.organization_id = "11111111-1111-1111-1111-111111111111"
         self.org_id_short = self.organization_id.replace("-", "")[:12]
+        self.user_email = "mock-email-1@example.com"
+        self.organization_users = [
+            OrganizationUser(
+                id=UUID(self.user_id),
+                name="mock-name-1",
+                email=self.user_email,
+                is_active=True,
+                has_mfa_device=False,
+                roles={
+                    "organization": {
+                        "id": "11111111-1111-1111-1111-111111111113",
+                        "name": "owner",
+                    }
+                },
+                is_support=False,
+            ),
+            OrganizationUser(
+                id=UUID("11111111-1111-1111-1111-111111111112"),
+                name="mock-name-2",
+                email="mock-email-2@example.com",
+                is_active=True,
+                has_mfa_device=False,
+                roles={
+                    "organization": {
+                        "id": "11111111-1111-1111-1111-111111111114",
+                        "name": "owner",
+                    }
+                },
+                is_support=False,
+            ),
+        ]
         self.mock_aws_credentials = ExplorerDataCredentials(
             access_key="mock_access",
             secret_key="mock_secret",
@@ -37,6 +70,7 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
             aws_session_credentials=self.mock_aws_credentials,
             user_id=self.user_id,
             organization_id=self.organization_id,
+            organization_users=self.organization_users,
         )
 
     def test_bucket_name(self):
@@ -140,6 +174,7 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
             aws_session_credentials=None,
             user_id=self.user_id,
             organization_id=self.organization_id,
+            organization_users=self.organization_users,
         )
         # pylint: disable=C1803 use-implicit-booleaness-not-comparison
         assert explorer_manager.aws_env == {}
@@ -164,13 +199,33 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
         )
         assert (
             translated_path
-            == f"s3://gencove-explorer-{self.org_id_short}/users/{self.organization_id}/files/"  # noqa: E501 pylint: disable=line-too-long
+            == f"s3://gencove-explorer-{self.org_id_short}/users/{self.user_id}/files/"  # noqa: E501 pylint: disable=line-too-long
         )  # noqa: E501
 
     def test_translate_path_to_s3_path_invalid(self):
         """Test with an invalid e:// path and expect a ValueError"""
         with pytest.raises(ValueError):
             self.explorer_manager.translate_path_to_s3_path("e://invalid/path")
+
+    def test_translate_path_to_s3_path_valid_with_email(self):
+        """Test translate_path_to_s3_path using a valid email instead of user_id"""
+        translated_path = self.explorer_manager.translate_path_to_s3_path(
+            path=f"e://users/{self.user_email}"
+        )
+        assert (
+            translated_path
+            == f"s3://gencove-explorer-{self.org_id_short}/users/{self.user_id}/files/"  # noqa: E501 pylint: disable=line-too-long
+        )  # noqa: E501
+
+    def test_translate_path_to_s3_path_with_null_email(self):
+        """Test translate_path_to_s3_path using an invalid email expecting None"""
+        translated_path = self.explorer_manager.translate_path_to_s3_path(
+            path="e://users/invalid@example.com"
+        )
+        assert (
+            translated_path
+            == f"s3://gencove-explorer-{self.org_id_short}/users/None/files/"  # noqa: E501 pylint: disable=line-too-long
+        )  # noqa: E501
 
     @patch("gencove.command.explorer.data.common.GencoveExplorerManager.list_users")
     def test_list_users(self, mock_list_users):

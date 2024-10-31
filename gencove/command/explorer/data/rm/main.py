@@ -21,6 +21,9 @@ class Remove(Command):
         self.organization = None
         self.aws_session_credentials = None
 
+        # populated after self.execute() is called
+        self.organization_users = None
+
     def validate(self):
         """Validate rm"""
         validate_explorer_user_data(self.user, self.organization)
@@ -45,5 +48,6 @@ class Remove(Command):
             aws_session_credentials=self.aws_session_credentials,
             user_id=str(self.user.id),
             organization_id=str(self.organization.id),
+            organization_users=self.api_client.get_organization_users(),
         )
         explorer_manager.execute_aws_s3_path("rm", self.path, self.ctx.args)

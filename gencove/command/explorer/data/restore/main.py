@@ -27,6 +27,9 @@ class Restore(Command):
         self.organization = None
         self.aws_session_credentials = None
 
+        # populated after self.execute() is called
+        self.organization_users = None
+
     def validate(self):
         """Validate restore"""
         self.validate_tier()
@@ -63,6 +66,7 @@ class Restore(Command):
             aws_session_credentials=self.aws_session_credentials,
             user_id=str(self.user.id),
             organization_id=str(self.organization.id),
+            organization_users=self.api_client.get_organization_users(),
         )
 
         bucket, _ = (

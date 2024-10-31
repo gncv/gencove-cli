@@ -76,6 +76,14 @@ def filter_data_credentials_response(response, json_response):
         for result in json_response["results"]:
             if "id" in result:
                 result["id"] = MOCK_UUID
+            if "email" in result:
+                result["email"] = "email@example.com"
+            if "name" in result:
+                result["name"] = "mock name"
+            if "roles" in result and "organization" in result["roles"]:
+                role = result["roles"]["organization"]
+                if "id" in role:
+                    role["id"] = MOCK_UUID
     if "roles" in json_response:
         json_response["roles"]["organization"]["id"] = MOCK_UUID
     if "email" in json_response:

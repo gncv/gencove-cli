@@ -78,14 +78,13 @@ def test_data_ls_success(mocker, credentials, recording, vcr):
     # Assumption that CLI user has a file called cli_test_file.txt in their
     # Explorer files dir
     res = runner.invoke(ls, ["e://users/me/", *credentials])
+    assert res.exit_code == 0
 
     if not recording:
         mocked_get_credentials.assert_called_once()
         mocked_aws.assert_called_once()
     else:
         assert "cli_test_file.txt" in res.output
-
-    assert res.exit_code == 0
 
 
 @pytest.mark.vcr

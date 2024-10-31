@@ -4,7 +4,7 @@ from typing import Optional
 
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
-HOST = "https://dev.gencove.com"
+HOST = "https://api.gencove.com"
 
 
 @unique

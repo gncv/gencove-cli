@@ -494,3 +494,22 @@ class UserDetails(GencoveBaseModel):
     uploads_enabled: bool
     explorer_enabled: bool
     is_support: bool
+
+
+class OrganizationUser(GencoveBaseModel):
+    """OrganizationUser model"""
+
+    id: UUID
+    name: str
+    email: str
+    is_active: Optional[bool]
+    has_mfa_device: Optional[bool]
+    roles: Optional[dict]
+    is_support: Optional[bool]
+
+
+class OrganizationUsers(BaseModel):
+    """OrganizationUsers model"""
+
+    meta: ResponseMeta
+    results: List[OrganizationUser]

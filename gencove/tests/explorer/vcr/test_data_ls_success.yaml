@@ -9,7 +9,7 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.11.0
+      - 2.24.0
       content-type:
       - application/json
     method: POST
@@ -24,18 +24,25 @@ interactions:
       - keep-alive
       Content-Length:
       - '582'
+      Content-Security-Policy:
+      - img-src 'self' data:; style-src 'self' 'unsafe-inline'; default-src 'self'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Mon, 18 Dec 2023 21:06:12 GMT
+      - Thu, 31 Oct 2024 18:16:26 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
       Referrer-Policy:
       - same-origin
       Server:
       - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
       Vary:
-      - Accept, Cookie, Origin
+      - Accept, Cookie, origin
       X-Content-Type-Options:
       - nosniff
       X-Frame-Options:
@@ -53,7 +60,7 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.11.0
+      - 2.24.0
       content-type:
       - application/json
     method: GET
@@ -70,18 +77,26 @@ interactions:
       - keep-alive
       Content-Length:
       - '199'
+      Content-Security-Policy:
+      - 'default-src ''self''; style-src ''self'' ''unsafe-inline''; img-src ''self''
+        data:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Mon, 18 Dec 2023 21:06:12 GMT
+      - Thu, 31 Oct 2024 18:16:26 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
       Referrer-Policy:
       - same-origin
       Server:
       - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
       Vary:
-      - Accept, Cookie, Origin
+      - Accept, Cookie, origin
       X-Content-Type-Options:
       - nosniff
       X-Frame-Options:
@@ -99,7 +114,7 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.11.0
+      - 2.24.0
       content-type:
       - application/json
     method: GET
@@ -109,26 +124,35 @@ interactions:
       string: '{"id": "11111111-1111-1111-1111-111111111111", "name": "CLI Testing",
         "expire_uploads_period_days": 0, "archive_period_days": 0, "archive_restore_period_days":
         12, "roles": {"organization": {"id": "11111111-1111-1111-1111-111111111111",
-        "name": "owner"}}, "uploads_enabled": true}'
+        "name": "owner"}}, "uploads_enabled": true, "delete_samples_enabled": false,
+        "project_sharing_enabled": false, "account_on_hold": false}'
     headers:
       Allow:
       - GET, PATCH, HEAD, OPTIONS
       Connection:
       - keep-alive
       Content-Length:
-      - '263'
+      - '350'
+      Content-Security-Policy:
+      - 'default-src ''self''; style-src ''self'' ''unsafe-inline''; img-src ''self''
+        data:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Mon, 18 Dec 2023 21:06:12 GMT
+      - Thu, 31 Oct 2024 18:16:26 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
       Referrer-Policy:
       - same-origin
       Server:
       - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
       Vary:
-      - Accept, Cookie, Origin
+      - Accept, Cookie, origin
       X-Content-Type-Options:
       - nosniff
       X-Frame-Options:
@@ -146,7 +170,7 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.11.0
+      - 2.24.0
       content-type:
       - application/json
     method: POST
@@ -154,26 +178,89 @@ interactions:
   response:
     body:
       string: '{"version": 1, "access_key": "mock_access_key", "secret_key": "mock_secret_key",
-        "token": "mock_token", "expiry_time": "2050-09-03T00:00:00+00:00"}'
+        "token": "mock_token", "expiry_time": "2050-09-03T00:00:00+00:00", "region_name":
+        "us-east-1"}'
     headers:
       Allow:
       - POST, OPTIONS
       Connection:
       - keep-alive
       Content-Length:
-      - '773'
+      - '883'
+      Content-Security-Policy:
+      - img-src 'self' data:; style-src 'self' 'unsafe-inline'; default-src 'self'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Mon, 18 Dec 2023 21:06:13 GMT
+      - Thu, 31 Oct 2024 18:16:26 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
       Referrer-Policy:
       - same-origin
       Server:
       - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
       Vary:
-      - Accept, Cookie, Origin
+      - Accept, Cookie, origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.24.0
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/organization-users/
+  response:
+    body:
+      string: '{"meta": {"count": 1, "next": null, "previous": null}, "results": [{"id":
+        "11111111-1111-1111-1111-111111111111", "email": "email@example.com", "is_active":
+        true, "has_mfa_device": false, "name": "mock name", "roles": {"organization":
+        {"id": "11111111-1111-1111-1111-111111111111", "name": "owner"}}, "is_support":
+        false}]}'
+    headers:
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '306'
+      Content-Security-Policy:
+      - img-src 'self' data:; style-src 'self' 'unsafe-inline'; default-src 'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Thu, 31 Oct 2024 18:16:26 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, Cookie, origin
       X-Content-Type-Options:
       - nosniff
       X-Frame-Options:

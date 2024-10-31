@@ -1,3 +1,5 @@
+Click [here](../-/merge_requests/new?merge_request%5Bsource_branch%5D=master&merge_request%5Btarget_branch%5D=prod&merge_request%5Btitle%5D=Deploy&merge_request%5Bdescription%5D=Standard%20deployment%20to%20production) to deploy latest version on `master` to production.
+
 # Gencove Python API and CLI
 
 ## Quick install ##

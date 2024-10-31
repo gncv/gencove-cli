@@ -28,6 +28,9 @@ class Archive(Command):
         self.organization = None
         self.aws_session_credentials: Optional[ExplorerDataCredentials] = None
 
+        # populated after self.execute() is called
+        self.organization_users = None
+
     def validate(self):
         """Validate archive"""
         validate_explorer_user_data(self.user, self.organization)
@@ -52,6 +55,7 @@ class Archive(Command):
             aws_session_credentials=self.aws_session_credentials,
             user_id=str(self.user.id),
             organization_id=str(self.organization.id),
+            organization_users=self.api_client.get_organization_users(),
         )
 
         bucket, _ = (

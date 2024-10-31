@@ -11,6 +11,7 @@ import boto3
 
 # pylint: disable=wrong-import-order
 from gencove.exceptions import ValidationError  # noqa I100
+from gencove.logger import echo_error
 from gencove.models import (
     ExplorerDataCredentials,
     OrganizationDetails,
@@ -29,7 +30,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
     organization_id: str
 
     aws_session_credentials: Optional[ExplorerDataCredentials]
-    organization_users: Optional[List[OrganizationUser]]
+    organization_users: List[OrganizationUser]
 
     # Constants ported from Gencove Explorer package
     # https://gitlab.com/gencove/platform/explorer-sdk/-/blob/main/gencove_explorer/constants.py  # noqa: E501 # pylint: disable=line-too-long
@@ -178,7 +179,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
             )
         except subprocess.CalledProcessError as err:
             if err.stderr:
-                self.echo_error(err.stderr.decode())  # pylint: disable=no-member
+                echo_error(err.stderr.decode())  # pylint: disable=no-member
             sys.exit(err.returncode)
 
     def uri_ok(self, path: Optional[str]) -> bool:

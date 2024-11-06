@@ -467,6 +467,8 @@ class Download(Command):
                 json.dumps(self.download_files, indent=4, cls=client.CustomEncoder)
             )
         else:
+            if not Path(self.download_to).parent.exists():
+                Path(self.download_to).parent.mkdir(parents=True, exist_ok=True)
             with open(self.download_to, "w", encoding="utf-8") as json_file:
                 json_file.write(
                     json.dumps(

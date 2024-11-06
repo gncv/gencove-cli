@@ -78,8 +78,9 @@ class Download(Command):
 
         self.login()
 
-        if not Path(self.download_to).exists() and Path(self.download_to).is_dir():
-            Path(self.download_to).mkdir(parents=True, exist_ok=True)
+        # Create directory if it does not exist
+        if not Path(self.download_to).parent.exists():
+            Path(self.download_to).parent.mkdir(parents=True, exist_ok=True)
 
         if self.filters.project_id:
             self.echo_debug(

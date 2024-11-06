@@ -78,6 +78,9 @@ class Download(Command):
 
         self.login()
 
+        if not Path(self.download_to).exists() and Path(self.download_to).is_dir():
+            Path(self.download_to).mkdir(parents=True, exist_ok=True)
+
         if self.filters.project_id:
             self.echo_debug(
                 f"Retrieving sample ids for a project: {self.filters.project_id}"

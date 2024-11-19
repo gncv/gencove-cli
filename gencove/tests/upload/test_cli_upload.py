@@ -1213,10 +1213,6 @@ def test_upload_fail_deleted(credentials, vcr, recording, mocker):
 
     mocked_get_credentials.assert_called_once()
 
-    import traceback
-
-    if res.exception:
-        traceback.print_exception(res.exception)
     assert not res.exception
     assert res.exit_code == 0
     assert "is taken by another upload that was deleted" in res.output

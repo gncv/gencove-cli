@@ -10,7 +10,10 @@ from gencove.tests.utils import MOCK_UUID
 def filter_upload_request(request):
     """Removes destination path and aws url from request."""
     request = copy.deepcopy(request)
-    if "uploads-post-data" in request.path:
+    if (
+        "uploads-post-data" in request.path
+        and b"gncv://cli-test-data-fail-deleted/" not in request.body
+    ):
         request.body = '{"destination_path": "gncv://cli-mock/test.fastq.gz"}'
     if "s3.amazonaws.com" in request.uri:
         request.uri = f"https://s3.amazonaws.com/mock_bucket/organization/{MOCK_UUID}/user/{MOCK_UUID}/uploads/{MOCK_UUID}.fastq-r1"  # noqa: E501 line too long pylint: disable=line-too-long
@@ -56,7 +59,11 @@ def filter_upload_post_data_response(response, json_response):
     """Removes sensitive data from POST to uploads-post-data."""
     if "id" in json_response:
         json_response["id"] = MOCK_UUID
-    if "destination_path" in json_response:
+    if (
+        "destination_path" in json_response
+        and "gncv://cli-test-data-fail-deleted/"
+        not in repr(json_response["destination_path"])
+    ):
         json_response["destination_path"] = "gncv://cli-mock/test.fastq.gz"
     if "s3" in json_response:
         json_response["s3"] = {
@@ -73,7 +80,11 @@ def filter_import_fastqs_from_url_response(response, json_response):
     """Removes sensitive data from POST to uploads-post-data."""
     if "id" in json_response:
         json_response["id"] = MOCK_UUID
-    if "destination_path" in json_response:
+    if (
+        "destination_path" in json_response
+        and "gncv://cli-test-data-fail-deleted/"
+        not in repr(json_response["destination_path"])
+    ):
         json_response["destination_path"] = "gncv://cli-mock/test.fastq.gz"
     if "s3" in json_response:
         json_response["s3"] = {

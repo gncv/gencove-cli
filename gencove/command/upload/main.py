@@ -38,6 +38,7 @@ from .multi_file_reader import MultiFileReader
 from .utils import (
     get_filename_from_path,
     get_get_upload_details_retry_predicate,
+    get_upload_details_give_up_predicate,
     get_gncv_path,
     looks_like_url,
     parse_fastqs_map_file,
@@ -289,7 +290,12 @@ class Upload(Command):
     @backoff.on_predicate(
         backoff.expo, get_get_upload_details_retry_predicate, max_tries=10
     )
-    @backoff.on_exception(backoff.expo, APIClientError, max_tries=10)
+    @backoff.on_exception(
+        backoff.expo,
+        APIClientError,
+        max_tries=10,
+        giveup=get_upload_details_give_up_predicate,
+    )
     @backoff.on_exception(backoff.expo, APIClientTooManyRequestsError, max_tries=20)
     def get_upload_details(self, gncv_path):
         """Get upload details with retry for last status update."""

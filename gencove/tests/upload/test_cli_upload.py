@@ -1193,13 +1193,6 @@ def test_upload_fail_deleted(credentials, vcr, recording, mocker):
             "gencove.command.upload.main.get_s3_client_refreshable",
             side_effect=get_s3_client_refreshable,
         )
-        if not recording:
-            response = get_vcr_response("/api/v2/uploads-post-data/", vcr)
-            mocker.patch.object(
-                APIClient,
-                "get_upload_details",
-                return_value=UploadsPostData(**response),
-            )
         mocker.patch("gencove.command.upload.main.upload_file", side_effect=upload_file)
 
         res = runner.invoke(

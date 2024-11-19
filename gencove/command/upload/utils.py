@@ -176,12 +176,7 @@ def get_upload_details_give_up_predicate(exc: APIClientError):
     Returns:
         bool: True for giving up, False to continue.
     """
-    if (
-        exc.status_code == 400
-        and "is taken by another upload that was deleted" in exc.message
-    ):
-        return True
-    return False
+    return exc.status_code in [400]
 
 
 def get_filename_from_path(full_path, source):

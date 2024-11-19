@@ -1179,7 +1179,7 @@ def test_upload_default_destination(credentials, vcr, recording, mocker):
 
 @pytest.mark.vcr
 @assert_authorization
-def test_upload_fail_deleted(credentials, vcr, recording, mocker):
+def test_upload_fail_deleted(credentials, mocker):
     """Test to confirm default destination is gncv://cli-*"""
     runner = CliRunner()
     with runner.isolated_filesystem():

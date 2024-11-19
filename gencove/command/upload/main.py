@@ -38,8 +38,8 @@ from .multi_file_reader import MultiFileReader
 from .utils import (
     get_filename_from_path,
     get_get_upload_details_retry_predicate,
-    get_upload_details_give_up_predicate,
     get_gncv_path,
+    get_upload_details_give_up_predicate,
     looks_like_url,
     parse_fastqs_map_file,
     seek_files_to_upload,

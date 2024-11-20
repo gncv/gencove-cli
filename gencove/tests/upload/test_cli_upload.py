@@ -1179,6 +1179,40 @@ def test_upload_default_destination(credentials, vcr, recording, mocker):
 
 @pytest.mark.vcr
 @assert_authorization
+def test_upload_fail_deleted(credentials, mocker):
+    """Test to confirm default destination is gncv://cli-*"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        os.mkdir("cli_test_data")
+        fastq_file_path = "cli_test_data/test.fastq.gz"
+
+        with open(fastq_file_path, "w", encoding="utf-8") as fastq_file:
+            fastq_file.write("AAABBB")
+
+        mocked_get_credentials = mocker.patch(
+            "gencove.command.upload.main.get_s3_client_refreshable",
+            side_effect=get_s3_client_refreshable,
+        )
+        mocker.patch("gencove.command.upload.main.upload_file", side_effect=upload_file)
+
+        res = runner.invoke(
+            upload,
+            [
+                "cli_test_data",
+                "gncv://cli-test-data-fail-deleted/",
+                *credentials,
+            ],
+        )
+
+    mocked_get_credentials.assert_called_once()
+
+    assert not res.exception
+    assert res.exit_code == 0
+    assert "is taken by another upload that was deleted" in res.output
+
+
+@pytest.mark.vcr
+@assert_authorization
 def test_upload_url_destination(credentials, vcr, recording, mocker):
     """Test to confirm default destination is gncv://cli-url-*"""
     runner = CliRunner()

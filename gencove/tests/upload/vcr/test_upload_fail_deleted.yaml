@@ -1,0 +1,157 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.24.1
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '582'
+      Content-Security-Policy:
+      - style-src 'self' 'unsafe-inline'; img-src 'self' data:; default-src 'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Tue, 19 Nov 2024 11:47:46 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, Cookie, origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.24.1
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/upload-credentials/
+  response:
+    body:
+      string: '{"version": 1, "access_key": "mock_access_key", "secret_key": "mock_secret_key",
+        "token": "mock_token", "expiry_time": "2050-09-03T00:00:00+00:00"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '582'
+      Content-Security-Policy:
+      - img-src 'self' data:; default-src 'self'; style-src 'self' 'unsafe-inline'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Tue, 19 Nov 2024 11:47:46 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, Cookie, origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"destination_path": "gncv://cli-test-data-fail-deleted/test.fastq.gz"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.24.1
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/uploads-post-data/
+  response:
+    body:
+      string: '{"destination_path": ["Destination gncv://cli-test-data-fail-deleted/test.fastq.gz
+        is taken by another upload that was deleted. Please choose a different destination."]}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '168'
+      Content-Security-Policy:
+      - style-src 'self' 'unsafe-inline'; img-src 'self' data:; default-src 'self'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Tue, 19 Nov 2024 11:47:47 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, Cookie, origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 400
+      message: Bad Request
+version: 1

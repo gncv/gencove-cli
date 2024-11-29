@@ -2,8 +2,8 @@ name: Release Gencove CLI
 
 on:
   push:
-    branches:
-      - "hotfix/*"  # TODO: revert to tags: "*.*.*" after testing
+    tags:
+      - "*.*.*"
 
 jobs:
   build:
@@ -86,7 +86,7 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          draft: true  # Todo change to false after testing
+          draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

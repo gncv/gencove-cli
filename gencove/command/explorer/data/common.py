@@ -18,7 +18,7 @@ from gencove.models import (
     OrganizationUser,
     UserDetails,
 )
-from gencove.collections import LazyList
+from gencove.collections_extras import LazyList
 
 
 @dataclass

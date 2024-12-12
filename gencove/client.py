@@ -66,7 +66,7 @@ from gencove.models import (  # noqa: I101, I100
     UploadURLImport,
     UserDetails,
 )
-from gencove.collections import LazyList
+from gencove.collections_extras import LazyList
 from gencove.version import version as cli_version
 
 

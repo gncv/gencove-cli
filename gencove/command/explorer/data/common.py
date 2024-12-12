@@ -10,6 +10,7 @@ from typing import List, Optional, Tuple
 import boto3
 
 # pylint: disable=wrong-import-order
+from gencove.collections_extras import LazyList
 from gencove.exceptions import ValidationError  # noqa I100
 from gencove.logger import echo_error
 from gencove.models import (
@@ -18,7 +19,6 @@ from gencove.models import (
     OrganizationUser,
     UserDetails,
 )
-from gencove.collections_extras import LazyList
 
 
 @dataclass

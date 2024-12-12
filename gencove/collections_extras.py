@@ -14,18 +14,22 @@ class LazyList(Generic[T]):
     """
     A lazily-evaluated, cache-backed list-like container.
 
-    LazyList allows the use of a generator to lazily compute elements on demand. Items are cached
-    as they are accessed, and the list can be iterated multiple times without re-generating values.
+    LazyList allows the use of a generator to lazily compute elements on demand.
+    Items are cached as they are accessed, and the list can be iterated multiple
+    times without re-generating values.
 
     Attributes:
-        _generator (Generator[T, None, None]): The underlying generator providing elements.
+        _generator (Generator[T, None, None]): The underlying generator providing
+            elements.
         _cache (List[T]): Cached elements for previously computed indices.
         _exhausted (bool): Tracks whether the generator has been completely iterated.
 
     Methods:
-        __getitem__(index): Accesses elements by index, computing and caching as needed.
+        __getitem__(index): Accesses elements by index, computing and caching as
+            needed.
         __iter__(): Iterates over cached and computed elements.
-        __len__(): Exhausts the generator and returns the total number of computed elements.
+        __len__(): Exhausts the generator and returns the total number of computed
+            elements.
         __repr__(): Provides a string representation of the LazyList.
     """
 

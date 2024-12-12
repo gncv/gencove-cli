@@ -18,8 +18,7 @@ from gencove.models import (
     OrganizationUser,
     UserDetails,
 )
-
-# Ensure there are two blank lines before any class or function definition
+from gencove.utils import LazyList
 
 
 @dataclass
@@ -30,7 +29,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
     organization_id: str
 
     aws_session_credentials: Optional[ExplorerDataCredentials]
-    organization_users: List[OrganizationUser]
+    organization_users: LazyList[OrganizationUser]
 
     # Constants ported from Gencove Explorer package
     # https://gitlab.com/gencove/platform/explorer-sdk/-/blob/main/gencove_explorer/constants.py  # noqa: E501 # pylint: disable=line-too-long

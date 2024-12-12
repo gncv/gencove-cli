@@ -2,6 +2,7 @@
 import os
 import re
 import sys
+from typing import Generator, List, TypeVar, Generic
 
 import boto3
 
@@ -225,3 +226,53 @@ def python_version_check():
             f"in the near future. Please upgrade your Python distribution at "
             f"your convenience."
         )
+
+
+T = TypeVar("T")
+
+
+class LazyList(Generic[T]):
+    def __init__(self, generator: Generator[T, None, None]):
+        self._generator: Generator[T, None, None] = generator  # The initial generator
+        self._cache: List[T] = []  # Internal list to cache values
+        self._exhausted: bool = False  # Flag to track if the generator is exhausted
+
+    def __getitem__(self, index: int) -> T:
+        # Ensure the cache is populated up to the requested index
+        while not self._exhausted and len(self._cache) <= index:
+            try:
+                self._cache.append(next(self._generator))
+            except StopIteration:
+                self._exhausted = True
+
+        if index < len(self._cache):
+            return self._cache[index]
+        else:
+            raise IndexError("LazyList index out of range")
+
+    def __iter__(self):
+        # Return an iterator that iterates over the cached values first,
+        # then continues consuming the generator if available
+        for value in self._cache:
+            yield value
+
+        while not self._exhausted:
+            try:
+                value = next(self._generator)
+                self._cache.append(value)
+                yield value
+            except StopIteration:
+                self._exhausted = True
+
+    def __len__(self) -> int:
+        # Fully exhaust the generator to determine its length
+        if not self._exhausted:
+            self._cache.extend(self._generator)
+            self._exhausted = True
+        return len(self._cache)
+
+    def __repr__(self) -> str:
+        # Show cached values and indicate if the generator is exhausted
+        if self._exhausted:
+            return f"LazyList({self._cache})"
+        return f"LazyList({self._cache} + [...])" if self._cache else "LazyList([...])"

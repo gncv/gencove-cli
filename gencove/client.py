@@ -16,6 +16,7 @@ from pydantic import BaseModel
 from requests import ConnectTimeout, ReadTimeout, delete, get, post  # noqa: I201
 
 from gencove import constants  # noqa: I100
+from gencove.collections_extras import LazyList
 from gencove.constants import (
     HiddenStatus,
     PipelineSortBy,
@@ -66,7 +67,6 @@ from gencove.models import (  # noqa: I101, I100
     UploadURLImport,
     UserDetails,
 )
-from gencove.collections_extras import LazyList
 from gencove.version import version as cli_version
 
 

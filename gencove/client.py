@@ -12,6 +12,7 @@ from builtins import str as text  # noqa
 from urllib.parse import parse_qs, urljoin, urlparse
 from uuid import UUID
 
+import backoff
 from pydantic import BaseModel
 from requests import ConnectTimeout, ReadTimeout, delete, get, post  # noqa: I201
 
@@ -152,6 +153,9 @@ class APIClient:
     def _serialize_post_payload(payload):
         return json.dumps(payload, cls=CustomEncoder)
 
+    @backoff.on_exception(
+        backoff.expo, APIClientTooManyRequestsError, max_tries=3, max_time=10
+    )
     # pylint: disable=bad-option-value,bad-continuation,too-many-arguments
     # pylint: disable=too-many-branches,too-many-locals, too-many-statements
     def _request(

@@ -1,5 +1,7 @@
 """Configure explorer data presign subcommand."""
 import sys
+import os
+import uuid
 
 import click
 
@@ -21,8 +23,8 @@ class Presign(Command):
         self.path = path
 
         # Populated after self.login() is called
-        self.user = None
-        self.organization = None
+        self.user_id = None
+        self.organization_id = None
         self.aws_session_credentials = None
 
         # populated after self.execute() is called
@@ -36,13 +38,16 @@ class Presign(Command):
     def initialize(self):
         """Initialize presign subcommand."""
         self.login()
-        self.user = self.api_client.get_user_details()
-        self.organization = self.api_client.get_organization_details()
 
         if not request_is_from_explorer():
+            self.user_id = self.api_client.get_user_details().id
+            self.organization_id = self.api_client.get_organization_details().id
             self.aws_session_credentials = (
                 self.api_client.get_explorer_data_credentials()
             )
+        else:
+            self.user_id = uuid.UUID(os.getenv("GENCOVE_USER_ID"))
+            self.organization_id = uuid.UUID(os.getenv("GENCOVE_ORGANIZATION_ID"))
 
     def execute(self):
         """Make a request to presign Explorer object."""
@@ -50,8 +55,8 @@ class Presign(Command):
 
         explorer_manager = GencoveExplorerManager(
             aws_session_credentials=self.aws_session_credentials,
-            user_id=str(self.user.id),
-            organization_id=str(self.organization.id),
+            user_id=str(self.user_id),
+            organization_id=str(self.organization_id),
             organization_users=self.api_client.get_organization_users(),
         )
 

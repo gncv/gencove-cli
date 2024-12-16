@@ -138,6 +138,8 @@ def test_data_read_credentials_from_env(mocker, credentials):
     os.environ["GENCOVE_USER_ID"] = uuid.uuid4().hex
     os.environ["GENCOVE_ORGANIZATION_ID"] = uuid.uuid4().hex
 
-    runner.invoke(cp, ["e://users/me/", *credentials])
+    runner.invoke(
+        cp, ["e://users/me/file", "e://users/other@gencove.com/file", *credentials]
+    )
 
     mocked_request_is_from_explorer.assert_called()

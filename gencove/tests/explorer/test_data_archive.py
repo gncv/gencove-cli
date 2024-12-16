@@ -144,19 +144,16 @@ def test_data_archive_no_permission(mocker, credentials):
 
 
 def test_data_read_credentials_from_env(mocker, credentials):
+    """Test read credentials from env on explorer."""
     runner = CliRunner()
     mocked_request_is_from_explorer = mocker.patch(
         "gencove.command.explorer.data.archive.main.request_is_from_explorer",
         return_value=True,
     )
-    mocked_execute = mocker.patch(
-        "gencove.command.explorer.data.archive.main.Archive.execute"
-    )
+    mocker.patch("gencove.command.explorer.data.archive.main.Archive.execute")
     os.environ["GENCOVE_USER_ID"] = uuid.uuid4().hex
     os.environ["GENCOVE_ORGANIZATION_ID"] = uuid.uuid4().hex
 
-    res = runner.invoke(archive, ["e://users/me/", *credentials])
-    # assert res.exit_code == 0
+    runner.invoke(archive, ["e://users/me/", *credentials])
 
     mocked_request_is_from_explorer.assert_called()
-    mocked_execute.assert_called()

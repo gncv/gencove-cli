@@ -1,6 +1,8 @@
 """Test data cp command."""
 import io
+import os
 import sys
+import uuid
 from pathlib import Path
 
 # pylint: disable=wrong-import-order, import-error
@@ -123,3 +125,19 @@ def test_data_cp_no_permission(mocker, credentials):
         )
     )
     assert output_line.getvalue() == res.output.encode()
+
+
+def test_data_read_credentials_from_env(mocker, credentials):
+    """Test read credentials from env on explorer."""
+    runner = CliRunner()
+    mocked_request_is_from_explorer = mocker.patch(
+        "gencove.command.explorer.data.cp.main.request_is_from_explorer",
+        return_value=True,
+    )
+    mocker.patch("gencove.command.explorer.data.cp.main.Copy.execute")
+    os.environ["GENCOVE_USER_ID"] = uuid.uuid4().hex
+    os.environ["GENCOVE_ORGANIZATION_ID"] = uuid.uuid4().hex
+
+    runner.invoke(cp, ["e://users/me/", *credentials])
+
+    mocked_request_is_from_explorer.assert_called()

@@ -11,9 +11,9 @@ def test_lazy_evaluation():
         yield 3
 
     lazy_list = LazyList(gen())
-    assert len(lazy_list._cache) == 0  # No values should be cached initially
-    assert lazy_list[0] == 1  # Accessing index 0 should cache one value
-    assert len(lazy_list._cache) == 1
+    assert len(lazy_list._cache) == 0  # pylint: disable=protected-access
+    assert lazy_list[0] == 1
+    assert len(lazy_list._cache) == 1  # pylint: disable=protected-access
 
 
 def test_indexing():
@@ -23,10 +23,10 @@ def test_indexing():
         yield from range(5)
 
     lazy_list = LazyList(gen())
-    assert lazy_list[2] == 2  # Accessing index 2 should compute up to index 2
-    assert lazy_list[4] == 4  # Accessing the last index of the generator
+    assert lazy_list[2] == 2
+    assert lazy_list[4] == 4
     try:
-        _ = lazy_list[5]  # Accessing out of range should raise IndexError
+        _ = lazy_list[5]
     except IndexError:
         pass
     else:
@@ -41,8 +41,8 @@ def test_iteration():
 
     lazy_list = LazyList(gen())
     result = list(lazy_list)
-    assert result == [0, 1, 2, 3, 4]  # Iterating should exhaust the generator
-    assert len(lazy_list) == 5  # __len__ should reflect the total number of items
+    assert result == [0, 1, 2, 3, 4]
+    assert len(lazy_list) == 5
 
 
 def test_caching():
@@ -53,7 +53,7 @@ def test_caching():
 
     lazy_list = LazyList(gen())
     _ = lazy_list[1]
-    assert lazy_list._cache == [0, 1]  # Accessing index 1 should cache 0 and 1
+    assert lazy_list._cache == [0, 1]  # pylint: disable=protected-access
 
 
 def test_repr():
@@ -68,7 +68,7 @@ def test_repr():
     assert repr(lazy_list) == "LazyList([...])"
     _ = lazy_list[0]
     assert repr(lazy_list) == "LazyList([1] + [...])"
-    _ = list(lazy_list)  # Exhaust the generator
+    _ = list(lazy_list)
     assert repr(lazy_list) == "LazyList([1, 2, 3])"
 
 
@@ -79,10 +79,10 @@ def test_exhaustion():
         yield from range(3)
 
     lazy_list = LazyList(gen())
-    _ = list(lazy_list)  # Exhaust the generator
-    assert lazy_list._exhausted
+    _ = list(lazy_list)
+    assert lazy_list._exhausted  # pylint: disable=protected-access
     try:
-        _ = lazy_list[5]  # Accessing beyond available indices raises IndexError
+        _ = lazy_list[5]
     except IndexError:
         pass
     else:
@@ -96,25 +96,25 @@ def test_len():
         yield from range(4)
 
     lazy_list = LazyList(gen())
-    assert len(lazy_list) == 4  # Should return the correct length after exhaustion
+    assert len(lazy_list) == 4
 
 
 def test_empty_generator():
     """Test LazyList with an empty generator."""
 
     def gen():
-        if False:  # Never yield anything
+        if False:  # pylint: disable=using-constant-test
             yield
 
     lazy_list = LazyList(gen())
     assert len(lazy_list) == 0
     try:
-        _ = lazy_list[0]  # Indexing should fail for an empty generator
+        _ = lazy_list[0]
     except IndexError:
         pass
     else:
         assert False, "Expected IndexError not raised"
-    assert list(lazy_list) == []  # Iterating should return an empty list
+    assert not list(lazy_list)
 
 
 def test_large_generator():
@@ -125,5 +125,5 @@ def test_large_generator():
             yield i
 
     lazy_list = LazyList(gen())
-    assert lazy_list[999] == 1000  # Access a large index
-    assert len(lazy_list._cache) < 1_000_000  # Ensure not all values are cached
+    assert lazy_list[999] == 1000
+    assert len(lazy_list._cache) < 1_000_000  # pylint: disable=protected-access

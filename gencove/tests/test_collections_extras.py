@@ -122,7 +122,7 @@ def test_large_generator():
 
     def gen():
         for i in range(1_000_000):
-            yield i
+            yield i + 1
 
     lazy_list = LazyList(gen())
     assert lazy_list[999] == 1000

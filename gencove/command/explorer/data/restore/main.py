@@ -30,7 +30,7 @@ class Restore(Command):
         self.user_id = None
         self.organization_id = None
         self.explorer_enabled = False
-        self.aws_session_credentials = None
+        self.aws_session_credentials: Optional[ExplorerDataCredentials] = None
 
         # populated after self.execute() is called
         self.organization_users = None

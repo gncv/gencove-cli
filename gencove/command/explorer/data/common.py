@@ -15,9 +15,7 @@ from gencove.exceptions import ValidationError  # noqa I100
 from gencove.logger import echo_error
 from gencove.models import (
     ExplorerDataCredentials,
-    OrganizationDetails,
     OrganizationUser,
-    UserDetails,
 )
 
 

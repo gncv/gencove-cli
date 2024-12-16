@@ -16,10 +16,11 @@ from .....models import ExplorerDataCredentials
 class Sync(Command):
     """Sync Explorer contents command executor."""
 
-    def __init__(self, ctx, path, credentials, options):
+    def __init__(self, ctx, source, destination, credentials, options):
         super().__init__(credentials, options)
         self.ctx = ctx
-        self.path = path
+        self.source = source
+        self.destination = destination
 
         # Populated after self.login() is called
         self.user_id = None

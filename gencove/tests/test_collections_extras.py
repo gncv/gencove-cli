@@ -127,3 +127,17 @@ def test_large_generator():
     lazy_list = LazyList(gen())
     assert lazy_list[999] == 1000
     assert len(lazy_list._cache) < 1_000_000  # pylint: disable=protected-access
+
+
+def test_iter():
+    """Test LazyList iterable."""
+
+    def gen_fib():
+        a, b = 1, 1
+        while a < 10:
+            yield a
+            a, b = b, b + a
+
+    lazy_list = LazyList(gen_fib())
+    for f1, f2 in zip(lazy_list, [1, 1, 2, 3, 5, 8, 13]):
+        assert f1 == f2

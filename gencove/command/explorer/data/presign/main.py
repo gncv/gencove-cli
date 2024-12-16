@@ -1,6 +1,6 @@
 """Configure explorer data presign subcommand."""
-import sys
 import os
+import sys
 import uuid
 
 import click

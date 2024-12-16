@@ -1,5 +1,6 @@
 """Configure explorer data sync subcommand."""
-import os, uuid
+import os
+import uuid
 
 from ..common import (
     GencoveExplorerManager,

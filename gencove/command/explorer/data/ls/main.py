@@ -1,6 +1,6 @@
 """Configure explorer data ls subcommand."""
-import sys
 import os
+import sys
 import uuid
 
 from ..common import (

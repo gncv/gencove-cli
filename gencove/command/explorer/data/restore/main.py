@@ -1,7 +1,7 @@
 """Configure explorer data restore definition."""
-from concurrent.futures import ThreadPoolExecutor
-import uuid
 import os
+import uuid
+from concurrent.futures import ThreadPoolExecutor
 
 from ..common import (
     GencoveExplorerManager,

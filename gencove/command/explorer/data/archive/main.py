@@ -1,8 +1,8 @@
 """Configure explorer data archive definition."""
-from concurrent.futures import ThreadPoolExecutor
-from typing import Optional
 import os
 import uuid
+from concurrent.futures import ThreadPoolExecutor
+from typing import Optional
 
 import botocore
 import botocore.exceptions

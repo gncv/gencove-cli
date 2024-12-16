@@ -1,5 +1,6 @@
 """Configure explorer data rm subcommand."""
-import uuid, os
+import os
+import uuid
 
 from ..common import (
     GencoveExplorerManager,

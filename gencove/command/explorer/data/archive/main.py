@@ -28,6 +28,7 @@ class Archive(Command):
         # Populated after self.login() is called
         self.user_id = None
         self.organization_id = None
+        self.explorer_enabled = False
         self.aws_session_credentials: Optional[ExplorerDataCredentials] = None
 
         # populated after self.execute() is called
@@ -35,7 +36,9 @@ class Archive(Command):
 
     def validate(self):
         """Validate archive"""
-        validate_explorer_user_data(self.user, self.organization)
+        validate_explorer_user_data(
+            self.user_id, self.organization_id, self.explorer_enabled
+        )
         user_has_aws_in_path(raise_exception=True)
 
     def initialize(self):
@@ -43,14 +46,17 @@ class Archive(Command):
         self.login()
 
         if not request_is_from_explorer():
-            self.user_id = self.api_client.get_user_details().id
+            user_data = self.api_client.get_user_details()
+            self.user_id = user_data.id
             self.organization_id = self.api_client.get_organization_details().id
+            self.explorer_enabled = user_data.explorer_enabled
             self.aws_session_credentials = (
                 self.api_client.get_explorer_data_credentials()
             )
         else:
             self.user_id = uuid.UUID(os.getenv("GENCOVE_USER_ID"))
             self.organization_id = uuid.UUID(os.getenv("GENCOVE_ORGANIZATION_ID"))
+            self.explorer_enabled = True
 
     def execute(self):
         """Make a request to archive Explorer objects."""

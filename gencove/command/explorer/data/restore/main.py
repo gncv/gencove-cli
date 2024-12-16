@@ -2,6 +2,7 @@
 import os
 import uuid
 from concurrent.futures import ThreadPoolExecutor
+from typing import Optional
 
 from ..common import (
     GencoveExplorerManager,
@@ -12,6 +13,7 @@ from ....base import Command
 from ....utils import user_has_aws_in_path
 from .....constants import RESTORE_TIERS_SUPPORTED
 from .....exceptions import ValidationError
+from .....models import ExplorerDataCredentials
 
 
 class Restore(Command):
@@ -27,6 +29,7 @@ class Restore(Command):
         # Populated after self.login() is called
         self.user_id = None
         self.organization_id = None
+        self.explorer_enabled = False
         self.aws_session_credentials = None
 
         # populated after self.execute() is called
@@ -35,7 +38,9 @@ class Restore(Command):
     def validate(self):
         """Validate restore"""
         self.validate_tier()
-        validate_explorer_user_data(self.user, self.organization)
+        validate_explorer_user_data(
+            self.user_id, self.organization_id, self.explorer_enabled
+        )
         user_has_aws_in_path(raise_exception=True)
 
     def validate_tier(self):
@@ -54,14 +59,17 @@ class Restore(Command):
         self.login()
 
         if not request_is_from_explorer():
-            self.user_id = self.api_client.get_user_details().id
+            user_data = self.api_client.get_user_details()
+            self.user_id = user_data.id
             self.organization_id = self.api_client.get_organization_details().id
+            self.explorer_enabled = user_data.explorer_enabled
             self.aws_session_credentials = (
                 self.api_client.get_explorer_data_credentials()
             )
         else:
             self.user_id = uuid.UUID(os.getenv("GENCOVE_USER_ID"))
             self.organization_id = uuid.UUID(os.getenv("GENCOVE_ORGANIZATION_ID"))
+            self.explorer_enabled = True
 
     def execute(self):
         """Make a request to restore Explorer objects."""

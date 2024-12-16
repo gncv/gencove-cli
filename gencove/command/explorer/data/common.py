@@ -390,14 +390,17 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         return paginated_response
 
 
-def validate_explorer_user_data(user: UserDetails, organization: OrganizationDetails):
+def validate_explorer_user_data(
+    user: uuid.UUID, organization: uuid.UUID, explorer_enabled: bool
+):
     """Validate user and organization data
 
     Args:
-        user (UserDetails): User details model
-        organization (OrganizationDetails): Organization details model
+        user_id (uuid.UUID): User id
+        organization_id (uuid.UUID): Organization id
+        explorer_enabled (bool): Wether explorer is enabled for the current user
     """
-    if not user.explorer_enabled:
+    if not explorer_enabled:
         raise ValidationError(
             "Explorer is not enabled on your user account, quitting. "
             "Please reach out to your organization owner to inquire "

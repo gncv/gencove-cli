@@ -133,11 +133,11 @@ def test_iter():
     """Test LazyList iterable."""
 
     def gen_fib():
-        a, b = 1, 1
-        while a < 10:
-            yield a
-            a, b = b, b + a
+        fib_a, fib_b = 1, 1
+        while fib_a < 10:
+            yield fib_a
+            fib_a, fib_b = fib_b, fib_b + fib_a
 
     lazy_list = LazyList(gen_fib())
-    for f1, f2 in zip(lazy_list, [1, 1, 2, 3, 5, 8, 13]):
-        assert f1 == f2
+    for lazy_result, expected_value in zip(lazy_list, [1, 1, 2, 3, 5, 8, 13]):
+        assert lazy_result == expected_value

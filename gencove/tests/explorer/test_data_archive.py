@@ -1,6 +1,8 @@
 """Test data archive command."""
 import io
+import os
 import sys
+import uuid
 
 # pylint: disable=wrong-import-order, import-error
 
@@ -139,3 +141,22 @@ def test_data_archive_no_permission(mocker, credentials):
         )
     )
     assert output_line.getvalue() == res.output.encode()
+
+
+def test_data_read_credentials_from_env(mocker, credentials):
+    runner = CliRunner()
+    mocked_request_is_from_explorer = mocker.patch(
+        "gencove.command.explorer.data.archive.main.request_is_from_explorer",
+        return_value=True,
+    )
+    mocked_execute = mocker.patch(
+        "gencove.command.explorer.data.archive.main.Archive.execute"
+    )
+    os.environ["GENCOVE_USER_ID"] = uuid.uuid4().hex
+    os.environ["GENCOVE_ORGANIZATION_ID"] = uuid.uuid4().hex
+
+    res = runner.invoke(archive, ["e://users/me/", *credentials])
+    assert res.exit_code == 0
+
+    mocked_request_is_from_explorer.assert_called()
+    mocked_execute.assert_called()

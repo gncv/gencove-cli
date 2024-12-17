@@ -1,6 +1,8 @@
 """Test data ls command."""
 import io
+import os
 import sys
+import uuid
 
 # pylint: disable=wrong-import-order, import-error
 
@@ -123,3 +125,19 @@ def test_data_ls_no_permission(mocker, credentials):
         )
     )
     assert output_line.getvalue() == res.output.encode()
+
+
+def test_data_read_credentials_from_env(mocker, credentials):
+    """Test read credentials from env on explorer."""
+    runner = CliRunner()
+    mocked_request_is_from_explorer = mocker.patch(
+        "gencove.command.explorer.data.ls.main.request_is_from_explorer",
+        return_value=True,
+    )
+    mocker.patch("gencove.command.explorer.data.ls.main.List.execute")
+    os.environ["GENCOVE_USER_ID"] = uuid.uuid4().hex
+    os.environ["GENCOVE_ORGANIZATION_ID"] = uuid.uuid4().hex
+
+    runner.invoke(ls, ["e://users/me/", *credentials])
+
+    mocked_request_is_from_explorer.assert_called()

@@ -1,4 +1,6 @@
 """Configure explorer data archive definition."""
+import os
+import uuid
 from concurrent.futures import ThreadPoolExecutor
 from typing import Optional
 
@@ -24,8 +26,9 @@ class Archive(Command):
         self.path = path
 
         # Populated after self.login() is called
-        self.user = None
-        self.organization = None
+        self.user_id = None
+        self.organization_id = None
+        self.explorer_enabled = False
         self.aws_session_credentials: Optional[ExplorerDataCredentials] = None
 
         # populated after self.execute() is called
@@ -33,19 +36,27 @@ class Archive(Command):
 
     def validate(self):
         """Validate archive"""
-        validate_explorer_user_data(self.user, self.organization)
+        validate_explorer_user_data(
+            self.user_id, self.organization_id, self.explorer_enabled
+        )
         user_has_aws_in_path(raise_exception=True)
 
     def initialize(self):
         """Initialize archive subcommand."""
         self.login()
-        self.user = self.api_client.get_user_details()
-        self.organization = self.api_client.get_organization_details()
 
         if not request_is_from_explorer():
+            user_data = self.api_client.get_user_details()
+            self.user_id = user_data.id
+            self.organization_id = self.api_client.get_organization_details().id
+            self.explorer_enabled = user_data.explorer_enabled
             self.aws_session_credentials = (
                 self.api_client.get_explorer_data_credentials()
             )
+        else:
+            self.user_id = uuid.UUID(os.getenv("GENCOVE_USER_ID"))
+            self.organization_id = uuid.UUID(os.getenv("GENCOVE_ORGANIZATION_ID"))
+            self.explorer_enabled = True
 
     def execute(self):
         """Make a request to archive Explorer objects."""
@@ -53,8 +64,8 @@ class Archive(Command):
 
         explorer_manager = GencoveExplorerManager(
             aws_session_credentials=self.aws_session_credentials,
-            user_id=str(self.user.id),
-            organization_id=str(self.organization.id),
+            user_id=str(self.user_id),
+            organization_id=str(self.organization_id),
             organization_users=self.api_client.get_organization_users(),
         )
 

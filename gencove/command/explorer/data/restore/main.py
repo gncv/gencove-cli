@@ -1,5 +1,8 @@
 """Configure explorer data restore definition."""
+import os
+import uuid
 from concurrent.futures import ThreadPoolExecutor
+from typing import Optional
 
 from ..common import (
     GencoveExplorerManager,
@@ -10,6 +13,7 @@ from ....base import Command
 from ....utils import user_has_aws_in_path
 from .....constants import RESTORE_TIERS_SUPPORTED
 from .....exceptions import ValidationError
+from .....models import ExplorerDataCredentials
 
 
 class Restore(Command):
@@ -23,9 +27,10 @@ class Restore(Command):
         self.tier = tier
 
         # Populated after self.login() is called
-        self.user = None
-        self.organization = None
-        self.aws_session_credentials = None
+        self.user_id = None
+        self.organization_id = None
+        self.explorer_enabled = False
+        self.aws_session_credentials: Optional[ExplorerDataCredentials] = None
 
         # populated after self.execute() is called
         self.organization_users = None
@@ -33,7 +38,9 @@ class Restore(Command):
     def validate(self):
         """Validate restore"""
         self.validate_tier()
-        validate_explorer_user_data(self.user, self.organization)
+        validate_explorer_user_data(
+            self.user_id, self.organization_id, self.explorer_enabled
+        )
         user_has_aws_in_path(raise_exception=True)
 
     def validate_tier(self):
@@ -50,13 +57,19 @@ class Restore(Command):
     def initialize(self):
         """Initialize restore subcommand."""
         self.login()
-        self.user = self.api_client.get_user_details()
-        self.organization = self.api_client.get_organization_details()
 
         if not request_is_from_explorer():
+            user_data = self.api_client.get_user_details()
+            self.user_id = user_data.id
+            self.organization_id = self.api_client.get_organization_details().id
+            self.explorer_enabled = user_data.explorer_enabled
             self.aws_session_credentials = (
                 self.api_client.get_explorer_data_credentials()
             )
+        else:
+            self.user_id = uuid.UUID(os.getenv("GENCOVE_USER_ID"))
+            self.organization_id = uuid.UUID(os.getenv("GENCOVE_ORGANIZATION_ID"))
+            self.explorer_enabled = True
 
     def execute(self):
         """Make a request to restore Explorer objects."""
@@ -64,8 +77,8 @@ class Restore(Command):
 
         explorer_manager = GencoveExplorerManager(
             aws_session_credentials=self.aws_session_credentials,
-            user_id=str(self.user.id),
-            organization_id=str(self.organization.id),
+            user_id=str(self.user_id),
+            organization_id=str(self.organization_id),
             organization_users=self.api_client.get_organization_users(),
         )
 

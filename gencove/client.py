@@ -9,14 +9,16 @@ import json
 import os
 import time
 from builtins import str as text  # noqa
-from typing import List
 from urllib.parse import parse_qs, urljoin, urlparse
 from uuid import UUID
+
+import backoff
 
 from pydantic import BaseModel
 from requests import ConnectTimeout, ReadTimeout, delete, get, post  # noqa: I201
 
 from gencove import constants  # noqa: I100
+from gencove.collections_extras import LazyList
 from gencove.constants import (
     HiddenStatus,
     PipelineSortBy,
@@ -152,6 +154,9 @@ class APIClient:
     def _serialize_post_payload(payload):
         return json.dumps(payload, cls=CustomEncoder)
 
+    @backoff.on_exception(
+        backoff.expo, APIClientTooManyRequestsError, max_tries=3, max_time=10
+    )
     # pylint: disable=bad-option-value,bad-continuation,too-many-arguments
     # pylint: disable=too-many-branches,too-many-locals, too-many-statements
     def _request(
@@ -1313,28 +1318,30 @@ class APIClient:
 
         return self._post(endpoint, payload, authorized=True, model=ExplorerAccessURL)
 
-    def get_organization_users(self) -> List[OrganizationUser]:
+    def get_organization_users(self) -> LazyList[OrganizationUser]:
         """Retrieve all organization users, handling pagination."""
-        endpoint = self.endpoints.ORGANIZATION_USERS.value
-        query_params = {}
-        all_users = []
 
-        while endpoint:
-            response = self._get(
-                endpoint,
-                query_params=query_params,
-                authorized=True,
-                model=OrganizationUsers,
-            )
-            all_users.extend(response.results)
+        def wrapped_generator():
+            endpoint = self.endpoints.ORGANIZATION_USERS.value
+            query_params = {}
 
-            next_url = response.meta.next
-            if next_url:
-                parsed_url = urlparse(next_url)
-                endpoint = parsed_url.path
-                query_params = parse_qs(parsed_url.query)
-                query_params = {k: v[0] for k, v in query_params.items()}
-            else:
-                endpoint = None
+            while endpoint:
+                response = self._get(
+                    endpoint,
+                    query_params=query_params,
+                    authorized=True,
+                    model=OrganizationUsers,
+                )
+                for user in response.results:
+                    yield user
 
-        return all_users
+                next_url = response.meta.next
+                if next_url:
+                    parsed_url = urlparse(next_url)
+                    endpoint = parsed_url.path
+                    query_params = parse_qs(parsed_url.query)
+                    query_params = {k: v[0] for k, v in query_params.items()}
+                else:
+                    endpoint = None
+
+        return LazyList(wrapped_generator())

@@ -7,4 +7,4 @@ from gencove.constants import Optionals
 class BaseSpaceAutoImportOptionals(Optionals):
     """BaseSpaceAutoImportOptionals model"""
 
-    metadata_json: Optional[str]
+    metadata_json: Optional[str] = None

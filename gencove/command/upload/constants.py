@@ -31,8 +31,8 @@ FASTQ_EXTENSIONS = (".fastq.gz", ".fastq.bgz", ".fq.gz", ".fq.bgz")
 class UploadOptions(Optionals):
     """UploadOptions model"""
 
-    project_id: Optional[str]
-    metadata: Optional[str]
+    project_id: Optional[str] = None
+    metadata: Optional[str] = None
 
 
 ASSIGN_ERROR = (

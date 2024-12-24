@@ -8,5 +8,5 @@ from gencove.constants import Optionals
 class UploadsOptions(Optionals):
     """UploadsOptions model"""
 
-    status: Optional[str]
-    search: Optional[str]
+    status: Optional[str] = None
+    search: Optional[str] = None

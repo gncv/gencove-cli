@@ -8,5 +8,5 @@ from gencove.constants import Optionals, SampleAssignmentStatus
 class RunPrefixOptionals(Optionals):
     """RunPrefixOptionals model"""
 
-    metadata_json: Optional[str]
-    status: Optional[SampleAssignmentStatus]
+    metadata_json: Optional[str] = None
+    status: Optional[SampleAssignmentStatus] = None

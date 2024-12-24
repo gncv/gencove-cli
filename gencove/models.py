@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any, List, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, HttpUrl, validator
+from pydantic import field_validator, BaseModel, HttpUrl
 
 
 # pylint: disable=too-few-public-methods
@@ -28,33 +28,33 @@ class CreateJWT(AccessJWT):
 class S3Object(BaseModel):
     """S3Object model"""
 
-    bucket: Optional[str]
-    object_name: Optional[str]
+    bucket: Optional[str] = None
+    object_name: Optional[str] = None
 
 
 class GencoveStatus(GencoveBaseModel):
     """GencoveStatus model"""
 
-    status: Optional[str]
-    note: Optional[str]
-    created: Optional[datetime]
-    transition_cutoff: Optional[datetime]
+    status: Optional[str] = None
+    note: Optional[str] = None
+    created: Optional[datetime] = None
+    transition_cutoff: Optional[datetime] = None
 
 
 class UploadsPostData(GencoveBaseModel):
     """UploadsPostData model"""
 
-    destination_path: Optional[str]
-    s3: Optional[S3Object]
-    last_status: Optional[GencoveStatus]
+    destination_path: Optional[str] = None
+    s3: Optional[S3Object] = None
+    last_status: Optional[GencoveStatus] = None
 
 
 class ResponseMeta(BaseModel):
     """ResponseMeta model"""
 
-    count: Optional[int]
-    next: Optional[str]
-    previous: Optional[str]
+    count: Optional[int] = None
+    next: Optional[str] = None
+    previous: Optional[str] = None
 
 
 # pylint: disable=too-few-public-methods
@@ -62,125 +62,126 @@ class PipelineCapabilities(GencoveBaseModel):
     """Pipeline Capabilities record"""
 
     id: UUID
-    name: Optional[str]
-    key: Optional[str]
+    name: Optional[str] = None
+    key: Optional[str] = None
 
 
 class SampleFile(GencoveBaseModel):
     """SampleFile model"""
 
-    s3_path: Optional[str]
-    size: Optional[int]
-    download_url: Optional[HttpUrl]
-    file_type: Optional[str]
-    checksum_sha256: Optional[str]
+    s3_path: Optional[str] = None
+    size: Optional[int] = None
+    download_url: Optional[HttpUrl] = None
+    file_type: Optional[str] = None
+    checksum_sha256: Optional[str] = None
 
 
 # pylint: disable=too-few-public-methods
 class Project(GencoveBaseModel):
     """Project record"""
 
-    name: Optional[str]
-    description: Optional[str]
-    created: Optional[datetime]
-    organization: Optional[str]
-    sample_count: Optional[int]
-    pipeline_capabilities: Optional[Union[UUID, PipelineCapabilities]]
-    roles: Optional[dict]
-    webhook_url: Optional[Union[HttpUrl, str]]  # deprecated
-    files: Optional[List[SampleFile]]
+    name: Optional[str] = None
+    description: Optional[str] = None
+    created: Optional[datetime] = None
+    organization: Optional[str] = None
+    sample_count: Optional[int] = None
+    pipeline_capabilities: Optional[Union[UUID, PipelineCapabilities]] = None
+    roles: Optional[dict] = None
+    webhook_url: Optional[Union[HttpUrl, str]] = None  # deprecated
+    files: Optional[List[SampleFile]] = None
 
 
 class AWSCredentials(BaseModel):
     """Generic AWS credentials model"""
 
-    version: Optional[int]
-    access_key: Optional[str]
-    secret_key: Optional[str]
-    token: Optional[str]
-    expiry_time: Optional[str]  # needs to be str for boto3 to work
+    version: Optional[int] = None
+    access_key: Optional[str] = None
+    secret_key: Optional[str] = None
+    token: Optional[str] = None
+    expiry_time: Optional[str] = None  # needs to be str for boto3 to work
 
 
 class ExplorerDataCredentials(AWSCredentials):
     """AWS Credentials for Explorer data commands"""
 
-    region_name: Optional[str]
+    region_name: Optional[str] = None
 
 
 class SampleDetails(GencoveBaseModel):
     """SampleDetails model"""
 
-    created: Optional[datetime]
-    modified: Optional[datetime]
-    run: Optional[str]
-    client_id: Optional[str]
-    physical_id: Optional[str]
-    legacy_id: Optional[str]
-    last_status: Optional[GencoveStatus]
-    archive_last_status: Optional[GencoveStatus]
-    files: Optional[List[SampleFile]]
+    created: Optional[datetime] = None
+    modified: Optional[datetime] = None
+    run: Optional[str] = None
+    client_id: Optional[str] = None
+    physical_id: Optional[str] = None
+    legacy_id: Optional[str] = None
+    last_status: Optional[GencoveStatus] = None
+    archive_last_status: Optional[GencoveStatus] = None
+    files: Optional[List[SampleFile]] = None
 
 
 class ProjectSamples(BaseModel):
     """ProjectSamples model"""
 
     meta: ResponseMeta
-    results: Optional[List[SampleDetails]]
+    results: Optional[List[SampleDetails]] = None
 
 
 class Upload(BaseModel):
     """Upload model"""
 
-    upload: Optional[UUID]
-    destination_path: Optional[str]
-    last_status: Optional[GencoveStatus]
+    upload: Optional[UUID] = None
+    destination_path: Optional[str] = None
+    last_status: Optional[GencoveStatus] = None
 
 
 class Fastqs(BaseModel):
     """Fastqs model"""
 
-    r1: Optional[Upload]
-    r2: Optional[Upload]
+    r1: Optional[Upload] = None
+    r2: Optional[Upload] = None
 
 
 class Sample(BaseModel):
     """Sample model"""
 
-    client_id: Optional[str]
-    fastq: Optional[Fastqs]
-    sample: Optional[UUID]
+    client_id: Optional[str] = None
+    fastq: Optional[Fastqs] = None
+    sample: Optional[UUID] = None
 
 
 class SampleSheet(BaseModel):
     """SampleSheet model"""
 
     meta: ResponseMeta
-    results: Optional[List[Sample]]
+    results: Optional[List[Sample]] = None
 
 
 class UploadSamples(BaseModel):
     """UploadSamples model"""
 
-    uploads: Optional[List[Sample]]
-    metadata: Optional[Any]
+    uploads: Optional[List[Sample]] = None
+    metadata: Optional[Any] = None
 
 
 class QualityControlType(BaseModel):
     """QualityControlType model"""
 
-    key: Optional[str]
-    type: Optional[str]
+    key: Optional[str] = None
+    type: Optional[str] = None
 
 
 class QualityControlData(BaseModel):
     """QualityControlData model"""
 
-    value_expected: Optional[float]
-    value_measured: Optional[float]
-    value_string: Optional[str]
-    status: Optional[str]
+    value_expected: Optional[float] = None
+    value_measured: Optional[float] = None
+    value_string: Optional[str] = None
+    status: Optional[str] = None
 
-    @validator("value_string", pre=True)
+    @field_validator("value_string", mode="before")
+    @classmethod
     def blank_string(
         cls, value: str  # noqa: N805
     ):  # pylint: disable=no-self-argument,no-self-use
@@ -193,112 +194,112 @@ class QualityControlData(BaseModel):
 class QualityControl(BaseModel):
     """QualityControl model"""
 
-    quality_control_type: Optional[QualityControlType]
-    quality_control: Optional[QualityControlData]
+    quality_control_type: Optional[QualityControlType] = None
+    quality_control: Optional[QualityControlData] = None
 
 
 class SampleQC(BaseModel):
     """SampleQC model"""
 
     meta: ResponseMeta
-    results: Optional[List[QualityControl]]
+    results: Optional[List[QualityControl]] = None
 
 
 class ClientFastQ(BaseModel):
     """ClientFastQ model"""
 
-    client_id: Optional[str]
-    fastq: Optional[Upload]
+    client_id: Optional[str] = None
+    fastq: Optional[Upload] = None
 
 
 class UploadFastQ(BaseModel):
     """UploadFastQ model"""
 
     meta: ResponseMeta
-    results: Optional[List[ClientFastQ]]
+    results: Optional[List[ClientFastQ]] = None
 
 
 class Projects(BaseModel):
     """Projects model"""
 
     meta: ResponseMeta
-    results: Optional[List[Project]]
+    results: Optional[List[Project]] = None
 
 
 class BatchType(BaseModel):
     """BatchType model"""
 
-    key: Optional[str]
-    description: Optional[str]
+    key: Optional[str] = None
+    description: Optional[str] = None
 
 
 class ProjectBatchTypes(BaseModel):
     """ProjectBatchTypes model"""
 
     meta: ResponseMeta
-    results: Optional[List[BatchType]]
+    results: Optional[List[BatchType]] = None
 
 
 class BatchDetail(GencoveBaseModel):
     """BatchDetail model"""
 
-    name: Optional[str]
-    batch_type: Optional[str]
-    sample_ids: Optional[List[UUID]]
-    last_status: Optional[GencoveStatus]
-    files: Optional[List[SampleFile]]
+    name: Optional[str] = None
+    batch_type: Optional[str] = None
+    sample_ids: Optional[List[UUID]] = None
+    last_status: Optional[GencoveStatus] = None
+    files: Optional[List[SampleFile]] = None
 
 
 class ProjectBatches(BaseModel):
     """ProjectBatches model"""
 
     meta: ResponseMeta
-    results: Optional[List[BatchDetail]]
+    results: Optional[List[BatchDetail]] = None
 
 
 class ProjectMergeVCFs(GencoveBaseModel):
     """ProjectMergeVCFs model"""
 
-    created: Optional[datetime]
-    user: Optional[UUID]
-    last_status: Optional[GencoveStatus]
-    up_to_date: Optional[bool]
+    created: Optional[datetime] = None
+    user: Optional[UUID] = None
+    last_status: Optional[GencoveStatus] = None
+    up_to_date: Optional[bool] = None
 
 
 class SampleMetadata(BaseModel):
     """SampleMetadata model"""
 
-    metadata: Optional[Any]
+    metadata: Optional[Any] = None
 
 
 class BaseSpaceProjectDetail(BaseModel):
     """BaseSpace project detail model"""
 
-    basespace_id: Optional[str]
-    basespace_name: Optional[str]
-    basespace_date_created: Optional[datetime]
+    basespace_id: Optional[str] = None
+    basespace_name: Optional[str] = None
+    basespace_date_created: Optional[datetime] = None
 
 
 class BaseSpaceProject(BaseModel):
     """BaseSpace project model"""
 
     meta: ResponseMeta
-    results: Optional[List[BaseSpaceProjectDetail]]
+    results: Optional[List[BaseSpaceProjectDetail]] = None
 
 
 class BaseSpaceBiosampleDetail(BaseModel):
     """BaseSpace Biosample detail model"""
 
-    basespace_id: Optional[str]
-    basespace_bio_sample_name: Optional[str]
-    basespace_date_created: Optional[datetime]
+    basespace_id: Optional[str] = None
+    basespace_bio_sample_name: Optional[str] = None
+    basespace_date_created: Optional[datetime] = None
 
 
 class BaseSpaceBiosample(BaseModel):
     """BaseSpace Biosample model"""
 
     meta: ResponseMeta
-    results: Optional[List[BaseSpaceBiosampleDetail]]
+    results: Optional[List[BaseSpaceBiosampleDetail]] = None
 
 
 class BaseSpaceProjectImportDetail(GencoveBaseModel):
@@ -306,14 +307,14 @@ class BaseSpaceProjectImportDetail(GencoveBaseModel):
 
     project_id: UUID
     identifier: str
-    metadata: Optional[Any]
+    metadata: Optional[Any] = None
 
 
 class BaseSpaceProjectImport(BaseModel):
     """BaseSpace project import model"""
 
     meta: ResponseMeta
-    results: Optional[List[BaseSpaceProjectImportDetail]]
+    results: Optional[List[BaseSpaceProjectImportDetail]] = None
 
 
 class S3AutoimportTopic(GencoveBaseModel):
@@ -327,21 +328,21 @@ class S3ProjectImportDetail(GencoveBaseModel):
 
     project_id: UUID
     s3_uri: str
-    metadata: Optional[Any]
+    metadata: Optional[Any] = None
 
 
 class S3ProjectImport(BaseModel):
     """S3 project import model"""
 
     meta: ResponseMeta
-    results: Optional[List[S3ProjectImportDetail]]
+    results: Optional[List[S3ProjectImportDetail]] = None
 
 
 class SampleImport(BaseModel):
     """Existing sample import model"""
 
     sample_id: UUID
-    client_id: Optional[str]
+    client_id: Optional[str] = None
 
 
 class ImportExistingSamplesModel(BaseModel):
@@ -349,21 +350,21 @@ class ImportExistingSamplesModel(BaseModel):
 
     project_id: UUID
     samples: List[SampleImport]
-    metadata: Optional[Any]
+    metadata: Optional[Any] = None
 
 
 class FileType(BaseModel):
     """FileType model"""
 
-    key: Optional[str]
-    description: Optional[str]
+    key: Optional[str] = None
+    description: Optional[str] = None
 
 
 class FileTypesModel(BaseModel):
     """File types model"""
 
     meta: ResponseMeta
-    results: Optional[List[FileType]]
+    results: Optional[List[FileType]] = None
 
 
 class Pipeline(GencoveBaseModel):
@@ -382,33 +383,33 @@ class Pipelines(BaseModel):
     """Pipeline model"""
 
     meta: ResponseMeta
-    results: Optional[List[Pipeline]]
+    results: Optional[List[Pipeline]] = None
 
 
 class UploadURLImport(GencoveBaseModel):
     """URL import moodel"""
 
-    s3: Optional[S3Object]
-    last_status: Optional[GencoveStatus]
-    destination_path: Optional[str]
-    source_url: Optional[str]
+    s3: Optional[S3Object] = None
+    last_status: Optional[GencoveStatus] = None
+    destination_path: Optional[str] = None
+    source_url: Optional[str] = None
 
 
 class File(GencoveBaseModel):
     """File model"""
 
-    s3_path: Optional[str]
-    size: Optional[int]
-    download_url: Optional[str]
-    file_type: Optional[str]
-    checksum_sha256: Optional[str]
+    s3_path: Optional[str] = None
+    size: Optional[int] = None
+    download_url: Optional[str] = None
+    file_type: Optional[str] = None
+    checksum_sha256: Optional[str] = None
 
 
 class SampleManifest(GencoveBaseModel):
     """Sample manifest model"""
 
     file_name: str
-    file: Optional[File]
+    file: Optional[File] = None
     project: UUID
 
 
@@ -423,7 +424,7 @@ class ExplorerInstance(BaseModel):
 
     id: UUID
     status: str
-    stop_after_inactivity_hours: Optional[int]
+    stop_after_inactivity_hours: Optional[int] = None
 
 
 class ExplorerInstanceIds(BaseModel):
@@ -443,7 +444,7 @@ class ExplorerInstanceInactivityStop(BaseModel):
     """ExplorerInstanceInactivityStop model"""
 
     instance_ids: List[UUID]
-    stop_after_inactivity_hours: Optional[int]
+    stop_after_inactivity_hours: Optional[int] = None
 
 
 class ExplorerInstanceInactivityStopOrganization(BaseModel):
@@ -456,22 +457,22 @@ class ExplorerInstanceInactivityStopOrganization(BaseModel):
 class ExplorerShellSessionCredentials(BaseModel):
     """ExplorerShellSessionCredentials model"""
 
-    version: Optional[int]
-    access_key: Optional[str]
-    secret_key: Optional[str]
-    token: Optional[str]
-    expiry_time: Optional[str]  # needs to be str for boto3 to work
-    region_name: Optional[str]
-    ec2_instance_id: Optional[str]
-    shell_session_ssm_document_name: Optional[str]
-    network_activity_ssm_document_name: Optional[str]
+    version: Optional[int] = None
+    access_key: Optional[str] = None
+    secret_key: Optional[str] = None
+    token: Optional[str] = None
+    expiry_time: Optional[str] = None  # needs to be str for boto3 to work
+    region_name: Optional[str] = None
+    ec2_instance_id: Optional[str] = None
+    shell_session_ssm_document_name: Optional[str] = None
+    network_activity_ssm_document_name: Optional[str] = None
 
 
 class ExplorerAccessURL(BaseModel):
     """ExplorerAccessURL model"""
 
     url: str
-    access_token_expiration: Optional[int]
+    access_token_expiration: Optional[int] = None
 
 
 class OrganizationDetails(GencoveBaseModel):
@@ -502,10 +503,10 @@ class OrganizationUser(GencoveBaseModel):
     id: UUID
     name: str
     email: str
-    is_active: Optional[bool]
-    has_mfa_device: Optional[bool]
-    roles: Optional[dict]
-    is_support: Optional[bool]
+    is_active: Optional[bool] = None
+    has_mfa_device: Optional[bool] = None
+    roles: Optional[dict] = None
+    is_support: Optional[bool] = None
 
 
 class OrganizationUsers(BaseModel):

@@ -7,4 +7,4 @@ from gencove.constants import Optionals
 class S3AutoImportOptionals(Optionals):
     """S3AutoImportOptionals model"""
 
-    metadata_json: Optional[str]
+    metadata_json: Optional[str] = None

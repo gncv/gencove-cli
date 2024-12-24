@@ -152,7 +152,7 @@ class Credentials(BaseModel):
 class Optionals(BaseModel):
     """Optionals model"""
 
-    host: Optional[str]
+    host: Optional[str] = None
 
 
 @unique

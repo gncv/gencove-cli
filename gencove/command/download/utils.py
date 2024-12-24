@@ -7,6 +7,7 @@ from urllib.parse import parse_qs, urlparse
 import backoff
 
 import requests
+from pydantic import HttpUrl
 
 from gencove import client  # noqa: I100
 from gencove.constants import (  # noqa: I100
@@ -178,7 +179,9 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
         str : file path
             location of the downloaded file
     """
-
+    download_url = (
+        str(download_url) if isinstance(download_url, HttpUrl) else download_url
+    )
     file_path_tmp = f"{file_path}.tmp"
     if os.path.exists(file_path_tmp):
         file_mode = "ab"

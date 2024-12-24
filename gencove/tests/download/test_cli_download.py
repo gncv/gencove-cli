@@ -244,8 +244,8 @@ def test_sample_ids_provided(credentials, mocker, recording, sample_id_download,
             calls = [
                 call(
                     f"cli_test_data/mock-client-id/{MOCK_UUID}/r1.fastq.gz",
-                    HttpUrl(
-                        url="https://example.com/r1.fastq.gz",
+                    HttpUrl.build(
+                        path="r1.fastq.gz",
                         scheme="https",
                         host="example.com",
                     ),
@@ -254,8 +254,8 @@ def test_sample_ids_provided(credentials, mocker, recording, sample_id_download,
                 ),
                 call(
                     f"cli_test_data/mock-client-id/{MOCK_UUID}/r2.fastq.gz",
-                    HttpUrl(
-                        url="https://example.com/r2.fastq.gz",
+                    HttpUrl.build(
+                        path="r2.fastq.gz",
                         scheme="https",
                         host="example.com",
                     ),
@@ -382,13 +382,11 @@ def test_create_checksum_file(credentials, mocker, recording, sample_id_download
             mocked_download_file.assert_called_once_with(
                 f"cli_test_data/mock-client-id/{MOCK_UUID}/{filename}",
                 HttpUrl(
-                    url=next(
+                    next(
                         file["download_url"]
                         for file in get_sample_details_response["files"]
                         if file["file_type"] == "fastq-r2"
                     ),
-                    scheme="https",
-                    host="example.com",
                 ),
                 True,
                 False,
@@ -459,13 +457,11 @@ def test_create_checksum_file_template(
             mocked_download_file.assert_called_once_with(
                 f"cli_test_data/{filename}",
                 HttpUrl(
-                    url=next(
+                    next(
                         file["download_url"]
                         for file in get_sample_details_response["files"]
                         if file["file_type"] == "fastq-r2"
                     ),
-                    scheme="https",
-                    host="example.com",
                 ),
                 True,
                 False,
@@ -527,13 +523,11 @@ def test_create_checksum_file_exception(
             mocked_download_file.assert_called_with(
                 f"cli_test_data/mock-client-id/{MOCK_UUID}/{filename}",
                 HttpUrl(
-                    url=next(
+                    next(
                         file["download_url"]
                         for file in get_sample_details_response["files"]
                         if file["file_type"] == "fastq-r1"
                     ),
-                    scheme="https",
-                    host="example.com",
                 ),
                 True,
                 False,
@@ -819,13 +813,11 @@ def test_download_no_progress(credentials, mocker, recording, sample_id_download
                     call(
                         f"cli_test_data/mock-client-id/{MOCK_UUID}/{MOCK_UUID}_R1.fastq.gz",  # noqa: E501 pylint: disable=line-too-long
                         HttpUrl(
-                            url=next(
+                            next(
                                 file["download_url"]
                                 for file in get_sample_details_response["files"]
                                 if file["file_type"] == "fastq-r1"
                             ),
-                            scheme="https",
-                            host="example.com",
                         ),
                         True,
                         True,
@@ -833,13 +825,11 @@ def test_download_no_progress(credentials, mocker, recording, sample_id_download
                     call(
                         f"cli_test_data/mock-client-id/{MOCK_UUID}/{MOCK_UUID}_R2.fastq.gz",  # noqa: E501 pylint: disable=line-too-long
                         HttpUrl(
-                            url=next(
+                            next(
                                 file["download_url"]
                                 for file in get_sample_details_response["files"]
                                 if file["file_type"] == "fastq-r2"
                             ),
-                            scheme="https",
-                            host="example.com",
                         ),
                         True,
                         True,

@@ -1,4 +1,4 @@
-image: python:3.7
+image: python:3.11
 
 stages:
   - test
@@ -30,19 +30,6 @@ test_windows:
     - powershell -Command "C:\\Python$env:PYTHON_VERSION_MAJOR$env:PYTHON_VERSION_MINOR\\python.exe -m pip install -e ."
   script:
     - powershell -Command "C:\\Python$env:PYTHON_VERSION_MAJOR$env:PYTHON_VERSION_MINOR\\Scripts\\gencove --version"
-
-python37_api_key:
-  stage: test
-  script: tox -e py37-api_key
-  except:
-    - tags
-
-python37_user_pass:
-  stage: test
-  script: tox -e py37-user_pass
-  except:
-    - tags
-  coverage: /^TOTAL.+?(\d+\.\d+\%)$/
 
 python38_api_key:
   image: python:3.8

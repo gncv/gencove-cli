@@ -46,7 +46,7 @@ setup(
         "boto3>=1.17.97",
         "progressbar2==3.55.0",
         "backoff<=2.2.1",
-        "pydantic==1.10.13",
+        "pydantic>=2.10.4",
         "click-default-group>=1.2.4",
     ],
     setup_requires=["pytest-runner"],

@@ -10,16 +10,13 @@ from typing import List, Optional, Tuple
 import boto3
 
 # pylint: disable=wrong-import-order
+from gencove.collections_extras import LazyList
 from gencove.exceptions import ValidationError  # noqa I100
 from gencove.logger import echo_error
 from gencove.models import (
     ExplorerDataCredentials,
-    OrganizationDetails,
     OrganizationUser,
-    UserDetails,
 )
-
-# Ensure there are two blank lines before any class or function definition
 
 
 @dataclass
@@ -30,7 +27,7 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
     organization_id: str
 
     aws_session_credentials: Optional[ExplorerDataCredentials]
-    organization_users: List[OrganizationUser]
+    organization_users: LazyList[OrganizationUser]
 
     # Constants ported from Gencove Explorer package
     # https://gitlab.com/gencove/platform/explorer-sdk/-/blob/main/gencove_explorer/constants.py  # noqa: E501 # pylint: disable=line-too-long
@@ -391,14 +388,17 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
         return paginated_response
 
 
-def validate_explorer_user_data(user: UserDetails, organization: OrganizationDetails):
+def validate_explorer_user_data(
+    user: uuid.UUID, organization: uuid.UUID, explorer_enabled: bool
+):
     """Validate user and organization data
 
     Args:
-        user (UserDetails): User details model
-        organization (OrganizationDetails): Organization details model
+        user_id (uuid.UUID): User id
+        organization_id (uuid.UUID): Organization id
+        explorer_enabled (bool): Wether explorer is enabled for the current user
     """
-    if not user.explorer_enabled:
+    if not explorer_enabled:
         raise ValidationError(
             "Explorer is not enabled on your user account, quitting. "
             "Please reach out to your organization owner to inquire "

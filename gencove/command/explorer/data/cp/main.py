@@ -16,11 +16,22 @@ from .....models import ExplorerDataCredentials
 class Copy(Command):
     """Copy Explorer contents command executor."""
 
-    def __init__(self, ctx, source, destination, credentials, options):
+    def __init__(
+        self,
+        ctx,
+        source,
+        destination,
+        auto_expire,
+        no_auto_archive,
+        credentials,
+        options,
+    ):
         super().__init__(credentials, options)
         self.ctx = ctx
         self.source = source
         self.destination = destination
+        self.auto_expire = auto_expire
+        self.no_auto_archive = no_auto_archive
 
         # Populated after self.login() is called
         self.user_id = None
@@ -67,4 +78,29 @@ class Copy(Command):
         )
         explorer_manager.execute_aws_s3_src_dst(
             "cp", self.source, self.destination, self.ctx.args
+        )
+
+        bucket, obj_key = (
+            explorer_manager.translate_path_to_s3_path(self.path)
+            .lstrip("s3://")
+            .split("/", 1)
+        )
+
+        s3_client = explorer_manager.thread_safe_client("s3")
+
+        s3_client.put_object_tagging(
+            Bucket=bucket,
+            Key=obj_key,
+            Tagging={
+                "TagSet": [
+                    {
+                        "Key": "AutoArchive",
+                        "Value": "no" if self.no_auto_archive else "yes",
+                    },
+                    {
+                        "Key": "AutoExpire",
+                        "Value": "yes" if self.auto_expire else "no",
+                    },
+                ]
+            },
         )

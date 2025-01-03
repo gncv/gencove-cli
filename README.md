@@ -10,7 +10,7 @@ Main documentation can be found here: [https://docs.gencove.com](https://docs.ge
 
 ## Local Development ##
 
-Have some form of virtualization, for instance pyenv for 3.7.x and a virtualenv.
+Have some form of virtualization, for instance pyenv for 3.11.x and a virtualenv.
 
 Install in editing mode:
 ```bash
@@ -53,19 +53,19 @@ tox
 
 This will run tests, black formatter and linters.
 
-To run only a specific job from tox (i.e. only the tests for python 3.7 using API key):
+To run only a specific job from tox (i.e. only the tests for python 3.9 using API key):
 
 ```bash
-tox -e py37-api_key
+tox -e py39-api_key
 ```
 If you invoke tox like this:
 
 ```
-tox -e py37-api_key -- gencove/tests/test_utils.py
+tox -e py39-api_key -- gencove/tests/test_utils.py
 ```
 or
 ```
-tox -e py37-api_key -- gencove/tests/test_utils.py::test_is_valid_uuid__is_not_valid__text
+tox -e py39-api_key -- gencove/tests/test_utils.py::test_is_valid_uuid__is_not_valid__text
 ```
 the arguments after the -- will be substituted everywhere where you specify {posargs} in your test commands.
 

@@ -4,11 +4,11 @@ from uuid import uuid4
 
 from click.testing import CliRunner
 
+from pydantic import HttpUrl
+
 from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.projects.cli import get_merged_vcf
 from gencove.models import Project
-
-from pydantic import HttpUrl
 
 
 def test_get_merged_vcf__bad_project_id(mocker):

@@ -6,7 +6,6 @@ from unittest.mock import call
 from uuid import uuid4
 
 from click.testing import CliRunner
-from pydantic import HttpUrl
 
 from gencove.command.download.utils import download_file
 from gencove.command.projects.get_reference_genome.cli import get_reference_genome
@@ -26,6 +25,8 @@ from gencove.tests.projects.vcr.filters import (
 )
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
 from gencove.tests.utils import MOCK_UUID
+
+from pydantic import HttpUrl
 
 import pytest
 

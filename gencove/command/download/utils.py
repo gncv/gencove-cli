@@ -6,8 +6,9 @@ from urllib.parse import parse_qs, urlparse
 
 import backoff
 
-import requests
 from pydantic import HttpUrl
+
+import requests
 
 from gencove import client  # noqa: I100
 from gencove.constants import (  # noqa: I100

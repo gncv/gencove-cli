@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any, List, Optional, Union
 from uuid import UUID
 
-from pydantic import field_validator, BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, field_validator
 
 
 # pylint: disable=too-few-public-methods

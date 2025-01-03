@@ -1,8 +1,9 @@
 """Samples command utilities."""
 import json
 
-import requests
 from pydantic import HttpUrl
+
+import requests
 
 from gencove import client  # noqa: I100
 from gencove.logger import echo_debug, echo_warning  # noqa: I100

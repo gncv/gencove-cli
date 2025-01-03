@@ -107,7 +107,9 @@ def test_list_project_batches__not_empty(
 
         output_line = io.BytesIO()
         sys.stdout = output_line
-        for response in ProjectBatches(**get_project_batches_response).results:
+        for response in ProjectBatches(  # pylint: disable=not-an-iterable
+            **get_project_batches_response
+        ).results:
             echo(
                 "\t".join(
                     [

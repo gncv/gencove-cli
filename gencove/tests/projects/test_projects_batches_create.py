@@ -223,7 +223,9 @@ def test_create_project_batches__success__with_sample_ids(
 
         output_line = io.BytesIO()
         sys.stdout = output_line
-        for response in ProjectBatches(**create_project_batch_response).results:
+        for response in ProjectBatches(  # pylint: disable=not-an-iterable
+            **create_project_batch_response
+        ).results:
             echo(
                 "\t".join(
                     [
@@ -281,7 +283,9 @@ def test_create_project_batches__success__without_sample_ids(
 
         output_line = io.BytesIO()
         sys.stdout = output_line
-        for response in ProjectBatches(**create_project_batch_response).results:
+        for response in ProjectBatches(  # pylint: disable=not-an-iterable
+            **create_project_batch_response
+        ).results:
             echo(
                 "\t".join(
                     [

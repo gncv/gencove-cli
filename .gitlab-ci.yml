@@ -101,6 +101,20 @@ python312_user_pass:
   except:
     - tags
 
+python313_api_key:
+  image: python:3.13
+  stage: test
+  script: tox -e py313-api_key
+  except:
+    - tags
+
+python313_user_pass:
+  image: python:3.13
+  stage: test
+  script: tox -e py313-user_pass
+  except:
+    - tags
+
 black:
   stage: test
   script: tox -e black_checker

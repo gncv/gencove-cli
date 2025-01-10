@@ -354,7 +354,7 @@ MOCKED_PROJECTS_WITH_UNEXPECTED_KEYS = dict(
             "webhook_url": "",
             "sample_count": 1,
             "pipeline_capabilities": str(uuid4()),
-            "roles": [],
+            "roles": {},
             **{"unexpected_key" + str(uuid4()): i for i in range(10)},
         }
     ],

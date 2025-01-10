@@ -14,7 +14,7 @@ from uuid import UUID
 
 import backoff
 
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 from requests import ConnectTimeout, ReadTimeout, delete, get, post  # noqa: I201
 
 from gencove import constants  # noqa: I100
@@ -85,6 +85,8 @@ class CustomEncoder(json.JSONEncoder):
         if isinstance(o, BaseModel):
             return {**o.dict(exclude_unset=True), **o.dict(exclude_none=True)}
         if isinstance(o, UUID):
+            return str(o)
+        if isinstance(o, HttpUrl):
             return str(o)
         return json.JSONEncoder.default(self, o)
 

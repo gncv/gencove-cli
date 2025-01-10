@@ -49,17 +49,17 @@ class DownloadFilters(BaseModel):
     # project_id and sample_ids should be UUID instead of Union[UUID, str]
     # some tests break on UUID because they are using arbitrary strings
     # fix tests and then modify
-    project_id: Optional[Union[UUID, str]]
-    sample_ids: Optional[Tuple[Union[UUID, str], ...]]
-    file_types: Optional[Tuple[str, ...]]
+    project_id: Optional[Union[UUID, str]] = None
+    sample_ids: Optional[Tuple[Union[UUID, str], ...]] = None
+    file_types: Optional[Tuple[str, ...]] = None
 
 
 # pylint: disable=too-few-public-methods
 class DownloadOptions(Optionals):
     """DownloadOptions model"""
 
-    skip_existing: Optional[bool]
-    download_template: Optional[str]
+    skip_existing: Optional[bool] = None
+    download_template: Optional[str] = None
 
 
 DEFAULT_FILENAME_TOKEN = f"{{{DownloadTemplateParts.DEFAULT_FILENAME.value}}}"

@@ -1,6 +1,8 @@
 """Samples command utilities."""
 import json
 
+from pydantic import HttpUrl
+
 import requests
 
 from gencove import client  # noqa: I100
@@ -34,6 +36,9 @@ def download_file(destination, download_url, no_progress=False):
         str : file path
             location of the downloaded file
     """
+    download_url = (
+        str(download_url) if isinstance(download_url, HttpUrl) else download_url
+    )
     stream_params = dict(stream=True, allow_redirects=False, headers={}, timeout=30)
 
     with requests.get(download_url, **stream_params) as req:

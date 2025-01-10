@@ -26,6 +26,8 @@ from gencove.tests.projects.vcr.filters import (
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
 from gencove.tests.utils import MOCK_UUID
 
+from pydantic import HttpUrl
+
 import pytest
 
 from vcr import VCR
@@ -157,7 +159,9 @@ def test_get_reference_genome__success(  # pylint: disable=too-many-arguments
                     f"cli_test_data/{filename}",
                     # We need to use SampleFile to have a full HttpUrl pydantic
                     # attribute
-                    SampleFile(id=MOCK_UUID, download_url=download_url).download_url,
+                    SampleFile(
+                        id=MOCK_UUID, download_url=HttpUrl(download_url)
+                    ).download_url,
                     no_progress=False,
                 )
             )
@@ -200,7 +204,7 @@ def test_get_reference_genome__success_specific_file_type(
             f"cli_test_data/{filename}",
             SampleFile(
                 id=MOCK_UUID,
-                download_url=download_url,
+                download_url=HttpUrl(download_url),
             ).download_url,
             no_progress=False,
         )
@@ -238,7 +242,7 @@ def test_get_reference_genome__success_no_progress(
         query_param = (
             f"response-content-disposition=attachment%3B+filename%3D{filename}"
         )
-        download_url = f"https://example.com/genome.dict?{query_param}"
+        download_url = HttpUrl(f"https://example.com/genome.dict?{query_param}")
         mocked_download_file.assert_called_once_with(
             f"cli_test_data/{filename}",
             SampleFile(

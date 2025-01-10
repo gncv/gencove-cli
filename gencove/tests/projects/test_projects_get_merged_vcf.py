@@ -8,6 +8,8 @@ from gencove.client import APIClient, APIClientError, APIClientTimeout
 from gencove.command.projects.cli import get_merged_vcf
 from gencove.models import Project
 
+from pydantic import HttpUrl  # pylint: disable=wrong-import-order
+
 
 def test_get_merged_vcf__bad_project_id(mocker):
     """Test get merged file failure when non-uuid string is used as
@@ -112,7 +114,7 @@ def test_get_merged_vcf_custom_filename(mocker):
     """Test project download merged VCF success with custom filename."""
     project_id = str(uuid4())
     file_id = str(uuid4())
-    download_url = (
+    download_url = HttpUrl(
         "https://bucket.s3.amazonaws.com/output/apps/merge_vcfs/"
         f"{file_id}/{file_id}.vcf.bgz"
     )
@@ -229,8 +231,10 @@ def test_get_merged_vcf__no_progress_success(mocker):
     mocked_get_project.assert_called_once()
     mocked_download_file.assert_called_once_with(
         f"{file_id}.vcf.bgz",
-        "https://bucket.s3.amazonaws.com/output/apps/"
-        f"merge_vcfs/{file_id}/{file_id}.vcf.bgz",
+        HttpUrl(
+            "https://bucket.s3.amazonaws.com/output/apps/"
+            f"merge_vcfs/{file_id}/{file_id}.vcf.bgz"
+        ),
         no_progress=True,
     )
 
@@ -326,8 +330,10 @@ def test_get_merged_vcf__success(mocker):
     mocked_get_project.assert_called_once()
     mocked_download_file.assert_called_once_with(
         f"{file_id}.vcf.bgz",
-        "https://bucket.s3.amazonaws.com/output/apps/"
-        f"merge_vcfs/{file_id}/{file_id}.vcf.bgz",
+        HttpUrl(
+            "https://bucket.s3.amazonaws.com/output/apps/"
+            f"merge_vcfs/{file_id}/{file_id}.vcf.bgz"
+        ),
         no_progress=False,
     )
 
@@ -390,7 +396,9 @@ def test_get_merged_vcf__success__project_with_legacy_webhhok_url(mocker):
     mocked_get_project.assert_called_once()
     mocked_download_file.assert_called_once_with(
         f"{file_id}.vcf.bgz",
-        "https://bucket.s3.amazonaws.com/output/apps/"
-        f"merge_vcfs/{file_id}/{file_id}.vcf.bgz",
+        HttpUrl(
+            "https://bucket.s3.amazonaws.com/output/apps/"
+            f"merge_vcfs/{file_id}/{file_id}.vcf.bgz"
+        ),
         no_progress=False,
     )

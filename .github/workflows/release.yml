@@ -2,7 +2,7 @@ name: Release Gencove CLI
 
 on:
   branches:
-      - "Hotfix/*"  # TODO: revert to tags: "*.*.*" after testing
+      - "hotfix/*"  # TODO: revert to tags: "*.*.*" after testing
 
 jobs:
   build:

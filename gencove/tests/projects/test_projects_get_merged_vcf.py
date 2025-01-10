@@ -395,7 +395,8 @@ def test_get_merged_vcf__success__project_with_legacy_webhhok_url(mocker):
     mocked_download_file.assert_called_once_with(
         f"{file_id}.vcf.bgz",
         HttpUrl(
-            f"https://bucket.s3.amazonaws.com/output/apps/merge_vcfs/{file_id}/{file_id}.vcf.bgz"  # noqa # pylint: disable=line-too-long
+            "https://bucket.s3.amazonaws.com/output/apps/"
+            f"merge_vcfs/{file_id}/{file_id}.vcf.bgz"
         ),
         no_progress=False,
     )

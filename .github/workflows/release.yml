@@ -3,7 +3,7 @@ name: Release Gencove CLI
 on:
   push:
     tags:
-      - "*.*.*.*"
+      - "*.*.*"
 
 jobs:
   build:

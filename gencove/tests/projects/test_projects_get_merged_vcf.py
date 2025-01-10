@@ -232,7 +232,8 @@ def test_get_merged_vcf__no_progress_success(mocker):
     mocked_download_file.assert_called_once_with(
         f"{file_id}.vcf.bgz",
         HttpUrl(
-            f"https://bucket.s3.amazonaws.com/output/apps/merge_vcfs/{file_id}/{file_id}.vcf.bgz"  # noqa # pylint: disable=line-too-long
+            "https://bucket.s3.amazonaws.com/output/apps/"
+            f"merge_vcfs/{file_id}/{file_id}.vcf.bgz"
         ),
         no_progress=True,
     )
@@ -330,7 +331,8 @@ def test_get_merged_vcf__success(mocker):
     mocked_download_file.assert_called_once_with(
         f"{file_id}.vcf.bgz",
         HttpUrl(
-            f"https://bucket.s3.amazonaws.com/output/apps/merge_vcfs/{file_id}/{file_id}.vcf.bgz"  # noqa # pylint: disable=line-too-long
+            "https://bucket.s3.amazonaws.com/output/apps/"
+            f"merge_vcfs/{file_id}/{file_id}.vcf.bgz"
         ),
         no_progress=False,
     )

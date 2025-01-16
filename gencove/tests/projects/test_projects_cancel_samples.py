@@ -135,7 +135,7 @@ def test_cancel_project_samples__success__empty_sample_ids(
 def test_cancel_project_samples__invalid_sample_ids(
     credentials, mocker
 ):  # pylint: disable=unused-argument
-    """Test cancel project samples failure when an invalid list of sample ids is sent."""
+    """Test cancel project samples failure when invalid list of sample ids is sent."""
     runner = CliRunner()
 
     res = runner.invoke(

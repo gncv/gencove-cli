@@ -5,8 +5,8 @@ import click
 from .create.cli import create_project
 from .create_batch.cli import create_project_batch
 from .create_merged_vcf.cli import create_merged_vcf
-from .create_sample_manifest.cli import create_sample_manifest
 from .cancel_samples.cli import cancel_project_samples
+from .create_sample_manifest.cli import create_sample_manifest
 from .delete.cli import delete_projects
 from .delete_samples.cli import delete_project_samples
 from .get_batch.cli import get_batch

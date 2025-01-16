@@ -140,6 +140,13 @@ def filter_projects_detail_request(request):
     return _replace_uuid_from_url(request, "projects")
 
 
+def filter_project_cancel_samples(request):
+    """Filter sensitive data from project-cancel-samples request."""
+    return _replace_uuid_from_url_and_body(
+        request, "project-cancel-samples", "sample_ids"
+    )
+
+
 @parse_response_to_json
 def filter_projects_detail_response(response, json_response):
     """Filter project detail sensitive data from response."""

@@ -2,8 +2,8 @@
 # pylint: disable=E0012,C0330,R0913
 import click
 
-from .create.cli import create_project
 from .cancel_samples.cli import cancel_project_samples
+from .create.cli import create_project
 from .create_batch.cli import create_project_batch
 from .create_merged_vcf.cli import create_merged_vcf
 from .create_sample_manifest.cli import create_sample_manifest

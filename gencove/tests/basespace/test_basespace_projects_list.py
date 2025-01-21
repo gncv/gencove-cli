@@ -1,8 +1,8 @@
 """Test basespace projects list command."""
 # pylint: disable=wrong-import-order
+import datetime
 import io
 import sys
-import datetime
 
 from click import echo
 from click.testing import CliRunner

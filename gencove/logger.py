@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 import uuid
-from datetime import datetime
+import datetime
 from platform import platform
 
 import boto3
@@ -11,6 +11,12 @@ import boto3
 import click
 
 from gencove.version import version
+
+try:
+    utc_tz = datetime.UTC  # Python 3.11+ only
+except AttributeError:
+    utc_tz = datetime.timezone.utc  # fallback for older Python versions
+
 
 INFO = "INFO"
 DEBUG = "DEBUG"
@@ -21,13 +27,13 @@ DEBUG_LOG = []
 def _echo(msg, **kwargs):
     """Output click echo message."""
     if LOG_LEVEL == DEBUG:
-        msg = f"{datetime.utcnow().isoformat()} {msg}"
+        msg = f"{datetime.datetime.now(utc_tz).isoformat()} {msg}"
     click.echo(msg, **kwargs)
 
 
 def _log(msg):
     """Adds the message to the log list."""
-    msg = f"{datetime.utcnow().isoformat()} {msg}"
+    msg = f"{datetime.datetime.now(utc_tz).isoformat()} {msg}"
     DEBUG_LOG.append(msg)
 
 
@@ -89,7 +95,7 @@ def get_debug_file_name():
     """Creates a 'unique' file name YYYY_MM_DD_HH_MM_RANDOM_ID.log
     inside a YYYY_MM folder.
     """
-    now = datetime.utcnow()
+    now = datetime.datetime.now(utc_tz)
     timestamp = f"{now:%Y_%m_%d_%H_%M_%S}"
     random_id = str(uuid.uuid4())[:8]
     filename = f"{timestamp}_{random_id}.log"

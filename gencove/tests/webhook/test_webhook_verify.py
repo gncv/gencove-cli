@@ -2,13 +2,18 @@
 
 import hmac
 import json
-from datetime import datetime
+import datetime
 from hashlib import sha512
 from uuid import uuid4
 
 from click.testing import CliRunner
 
 from gencove.command.webhook.cli import verify
+
+try:
+    utc_tz = datetime.UTC  # Python 3.11+ only
+except AttributeError:
+    utc_tz = datetime.timezone.utc  # fallback for older Python versions
 
 
 # Copied from back_api2/core/crypto.py#get_hmac
@@ -18,7 +23,7 @@ def get_hmac(secret_key, payload=None, digestmode=sha512, timestamp=None):
         payload = ""
 
     if not timestamp:
-        timestamp = int(datetime.utcnow().timestamp())
+        timestamp = int(datetime.datetime.now(utc_tz).timestamp())
 
     return (
         timestamp,
@@ -37,7 +42,7 @@ VALID_PAYLOAD = json.dumps(
         {
             "event_id": str(uuid4()),
             "event_type": "analysis_complete_v2",
-            "timestamp": str(datetime.utcnow()),
+            "timestamp": str(datetime.datetime.now(utc_tz)),
             "payload": {
                 "project": {"id": str(uuid4())},
                 "samples": [

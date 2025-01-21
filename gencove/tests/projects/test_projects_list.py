@@ -4,7 +4,7 @@ import io
 import operator
 import os
 import sys
-from datetime import datetime, timedelta
+import datetime
 from platform import platform
 from uuid import uuid4
 
@@ -38,6 +38,11 @@ from gencove.version import version
 import pytest
 
 from vcr import VCR
+
+try:
+    utc_tz = datetime.UTC  # Python 3.11+ only
+except AttributeError:
+    utc_tz = datetime.timezone.utc  # fallback for older Python versions
 
 
 @pytest.fixture(scope="module")
@@ -349,7 +354,9 @@ MOCKED_PROJECTS_WITH_UNEXPECTED_KEYS = dict(
             "id": str(uuid4()),
             "name": "test\tproject",
             "description": "",
-            "created": (datetime.utcnow() - timedelta(days=7)).isoformat(),
+            "created": (
+                datetime.datetime.now(utc_tz) - datetime.timedelta(days=7)
+            ).isoformat(),
             "organization": str(uuid4()),
             "webhook_url": "",
             "sample_count": 1,

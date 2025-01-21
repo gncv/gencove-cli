@@ -2,7 +2,7 @@
 import json
 import os
 import uuid
-from datetime import datetime
+import datetime
 from time import sleep
 
 import backoff
@@ -49,6 +49,11 @@ from .utils import (
 from ..utils import is_valid_json
 from ...constants import ASSIGN_BATCH_SIZE
 
+try:
+    utc_tz = datetime.UTC  # Python 3.11+ only
+except AttributeError:
+    utc_tz = datetime.timezone.utc  # fallback for older Python versions
+
 
 # pylint: disable=too-many-instance-attributes
 class Upload(Command):
@@ -73,7 +78,7 @@ class Upload(Command):
         """Autogenerate gencove destination path."""
         return (
             f"{UPLOAD_PREFIX}{fastq_source}-"
-            f"{datetime.utcnow().strftime('%Y%m%d%H%M%S')}-"
+            f"{datetime.datetime.now(utc_tz).strftime('%Y%m%d%H%M%S')}-"
             f"{uuid.uuid4().hex}"
         )
 

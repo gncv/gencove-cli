@@ -2,7 +2,7 @@
 # pylint: disable=wrong-import-order
 import io
 import sys
-from datetime import datetime, timedelta
+import datetime
 
 from click import echo
 from click.testing import CliRunner
@@ -17,6 +17,11 @@ from gencove.models import (
     BaseSpaceProject,
     BaseSpaceProjectDetail,
 )
+
+try:
+    utc_tz = datetime.UTC  # Python 3.11+ only
+except AttributeError:
+    utc_tz = datetime.timezone.utc  # fallback for older Python versions
 
 
 def test_basespace_list__empty(mocker):
@@ -42,7 +47,7 @@ MOCKED_BASESPACE_PROJECTS = dict(
             "basespace_id": "1234",
             "basespace_name": "test\tproject",
             "basespace_date_created": (
-                datetime.utcnow() - timedelta(days=7)
+                datetime.datetime.now(utc_tz) - datetime.timedelta(days=7)
             ).isoformat(),
         }
     ],
@@ -57,7 +62,7 @@ MOCKED_BASESPACE_PROJECTS_WITH_UNEXPECTED_KEYS = dict(
             "basespace_name": "test\tproject",
             "basespace_description": "",
             "basespace_date_created": (
-                datetime.utcnow() - timedelta(days=7)
+                datetime.datetime.now(utc_tz) - datetime.timedelta(days=7)
             ).isoformat(),
         }
     ],

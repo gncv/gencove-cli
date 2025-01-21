@@ -1,8 +1,8 @@
 """Test webhook verify command."""
 
+import datetime
 import hmac
 import json
-import datetime
 from hashlib import sha512
 from uuid import uuid4
 

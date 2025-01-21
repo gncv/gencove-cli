@@ -4,9 +4,9 @@
 
 # pylint: disable=import-error
 
+import datetime
 import os
 import uuid
-import datetime
 
 import pytest
 

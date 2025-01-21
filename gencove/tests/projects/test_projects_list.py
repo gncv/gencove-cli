@@ -1,10 +1,10 @@
 """Test project list command."""
 # pylint: disable=wrong-import-order, import-error
+import datetime
 import io
 import operator
 import os
 import sys
-import datetime
 from platform import platform
 from uuid import uuid4
 

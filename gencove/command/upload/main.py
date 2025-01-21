@@ -1,8 +1,8 @@
 """Entry point into upload command."""
+import datetime
 import json
 import os
 import uuid
-import datetime
 from time import sleep
 
 import backoff

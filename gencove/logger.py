@@ -1,9 +1,9 @@
 """Utilities for different levels of click.echo outputs."""
+import datetime
 import logging
 import os
 import sys
 import uuid
-import datetime
 from platform import platform
 
 import boto3

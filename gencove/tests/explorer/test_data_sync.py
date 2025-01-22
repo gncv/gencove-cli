@@ -16,6 +16,8 @@ from gencove.client import (
 )  # noqa: I100
 from gencove.command.explorer.data.cli import sync
 from gencove.command.explorer.data.common import GencoveExplorerManager
+from gencove.command.explorer.data.sync.main import Sync
+from gencove.constants import Credentials, Optionals, HOST
 from gencove.models import AWSCredentials
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.explorer.vcr.filters import (  # noqa: I101
@@ -24,8 +26,6 @@ from gencove.tests.explorer.vcr.filters import (  # noqa: I101
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
 from gencove.tests.utils import get_vcr_response
-from gencove.command.explorer.data.sync.main import Sync
-from gencove.constants import Credentials, Optionals, HOST
 
 import pytest
 

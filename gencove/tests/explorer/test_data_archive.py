@@ -181,7 +181,7 @@ def test_data_read_credentials_from_env(mocker, credentials):
 
     # Make sure the archive object was correctly setup
     mocked_request_is_from_explorer.assert_called()
-    assert archive.user_id == mock_user_id
-    assert archive.organization_id == mock_org_id
+    assert str(archive.user_id).replace("-", "") == mock_user_id
+    assert str(archive.organization_id).replace("-", "") == mock_org_id
     assert archive.explorer_enabled
     assert not archive.aws_session_credentials

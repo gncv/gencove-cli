@@ -151,9 +151,11 @@ def test_data_read_credentials_from_env(mocker, credentials):
         return_value=True,
     )
     mocker.patch("gencove.command.explorer.data.archive.main.Archive.execute")
+    mocker.patch("gencove.command.explorer.data.archive.main.Archive.login")
     os.environ["GENCOVE_USER_ID"] = uuid.uuid4().hex
     os.environ["GENCOVE_ORGANIZATION_ID"] = uuid.uuid4().hex
 
-    runner.invoke(archive, ["e://users/me/", *credentials])
+    res = runner.invoke(archive, ["e://users/me/", *credentials])
+    assert res.exit_code == 0
 
     mocked_request_is_from_explorer.assert_called()

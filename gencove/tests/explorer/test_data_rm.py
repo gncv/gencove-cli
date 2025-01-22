@@ -157,22 +157,22 @@ def test_data_read_credentials_from_env(mocker, credentials):
         credentials = Credentials(email="", password="", api_key=credentials[0])
 
     # Setup "Remove" object
-    rm = Remove(
+    _rm = Remove(
         {},
         "e://users/me/",
         credentials,
         Optionals(host=HOST),
     )
-    setattr(rm, "login", lambda: None)
-    setattr(rm, "validate_login_success", lambda: None)
-    setattr(rm, "execute", lambda: None)
+    setattr(_rm, "login", lambda: None)
+    setattr(_rm, "validate_login_success", lambda: None)
+    setattr(_rm, "execute", lambda: None)
 
     # Should read explorer credentials from env
-    rm.initialize()
+    _rm.initialize()
 
     # Make sure the Remove object was correctly setup
     mocked_request_is_from_explorer.assert_called()
-    assert str(rm.user_id).replace("-", "") == mock_user_id
-    assert str(rm.organization_id).replace("-", "") == mock_org_id
-    assert rm.explorer_enabled
-    assert not rm.aws_session_credentials
+    assert str(_rm.user_id).replace("-", "") == mock_user_id
+    assert str(_rm.organization_id).replace("-", "") == mock_org_id
+    assert _rm.explorer_enabled
+    assert not _rm.aws_session_credentials

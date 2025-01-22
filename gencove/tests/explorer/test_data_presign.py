@@ -16,7 +16,7 @@ from gencove.client import (
 from gencove.command.explorer.data.cli import presign
 from gencove.command.explorer.data.common import GencoveExplorerManager
 from gencove.command.explorer.data.presign.main import Presign
-from gencove.constants import Credentials, Optionals, HOST
+from gencove.constants import Credentials, HOST, Optionals
 from gencove.models import AWSCredentials
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.explorer.vcr.filters import (  # noqa: I101
@@ -158,7 +158,7 @@ def test_data_read_credentials_from_env(mocker, credentials):
         credentials = Credentials(email="", password="", api_key=credentials[0])
 
     # Setup "Presign" object
-    presign = Presign(
+    _presign = Presign(
         {},
         "e://users/me/file.txt",
         credentials,

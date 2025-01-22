@@ -16,7 +16,7 @@ from gencove.client import (
 from gencove.command.explorer.data.archive.main import Archive
 from gencove.command.explorer.data.cli import archive
 from gencove.command.explorer.data.common import GencoveExplorerManager
-from gencove.constants import Credentials, Optionals, HOST
+from gencove.constants import Credentials, HOST, Optionals
 from gencove.models import AWSCredentials
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.explorer.vcr.filters import (  # noqa: I101

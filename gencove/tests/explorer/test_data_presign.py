@@ -23,6 +23,8 @@ from gencove.tests.explorer.vcr.filters import (  # noqa: I101
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
 from gencove.tests.utils import get_vcr_response
+from gencove.command.explorer.data.presign.main import Presign
+from gencove.constants import Credentials, Optionals, HOST
 
 import pytest
 
@@ -131,16 +133,47 @@ def test_data_presign_no_permission(mocker, credentials):
 
 
 def test_data_read_credentials_from_env(mocker, credentials):
-    """Test read credentials from env on explorer."""
-    runner = CliRunner()
+    """
+    Make sure credentials are from env variables on explorer.
+    This test fails when a request to the API is made.
+    Is heavily mocked in API interaction and validation to make sure we don't
+    do any unnecessary requests.
+    """
+
     mocked_request_is_from_explorer = mocker.patch(
         "gencove.command.explorer.data.presign.main.request_is_from_explorer",
         return_value=True,
     )
-    mocker.patch("gencove.command.explorer.data.presign.main.Presign.execute")
-    os.environ["GENCOVE_USER_ID"] = uuid.uuid4().hex
-    os.environ["GENCOVE_ORGANIZATION_ID"] = uuid.uuid4().hex
+    mock_user_id = uuid.uuid4().hex
+    mock_org_id = uuid.uuid4().hex
+    os.environ["GENCOVE_USER_ID"] = mock_user_id
+    os.environ["GENCOVE_ORGANIZATION_ID"] = mock_org_id
 
-    runner.invoke(presign, ["e://users/me/", *credentials])
+    # Setup credentials dataclass
+    if "--email" in credentials:
+        credentials = Credentials(
+            email=credentials[1], password=credentials[3], api_key=""
+        )
+    else:
+        credentials = Credentials(email="", password="", api_key=credentials[0])
 
+    # Setup "Presign" object
+    presign = Presign(
+        {},
+        "e://users/me/",
+        credentials,
+        Optionals(host=HOST),
+    )
+    setattr(presign, "login", lambda: None)
+    setattr(presign, "validate_login_success", lambda: None)
+    setattr(presign, "execute", lambda: None)
+
+    # Should read explorer credentials from env
+    presign.initialize()
+
+    # Make sure the Presign object was correctly setup
     mocked_request_is_from_explorer.assert_called()
+    assert str(presign.user_id).replace("-", "") == mock_user_id
+    assert str(presign.organization_id).replace("-", "") == mock_org_id
+    assert presign.explorer_enabled
+    assert not presign.aws_session_credentials

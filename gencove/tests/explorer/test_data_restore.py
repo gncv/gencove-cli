@@ -174,6 +174,8 @@ def test_data_read_credentials_from_env(mocker, credentials):
     restore = Restore(
         {},
         "e://users/me/",
+        10,
+        "Standard",
         credentials,
         Optionals(host=HOST),
     )

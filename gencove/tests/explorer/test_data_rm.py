@@ -140,7 +140,7 @@ def test_data_read_credentials_from_env(mocker, credentials):
     """
 
     mocked_request_is_from_explorer = mocker.patch(
-        "gencove.command.explorer.data.ls.main.request_is_from_explorer",
+        "gencove.command.explorer.data.rm.main.request_is_from_explorer",
         return_value=True,
     )
     mock_user_id = uuid.uuid4().hex

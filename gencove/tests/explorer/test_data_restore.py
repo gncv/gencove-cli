@@ -170,8 +170,8 @@ def test_data_read_credentials_from_env(mocker, credentials):
     else:
         credentials = Credentials(email="", password="", api_key=credentials[0])
 
-    # Setup "restore" object
-    restore = Restore(
+    # Setup "Restore" object
+    _restore = Restore(
         {},
         "e://users/me/",
         10,
@@ -179,16 +179,16 @@ def test_data_read_credentials_from_env(mocker, credentials):
         credentials,
         Optionals(host=HOST),
     )
-    setattr(restore, "login", lambda: None)
-    setattr(restore, "validate_login_success", lambda: None)
-    setattr(restore, "execute", lambda: None)
+    setattr(_restore, "login", lambda: None)
+    setattr(_restore, "validate_login_success", lambda: None)
+    setattr(_restore, "execute", lambda: None)
 
     # Should read explorer credentials from env
-    restore.initialize()
+    _restore.initialize()
 
     # Make sure the Restore object was correctly setup
     mocked_request_is_from_explorer.assert_called()
-    assert str(restore.user_id).replace("-", "") == mock_user_id
-    assert str(restore.organization_id).replace("-", "") == mock_org_id
-    assert restore.explorer_enabled
-    assert not restore.aws_session_credentials
+    assert str(_restore.user_id).replace("-", "") == mock_user_id
+    assert str(_restore.organization_id).replace("-", "") == mock_org_id
+    assert _restore.explorer_enabled
+    assert not _restore.aws_session_credentials

@@ -155,22 +155,22 @@ def test_data_read_credentials_from_env(mocker, credentials):
         credentials = Credentials(email="", password="", api_key=credentials[0])
 
     # Setup "List" object
-    ls = List(
+    _ls = List(
         {},
         "e://users/me/",
         credentials,
         Optionals(host=HOST),
     )
-    setattr(ls, "login", lambda: None)
-    setattr(ls, "validate_login_success", lambda: None)
-    setattr(ls, "execute", lambda: None)
+    setattr(_ls, "login", lambda: None)
+    setattr(_ls, "validate_login_success", lambda: None)
+    setattr(_ls, "execute", lambda: None)
 
     # Should read explorer credentials from env
-    ls.initialize()
+    _ls.initialize()
 
     # Make sure the List object was correctly setup
     mocked_request_is_from_explorer.assert_called()
-    assert str(ls.user_id).replace("-", "") == mock_user_id
-    assert str(ls.organization_id).replace("-", "") == mock_org_id
-    assert ls.explorer_enabled
-    assert not ls.aws_session_credentials
+    assert str(_ls.user_id).replace("-", "") == mock_user_id
+    assert str(_ls.organization_id).replace("-", "") == mock_org_id
+    assert _ls.explorer_enabled
+    assert not _ls.aws_session_credentials

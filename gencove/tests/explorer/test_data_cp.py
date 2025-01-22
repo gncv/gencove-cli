@@ -155,23 +155,23 @@ def test_data_read_credentials_from_env(mocker, credentials):
         credentials = Credentials(email="", password="", api_key=credentials[0])
 
     # Setup "Copy" object
-    copy = Copy(
+    _copy = Copy(
         {},
         "e://users/me/file-a.txt",
         "e://users/me/file-b.txt",
         credentials,
         Optionals(host=HOST),
     )
-    setattr(copy, "login", lambda: None)
-    setattr(copy, "validate_login_success", lambda: None)
-    setattr(copy, "execute", lambda: None)
+    setattr(_copy, "login", lambda: None)
+    setattr(_copy, "validate_login_success", lambda: None)
+    setattr(_copy, "execute", lambda: None)
 
     # Should read explorer credentials from env
-    copy.initialize()
+    _copy.initialize()
 
-    # Make sure the copy object was correctly setup
+    # Make sure the Copy object was correctly setup
     mocked_request_is_from_explorer.assert_called()
-    assert str(copy.user_id).replace("-", "") == mock_user_id
-    assert str(copy.organization_id).replace("-", "") == mock_org_id
-    assert copy.explorer_enabled
-    assert not copy.aws_session_credentials
+    assert str(_copy.user_id).replace("-", "") == mock_user_id
+    assert str(_copy.organization_id).replace("-", "") == mock_org_id
+    assert _copy.explorer_enabled
+    assert not _copy.aws_session_credentials

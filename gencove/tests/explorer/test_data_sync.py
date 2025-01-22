@@ -163,23 +163,23 @@ def test_data_read_credentials_from_env(mocker, credentials):
         credentials = Credentials(email="", password="", api_key=credentials[0])
 
     # Setup "Sync" object
-    sync = Sync(
+    _sync = Sync(
         {},
         "e://users/me/",
         "e://users/other@gencove.com/",
         credentials,
         Optionals(host=HOST),
     )
-    setattr(sync, "login", lambda: None)
-    setattr(sync, "validate_login_success", lambda: None)
-    setattr(sync, "execute", lambda: None)
+    setattr(_sync, "login", lambda: None)
+    setattr(_sync, "validate_login_success", lambda: None)
+    setattr(_sync, "execute", lambda: None)
 
     # Should read explorer credentials from env
-    sync.initialize()
+    _sync.initialize()
 
     # Make sure the Sync object was correctly setup
     mocked_request_is_from_explorer.assert_called()
-    assert str(sync.user_id).replace("-", "") == mock_user_id
-    assert str(sync.organization_id).replace("-", "") == mock_org_id
-    assert sync.explorer_enabled
-    assert not sync.aws_session_credentials
+    assert str(_sync.user_id).replace("-", "") == mock_user_id
+    assert str(_sync.organization_id).replace("-", "") == mock_org_id
+    assert _sync.explorer_enabled
+    assert not _sync.aws_session_credentials

@@ -171,17 +171,17 @@ def test_data_read_credentials_from_env(mocker, credentials):
         credentials = Credentials(email="", password="", api_key=credentials[0])
 
     # Setup "Archive" object
-    archive = Archive({}, "e://users/me/", credentials, Optionals(host=HOST))
-    setattr(archive, "login", lambda: None)
-    setattr(archive, "validate_login_success", lambda: None)
-    setattr(archive, "execute", lambda: None)
+    _archive = Archive({}, "e://users/me/", credentials, Optionals(host=HOST))
+    setattr(_archive, "login", lambda: None)
+    setattr(_archive, "validate_login_success", lambda: None)
+    setattr(_archive, "execute", lambda: None)
 
     # Should read explorer credentials from env
-    archive.initialize()
+    _archive.initialize()
 
-    # Make sure the archive object was correctly setup
+    # Make sure the Archive object was correctly setup
     mocked_request_is_from_explorer.assert_called()
-    assert str(archive.user_id).replace("-", "") == mock_user_id
-    assert str(archive.organization_id).replace("-", "") == mock_org_id
-    assert archive.explorer_enabled
-    assert not archive.aws_session_credentials
+    assert str(_archive.user_id).replace("-", "") == mock_user_id
+    assert str(_archive.organization_id).replace("-", "") == mock_org_id
+    assert _archive.explorer_enabled
+    assert not _archive.aws_session_credentials

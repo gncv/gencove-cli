@@ -164,16 +164,16 @@ def test_data_read_credentials_from_env(mocker, credentials):
         credentials,
         Optionals(host=HOST),
     )
-    setattr(presign, "login", lambda: None)
-    setattr(presign, "validate_login_success", lambda: None)
-    setattr(presign, "execute", lambda: None)
+    setattr(_presign, "login", lambda: None)
+    setattr(_presign, "validate_login_success", lambda: None)
+    setattr(_presign, "execute", lambda: None)
 
     # Should read explorer credentials from env
-    presign.initialize()
+    _presign.initialize()
 
     # Make sure the Presign object was correctly setup
     mocked_request_is_from_explorer.assert_called()
-    assert str(presign.user_id).replace("-", "") == mock_user_id
-    assert str(presign.organization_id).replace("-", "") == mock_org_id
-    assert presign.explorer_enabled
-    assert not presign.aws_session_credentials
+    assert str(_presign.user_id).replace("-", "") == mock_user_id
+    assert str(_presign.organization_id).replace("-", "") == mock_org_id
+    assert _presign.explorer_enabled
+    assert not _presign.aws_session_credentials

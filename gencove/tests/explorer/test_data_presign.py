@@ -160,7 +160,7 @@ def test_data_read_credentials_from_env(mocker, credentials):
     # Setup "Presign" object
     presign = Presign(
         {},
-        "e://users/me/",
+        "e://users/me/file.txt",
         credentials,
         Optionals(host=HOST),
     )

@@ -16,6 +16,8 @@ from gencove.client import (
 )  # noqa: I100
 from gencove.command.explorer.data.cli import cp
 from gencove.command.explorer.data.common import GencoveExplorerManager
+from gencove.command.explorer.data.cp.main import Copy
+from gencove.constants import Credentials, HOST, Optionals
 from gencove.models import ExplorerDataCredentials
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.explorer.vcr.filters import (  # noqa: I101
@@ -128,18 +130,48 @@ def test_data_cp_no_permission(mocker, credentials):
 
 
 def test_data_read_credentials_from_env(mocker, credentials):
-    """Test read credentials from env on explorer."""
-    runner = CliRunner()
+    """
+    Make sure credentials are from env variables on explorer.
+    This test fails when a request to the API is made.
+    Is heavily mocked in API interaction and validation to make sure we don't
+    do any unnecessary requests.
+    """
+
     mocked_request_is_from_explorer = mocker.patch(
         "gencove.command.explorer.data.cp.main.request_is_from_explorer",
         return_value=True,
     )
-    mocker.patch("gencove.command.explorer.data.cp.main.Copy.execute")
-    os.environ["GENCOVE_USER_ID"] = uuid.uuid4().hex
-    os.environ["GENCOVE_ORGANIZATION_ID"] = uuid.uuid4().hex
+    mock_user_id = uuid.uuid4().hex
+    mock_org_id = uuid.uuid4().hex
+    os.environ["GENCOVE_USER_ID"] = mock_user_id
+    os.environ["GENCOVE_ORGANIZATION_ID"] = mock_org_id
 
-    runner.invoke(
-        cp, ["e://users/me/file", "e://users/other@gencove.com/file", *credentials]
+    # Setup credentials dataclass
+    if "--email" in credentials:
+        credentials = Credentials(
+            email=credentials[1], password=credentials[3], api_key=""
+        )
+    else:
+        credentials = Credentials(email="", password="", api_key=credentials[0])
+
+    # Setup "Copy" object
+    _copy = Copy(
+        {},
+        "e://users/me/file-a.txt",
+        "e://users/me/file-b.txt",
+        credentials,
+        Optionals(host=HOST),
     )
+    setattr(_copy, "login", lambda: None)
+    setattr(_copy, "validate_login_success", lambda: None)
+    setattr(_copy, "execute", lambda: None)
 
+    # Should read explorer credentials from env
+    _copy.initialize()
+
+    # Make sure the Copy object was correctly setup
     mocked_request_is_from_explorer.assert_called()
+    assert str(_copy.user_id).replace("-", "") == mock_user_id
+    assert str(_copy.organization_id).replace("-", "") == mock_org_id
+    assert _copy.explorer_enabled
+    assert not _copy.aws_session_credentials

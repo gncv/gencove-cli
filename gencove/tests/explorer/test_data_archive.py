@@ -152,6 +152,9 @@ def test_data_read_credentials_from_env(mocker, credentials):
     )
     mocker.patch("gencove.command.explorer.data.archive.main.Archive.execute")
     mocker.patch("gencove.command.explorer.data.archive.main.Archive.login")
+    mocker.patch(
+        "gencove.command.explorer.data.archive.main.Archive.validate_login_success"
+    )
     os.environ["GENCOVE_USER_ID"] = uuid.uuid4().hex
     os.environ["GENCOVE_ORGANIZATION_ID"] = uuid.uuid4().hex
 

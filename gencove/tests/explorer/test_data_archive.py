@@ -13,8 +13,10 @@ from gencove.client import (
     APIClient,
     APIClientError,
 )  # noqa: I100
+from gencove.command.explorer.data.archive.main import Archive
 from gencove.command.explorer.data.cli import archive
 from gencove.command.explorer.data.common import GencoveExplorerManager
+from gencove.constants import Credentials, HOST, Optionals
 from gencove.models import AWSCredentials
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.explorer.vcr.filters import (  # noqa: I101
@@ -144,16 +146,42 @@ def test_data_archive_no_permission(mocker, credentials):
 
 
 def test_data_read_credentials_from_env(mocker, credentials):
-    """Test read credentials from env on explorer."""
-    runner = CliRunner()
+    """
+    Make sure credentials are from env variables on explorer.
+    This test fails when a request to the API is made.
+    Is heavily mocked in API interaction and validation to make sure we don't
+    do any unnecessary requests.
+    """
+
     mocked_request_is_from_explorer = mocker.patch(
         "gencove.command.explorer.data.archive.main.request_is_from_explorer",
         return_value=True,
     )
-    mocker.patch("gencove.command.explorer.data.archive.main.Archive.execute")
-    os.environ["GENCOVE_USER_ID"] = uuid.uuid4().hex
-    os.environ["GENCOVE_ORGANIZATION_ID"] = uuid.uuid4().hex
+    mock_user_id = uuid.uuid4().hex
+    mock_org_id = uuid.uuid4().hex
+    os.environ["GENCOVE_USER_ID"] = mock_user_id
+    os.environ["GENCOVE_ORGANIZATION_ID"] = mock_org_id
 
-    runner.invoke(archive, ["e://users/me/", *credentials])
+    # Setup credentials dataclass
+    if "--email" in credentials:
+        credentials = Credentials(
+            email=credentials[1], password=credentials[3], api_key=""
+        )
+    else:
+        credentials = Credentials(email="", password="", api_key=credentials[0])
 
+    # Setup "Archive" object
+    _archive = Archive({}, "e://users/me/", credentials, Optionals(host=HOST))
+    setattr(_archive, "login", lambda: None)
+    setattr(_archive, "validate_login_success", lambda: None)
+    setattr(_archive, "execute", lambda: None)
+
+    # Should read explorer credentials from env
+    _archive.initialize()
+
+    # Make sure the Archive object was correctly setup
     mocked_request_is_from_explorer.assert_called()
+    assert str(_archive.user_id).replace("-", "") == mock_user_id
+    assert str(_archive.organization_id).replace("-", "") == mock_org_id
+    assert _archive.explorer_enabled
+    assert not _archive.aws_session_credentials

@@ -1,8 +1,8 @@
 """Test basespace biosamples list command."""
 # pylint: disable=wrong-import-order
+import datetime
 import io
 import sys
-from datetime import datetime, timedelta
 
 from click import echo
 from click.testing import CliRunner
@@ -17,6 +17,11 @@ from gencove.models import (
     BaseSpaceBiosample,
     BaseSpaceBiosampleDetail,
 )
+
+try:
+    utc_tz = datetime.UTC  # Python 3.11+ only
+except AttributeError:
+    utc_tz = datetime.timezone.utc  # fallback for older Python versions
 
 
 def test_biosamples_list__empty(mocker):
@@ -45,7 +50,7 @@ MOCKED_BASESPACE_BIOSAMPLES = dict(
             "basespace_id": "1234",
             "basespace_bio_sample_name": "test\tproject",
             "basespace_date_created": (
-                datetime.utcnow() - timedelta(days=7)
+                datetime.datetime.now(utc_tz) - datetime.timedelta(days=7)
             ).isoformat(),
         }
     ],
@@ -60,7 +65,7 @@ MOCKED_BASESPACE_BIOSAMPLES_WITH_UNEXPECTED_KEYS = dict(
             "basespace_bio_sample_name": "test\tproject",
             "basespace_description": "",
             "basespace_date_created": (
-                datetime.utcnow() - timedelta(days=7)
+                datetime.datetime.now(utc_tz) - datetime.timedelta(days=7)
             ).isoformat(),
         }
     ],

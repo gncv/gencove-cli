@@ -4,11 +4,16 @@
 
 # pylint: disable=import-error
 
+import datetime
 import os
 import uuid
-from datetime import datetime
 
 import pytest
+
+try:
+    utc_tz = datetime.UTC  # Python 3.11+ only
+except AttributeError:
+    utc_tz = datetime.timezone.utc  # fallback for older Python versions
 
 
 @pytest.fixture(scope="session")
@@ -167,7 +172,7 @@ def dont_save_dump_log():
 def dump_filename(mocker):
     """Fixtures that returns the log filename and creates the folder."""
     random_id = str(uuid.uuid4())
-    now = datetime.utcnow()
+    now = datetime.datetime.now(utc_tz)
     folder = f".logs/{now:%Y_%m}"
     filename = f"{folder}/{now:%Y_%m_%d_%H_%M_%S}_{random_id[:8]}.log"
 

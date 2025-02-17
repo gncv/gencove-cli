@@ -103,8 +103,8 @@ def test_cancel_project_samples__not_owned_project(credentials, mocker):
 @assert_authorization
 @pytest.mark.parametrize("remove_hyphens", [True, False])
 def test_cancel_project_samples__invalid_empty_sample_ids(
-    credentials, mocker, project_id_cancel, recording, vcr, remove_hyphens
-):
+    credentials, mocker, project_id_cancel, vcr, remove_hyphens
+):  # pylint: disable=unused-argument
     """Test cancel project samples success when an empty list of sample ids is sent."""
     runner = CliRunner()
 
@@ -122,7 +122,7 @@ def test_cancel_project_samples__invalid_empty_sample_ids(
     )
     assert res.exit_code == 1
     assert "There was an error requesting cancel project samples" in res.output
-    assert "sample_ids: This list may not be empty" in res.output
+    assert "This list may not be empty." in res.output
 
 
 @assert_no_requests
@@ -149,8 +149,8 @@ def test_cancel_project_samples__invalid_sample_ids(
 @assert_authorization
 @pytest.mark.parametrize("remove_hyphens", [True, False])
 def test_cancel_project_samples__sample_not_in_project(
-    credentials, mocker, project_id, sample_id_cancel, recording, vcr, remove_hyphens
-):
+    credentials, mocker, project_id, sample_id_cancel, remove_hyphens
+):  # pylint: disable=unused-argument
     """Test cancel project samples with sample not in project.
 
     Uses project ID used for testing uploads to raise the error.
@@ -178,8 +178,8 @@ def test_cancel_project_samples__sample_not_in_project(
 @pytest.mark.vcr
 @assert_authorization
 def test_cancel_project_samples__success(  # pylint: disable=too-many-arguments
-    credentials, mocker, project_id_cancel, sample_id_cancel, recording, vcr
-):
+    credentials, mocker, project_id_cancel, sample_id_cancel
+):  # pylint: disable=unused-argument
     """Test cancel project samples success."""
     runner = CliRunner()
 

@@ -1,0 +1,54 @@
+interactions:
+- request:
+    body: '{"sample_ids": []}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 3.0.1
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/project-cancel-samples/11111111-1111-1111-1111-111111111111
+  response:
+    body:
+      string: '{"sample_ids": ["This list may not be empty."]}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '46'
+      Content-Security-Policy:
+      - 'default-src ''self''; style-src ''self'' ''unsafe-inline''; img-src ''self''
+        data:'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Mon, 17 Feb 2025 10:43:13 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, Cookie, origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 400
+      message: Bad Request
+version: 1

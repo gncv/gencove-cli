@@ -101,34 +101,28 @@ def test_cancel_project_samples__not_owned_project(credentials, mocker):
 
 @pytest.mark.vcr
 @assert_authorization
-def test_cancel_project_samples__success__empty_sample_ids(
-    credentials, mocker, project_id, recording, vcr
+@pytest.mark.parametrize("remove_hyphens", [True, False])
+def test_cancel_project_samples__invalid_empty_sample_ids(
+    credentials, mocker, project_id_cancel, recording, vcr, remove_hyphens
 ):
     """Test cancel project samples success when an empty list of sample ids is sent."""
     runner = CliRunner()
-    if not recording:
-        cancel_project_samples_response = get_vcr_response(
-            "/api/v2/project-cancel-samples/", vcr, operator.contains
-        )
-        mocked_cancel_project_samples = mocker.patch.object(
-            APIClient,
-            "cancel_project_samples",
-            return_value=cancel_project_samples_response,
-        )
+
+    if remove_hyphens:
+        project_id_cancel = project_id_cancel.replace("-", "")
 
     res = runner.invoke(
         cancel_project_samples,
         [
-            project_id,
+            project_id_cancel,
             *credentials,
             "--sample-ids",
             "",
         ],
     )
-    assert res.exit_code == 0
-    if not recording:
-        mocked_cancel_project_samples.assert_called_once()
-    assert "The following samples have been canceled successfully" in res.output
+    assert res.exit_code == 1
+    assert "There was an error requesting cancel project samples" in res.output
+    assert "sample_ids: This list may not be empty" in res.output
 
 
 @assert_no_requests
@@ -153,75 +147,52 @@ def test_cancel_project_samples__invalid_sample_ids(
 
 @pytest.mark.vcr
 @assert_authorization
+@pytest.mark.parametrize("remove_hyphens", [True, False])
 def test_cancel_project_samples__sample_not_in_project(
-    credentials, mocker, project_id, recording, vcr
+    credentials, mocker, project_id, sample_id_cancel, recording, vcr, remove_hyphens
 ):
-    """Test cancel project samples with sample not in project."""
+    """Test cancel project samples with sample not in project.
+
+    Uses project ID used for testing uploads to raise the error.
+    """
     runner = CliRunner()
-    if not recording:
-        cancel_project_samples_response = get_vcr_response(
-            "/api/v2/project-cancel-samples/",
-            vcr,
-            operator.contains,
-            just_body=False,
-        )
-        mocked_cancel_project_samples = mocker.patch.object(
-            APIClient,
-            "cancel_project_samples",
-            side_effect=APIClientError(
-                message=cancel_project_samples_response["body"]["string"],
-                status_code=cancel_project_samples_response["status"]["code"],
-            ),
-        )
+
+    if remove_hyphens:
+        project_id = project_id.replace("-", "")
+        sample_id_cancel = sample_id_cancel.replace("-", "")
+
     res = runner.invoke(
         cancel_project_samples,
         [
             project_id,
             *credentials,
             "--sample-ids",
-            "11111111-1111-1111-1111-111111111111",
+            sample_id_cancel,
         ],
     )
-    assert res.exit_code == 0
-    if not recording:
-        mocked_cancel_project_samples.assert_called_once()
-    assert "All sample ids must be part of the current project." in res.output
+    assert res.exit_code == 1
+    assert "There was an error requesting cancel project samples" in res.output
+    assert "Invalid sample IDs" in res.output
 
 
 @pytest.mark.vcr
 @assert_authorization
-@pytest.mark.default_cassette("test_cancel_project_samples__success.yaml")
-@pytest.mark.parametrize("remove_hyphens", [True, False])
 def test_cancel_project_samples__success(  # pylint: disable=too-many-arguments
-    canceled_sample, credentials, mocker, project_id, recording, vcr, remove_hyphens
+    credentials, mocker, project_id_cancel, sample_id_cancel, recording, vcr
 ):
     """Test cancel project samples success."""
     runner = CliRunner()
-    if not recording:
-        cancel_project_samples_response = get_vcr_response(
-            "/api/v2/project-cancel-samples/", vcr, operator.contains
-        )
-        mocked_cancel_project_samples = mocker.patch.object(
-            APIClient,
-            "cancel_project_samples",
-            return_value=cancel_project_samples_response,
-        )
-
-    if remove_hyphens:
-        project_id = project_id.replace("-", "")
 
     res = runner.invoke(
         cancel_project_samples,
         [
-            project_id,
+            project_id_cancel,
             *credentials,
             "--sample-ids",
-            canceled_sample,
+            sample_id_cancel,
         ],
     )
     assert res.exit_code == 0
-    if not recording:
-        mocked_cancel_project_samples.assert_called_once()
     assert "The following samples have been canceled successfully" in res.output
 
 
@@ -232,10 +203,10 @@ def test_cancel_project_samples__success(  # pylint: disable=too-many-arguments
 )
 def test_cancel_project_samples__returns_maintenance_error_503(
     # pylint: disable=too-many-arguments
-    canceled_sample,
     credentials,
     mocker,
-    project_id,
+    project_id_cancel,
+    sample_id_cancel,
     recording,
     using_api_key,
     vcr,
@@ -258,10 +229,10 @@ def test_cancel_project_samples__returns_maintenance_error_503(
     res = runner.invoke(
         cancel_project_samples,
         [
-            project_id,
+            project_id_cancel,
             *credentials,
             "--sample-ids",
-            canceled_sample,
+            sample_id_cancel,
         ],
     )
     assert res.exit_code == 1

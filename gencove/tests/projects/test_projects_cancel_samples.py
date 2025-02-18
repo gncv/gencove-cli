@@ -5,10 +5,7 @@ from uuid import uuid4
 
 from click.testing import CliRunner
 
-from gencove.client import (
-    APIClient,
-    APIClientError,
-)  # noqa: I100
+from gencove.client import APIClient, APIClientError
 from gencove.command.projects.cli import cancel_project_samples
 from gencove.exceptions import MaintenanceError
 from gencove.tests.decorators import assert_authorization, assert_no_requests

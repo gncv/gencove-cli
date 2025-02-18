@@ -98,6 +98,18 @@ def sample_id_hide_unhide():
 
 
 @pytest.fixture(scope="session")
+def project_id_cancel():
+    """Returns the project id in which the analysis will be canceled."""
+    return os.getenv("GENCOVE_PROJECT_ID_CANCEL_TEST")
+
+
+@pytest.fixture(scope="session")
+def sample_id_cancel():
+    """Returns the sample id to cancel."""
+    return os.getenv("GENCOVE_SAMPLE_ID_CANCEL_TEST")
+
+
+@pytest.fixture(scope="session")
 def credentials(using_api_key):  # pylint: disable=redefined-outer-name
     """Fixture to have the appropriate credentials."""
     api_key = os.getenv("GENCOVE_API_KEY_TEST")

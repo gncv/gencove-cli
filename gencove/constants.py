@@ -35,6 +35,7 @@ class ApiEndpoints(Enum):
     PROJECTS_UNHIDE = "/api/v2/projects-unhide/"
     PROJECT_DELETE_SAMPLES = "/api/v2/project-delete-samples/{id}"
     PROJECT_HIDE_SAMPLES = "/api/v2/project-hide-samples/{id}"
+    PROJECT_CANCEL_SAMPLES = "/api/v2/project-cancel-samples/{id}"
     PROJECT_UNHIDE_SAMPLES = "/api/v2/project-unhide-samples/{id}"
     PROJECT_RESTORE_SAMPLES = "/api/v2/project-restore-samples/{id}"
     PROJECT_QC_REPORT = "/api/v2/project-qc-report/{id}"

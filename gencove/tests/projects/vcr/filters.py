@@ -150,6 +150,9 @@ def filter_project_cancel_samples_request(request):
 
 @parse_response_to_json
 def filter_project_cancel_samples_response(response, json_response):
+    """Filter sample ids from response when (un)successfuly canceling
+    analysis.
+    """
     if "sample_ids" in json_response:
         messages = []
         for msg in json_response["sample_ids"]:

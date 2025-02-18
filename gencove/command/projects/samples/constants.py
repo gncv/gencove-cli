@@ -8,8 +8,8 @@ from gencove.constants import Optionals
 class SamplesOptions(Optionals):
     """SamplesOptions model"""
 
-    status: Optional[str]
-    archive_status: Optional[str]
-    search: Optional[str]
-    include_run: Optional[bool]
-    include_hidden: Optional[bool]
+    status: Optional[str] = None
+    archive_status: Optional[str] = None
+    search: Optional[str] = None
+    include_run: Optional[bool] = None
+    include_hidden: Optional[bool] = None

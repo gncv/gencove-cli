@@ -4,11 +4,16 @@
 
 # pylint: disable=import-error
 
+import datetime
 import os
 import uuid
-from datetime import datetime
 
 import pytest
+
+try:
+    utc_tz = datetime.UTC  # Python 3.11+ only
+except AttributeError:
+    utc_tz = datetime.timezone.utc  # fallback for older Python versions
 
 
 @pytest.fixture(scope="session")
@@ -93,6 +98,18 @@ def sample_id_hide_unhide():
 
 
 @pytest.fixture(scope="session")
+def project_id_cancel():
+    """Returns the project id in which the analysis will be canceled."""
+    return os.getenv("GENCOVE_PROJECT_ID_CANCEL_TEST")
+
+
+@pytest.fixture(scope="session")
+def sample_id_cancel():
+    """Returns the sample id to cancel."""
+    return os.getenv("GENCOVE_SAMPLE_ID_CANCEL_TEST")
+
+
+@pytest.fixture(scope="session")
 def credentials(using_api_key):  # pylint: disable=redefined-outer-name
     """Fixture to have the appropriate credentials."""
     api_key = os.getenv("GENCOVE_API_KEY_TEST")
@@ -167,7 +184,7 @@ def dont_save_dump_log():
 def dump_filename(mocker):
     """Fixtures that returns the log filename and creates the folder."""
     random_id = str(uuid.uuid4())
-    now = datetime.utcnow()
+    now = datetime.datetime.now(utc_tz)
     folder = f".logs/{now:%Y_%m}"
     filename = f"{folder}/{now:%Y_%m_%d_%H_%M_%S}_{random_id[:8]}.log"
 

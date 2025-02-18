@@ -6,6 +6,8 @@ from urllib.parse import parse_qs, urlparse
 
 import backoff
 
+from pydantic import HttpUrl
+
 import requests
 
 from gencove import client  # noqa: I100
@@ -42,21 +44,22 @@ def get_filename_from_download_url(url):
     """Deduce filename from url.
 
     Args:
-        url (str): URL string
+        url (str or HttpUrl): URL string or HttpUrl object
 
     Returns:
         str: filename
     """
+    url_str = str(url)
     try:
         filename = re.findall(
             FILENAME_RE,
-            parse_qs(urlparse(url).query)["response-content-disposition"][0],
+            parse_qs(urlparse(url_str).query)["response-content-disposition"][0],
         )[0]
     except (KeyError, IndexError):
         echo_debug(
             "URL didn't contain filename query argument. Assume filename from url"
         )
-        filename = urlparse(url).path.split("/")[-1]
+        filename = urlparse(url_str).path.split("/")[-1]
 
     return filename
 
@@ -177,7 +180,9 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
         str : file path
             location of the downloaded file
     """
-
+    download_url = (
+        str(download_url) if isinstance(download_url, HttpUrl) else download_url
+    )
     file_path_tmp = f"{file_path}.tmp"
     if os.path.exists(file_path_tmp):
         file_mode = "ab"

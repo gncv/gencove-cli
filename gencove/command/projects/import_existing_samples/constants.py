@@ -8,4 +8,4 @@ from gencove.constants import Optionals
 class ImportExistingSamplesOptionals(Optionals):
     """ImportExistingSamplesOptionals model"""
 
-    metadata_json: Optional[str]
+    metadata_json: Optional[str] = None

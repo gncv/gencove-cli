@@ -14,7 +14,7 @@ from uuid import UUID
 
 import backoff
 
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 from requests import ConnectTimeout, ReadTimeout, delete, get, post  # noqa: I201
 
 from gencove import constants  # noqa: I100
@@ -85,6 +85,8 @@ class CustomEncoder(json.JSONEncoder):
         if isinstance(o, BaseModel):
             return {**o.dict(exclude_unset=True), **o.dict(exclude_none=True)}
         if isinstance(o, UUID):
+            return str(o)
+        if isinstance(o, HttpUrl):
             return str(o)
         return json.JSONEncoder.default(self, o)
 
@@ -1051,6 +1053,21 @@ class APIClient:
         payload = {"sample_ids": sample_ids}
 
         return self._delete(delete_project_samples_endpoint, payload, authorized=True)
+
+    def cancel_project_samples(self, project_id, sample_ids):
+        """Make a request to cancel samples in given project.
+
+        Args:
+            project_id (str): project to which to assign the samples
+            sample_ids (list of strings): sample_ids to cancel
+        """
+        cancel_project_samples_endpoint = (
+            self.endpoints.PROJECT_CANCEL_SAMPLES.value.format(id=project_id)
+        )
+
+        payload = {"sample_ids": sample_ids}
+
+        return self._post(cancel_project_samples_endpoint, payload, authorized=True)
 
     def hide_project_samples(self, project_id, sample_ids):
         """Make a request to hide samples in given project.

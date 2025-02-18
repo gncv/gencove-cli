@@ -1,5 +1,6 @@
 """VCR filters for projects tests."""
 import json
+import re
 from urllib.parse import urlparse
 
 from gencove.tests.decorators import parse_response_to_json
@@ -138,6 +139,32 @@ def filter_projects_unhide(request):
 def filter_projects_detail_request(request):
     """Filter sensitive data from projects request."""
     return _replace_uuid_from_url(request, "projects")
+
+
+def filter_project_cancel_samples_request(request):
+    """Filter sensitive data from project-cancel-samples request."""
+    return _replace_uuid_from_url_and_body(
+        request, "project-cancel-samples", "sample_ids"
+    )
+
+
+@parse_response_to_json
+def filter_project_cancel_samples_response(response, json_response):
+    """Filter sample ids from response when (un)successfuly canceling
+    analysis.
+    """
+    if "sample_ids" in json_response:
+        messages = []
+        for msg in json_response["sample_ids"]:
+            # Replace UUIDs with a MOCK_UUID string
+            uuid_pattern = re.compile(
+                r"\b[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89a-f][a-f0-9]{3}-[a-f0-9]{12}\b",  # noqa: E501, pylint: disable=line-too-long
+                re.IGNORECASE,
+            )
+            messages.append(uuid_pattern.sub(MOCK_UUID, msg))
+        json_response["sample_ids"] = messages
+
+    return response, json_response
 
 
 @parse_response_to_json

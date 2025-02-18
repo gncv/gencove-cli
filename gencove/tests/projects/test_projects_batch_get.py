@@ -132,8 +132,8 @@ def test_get_batch__not_empty(batch_id, credentials, mocker, recording, vcr):
         mocked_get_batch.assert_called_once()
         mocked_download_file.assert_called_once_with(
             "test.zip",
-            HttpUrl(
-                url="https://example.com/report.zip",
+            HttpUrl.build(
+                path="report.zip",
                 scheme="https",
                 host="example.com",
             ),
@@ -180,8 +180,8 @@ def test_get_batch__no_progress_not_empty(
         mocked_get_batch.assert_called_once()
         mocked_download_file.assert_called_once_with(
             "test.zip",
-            HttpUrl(
-                url="https://example.com/report.zip",
+            HttpUrl.build(
+                path="report.zip",
                 scheme="https",
                 host="example.com",
             ),

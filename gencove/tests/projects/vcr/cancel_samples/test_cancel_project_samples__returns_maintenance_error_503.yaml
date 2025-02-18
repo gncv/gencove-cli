@@ -1,0 +1,98 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.3.6
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"maintenance": true, "maintenance_eta": "2022-10-21T17:00:00", "maintenance_message":
+        "Gencove is currently undergoing maintenance and will return at the given
+        ETA. Thank you for your patience."}'
+    headers:
+      Cache-Control:
+      - max-age=0, no-cache, no-store, must-revalidate, private
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '196'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 28 Sep 2022 16:37:57 GMT
+      Expires:
+      - Wed, 28 Sep 2022 16:37:57 GMT
+      Referrer-Policy:
+      - same-origin
+      Retry-After:
+      - '3600'
+      Server:
+      - gunicorn
+      Vary:
+      - Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 503
+      message: Service Unavailable
+- request:
+    body: '{"sample_ids": ["11111111-1111-1111-1111-111111111111"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 2.3.6
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/project-cancel-samples/11111111-1111-1111-1111-111111111111
+  response:
+    body:
+      string: '{"maintenance": true, "maintenance_eta": "2022-10-21T17:00:00", "maintenance_message":
+        "Gencove is currently undergoing maintenance and will return at the given
+        ETA. Thank you for your patience."}'
+    headers:
+      Cache-Control:
+      - max-age=0, no-cache, no-store, must-revalidate, private
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '196'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 28 Sep 2022 16:38:46 GMT
+      Expires:
+      - Wed, 28 Sep 2022 16:38:46 GMT
+      Referrer-Policy:
+      - same-origin
+      Retry-After:
+      - '3600'
+      Server:
+      - gunicorn
+      Vary:
+      - Cookie, Origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 503
+      message: Service Unavailable
+version: 1

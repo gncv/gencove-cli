@@ -11,7 +11,8 @@ from gencove.exceptions import MaintenanceError
 from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import filter_jwt, replace_gencove_url_vcr
 from gencove.tests.projects.vcr.filters import (
-    filter_project_cancel_samples,
+    filter_project_cancel_samples_request,
+    filter_project_cancel_samples_response,
 )
 from gencove.tests.upload.vcr.filters import filter_volatile_dates
 from gencove.tests.utils import get_vcr_response
@@ -25,7 +26,7 @@ from vcr import VCR
 def vcr_config():
     """VCR configuration."""
     return {
-        "cassette_library_dir": "gencove/tests/projects/vcr",
+        "cassette_library_dir": "gencove/tests/projects/vcr/cancel_samples",
         "filter_headers": [
             "Authorization",
             "Content-Length",
@@ -39,11 +40,12 @@ def vcr_config():
         "path_transformer": VCR.ensure_suffix(".yaml"),
         "before_record_request": [
             replace_gencove_url_vcr,
-            filter_project_cancel_samples,
+            filter_project_cancel_samples_request,
         ],
         "before_record_response": [
             filter_jwt,
             filter_volatile_dates,
+            filter_project_cancel_samples_response,
         ],
     }
 

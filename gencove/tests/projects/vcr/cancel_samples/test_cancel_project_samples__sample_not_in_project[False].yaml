@@ -25,14 +25,13 @@ interactions:
       Content-Length:
       - '582'
       Content-Security-Policy:
-      - 'default-src ''self''; style-src ''self'' ''unsafe-inline''; img-src ''self''
-        data:'
+      - img-src 'self' data:; default-src 'self'; style-src 'self' 'unsafe-inline'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Mon, 17 Feb 2025 17:10:33 GMT
+      - Mon, 17 Feb 2025 17:10:34 GMT
       Permissions-Policy:
       - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
         usb=()
@@ -68,7 +67,7 @@ interactions:
     uri: https://www.example.com/api/v2/project-cancel-samples/11111111-1111-1111-1111-111111111111
   response:
     body:
-      string: '{"sample_ids": ["Invalid sample IDs: dce01edd-9ddf-41a4-a2d6-ccb44d8d57e2"]}'
+      string: '{"sample_ids": ["Invalid sample IDs: 11111111-1111-1111-1111-111111111111"]}'
     headers:
       Allow:
       - POST, OPTIONS
@@ -77,13 +76,14 @@ interactions:
       Content-Length:
       - '75'
       Content-Security-Policy:
-      - img-src 'self' data:; default-src 'self'; style-src 'self' 'unsafe-inline'
+      - 'default-src ''self''; style-src ''self'' ''unsafe-inline''; img-src ''self''
+        data:'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Mon, 17 Feb 2025 17:10:33 GMT
+      - Mon, 17 Feb 2025 17:10:34 GMT
       Permissions-Policy:
       - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
         usb=()

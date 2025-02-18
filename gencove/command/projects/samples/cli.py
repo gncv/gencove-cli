@@ -37,7 +37,7 @@ from .main import ListSamples
 @click.option(
     "--hidden",
     "include_hidden",
-    help="Include hidden projects",
+    help="Include hidden samples",
     is_flag=True,
 )
 @add_options(common_options)

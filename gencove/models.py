@@ -365,7 +365,6 @@ class CopyExistingSamplesModel(BaseModel):
 
     project_id: UUID
     samples: List[SampleCopy]
-    metadata: Optional[Any] = None
 
 
 class FileType(BaseModel):

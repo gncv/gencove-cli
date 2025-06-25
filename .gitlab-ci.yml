@@ -25,7 +25,7 @@ test_windows:
     PYTHON_VERSION_PATCH: "11"
   before_script:
     - powershell -Command "Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1; refreshenv"
-    - powershell -Command "choco install python -y --version $env:PYTHON_VERSION_MAJOR.$env:PYTHON_VERSION_MINOR.$env:PYTHON_VERSION_PATCH"
+    - powershell -Command "choco install python -y --allow-downgrade --version $env:PYTHON_VERSION_MAJOR.$env:PYTHON_VERSION_MINOR.$env:PYTHON_VERSION_PATCH"
     - powershell -Command "C:\\Python$env:PYTHON_VERSION_MAJOR$env:PYTHON_VERSION_MINOR\\python.exe -m pip install --upgrade pip"
     - powershell -Command "C:\\Python$env:PYTHON_VERSION_MAJOR$env:PYTHON_VERSION_MINOR\\python.exe -m pip install -e ."
   script:

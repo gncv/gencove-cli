@@ -5,7 +5,7 @@ import backoff
 
 from .utils import get_line
 from ...base import Command
-from ...utils import is_valid_json, is_valid_uuid
+from ...utils import is_valid_uuid
 from .... import client
 from ....constants import IMPORT_BATCH_SIZE, SampleArchiveStatus, SampleStatus
 from ....exceptions import ValidationError
@@ -34,8 +34,6 @@ class CopyExistingSamples(Command):
         Raises:
             ValidationError - if something is wrong with command parameters.
         """
-        if self.metadata_json and is_valid_json(self.metadata_json) is False:
-            raise ValidationError("Metadata JSON is not valid. Exiting.")
         if self.source_project_id and not is_valid_uuid(self.source_project_id):
             raise ValidationError("Source project ID is not valid. Exiting.")
         if (self.source_sample_ids and self.source_project_id) or (

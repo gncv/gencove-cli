@@ -42,7 +42,7 @@ setup(
         # above - we are attempting to keep the requirement as loose as
         # possible in terms of minimal required version
         "six>=1.5",
-        "Click>=7.0,<8.0",
+        "Click>=7.0,<=8.1.8",
         "requests>=2.19.1",
         "boto3>=1.17.97",
         "progressbar2==3.55.0",

@@ -26,7 +26,8 @@ setup(
     long_description=long_description(),
     long_description_content_type="text/markdown",
     url="https://docs.gencove.com",
-    author="Tomaz Berisa",
+    author="Gencove Engineering Team",
+    author_email="engineering@gencove.com",
     license="Apache 2.0",
     version=version(),
     python_requires=">=3.8",
@@ -41,7 +42,7 @@ setup(
         # above - we are attempting to keep the requirement as loose as
         # possible in terms of minimal required version
         "six>=1.5",
-        "Click>=7.0",
+        "Click>=7.0,<8.0",
         "requests>=2.19.1",
         "boto3>=1.17.97",
         "progressbar2==3.55.0",

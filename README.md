@@ -27,7 +27,7 @@ Install pre-commit hooks:
 pre-commit install
 ```
 
-Use with local api service (need to have [back_api2](http://gitlab.com/gencove/v2/back_api2/) running)
+Use with local api service (need to have [back_api2](http://gitlab.com/gencove/platform/back_api2/) running)
 
 ```
 gencove <command> --host http://localhost:8200

@@ -57,17 +57,13 @@ def copy_existing_project_samples(  # pylint: disable=too-many-arguments
 
     Examples:
 
-        Copy samples from project:
+        Copy all available samples from source project:
 
             gencove projects copy-existing-samples d9eaa54b-aaac-4b85-92b0-0b564be6d7db --source-project-id d8eb0bb5-29ee-44ed-b681-0fc05a557183
 
-        Copy samples:
+        Copy samples by id:
 
             gencove projects copy-existing-samples d9eaa54b-aaac-4b85-92b0-0b564be6d7db --sample-ids 59f5c1fd-cce0-4c4c-90e2-0b6c6c525d71,7edee497-12b5-4a1d-951f-34dc8dce1c1d
-
-        Copy samples with metadata:
-
-            gencove projects copy-existing-samples d9eaa54b-aaac-4b85-92b0-0b564be6d7db --sample-ids 59f5c1fd-cce0-4c4c-90e2-0b6c6c525d71,7edee497-12b5-4a1d-951f-34dc8dce1c1d --metadata-json='{"batch": "batch1"}'
     """  # noqa: E501
     echo_debug(f"Sample ids translation: {source_sample_ids}")
     CopyExistingSamples(

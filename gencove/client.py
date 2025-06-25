@@ -37,6 +37,7 @@ from gencove.models import (  # noqa: I101, I100
     BaseSpaceProject,
     BaseSpaceProjectImport,
     BatchDetail,
+    CopyExistingSamplesModel,
     CreateJWT,
     ExplorerInstanceInactivityStopOrganization,
     ExplorerInstances,
@@ -1173,6 +1174,19 @@ class APIClient:
             payload,
             authorized=True,
             model=ImportExistingSamplesModel,
+        )
+
+    def copy_existing_samples(self, project_id, sample_ids) -> CopyExistingSamplesModel:
+        """Copy existing samples to a project."""
+        payload = {
+            "project_id": project_id,
+            "samples": [{"sample_id": sample_id} for sample_id in sample_ids],
+        }
+        return self._post(
+            self.endpoints.PROJECT_COPY_SAMPLES.value,
+            payload,
+            authorized=True,
+            model=CopyExistingSamplesModel,
         )
 
     def import_fastqs_from_url(self, gncv_file_path, url):

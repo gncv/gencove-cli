@@ -4,7 +4,6 @@ import click
 from gencove.command.common_cli_options import add_options, common_options
 from gencove.command.utils import validate_uuid, validate_uuid_list
 from gencove.constants import Credentials, Optionals
-from gencove.logger import echo_debug
 
 from .main import CopyExistingSamples
 
@@ -34,18 +33,11 @@ from .main import CopyExistingSamples
     ),
     callback=validate_uuid_list,
 )
-@click.option(
-    "--metadata-json",
-    required=False,
-    default=None,
-    help="Add metadata to all samples that are to be copied into a project.",
-)
 @add_options(common_options)
 def copy_existing_project_samples(  # pylint: disable=too-many-arguments
     project_id,
     source_project_id,
     source_sample_ids,
-    metadata_json,
     host,
     email,
     password,
@@ -65,7 +57,6 @@ def copy_existing_project_samples(  # pylint: disable=too-many-arguments
 
             gencove projects copy-existing-samples d9eaa54b-aaac-4b85-92b0-0b564be6d7db --sample-ids 59f5c1fd-cce0-4c4c-90e2-0b6c6c525d71,7edee497-12b5-4a1d-951f-34dc8dce1c1d
     """  # noqa: E501
-    echo_debug(f"Sample ids translation: {source_sample_ids}")
     CopyExistingSamples(
         project_id,
         source_project_id,

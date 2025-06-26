@@ -61,8 +61,7 @@ class CopyExistingSamples(Command):
             )
         self.echo_info(f"Copy existing samples to the project: {self.project_id}")
         try:
-            # Copy existing samples to the project optionally
-            # passing metadata.
+            # Copy existing samples to the project.
             for samples_batch in batchify(
                 self.source_sample_ids, batch_size=IMPORT_BATCH_SIZE
             ):

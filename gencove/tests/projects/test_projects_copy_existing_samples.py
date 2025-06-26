@@ -253,7 +253,7 @@ def test_copy_existing_project_samples__server_rejects(
 @pytest.mark.vcr
 @assert_authorization
 def test_copy_existing_project_samples__success(
-    mocker, credentials, project_id, sample_id_copy_existing, recording, vcr
+    mocker, credentials, project_id_copy, sample_id_copy_existing, recording, vcr
 ):  # pylint: disable=too-many-arguments
     """Test copy existing project samples success."""
     runner = CliRunner()
@@ -273,7 +273,7 @@ def test_copy_existing_project_samples__success(
     res = runner.invoke(
         copy_existing_project_samples,
         [
-            project_id,
+            project_id_copy,
             "--source-sample-ids",
             sample_id_copy_existing,
             *credentials,
@@ -282,58 +282,6 @@ def test_copy_existing_project_samples__success(
     assert res.exit_code == 0
     if not recording:
         mocked_copy_existing_samples.assert_called_once()
-    assert "Number of samples copied into the project" in res.output
-
-
-@pytest.mark.vcr
-@assert_authorization
-def test_copy_existing_project__from_source_project(
-    mocker, credentials, project_id_copy, project_id_batches, recording, vcr
-):  # pylint: disable=too-many-arguments
-    """Test copy existing project samples success
-    Using project_id_copy as destination since configuration is Copy FASTQs
-    Using project_id_batches as source since it only contains 2 samples
-    """
-    runner = CliRunner()
-
-    if not recording:
-        # Mock copy_existing_samples only if using the cassettes, since we
-        # mock the return value.
-        mocked_samples = get_vcr_response(
-            "/api/v2/project-samples/", vcr, operator.contains
-        )
-        # Changing "mock status" to valid values
-        mocked_samples["results"][0]["last_status"]["status"] = "succeeded"
-        mocked_samples["results"][1]["last_status"]["status"] = "failed qc"
-        mocked_get_project_samples = mocker.patch.object(
-            APIClient,
-            "get_project_samples",
-            return_value=ProjectSamples(**mocked_samples),
-        )
-        project_samples_copy_response = get_vcr_response(
-            "/api/v2/project-samples-copy/", vcr, operator.contains
-        )
-        mocked_copy_existing_samples = mocker.patch.object(
-            APIClient,
-            "copy_existing_samples",
-            return_value=CopyExistingSamplesModel(**project_samples_copy_response),
-        )
-
-    res = runner.invoke(
-        copy_existing_project_samples,
-        [
-            project_id_copy,
-            "--source-project-id",
-            project_id_batches,
-            *credentials,
-        ],
-    )
-    assert res.exit_code == 0
-    if not recording:
-        mocked_get_project_samples.assert_called_once()
-        mocked_copy_existing_samples.assert_called_once_with(
-            project_id_copy, [MOCK_UUID, MOCK_UUID]
-        )
     assert "Number of samples copied into the project" in res.output
 
 

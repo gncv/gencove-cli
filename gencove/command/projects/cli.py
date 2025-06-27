@@ -3,6 +3,7 @@
 import click
 
 from .cancel_samples.cli import cancel_project_samples
+from .copy_existing_samples.cli import copy_existing_project_samples
 from .create.cli import create_project
 from .create_batch.cli import create_project_batch
 from .create_merged_vcf.cli import create_merged_vcf
@@ -47,6 +48,7 @@ projects.add_command(delete_project_samples)
 projects.add_command(cancel_project_samples)
 projects.add_command(restore_project_samples)
 projects.add_command(import_existing_project_samples)
+projects.add_command(copy_existing_project_samples)
 projects.add_command(run_prefix)
 projects.add_command(create_merged_vcf)
 projects.add_command(status_merged_vcf)

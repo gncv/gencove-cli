@@ -298,6 +298,34 @@ def filter_import_existing_samples_response(response, json_response):
     return response, json_response
 
 
+def filter_copy_existing_samples_request(request):
+    """Filter copy_existing_samples sensitive data from request."""
+    try:
+        body = json.loads(request.body)
+        if "project_id" in body:
+            body["project_id"] = MOCK_UUID
+        if "samples" in body:
+            body["samples"] = [{"sample_id": MOCK_UUID} for _ in body["samples"]]
+        request.body = json.dumps(body).encode()
+    except (json.decoder.JSONDecodeError, TypeError):
+        pass
+    return request
+
+
+@parse_response_to_json
+def filter_copy_existing_samples_response(response, json_response):
+    """Filter copy_existing_samples sensitive data from response."""
+    if "project_id" in json_response:
+        json_response["project_id"] = MOCK_UUID
+    if "samples" in json_response:
+        for sample in json_response["samples"]:
+            if "sample_id" in sample:
+                sample["sample_id"] = MOCK_UUID
+            if "client_id" in sample:
+                sample["client_id"] = "foo"
+    return response, json_response
+
+
 @parse_response_to_json
 def filter_project_pipelines_response(response, json_response):
     """Filter project_pipelines sensitive data from response."""

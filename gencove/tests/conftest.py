@@ -174,6 +174,18 @@ def sample_id_import_existing():
     return os.getenv("GENCOVE_SAMPLE_ID_IMPORT_EXISTING_TEST")
 
 
+@pytest.fixture(scope="session")
+def project_id_copy():
+    """Returns the project id to copy into."""
+    return os.getenv("GENCOVE_PROJECT_ID_COPY_TEST")
+
+
+@pytest.fixture(scope="session")
+def sample_id_copy_existing():
+    """Returns a successful sample id for copying."""
+    return os.getenv("GENCOVE_SAMPLE_ID_COPY_EXISTING_TEST")
+
+
 @pytest.fixture(scope="function", autouse=True)
 def dont_save_dump_log():
     """Sets the environment variable to disable dumping the log file."""

@@ -353,6 +353,20 @@ class ImportExistingSamplesModel(BaseModel):
     metadata: Optional[Any] = None
 
 
+class SampleCopy(BaseModel):
+    """Existing sample copy model"""
+
+    sample_id: UUID
+    client_id: Optional[str] = None
+
+
+class CopyExistingSamplesModel(BaseModel):
+    """Copy existing samples model"""
+
+    project_id: UUID
+    samples: List[SampleCopy]
+
+
 class FileType(BaseModel):
     """FileType model"""
 

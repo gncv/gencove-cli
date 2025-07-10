@@ -79,6 +79,13 @@ jobs:
           name: gencove-Windows
           path: gencove-Windows
 
+      - name: Zip release
+        run: |
+            chmod -R +x .
+            zip --junk-paths gencove-Linux gencove-Linux/gencove
+            zip --junk-paths gencove-macOS gencove-macOS/gencove
+            zip --junk-paths gencove-Windows gencove-Windows/gencove.exe
+
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v2
@@ -88,41 +95,9 @@ jobs:
           name: Release ${{ github.ref_name }}
           draft: false
           prerelease: false
+          files: |
+            gencove-Linux.zip
+            gencove-macOS.zip
+            gencove-Windows.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Zip release
-        # Uploading artifact changes file permissions
-        run: |
-          chmod -R +x .
-          zip --junk-paths gencove-Linux gencove-Linux/gencove
-          zip --junk-paths gencove-macOS gencove-macOS/gencove
-          zip --junk-paths gencove-Windows gencove-Windows/gencove.exe
-
-      - name: Upload Release Asset Linux
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./gencove-Linux.zip
-          asset_name: gencove-Linux.zip
-          asset_content_type: application/zip
-      - name: Upload Release Asset macOS
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./gencove-macOS.zip
-          asset_name: gencove-macOS.zip
-          asset_content_type: application/zip
-      - name: Upload Release Asset Windows
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./gencove-Windows.zip
-          asset_name: gencove-Windows.zip
-          asset_content_type: application/zip

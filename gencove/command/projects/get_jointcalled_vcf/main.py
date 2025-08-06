@@ -46,11 +46,13 @@ class GetJointcalledVCF(Command):
         try:
             project = self.api_client.get_project(self.project_id)
             self.echo_debug(project)
-            for f in project.files:
-                if f.file_type in ["jointcalled-vcf", "jointcalled-vcf_indexed"]:
-                    self.echo_debug(f"Downloading jointcalled VCF file {f.file_type}")
+            for file in project.files:
+                if file.file_type in ["jointcalled-vcf", "jointcalled-vcf_indexed"]:
+                    self.echo_debug(
+                        f"Downloading jointcalled VCF file {file.file_type}"
+                    )
                     filename = download.utils.get_filename_from_download_url(
-                        f.download_url
+                        file.download_url
                     )
                     download_path = os.path.join(self.output_folder, filename)
                     self.echo_debug(
@@ -58,7 +60,7 @@ class GetJointcalledVCF(Command):
                     )
                     download.utils.download_file(
                         download_path,
-                        f.download_url,
+                        file.download_url,
                         no_progress=self.no_progress,
                     )
         except client.APIClientError as err:

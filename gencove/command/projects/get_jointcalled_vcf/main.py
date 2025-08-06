@@ -1,6 +1,7 @@
 """Download project's jointcalled VCF files executor."""
-import backoff
 import os
+
+import backoff
 
 from ... import download
 from ...base import Command

@@ -6,7 +6,6 @@ import backoff
 from ... import download
 from ...base import Command
 from .... import client
-from ....exceptions import ValidationError
 
 
 class GetJointcalledVCF(Command):

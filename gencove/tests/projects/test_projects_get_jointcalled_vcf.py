@@ -12,9 +12,6 @@ from pydantic import HttpUrl  # pylint: disable=wrong-import-order
 
 
 def test_get_jointcalled_vcf__bad_project_id(mocker):
-    """Test get jointcalled file failure when non-uuid string is used as
-    project id.
-    """
     runner = CliRunner()
 
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
@@ -42,7 +39,6 @@ def test_get_jointcalled_vcf__bad_project_id(mocker):
 
 
 def test_get_jointcalled_vcf__not_owned_project(mocker):
-    """Test get jointcalled file failure when project is not owned."""
     mocked_response = {"detail": "Not found."}
 
     runner = CliRunner()
@@ -73,7 +69,6 @@ def test_get_jointcalled_vcf__not_owned_project(mocker):
 
 
 def test_get_jointcalled_vcf__empty(mocker):
-    """Test project doesn't have jointcalled VCF files - should succeed without downloading."""
     project_id = str(uuid4())
 
     runner = CliRunner()
@@ -116,7 +111,6 @@ def test_get_jointcalled_vcf__empty(mocker):
 
 
 def test_get_jointcalled_vcf_custom_output_folder(mocker):
-    """Test project download jointcalled VCF success with custom output folder."""
     project_id = str(uuid4())
     file_id = str(uuid4())
     download_url = HttpUrl(
@@ -176,7 +170,6 @@ def test_get_jointcalled_vcf_custom_output_folder(mocker):
 
 
 def test_get_jointcalled_vcf__no_progress_success(mocker):
-    """Test project download jointcalled VCF success."""
     project_id = str(uuid4())
     file_id = str(uuid4())
 
@@ -239,7 +232,6 @@ def test_get_jointcalled_vcf__no_progress_success(mocker):
 
 
 def test_get_jointcalled_vcf__slow_response_retry(mocker):
-    """Test project download jointcalled VCF slow response retry."""
     project_id = str(uuid4())
 
     runner = CliRunner()
@@ -273,7 +265,6 @@ def test_get_jointcalled_vcf__slow_response_retry(mocker):
 
 
 def test_get_jointcalled_vcf__success(mocker):
-    """Test project download jointcalled VCF success."""
     project_id = str(uuid4())
     file_id = str(uuid4())
 
@@ -338,7 +329,6 @@ def test_get_jointcalled_vcf__success(mocker):
 
 
 def test_get_jointcalled_vcf__success__project_with_legacy_webhhok_url(mocker):
-    """Test project download jointcalled VCF success."""
     project_id = str(uuid4())
     file_id = str(uuid4())
 
@@ -404,7 +394,6 @@ def test_get_jointcalled_vcf__success__project_with_legacy_webhhok_url(mocker):
 
 
 def test_get_jointcalled_vcf__multiple_files(mocker):
-    """Test project download multiple jointcalled VCF files success."""
     project_id = str(uuid4())
     file_id1 = str(uuid4())
     file_id2 = str(uuid4())
@@ -492,7 +481,6 @@ def test_get_jointcalled_vcf__multiple_files(mocker):
 
 
 def test_get_jointcalled_vcf__mixed_file_types(mocker):
-    """Test project with mixed file types - only jointcalled files should be downloaded."""
     project_id = str(uuid4())
     file_id = str(uuid4())
 

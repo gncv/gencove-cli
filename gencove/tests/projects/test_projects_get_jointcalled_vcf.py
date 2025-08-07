@@ -12,6 +12,7 @@ from pydantic import HttpUrl  # pylint: disable=wrong-import-order
 
 
 def test_get_jointcalled_vcf__bad_project_id(mocker):
+    """Test jointcalled vcf with wrong project id"""
     runner = CliRunner()
 
     mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
@@ -39,6 +40,7 @@ def test_get_jointcalled_vcf__bad_project_id(mocker):
 
 
 def test_get_jointcalled_vcf__not_owned_project(mocker):
+    """Test jointcalled vcf with not owned project"""
     mocked_response = {"detail": "Not found."}
 
     runner = CliRunner()
@@ -69,6 +71,7 @@ def test_get_jointcalled_vcf__not_owned_project(mocker):
 
 
 def test_get_jointcalled_vcf__empty(mocker):
+    """Test jointcalled vcf with empty project"""
     project_id = str(uuid4())
 
     runner = CliRunner()
@@ -111,6 +114,7 @@ def test_get_jointcalled_vcf__empty(mocker):
 
 
 def test_get_jointcalled_vcf_custom_output_folder(mocker):
+    """Test jointcalled vcf with custom output folder"""
     project_id = str(uuid4())
     file_id = str(uuid4())
     download_url = HttpUrl(
@@ -170,6 +174,7 @@ def test_get_jointcalled_vcf_custom_output_folder(mocker):
 
 
 def test_get_jointcalled_vcf__no_progress_success(mocker):
+    """Test jointcalled vcf with no progress"""
     project_id = str(uuid4())
     file_id = str(uuid4())
 
@@ -232,6 +237,7 @@ def test_get_jointcalled_vcf__no_progress_success(mocker):
 
 
 def test_get_jointcalled_vcf__slow_response_retry(mocker):
+    """Test jointcalled vcf with slow response retry"""
     project_id = str(uuid4())
 
     runner = CliRunner()
@@ -265,6 +271,7 @@ def test_get_jointcalled_vcf__slow_response_retry(mocker):
 
 
 def test_get_jointcalled_vcf__success(mocker):
+    """Test jointcalled vcf with success"""
     project_id = str(uuid4())
     file_id = str(uuid4())
 
@@ -280,71 +287,6 @@ def test_get_jointcalled_vcf__success(mocker):
             description="",
             created="2020-06-11T02:14:00.541889Z",
             organization=str(uuid4()),
-            sample_count=3,
-            pipeline_capabilities=str(uuid4()),
-            files=[
-                {
-                    "id": "755ec682-e4a5-414a-a5be-07e0af11cf75",
-                    "s3_path": (
-                        "app-data/output/apps/jointcalled_vcfs/"
-                        f"{file_id}/{file_id}.vcf.bgz"
-                    ),
-                    "size": None,
-                    "download_url": (
-                        "https://bucket.s3.amazonaws.com/output/apps/"
-                        f"jointcalled_vcfs/{file_id}/{file_id}.vcf.bgz"
-                    ),
-                    "file_type": "jointcalled-vcf",
-                }
-            ],
-        ),
-    )
-
-    with runner.isolated_filesystem():
-        mocked_download_file = mocker.patch(
-            "gencove.command.projects.get_jointcalled_vcf.main.download.utils."
-            "download_file"
-        )
-        res = runner.invoke(
-            get_jointcalled_vcf,
-            [
-                project_id,
-                "--email",
-                "foo@bar.com",
-                "--password",
-                "123",
-            ],
-        )
-    assert res.exit_code == 0
-    mocked_login.assert_called_once()
-    mocked_get_project.assert_called_once()
-    mocked_download_file.assert_called_once_with(
-        f"./{file_id}.vcf.bgz",
-        HttpUrl(
-            "https://bucket.s3.amazonaws.com/output/apps/"
-            f"jointcalled_vcfs/{file_id}/{file_id}.vcf.bgz"
-        ),
-        no_progress=False,
-    )
-
-
-def test_get_jointcalled_vcf__success__project_with_legacy_webhhok_url(mocker):
-    project_id = str(uuid4())
-    file_id = str(uuid4())
-
-    runner = CliRunner()
-
-    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
-    mocked_get_project = mocker.patch.object(
-        APIClient,
-        "get_project",
-        return_value=Project(
-            id=project_id,
-            name="Project Cadmus",
-            description="",
-            created="2020-06-11T02:14:00.541889Z",
-            organization=str(uuid4()),
-            webhook_url="",
             sample_count=3,
             pipeline_capabilities=str(uuid4()),
             files=[
@@ -394,6 +336,7 @@ def test_get_jointcalled_vcf__success__project_with_legacy_webhhok_url(mocker):
 
 
 def test_get_jointcalled_vcf__multiple_files(mocker):
+    """Test jointcalled vcf with multiple files"""
     project_id = str(uuid4())
     file_id1 = str(uuid4())
     file_id2 = str(uuid4())
@@ -481,6 +424,7 @@ def test_get_jointcalled_vcf__multiple_files(mocker):
 
 
 def test_get_jointcalled_vcf__mixed_file_types(mocker):
+    """Test jointcalled vcf with mixed file types"""
     project_id = str(uuid4())
     file_id = str(uuid4())
 

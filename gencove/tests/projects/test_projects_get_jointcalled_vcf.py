@@ -71,7 +71,7 @@ def test_get_jointcalled_vcf__not_owned_project(mocker):
 
 
 def test_get_jointcalled_vcf__empty(mocker):
-    """Test jointcalled vcf with empty project"""
+    """Test jointcalled vcf with empty project shows error message"""
     project_id = str(uuid4())
 
     runner = CliRunner()
@@ -111,6 +111,7 @@ def test_get_jointcalled_vcf__empty(mocker):
     mocked_login.assert_called_once()
     mocked_get_project.assert_called_once()
     mocked_download_file.assert_not_called()
+    assert f"Project {project_id} has no jointcalled VCF files." in res.output
 
 
 def test_get_jointcalled_vcf_custom_output_folder(mocker):

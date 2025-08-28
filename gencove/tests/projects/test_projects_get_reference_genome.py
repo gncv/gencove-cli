@@ -107,6 +107,54 @@ def test_get_reference_genome__not_owned_project(
     assert f"ERROR: Project {project_id} does not exist." in res.output
 
 
+@assert_no_requests
+def test_get_reference_genome__empty_project(
+    credentials, mocker
+):  # pylint: disable=unused-argument
+    """Test get reference genome shows error message when project has no files."""
+    from gencove.client import APIClient
+    from gencove.models import Project
+
+    runner = CliRunner()
+    project_id = str(uuid4())
+
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_get_project = mocker.patch.object(
+        APIClient,
+        "get_project",
+        return_value=Project(
+            id=project_id,
+            name="Project Test",
+            description="",
+            created="2020-06-11T02:14:00.541889Z",
+            organization=str(uuid4()),
+            sample_count=0,
+            pipeline_capabilities=str(uuid4()),
+            files=[],
+        ),
+    )
+
+    with runner.isolated_filesystem():
+        os.mkdir("cli_test_data")
+        mocked_download_file = mocker.patch(
+            "gencove.command.projects.get_reference_genome.main.download_file"
+        )
+        res = runner.invoke(
+            get_reference_genome,
+            [
+                project_id,
+                "cli_test_data",
+                *credentials,
+            ],
+        )
+
+    assert res.exit_code == 0
+    mocked_login.assert_called_once()
+    mocked_get_project.assert_called_once()
+    mocked_download_file.assert_not_called()
+    assert f"Project {project_id} has no reference genome files." in res.output
+
+
 @pytest.mark.vcr
 @assert_authorization
 @pytest.mark.parametrize("remove_hyphens", [True, False])

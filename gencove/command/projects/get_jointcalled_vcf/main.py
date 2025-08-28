@@ -46,6 +46,12 @@ class GetJointcalledVCF(Command):
         try:
             project = self.api_client.get_project(self.project_id)
             self.echo_debug(project)
+            if not project.files:
+                self.echo_error(
+                    f"Project {self.project_id} has no jointcalled VCF files."
+                )
+                return
+
             for file in project.files:
                 if file.file_type in ["jointcalled-vcf", "jointcalled-vcf_indexed"]:
                     self.echo_debug(

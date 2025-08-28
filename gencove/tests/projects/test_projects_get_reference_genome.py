@@ -7,9 +7,10 @@ from uuid import uuid4
 
 from click.testing import CliRunner
 
+from gencove.client import APIClient
 from gencove.command.download.utils import download_file
 from gencove.command.projects.get_reference_genome.cli import get_reference_genome
-from gencove.models import SampleFile
+from gencove.models import FileTypesModel, Project, SampleFile
 from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import (
     filter_aws_headers,
@@ -112,8 +113,6 @@ def test_get_reference_genome__empty_project(
     credentials, mocker
 ):  # pylint: disable=unused-argument
     """Test get reference genome shows error message when project has no files."""
-    from gencove.client import APIClient
-    from gencove.models import Project
 
     runner = CliRunner()
     project_id = str(uuid4())
@@ -133,6 +132,11 @@ def test_get_reference_genome__empty_project(
             files=[],
         ),
     )
+    mocked_get_file_types = mocker.patch.object(
+        APIClient,
+        "get_file_types",
+        return_value=FileTypesModel(results=[], meta=dict(next=None)),
+    )
 
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
@@ -151,6 +155,7 @@ def test_get_reference_genome__empty_project(
     assert res.exit_code == 0
     mocked_login.assert_called_once()
     mocked_get_project.assert_called_once()
+    mocked_get_file_types.assert_called_once()
     mocked_download_file.assert_not_called()
     assert f"Project {project_id} has no reference genome files." in res.output
 

@@ -133,7 +133,7 @@ def test_get_reference_genome__empty_project(
             files=[],
         ),
     )
-    mocked_get_file_types = mocker.patch.object(
+    mocker.patch.object(
         APIClient,
         "get_file_types",
         return_value=FileTypesModel(

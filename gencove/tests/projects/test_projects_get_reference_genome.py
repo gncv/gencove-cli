@@ -7,9 +7,10 @@ from uuid import uuid4
 
 from click.testing import CliRunner
 
+from gencove.client import APIClient
 from gencove.command.download.utils import download_file
 from gencove.command.projects.get_reference_genome.cli import get_reference_genome
-from gencove.models import SampleFile
+from gencove.models import FileType, FileTypesModel, Project, SampleFile
 from gencove.tests.decorators import assert_authorization, assert_no_requests
 from gencove.tests.filters import (
     filter_aws_headers,
@@ -105,6 +106,62 @@ def test_get_reference_genome__not_owned_project(
     assert res.exit_code == 1
     assert "WARNING: There was an error while validating file types." in res.output
     assert f"ERROR: Project {project_id} does not exist." in res.output
+
+
+@assert_no_requests
+def test_get_reference_genome__empty_project(
+    credentials, mocker
+):  # pylint: disable=unused-argument
+    """Test get reference genome shows error message when project has no files."""
+
+    project_id = str(uuid4())
+
+    runner = CliRunner()
+
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_get_project = mocker.patch.object(
+        APIClient,
+        "get_project",
+        return_value=Project(
+            id=project_id,
+            name="Project Cadmus",
+            description="",
+            created="2020-06-11T02:14:00.541889Z",
+            organization=str(uuid4()),
+            sample_count=3,
+            pipeline_capabilities=str(uuid4()),
+            files=[],
+        ),
+    )
+    mocker.patch.object(
+        APIClient,
+        "get_file_types",
+        return_value=FileTypesModel(
+            results=[FileType(key="genome-dict", description="Genome dict")],
+            meta=dict(next=None),
+        ),
+    )
+
+    with runner.isolated_filesystem():
+        mocked_download_file = mocker.patch(
+            "gencove.command.projects.get_reference_genome.main.download_file"
+        )
+        res = runner.invoke(
+            get_reference_genome,
+            [
+                project_id,
+                "reference_genome",
+                "--email",
+                "foo@bar.com",
+                "--password",
+                "123",
+            ],
+        )
+    assert res.exit_code == 0
+    mocked_login.assert_called_once()
+    mocked_get_project.assert_called_once()
+    mocked_download_file.assert_not_called()
+    assert f"Project {project_id} has no reference genome files." in res.output
 
 
 @pytest.mark.vcr

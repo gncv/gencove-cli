@@ -11,6 +11,7 @@ from .create_sample_manifest.cli import create_sample_manifest
 from .delete.cli import delete_projects
 from .delete_samples.cli import delete_project_samples
 from .get_batch.cli import get_batch
+from .get_jointcalled_vcf.cli import get_jointcalled_vcf
 from .get_merged_vcf.cli import get_merged_vcf
 from .get_reference_genome.cli import get_reference_genome
 from .get_sample_manifests.cli import get_sample_manifests
@@ -44,6 +45,7 @@ projects.add_command(list_project_batches)
 projects.add_command(list_project_pipeline_capabilities)
 projects.add_command(list_project_pipelines)
 projects.add_command(get_batch)
+projects.add_command(get_jointcalled_vcf)
 projects.add_command(delete_project_samples)
 projects.add_command(cancel_project_samples)
 projects.add_command(restore_project_samples)

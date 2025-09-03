@@ -70,6 +70,12 @@ class GetReferenceGenome(Command):
             project = self.api_client.get_project(self.project_id)
             self.echo_debug(project)
             file_types_re = re.compile("|".join(self.file_types), re.IGNORECASE)
+            if not project.files:
+                self.echo_error(
+                    f"Project {self.project_id} has no reference genome files."
+                )
+                return
+
             for file in project.files:
                 if self.file_types and not file_types_re.match(file.file_type):
                     self.echo_debug(

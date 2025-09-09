@@ -918,7 +918,7 @@ class APIClient:
             s3_uri (str): s3 path formated as s3://<bucket-name>/prefix
             project_id (str): project to which to assign the samples
             metadata (str): Optional JSON metadata to be applied to all samples
-            input_format (str): Input format for the samples (fastq, cram, or autodetect)
+            input_format (str): Input format for the samples
         """
 
         payload = {

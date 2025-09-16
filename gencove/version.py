@@ -1,10 +1,19 @@
 """Utility to generate version string."""
-import pkgutil
+import os
 
 
 def version():
     """Return version string."""
-    major = pkgutil.get_data(__package__, "version/A-major").strip()
-    minor = pkgutil.get_data(__package__, "version/B-minor").strip()
-    patch = pkgutil.get_data(__package__, "version/C-patch").strip()
-    return f"{major.decode('utf-8')}.{minor.decode('utf-8')}.{patch.decode('utf-8')}"
+    base_dir = os.path.dirname(__file__)
+    with open(os.path.join(base_dir, "version", "A-major")) as f:
+        major = f.read().strip()
+    with open(os.path.join(base_dir, "version", "B-minor")) as f:
+        minor = f.read().strip()
+    with open(os.path.join(base_dir, "version", "C-patch")) as f:
+        patch = f.read().strip()
+    return f"{major}.{minor}.{patch}"
+
+
+def get_version():
+    """Return version string for setuptools dynamic versioning."""
+    return version()

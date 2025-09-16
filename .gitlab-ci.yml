@@ -1,4 +1,4 @@
-image: python:3.10  # >3.10 cause failures
+image: python:3.10
 
 stages:
   - test
@@ -13,6 +13,7 @@ before_script:
   - export PATH="$HOME/.local/bin:$PATH"
   # Setup project with uv
   - uv sync --extra dev
+  - touch gencove/tests/.env
 
 test_windows:
   stage: test
@@ -28,6 +29,7 @@ test_windows:
     # Install uv on Windows
     - powershell -Command "irm https://astral.sh/uv/install.ps1 | iex"
     - powershell -Command "uv sync"
+    - powershell -Command "New-Item -ItemType File -Path 'gencove/tests/.env' -Force"
   script:
     - powershell -Command "uv run gencove --version"
 

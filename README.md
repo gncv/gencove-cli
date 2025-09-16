@@ -10,39 +10,52 @@ Main documentation can be found here: [https://docs.gencove.com](https://docs.ge
 
 ## Local Development ##
 
-Have some form of virtualization, for instance pyenv for 3.11.x and a virtualenv.
+Have some form of virtualization, for instance pyenv for 3.11.x and a virtualenv, or use uv for Python version management.
 
-Install in editing mode:
+**With `uv` (recommended):**
 ```bash
+# Install dependencies and set up development environment
+uv sync --extra dev
+
+# Install pre-commit hooks
+uv run pre-commit install
+```
+
+**Alternative with `pip`:**
+```bash
+# Install in editing mode
 pip install -e .
-```
 
-Install local requirements:
-```bash
+# Install local requirements
 pip install -r requirements.txt
-```
 
-Install pre-commit hooks:
-```bash
+# Install pre-commit hooks
 pre-commit install
 ```
 
 Use with local api service (need to have [back_api2](http://gitlab.com/gencove/platform/back_api2/) running)
 
-```
+```bash
+# With uv
+uv run gencove <command> --host http://localhost:8200
+
+# Or directly (if installed in environment)
 gencove <command> --host http://localhost:8200
 ```
 
 or use with development version of deployed API service
 
-```
+```bash
+uv run gencove <command> --host https://api-dev.gencove-dev.com
+
+# Or directly (if installed in environment)
 gencove <command> --host https://api-dev.gencove-dev.com
 ```
 
 Before pushing run:
 
 ```bash
-pre-commit run
+uv run pre-commit run
 ```
 
 and then:
@@ -68,7 +81,6 @@ or
 tox -e py39-api_key -- gencove/tests/test_utils.py::test_is_valid_uuid__is_not_valid__text
 ```
 the arguments after the -- will be substituted everywhere where you specify {posargs} in your test commands.
-
 
 Tests Configuration:
 

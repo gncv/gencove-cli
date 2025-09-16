@@ -34,94 +34,94 @@ test_windows:
 python39_api_key:
   image: python:3.9
   stage: test
-  script: tox -e py39-api_key
+  script: uv run tox -e py39-api_key
   except:
     - tags
 
 python39_user_pass:
   image: python:3.9
   stage: test
-  script: tox -e py39-user_pass
+  script: uv run tox -e py39-user_pass
   except:
     - tags
 
 python310_api_key:
   image: python:3.10
   stage: test
-  script: tox -e py310-api_key
+  script: uv run tox -e py310-api_key
   except:
     - tags
 
 python310_user_pass:
   image: python:3.10
   stage: test
-  script: tox -e py310-user_pass
+  script: uv run tox -e py310-user_pass
   except:
     - tags
 
 python311_api_key:
   image: python:3.11
   stage: test
-  script: tox -e py311-api_key
+  script: uv run tox -e py311-api_key
   except:
     - tags
 
 python311_user_pass:
   image: python:3.11
   stage: test
-  script: tox -e py311-user_pass
+  script: uv run tox -e py311-user_pass
   except:
     - tags
 
 python312_api_key:
   image: python:3.12
   stage: test
-  script: tox -e py312-api_key
+  script: uv run tox -e py312-api_key
   except:
     - tags
 
 python312_user_pass:
   image: python:3.12
   stage: test
-  script: tox -e py312-user_pass
+  script: uv run tox -e py312-user_pass
   except:
     - tags
 
 python313_api_key:
   image: python:3.13
   stage: test
-  script: tox -e py313-api_key
+  script: uv run tox -e py313-api_key
   except:
     - tags
 
 python313_user_pass:
   image: python:3.13
   stage: test
-  script: tox -e py313-user_pass
+  script: uv run tox -e py313-user_pass
   except:
     - tags
 
 black:
   stage: test
-  script: tox -e black_checker
+  script: uv run tox -e black_checker
   except:
     - tags
 
 flake8:
   stage: test
-  script: tox -e flake8
+  script: uv run tox -e flake8
   except:
     - tags
 
 pylint:
   stage: test
-  script: tox -e pylint
+  script: uv run tox -e pylint
   except:
     - tags
 
 bandit:
   stage: test
-  script: tox -e bandit
+  script: uv run tox -e bandit
   except:
     - tags
 

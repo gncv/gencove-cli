@@ -22,9 +22,8 @@ test_windows:
     PYTHON_VERSION_MINOR: "10"
     PYTHON_VERSION_PATCH: "11"
   before_script:
-    - powershell -Command "Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1; refreshenv"
-    - powershell -Command "choco install python -y --allow-downgrade --version $env:PYTHON_VERSION_MAJOR.$env:PYTHON_VERSION_MINOR.$env:PYTHON_VERSION_PATCH"
     - powershell -Command "irm https://astral.sh/uv/install.ps1 | iex"
+    - powershell -Command "C:\Users\gitlab_runner\.local\bin\uv.exe python install $env:PYTHON_VERSION_MAJOR.$env:PYTHON_VERSION_MINOR.$env:PYTHON_VERSION_PATCH"
     - powershell -Command "C:\Users\gitlab_runner\.local\bin\uv.exe sync"
     - powershell -Command "New-Item -ItemType File -Path 'gencove/tests/.env' -Force"
   script:

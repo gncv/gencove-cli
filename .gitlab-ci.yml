@@ -25,11 +25,11 @@ test_windows:
     - powershell -Command "Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1; refreshenv"
     - powershell -Command "choco install python -y --allow-downgrade --version $env:PYTHON_VERSION_MAJOR.$env:PYTHON_VERSION_MINOR.$env:PYTHON_VERSION_PATCH"
     - powershell -Command "irm https://astral.sh/uv/install.ps1 | iex"
-    - powershell -Command "$env:Path = 'C:\Users\gitlab_runner\.local\bin;' + $env:Path"
+    - powershell -Command '$env:Path = "C:\Users\gitlab_runner\.local\bin;" + $env:Path'
     - powershell -Command "uv sync"
     - powershell -Command "New-Item -ItemType File -Path 'gencove/tests/.env' -Force"
   script:
-    - powershell -Command "$env:Path = 'C:\Users\gitlab_runner\.local\bin;' + $env:Path"
+    - powershell -Command '$env:Path = "C:\Users\gitlab_runner\.local\bin;" + $env:Path'
     - powershell -Command "uv run gencove --version"
 
 python39_api_key:

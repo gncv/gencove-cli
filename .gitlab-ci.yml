@@ -28,10 +28,10 @@ test_windows:
     - powershell -Command "choco install python -y --allow-downgrade --version $env:PYTHON_VERSION_MAJOR.$env:PYTHON_VERSION_MINOR.$env:PYTHON_VERSION_PATCH"
     # Install uv on Windows
     - powershell -Command "irm https://astral.sh/uv/install.ps1 | iex"
-    - powershell -Command "uv sync"
+    - powershell -Command "$env:Path = 'C:\Users\gitlab_runner\.local\bin;' + $env:Path; uv sync"
     - powershell -Command "New-Item -ItemType File -Path 'gencove/tests/.env' -Force"
   script:
-    - powershell -Command "uv run gencove --version"
+    - powershell -Command "$env:Path = 'C:\Users\gitlab_runner\.local\bin;' + $env:Path; uv run gencove --version"
 
 python39_api_key:
   image: python:3.9

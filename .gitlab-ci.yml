@@ -1,4 +1,4 @@
-image: ghcr.io/astral-sh/uv:python3.10-alpine  # >3.10 causes failures
+image: ghcr.io/astral-sh/uv:python3.10-bookworm-slim  # >3.10 causes failures
 
 stages:
   - test
@@ -28,14 +28,14 @@ test_windows:
 
 
 python38_api_key:
-  image: ghcr.io/astral-sh/uv:python3.8-alpine
+  image: ghcr.io/astral-sh/uv:python3.8-bookworm-slim
   stage: test
   script: uv run tox -e py38-api_key
   except:
     - tags
 
 python38_user_pass:
-  image: ghcr.io/astral-sh/uv:python3.8-alpine
+  image: ghcr.io/astral-sh/uv:python3.8-bookworm-slim
   stage: test
   script: uv run tox -e py38-user_pass
   except:
@@ -43,70 +43,70 @@ python38_user_pass:
 
 
 python39_api_key:
-  image: ghcr.io/astral-sh/uv:python3.9-alpine
+  image: ghcr.io/astral-sh/uv:python3.9-bookworm-slim
   stage: test
   script: uv run tox -e py39-api_key
   except:
     - tags
 
 python39_user_pass:
-  image: ghcr.io/astral-sh/uv:python3.9-alpine
+  image: ghcr.io/astral-sh/uv:python3.9-bookworm-slim
   stage: test
   script: uv run tox -e py39-user_pass
   except:
     - tags
 
 python310_api_key:
-  image: ghcr.io/astral-sh/uv:python3.10-alpine
+  image: ghcr.io/astral-sh/uv:python3.10-bookworm-slim
   stage: test
   script: uv run tox -e py310-api_key
   except:
     - tags
 
 python310_user_pass:
-  image: ghcr.io/astral-sh/uv:python3.10-alpine
+  image: ghcr.io/astral-sh/uv:python3.10-bookworm-slim
   stage: test
   script: uv run tox -e py310-user_pass
   except:
     - tags
 
 python311_api_key:
-  image: ghcr.io/astral-sh/uv:python3.11-alpine
+  image: ghcr.io/astral-sh/uv:python3.11-bookworm-slim
   stage: test
   script: uv run tox -e py311-api_key
   except:
     - tags
 
 python311_user_pass:
-  image: ghcr.io/astral-sh/uv:python3.11-alpine
+  image: ghcr.io/astral-sh/uv:python3.11-bookworm-slim
   stage: test
   script: uv run tox -e py311-user_pass
   except:
     - tags
 
 python312_api_key:
-  image: ghcr.io/astral-sh/uv:python3.12-alpine
+  image: ghcr.io/astral-sh/uv:python3.12-bookworm-slim
   stage: test
   script: uv run tox -e py312-api_key
   except:
     - tags
 
 python312_user_pass:
-  image: ghcr.io/astral-sh/uv:python3.12-alpine
+  image: ghcr.io/astral-sh/uv:python3.12-bookworm-slim
   stage: test
   script: uv run tox -e py312-user_pass
   except:
     - tags
 
 python313_api_key:
-  image: ghcr.io/astral-sh/uv:python3.13-alpine
+  image: ghcr.io/astral-sh/uv:python3.13-bookworm-slim
   stage: test
   script: uv run tox -e py313-api_key
   except:
     - tags
 
 python313_user_pass:
-  image: ghcr.io/astral-sh/uv:python3.13-alpine
+  image: ghcr.io/astral-sh/uv:python3.13-bookworm-slim
   stage: test
   script: uv run tox -e py313-user_pass
   except:

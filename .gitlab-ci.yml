@@ -10,6 +10,9 @@ before_script:
   - uv sync --extra dev
   - touch gencove/tests/.env
 
+variables:
+    UV_LINK_MODE: copy
+
 test_windows:
   stage: test
   tags:

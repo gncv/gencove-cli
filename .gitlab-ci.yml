@@ -8,7 +8,6 @@ stages:
 before_script:
   - export PATH="/usr/local/bin:$PATH"
   - uv sync --extra dev
-  - touch gencove/tests/.env
 
 variables:
     UV_LINK_MODE: copy

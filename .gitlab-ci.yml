@@ -158,7 +158,6 @@ build_docs_prod:
 production:
   stage: deploy
   script:
-    - uv tool install awscli
     - uv build
     - uv publish
     # Autotag

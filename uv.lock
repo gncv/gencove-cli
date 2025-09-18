@@ -695,7 +695,6 @@ dependencies = [
 dev = [
     { name = "bandit" },
     { name = "black" },
-    { name = "faker" },
     { name = "flake8" },
     { name = "flake8-import-order" },
     { name = "flake8-typing-imports" },
@@ -706,15 +705,9 @@ dev = [
     { name = "pyflakes" },
     { name = "pyinstaller" },
     { name = "pylint" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "pytest-mock" },
-    { name = "pytest-recording" },
-    { name = "pytest-xdist" },
     { name = "tox", version = "4.25.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "tox", version = "4.30.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "urllib3" },
-    { name = "vcrpy" },
 ]
 test = [
     { name = "faker" },
@@ -723,7 +716,6 @@ test = [
     { name = "pytest-mock" },
     { name = "pytest-recording" },
     { name = "pytest-xdist" },
-    { name = "urllib3" },
     { name = "vcrpy" },
 ]
 
@@ -735,7 +727,6 @@ requires-dist = [
     { name = "boto3", specifier = ">=1.17.97" },
     { name = "click", specifier = ">=7.0,<=8.1.8" },
     { name = "click-default-group", specifier = ">=1.2.4" },
-    { name = "faker", marker = "extra == 'dev'", specifier = "==14.0.0" },
     { name = "faker", marker = "extra == 'test'", specifier = "==14.0.0" },
     { name = "flake8", marker = "extra == 'dev'", specifier = "==5.0.4" },
     { name = "flake8-import-order", marker = "extra == 'dev'", specifier = "==0.18.1" },
@@ -749,23 +740,16 @@ requires-dist = [
     { name = "pyflakes", marker = "extra == 'dev'", specifier = "==2.5.0" },
     { name = "pyinstaller", marker = "extra == 'dev'", specifier = "==6.11.1" },
     { name = "pylint", marker = "extra == 'dev'", specifier = "==2.13.9" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = "==7.0.1" },
     { name = "pytest", marker = "extra == 'test'", specifier = "==7.0.1" },
-    { name = "pytest-cov", marker = "extra == 'dev'", specifier = "==3.0.0" },
     { name = "pytest-cov", marker = "extra == 'test'", specifier = "==3.0.0" },
-    { name = "pytest-mock", marker = "extra == 'dev'", specifier = "==3.6.1" },
     { name = "pytest-mock", marker = "extra == 'test'", specifier = "==3.6.1" },
-    { name = "pytest-recording", marker = "extra == 'dev'", specifier = "==0.12.1" },
     { name = "pytest-recording", marker = "extra == 'test'", specifier = "==0.12.1" },
-    { name = "pytest-xdist", marker = "extra == 'dev'", specifier = "==2.5.0" },
     { name = "pytest-xdist", marker = "extra == 'test'", specifier = "==2.5.0" },
     { name = "python-dateutil", specifier = ">=2.2.0" },
     { name = "requests", specifier = ">=2.19.1" },
     { name = "six", specifier = ">=1.5" },
     { name = "tox", marker = "extra == 'dev'", specifier = ">=3.28.0" },
     { name = "urllib3", marker = "extra == 'dev'", specifier = "<=2" },
-    { name = "urllib3", marker = "extra == 'test'", specifier = "<=2" },
-    { name = "vcrpy", marker = "extra == 'dev'", specifier = "==4.1.1" },
     { name = "vcrpy", marker = "extra == 'test'", specifier = "==4.1.1" },
 ]
 provides-extras = ["dev", "test"]

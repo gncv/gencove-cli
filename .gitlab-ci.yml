@@ -7,7 +7,8 @@ stages:
 
 before_script:
   - export PATH="/usr/local/bin:$PATH"
-  - uv sync --extra dev
+  - uv sync --extra dev --extra test
+  - touch gencove/tests/.env
 
 variables:
     UV_LINK_MODE: copy
@@ -23,7 +24,7 @@ test_windows:
   before_script:
     - powershell -Command "irm https://astral.sh/uv/install.ps1 | iex"
     - powershell -Command "C:\Users\gitlab_runner\.local\bin\uv.exe python install $env:PYTHON_VERSION_MAJOR.$env:PYTHON_VERSION_MINOR.$env:PYTHON_VERSION_PATCH"
-    - powershell -Command "C:\Users\gitlab_runner\.local\bin\uv.exe sync"
+    - powershell -Command "C:\Users\gitlab_runner\.local\bin\uv.exe sync --extra dev --extra test"
     - powershell -Command "New-Item -ItemType File -Path 'gencove/tests/.env' -Force"
   script:
     - powershell -Command "C:\Users\gitlab_runner\.local\bin\uv.exe run gencove --version"

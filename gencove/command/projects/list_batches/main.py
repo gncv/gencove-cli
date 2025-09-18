@@ -42,8 +42,7 @@ class ListBatches(Command):
                 self.echo_info(err.message)
             elif err.status_code == 404:
                 self.echo_warning(f"Project {self.project_id} does not exist.")
-            else:
-                raise
+            raise
 
     def get_paginated_batches(self):
         """Paginate over all batches for the destination.

@@ -51,5 +51,4 @@ class Hide(Command):
                     f"Some of the projects in the provided list {self.project_ids} "
                     f"do not exist."
                 )
-            else:
-                raise
+            raise

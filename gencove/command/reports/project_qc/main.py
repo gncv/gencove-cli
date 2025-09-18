@@ -73,5 +73,4 @@ class ProjectQCReport(Command):
                     f"Project with ID {self.project_id} does not exist or "
                     "you do not have access."
                 )
-            else:
-                raise
+            raise

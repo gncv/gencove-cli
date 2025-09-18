@@ -172,13 +172,10 @@ class Upload(Command):
         """
         s3_client = get_s3_client_refreshable(self.api_client.get_upload_credentials)
 
-        try:
-            if self.fastqs:
-                self.upload_from_source(s3_client)
-            elif self.fastqs_map:
-                self.upload_from_map_file(s3_client)
-        except UploadError:
-            raise
+        if self.fastqs:
+            self.upload_from_source(s3_client)
+        elif self.fastqs_map:
+            self.upload_from_map_file(s3_client)
 
         self.echo_debug(f"Upload ids are now: {self.upload_ids}")
         if self.project_id:

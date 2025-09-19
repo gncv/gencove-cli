@@ -331,3 +331,65 @@ def test_s3_import__success_with_input_format_and_metadata(mocker):
         input_format="fastq",
     )
     assert "Request to import samples from S3 accepted." in res.output
+
+
+def test_s3_import__invalid_input_format(mocker):
+    """Test S3 import failure with invalid input format."""
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_import_s3_projects = mocker.patch.object(
+        APIClient,
+        "s3_uri_import",
+    )
+
+    project_id = str(uuid4())
+    res = runner.invoke(
+        s3_import,
+        [
+            "s3://bucket/path/",
+            project_id,
+            "--input-format",
+            "invalid_format",
+            "--email",
+            "foo@bar.com",
+            "--password",
+            "123",
+        ],
+    )
+    assert res.exit_code == 2  # Click validation error exit code
+    mocked_login.assert_not_called()
+    mocked_import_s3_projects.assert_not_called()
+    assert "Invalid value for '--input-format'" in res.output
+    assert "invalid_format" in res.output
+    assert "Choose from:" in res.output or "is not one of" in res.output
+
+
+def test_s3_import__bad_json(mocker):
+    """Test S3 import failure with invalid json metadata."""
+    project_id = str(uuid4())
+
+    runner = CliRunner()
+
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_import_s3_projects = mocker.patch.object(
+        APIClient,
+        "s3_uri_import",
+    )
+
+    res = runner.invoke(
+        s3_import,
+        [
+            "s3://bucket/path/",
+            project_id,
+            "--email",
+            "foo@bar.com",
+            "--password",
+            "123",
+            "--metadata-json",
+            "[1,2,3",
+        ],
+    )
+    assert res.exit_code == 1
+    mocked_login.assert_called_once()
+    mocked_import_s3_projects.assert_not_called()
+    assert "Metadata JSON is not valid" in res.output

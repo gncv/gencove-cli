@@ -10,16 +10,11 @@ Main documentation can be found here: [https://docs.gencove.com](https://docs.ge
 
 ## Local Development ##
 
-Have some form of virtualization, for instance pyenv for 3.11.x and a virtualenv.
+We use [uv](https://docs.astral.sh/uv/guides/install-python/) for Python management in this project.
 
-Install in editing mode:
+Install package with dev dependencies:
 ```bash
-pip install -e .
-```
-
-Install local requirements:
-```bash
-pip install -r requirements.txt
+uv sync --extra dev --extra test
 ```
 
 Install pre-commit hooks:

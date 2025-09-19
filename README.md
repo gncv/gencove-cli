@@ -14,7 +14,7 @@ We use [uv](https://docs.astral.sh/uv/guides/install-python/) for Python managem
 
 Install package with dev dependencies:
 ```bash
-uv sync --extra dev
+uv sync --extra dev --extra test
 ```
 
 Install pre-commit hooks:

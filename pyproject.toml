@@ -72,8 +72,10 @@ test = [
 ]
 
 [tool.setuptools]
-packages = ["gencove"]
 include-package-data = true
+
+[tool.setuptools.packages.find]
+exclude = ["tests"]
 
 [tool.setuptools.package-data]
 gencove = ["version/*", "description/*"]

@@ -8,3 +8,4 @@ class S3ImportOptionals(Optionals):
     """S3ImportOptionals model"""
 
     metadata_json: Optional[str] = None
+    input_format: Optional[str] = None

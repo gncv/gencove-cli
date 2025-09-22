@@ -185,3 +185,180 @@ def test_s3_import__success(mocker):
     mocked_login.assert_called_once()
     mocked_import_s3_projects.assert_called_once()
     assert "Request to import samples from S3 accepted." in res.output
+
+
+def test_s3_import__success_with_input_format_fastq(mocker):
+    """Test S3 import success with input format fastq."""
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_import_s3_projects = mocker.patch.object(
+        APIClient,
+        "s3_uri_import",
+        return_value=None,
+    )
+
+    project_id = str(uuid4())
+    res = runner.invoke(
+        s3_import,
+        [
+            "s3://bucket/path/",
+            project_id,
+            "--input-format",
+            "fastq",
+            "--email",
+            "foo@bar.com",
+            "--password",
+            "123",
+        ],
+    )
+    assert res.exit_code == 0
+    mocked_login.assert_called_once()
+    mocked_import_s3_projects.assert_called_once()
+    mocked_import_s3_projects.assert_called_with(
+        s3_uri="s3://bucket/path/",
+        project_id=project_id,
+        metadata=None,
+        input_format="fastq",
+    )
+    assert "Request to import samples from S3 accepted." in res.output
+
+
+def test_s3_import__success_with_input_format_cram(mocker):
+    """Test S3 import success with input format cram."""
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_import_s3_projects = mocker.patch.object(
+        APIClient,
+        "s3_uri_import",
+        return_value=None,
+    )
+
+    project_id = str(uuid4())
+    res = runner.invoke(
+        s3_import,
+        [
+            "s3://bucket/path/",
+            project_id,
+            "--input-format",
+            "cram",
+            "--email",
+            "foo@bar.com",
+            "--password",
+            "123",
+        ],
+    )
+    assert res.exit_code == 0
+    mocked_login.assert_called_once()
+    mocked_import_s3_projects.assert_called_once()
+    mocked_import_s3_projects.assert_called_with(
+        s3_uri="s3://bucket/path/",
+        project_id=project_id,
+        metadata=None,
+        input_format="cram",
+    )
+    assert "Request to import samples from S3 accepted." in res.output
+
+
+def test_s3_import__success_with_input_format_autodetect(mocker):
+    """Test S3 import success with input format autodetect (default)."""
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_import_s3_projects = mocker.patch.object(
+        APIClient,
+        "s3_uri_import",
+        return_value=None,
+    )
+
+    project_id = str(uuid4())
+    res = runner.invoke(
+        s3_import,
+        [
+            "s3://bucket/path/",
+            project_id,
+            "--input-format",
+            "autodetect",
+            "--email",
+            "foo@bar.com",
+            "--password",
+            "123",
+        ],
+    )
+    assert res.exit_code == 0
+    mocked_login.assert_called_once()
+    mocked_import_s3_projects.assert_called_once()
+    mocked_import_s3_projects.assert_called_with(
+        s3_uri="s3://bucket/path/",
+        project_id=project_id,
+        metadata=None,
+        input_format="autodetect",
+    )
+    assert "Request to import samples from S3 accepted." in res.output
+
+
+def test_s3_import__success_with_input_format_and_metadata(mocker):
+    """Test S3 import success with both input format and metadata."""
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_import_s3_projects = mocker.patch.object(
+        APIClient,
+        "s3_uri_import",
+        return_value=None,
+    )
+
+    project_id = str(uuid4())
+    res = runner.invoke(
+        s3_import,
+        [
+            "s3://bucket/path/",
+            project_id,
+            "--input-format",
+            "fastq",
+            "--metadata-json",
+            '{"batch": "batch1"}',
+            "--email",
+            "foo@bar.com",
+            "--password",
+            "123",
+        ],
+    )
+    assert res.exit_code == 0
+    mocked_login.assert_called_once()
+    mocked_import_s3_projects.assert_called_once()
+    mocked_import_s3_projects.assert_called_with(
+        s3_uri="s3://bucket/path/",
+        project_id=project_id,
+        metadata={"batch": "batch1"},
+        input_format="fastq",
+    )
+    assert "Request to import samples from S3 accepted." in res.output
+
+
+def test_s3_import__invalid_input_format(mocker):
+    """Test S3 import failure with invalid input format."""
+    runner = CliRunner()
+    mocked_login = mocker.patch.object(APIClient, "login", return_value=None)
+    mocked_import_s3_projects = mocker.patch.object(
+        APIClient,
+        "s3_uri_import",
+    )
+
+    project_id = str(uuid4())
+    res = runner.invoke(
+        s3_import,
+        [
+            "s3://bucket/path/",
+            project_id,
+            "--input-format",
+            "invalid_format",
+            "--email",
+            "foo@bar.com",
+            "--password",
+            "123",
+        ],
+    )
+    assert res.exit_code == 2  # Click validation error exit code
+    mocked_login.assert_not_called()
+    mocked_import_s3_projects.assert_not_called()
+    assert "Invalid value for '--input-format'" in res.output
+    assert "invalid_format" in res.output
+    assert "Choose from:" in res.output or "is not one of" in res.output

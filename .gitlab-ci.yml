@@ -156,6 +156,9 @@ build_docs_prod:
 
 production:
   stage: deploy
+  id_tokens:
+    PYPI_ID_TOKEN:
+      aud: pypi
   script:
     - uv build
     - uv publish

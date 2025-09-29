@@ -19,11 +19,18 @@ from .main import S3Import
     default=None,
     help=("Add metadata to all samples that are to be imported from S3 to a project."),
 )
+@click.option(
+    "--input-format",
+    type=click.Choice(["fastq", "cram", "autodetect"]),
+    default="autodetect",
+    help="Input format for the samples. Defaults to autodetect.",
+)
 @add_options(common_options)
 def s3_import(  # pylint: disable=too-many-arguments
     s3_uri,
     project_id,
     metadata_json,
+    input_format,
     host,
     email,
     password,
@@ -42,13 +49,19 @@ def s3_import(  # pylint: disable=too-many-arguments
 
             gencove s3 import s3://bucket/path/ 06a5d04b-526a-4471-83ba-fb54e0941758
 
-        Import samples to a project:
+        Import samples to a project with metadata:
 
             gencove s3 import s3://bucket/path/ 06a5d04b-526a-4471-83ba-fb54e0941758 --metadata-json='{"batch": "batch1"}'
+
+        Import CRAM samples to a project:
+
+            gencove s3 import s3://bucket/path/ 06a5d04b-526a-4471-83ba-fb54e0941758 --input-format=cram
     """  # noqa: E501
     S3Import(
         s3_uri,
         project_id,
         Credentials(email=email, password=password, api_key=api_key),
-        S3ImportOptionals(host=host, metadata_json=metadata_json),
+        S3ImportOptionals(
+            host=host, metadata_json=metadata_json, input_format=input_format
+        ),
     ).run()

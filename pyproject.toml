@@ -1,0 +1,99 @@
+[build-system]
+requires = ["setuptools>=75.3.2", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gencove"
+description = "Gencove API and CLI tool"
+readme = "gencove/description/pypi_readme.md"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Gencove Engineering Team", email = "engineering@gencove.com"},
+]
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "python-dateutil>=2.2.0",
+    "six>=1.5",
+    "Click>=7.0,<=8.1.8",
+    "requests>=2.19.1",
+    "boto3>=1.17.97",
+    "progressbar2==3.55.0",
+    "backoff<=2.2.1",
+    "pydantic==2.10.3",
+    "click-default-group>=1.2.4",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://docs.gencove.com"
+Documentation = "https://docs.gencove.com/base/getting-started/"
+Repository = "https://gitlab.com/gencove/cli"
+
+[project.scripts]
+gencove = "gencove.cli:cli"
+ged = "gencove.command.explorer.data.cli:data"
+
+[project.optional-dependencies]
+dev = [
+    "tox==3.28.0",
+    "pre-commit==2.17.0",
+    "pyinstaller==6.11.1",
+    "urllib3<=2",
+    "black==22.6.0",
+    "flake8==5.0.4",
+    "flake8-import-order==0.18.1",
+    "flake8-typing-imports==1.12.0",
+    "pep8-naming==0.12.1",
+    "pyflakes==2.5.0",
+    "pylint==2.13.9",
+    "bandit==1.7.1",
+    "importlib-metadata==4.13.0",
+    "pbr==6.1.0",
+]
+test = [
+    "pytest==7.0.1",
+    "pytest-mock==3.6.1",
+    "pytest-cov==3.0.0",
+    "pytest-xdist==2.5.0",
+    "pytest-recording==0.12.1",
+    "vcrpy==4.1.1",
+    "faker==14.0.0",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+exclude = ["tests"]
+
+[tool.setuptools.package-data]
+gencove = ["version/*", "description/*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "gencove.version.version"}
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.pytest.ini_options]
+testpaths = ["gencove/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--cov=gencove",
+    "--cov-report=term-missing",
+    "--cov-config=.coveragerc",
+]

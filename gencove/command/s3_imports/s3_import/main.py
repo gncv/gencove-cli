@@ -16,6 +16,7 @@ class S3Import(Command):
         self.s3_uri = s3_uri
         self.project_id = project_id
         self.metadata_json = options.metadata_json
+        self.input_format = options.input_format
 
     def initialize(self):
         """Initialize s3-import subcommand."""
@@ -50,6 +51,7 @@ class S3Import(Command):
                 s3_uri=self.s3_uri,
                 project_id=self.project_id,
                 metadata=metadata,
+                input_format=self.input_format,
             )
             self.echo_debug(s3_uri_import)
             self.echo_info("Request to import samples from S3 accepted.")

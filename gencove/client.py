@@ -908,7 +908,9 @@ class APIClient:
             model=BaseSpaceBiosample,
         )
 
-    def s3_uri_import(self, s3_uri, project_id, metadata=None):
+    def s3_uri_import(
+        self, s3_uri, project_id, metadata=None, input_format="autodetect"
+    ):
         """Make a request to import samples from S3 URI to a given
         project.
 
@@ -916,12 +918,14 @@ class APIClient:
             s3_uri (str): s3 path formated as s3://<bucket-name>/prefix
             project_id (str): project to which to assign the samples
             metadata (str): Optional JSON metadata to be applied to all samples
+            input_format (str): Input format for the samples
         """
 
         payload = {
             "s3_uri": s3_uri,
             "project_id": project_id,
             "metadata": metadata,
+            "input_format": input_format,
         }
 
         return self._post(

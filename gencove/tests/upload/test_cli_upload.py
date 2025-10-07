@@ -440,7 +440,7 @@ def test_upload__with_metadata_without_project_id(credentials, mocker):
 def test_upload_and_run_immediately_something_went_wrong(
     credentials, mocker, project_id, recording, vcr
 ):
-    """Upload and assign right away did't work."""
+    """Upload and assign right away didn't work."""
     runner = CliRunner()
     with runner.isolated_filesystem():
         os.mkdir("cli_test_data")
@@ -482,7 +482,7 @@ def test_upload_and_run_immediately_something_went_wrong(
             ],
         )
 
-        assert res.exit_code == 0
+        assert res.exit_code == 1
         mocked_get_credentials.assert_called_once()
         if not recording:
             mocked_get_upload_details.assert_called_once()
@@ -901,7 +901,7 @@ def test_upload_and_run_immediately_slow_response_retry(
             ],
         )
 
-        assert res.exit_code == 0
+        assert res.exit_code == 1
         mocked_get_credentials.assert_called_once()
         mocked_upload_file.assert_called_once()
         if not recording:
@@ -1206,8 +1206,7 @@ def test_upload_fail_deleted(credentials, mocker):
 
     mocked_get_credentials.assert_called_once()
 
-    assert not res.exception
-    assert res.exit_code == 0
+    assert res.exit_code == 1
     assert "is taken by another upload that was deleted" in res.output
 
 

@@ -50,5 +50,4 @@ class Delete(Command):
                 self.echo_warning(
                     f"Some of the projects {self.project_ids} do not exist."
                 )
-            else:
-                raise
+            raise

@@ -73,8 +73,7 @@ class GetBatch(Command):
                 self.echo_warning(
                     f"Batch {self.batch_id} does not exist.",
                 )
-            else:
-                raise
+            raise
 
     @backoff.on_exception(
         backoff.expo,

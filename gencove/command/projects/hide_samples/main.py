@@ -54,5 +54,4 @@ class HideSamples(Command):
                 self.echo_info(err.message)
             elif err.status_code == 404:
                 self.echo_warning(f"Project {self.project_id} does not exist.")
-            else:
-                raise
+            raise

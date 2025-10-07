@@ -192,7 +192,7 @@ def test_delete_project_samples__sample_not_in_project(
             "11111111-1111-1111-1111-111111111111",
         ],
     )
-    assert res.exit_code == 0
+    assert res.exit_code == 1
     if not recording:
         mocked_delete_project_samples.assert_called_once()
     assert "All sample ids must be part of the current project." in res.output

@@ -35,8 +35,7 @@ class ListPipelines(Command):
                 self.echo_warning("There was an error listing pipelines.")
                 self.echo_info("The following error was returned:")
                 self.echo_info(err.message)
-            else:
-                raise
+            raise
 
     def get_paginated_pipelines(self):
         """Paginate over all pipelines for the destination.

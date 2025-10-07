@@ -83,7 +83,7 @@ def test_project_qc__not_owned(
             ],
         )
 
-    assert res.exit_code == 0
+    assert res.exit_code == 1
     if not recording:
         mocked_project_qc.assert_called_once()
     assert "does not exist or you do not have access" in res.output
@@ -211,7 +211,7 @@ def test_project_qc__bad_columns(  # pylint: disable=too-many-arguments,unused-a
             ],
         )
 
-    assert res.exit_code == 0
+    assert res.exit_code == 1
     if not recording:
         mocked_project_qc.assert_called_once()
     assert "There was an error retrieving the project QC report" in res.output

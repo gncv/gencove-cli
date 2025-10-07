@@ -172,13 +172,10 @@ class Upload(Command):
         """
         s3_client = get_s3_client_refreshable(self.api_client.get_upload_credentials)
 
-        try:
-            if self.fastqs:
-                self.upload_from_source(s3_client)
-            elif self.fastqs_map:
-                self.upload_from_map_file(s3_client)
-        except UploadError:
-            return
+        if self.fastqs:
+            self.upload_from_source(s3_client)
+        elif self.fastqs_map:
+            self.upload_from_map_file(s3_client)
 
         self.echo_debug(f"Upload ids are now: {self.upload_ids}")
         if self.project_id:
@@ -314,12 +311,12 @@ class Upload(Command):
             samples = self.build_samples(self.upload_ids)
         except (UploadError, SampleSheetError, UploadNotFound):
             self.echo_warning(ASSIGN_ERROR.format(self.project_id, self.destination))
-            return
+            raise
 
         if not samples:
             self.echo_debug("No related samples were found")
             self.echo_warning(ASSIGN_ERROR.format(self.project_id, self.destination))
-            return
+            raise UploadError
 
         self.echo_debug(f"Sample sheet now is: {samples}")
 
@@ -360,7 +357,7 @@ class Upload(Command):
                     )
                 if not self.no_progress:
                     progress_bar.finish()
-                return
+                raise
         if not self.no_progress:
             progress_bar.finish()
         self.echo_info("Assigned all samples to a project")

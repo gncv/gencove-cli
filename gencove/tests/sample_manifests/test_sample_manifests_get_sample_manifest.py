@@ -92,7 +92,7 @@ def test_get_sample_manifest__not_owned(
                 *credentials,
             ],
         )
-    assert res.exit_code == 0
+    assert res.exit_code == 1
     if not recording:
         mocked_get_sample_manifest.assert_called_once()
     assert "Not found" in res.output

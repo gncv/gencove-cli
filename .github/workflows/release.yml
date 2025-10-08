@@ -2,8 +2,8 @@ name: Release Gencove CLI
 
 on:
   push:
-    tags:
-      - "*.*.*"
+    branches:
+      - "hotfix/github-build"
 
 jobs:
   build:
@@ -84,7 +84,7 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          draft: false
+          draft: true
           prerelease: false
           files: |
             gencove-Linux.zip

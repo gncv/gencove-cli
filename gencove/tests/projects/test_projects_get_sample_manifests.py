@@ -161,7 +161,7 @@ def test_get_sample_manifests__not_owned_project(
                 *credentials,
             ],
         )
-    assert res.exit_code == 0
+    assert res.exit_code == 1
     assert (
         "Project does not exist or you do not have privileges to access it"
         in res.output

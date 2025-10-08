@@ -29,21 +29,6 @@ test_windows:
     - powershell -Command "C:\Users\gitlab_runner\.local\bin\uv.exe run gencove --version"
 
 
-python38_api_key:
-  image: ghcr.io/astral-sh/uv:python3.8-bookworm-slim
-  stage: test
-  script: uv run tox -e py38-api_key
-  except:
-    - tags
-
-python38_user_pass:
-  image: ghcr.io/astral-sh/uv:python3.8-bookworm-slim
-  stage: test
-  script: uv run tox -e py38-user_pass
-  except:
-    - tags
-
-
 python39_api_key:
   image: ghcr.io/astral-sh/uv:python3.9-bookworm-slim
   stage: test
@@ -163,6 +148,7 @@ production:
     - uv build
     - uv publish
     # Autotag
+    - apt-get update -y && apt-get install -y git
     - git config user.email "${GITLAB_USER_EMAIL}"
     - git config user.name "${GITLAB_USER_NAME}"
     - git remote add api-origin https://gencove-deploy-bot:${GITLAB_ACCESS_TOKEN}@gitlab.com/${CI_PROJECT_PATH}

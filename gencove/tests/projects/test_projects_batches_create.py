@@ -174,7 +174,7 @@ def test_create_project_batches__duplicate_client_ids(credentials, mocker):
             "foo bar",
         ],
     )
-    assert res.exit_code == 0
+    assert res.exit_code == 1
     mocked_create_project_batch.assert_called_once()
     assert "There was an error creating project batches" in res.output
 

@@ -187,7 +187,7 @@ def test_monthly_usage__bad_date(  # pylint: disable=too-many-arguments,unused-a
             ],
         )
 
-    assert res.exit_code == 0
+    assert res.exit_code == 1
     if not recording:
         mocked_monthly_usage.assert_called_once()
     assert "There was an error retrieving the monthly usage report" in res.output

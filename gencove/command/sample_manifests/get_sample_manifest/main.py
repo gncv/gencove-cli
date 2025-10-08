@@ -64,5 +64,4 @@ class GetSampleManifest(Command):
                     f"Sample manifest with ID {self.manifest_id} does not exist or "
                     "you do not have access."
                 )
-            else:
-                raise
+            raise

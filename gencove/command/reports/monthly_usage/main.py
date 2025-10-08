@@ -70,5 +70,4 @@ class MonthlyUsageReport(Command):
                 self.echo_info(err.message)
             elif err.status_code == 404:
                 self.echo_warning("You do not have access to this report")
-            else:
-                raise
+            raise

@@ -43,8 +43,7 @@ class ListBatchTypes(Command):
                 self.echo_info(err.message)
             elif err.status_code == 404:
                 self.echo_warning(f"Project {self.project_id} does not exist.")
-            else:
-                raise
+            raise
 
     def get_paginated_batch_types(self):
         """Paginate over all batch types for the destination.

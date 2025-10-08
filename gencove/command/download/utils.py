@@ -1,9 +1,11 @@
 """Download command utilities."""
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
+import math
 import os
 import re
 import threading
+import time
 from urllib.parse import parse_qs, urlparse
 
 import backoff
@@ -32,6 +34,8 @@ from .constants import (
     FilePrefix,
 )
 
+PROGRESS_LOG_INTERVAL_SECONDS = 5
+
 
 class ParallelDownloadFallback(Exception):
     """Raised when parallel download should fall back to sequential."""
@@ -42,6 +46,16 @@ class SwitchToParallel(Exception):
 
     def __init__(self, total_size):
         self.total_size = total_size
+
+
+def _format_speed(bytes_per_second: float) -> str:
+    """Return a human readable transfer speed string."""
+    if bytes_per_second <= 0:
+        return "0 B/s"
+    units = ["B/s", "KiB/s", "MiB/s", "GiB/s", "TiB/s"]
+    index = min(len(units) - 1, int(math.log(max(bytes_per_second, 1), 1024)))
+    value = bytes_per_second / math.pow(1024, index)
+    return f"{value:.2f} {units[index]}"
 
 
 def _get_prefix_parts(full_prefix):
@@ -202,20 +216,33 @@ def _parallel_download(
 
     pbar = None
     if not no_progress:
-        pbar = get_progress_bar(total_size, "Downloading: ")
+        pbar = get_progress_bar(total_size, "Downloading: ", show_speed=False)
         pbar.start()
 
     progress_lock = threading.Lock()
     progress_bytes = 0
+    download_start = time.monotonic()
+    last_log_time = download_start
 
     def update_progress(delta: int):
-        nonlocal progress_bytes
-        if no_progress:
-            return
+        nonlocal progress_bytes, last_log_time
+        report_bytes = None
+        now = time.monotonic()
         with progress_lock:
             progress_bytes += delta
-            if pbar:
+            if not no_progress and pbar:
                 pbar.update(min(progress_bytes, total_size))
+            if (
+                now - last_log_time >= PROGRESS_LOG_INTERVAL_SECONDS
+                or progress_bytes == total_size
+            ) and progress_bytes:
+                report_bytes = progress_bytes
+                last_log_time = now
+        if report_bytes is not None:
+            elapsed = max(now - download_start, 1e-6)
+            speed_str = _format_speed(report_bytes / elapsed)
+            percent = (report_bytes / total_size) * 100
+            echo_info(f"Streaming at ~{speed_str} ({percent:.0f}%)")
 
     def download_range(byte_range):
         start, end = byte_range
@@ -279,11 +306,13 @@ def _parallel_download(
             pass
         raise raised_exception
 
+    elapsed = max(time.monotonic() - download_start, 1e-6)
     if os.path.exists(file_path):
         echo_debug(f"Found old file under same name: {file_path}. Removing it.")
         os.remove(file_path)
     os.rename(file_path_tmp, file_path)
-    echo_info(f"Finished downloading a file: {file_path}")
+    speed_str = _format_speed(total_size / elapsed)
+    echo_info(f"Finished downloading a file: {file_path} ({speed_str})")
     return file_path
 
 
@@ -334,22 +363,42 @@ def _download_sequential(
 
         echo_debug(f"Starting to download file to: {file_path}")
 
+        session_bytes = 0
+        download_start = time.monotonic()
+        last_log_time = download_start
+        pbar = None
         with open(file_path_tmp, file_mode) as downloaded_file:
             if not no_progress:
                 pbar = get_progress_bar(total, "Downloading: ")
                 pbar.start()
             for chunk in req.iter_content(chunk_size=CHUNK_SIZE):
                 downloaded_file.write(chunk)
+                session_bytes += len(chunk)
                 if not no_progress:
                     pbar.update(pbar.value + len(chunk))
+                now = time.monotonic()
+                if (
+                    now - last_log_time >= PROGRESS_LOG_INTERVAL_SECONDS
+                    or session_bytes == total
+                ) and session_bytes:
+                    elapsed_so_far = max(now - download_start, 1e-6)
+                    speed_str = _format_speed(session_bytes / elapsed_so_far)
+                    percent = (session_bytes / total) * 100
+                    echo_info(f"Streaming at ~{speed_str} ({percent:.0f}%)")
+                    last_log_time = now
             if not no_progress:
                 pbar.finish()
+        elapsed = max(time.monotonic() - download_start, 1e-6)
 
     if os.path.exists(file_path):
         echo_debug(f"Found old file under same name: {file_path}. Removing it.")
         os.remove(file_path)
     os.rename(file_path_tmp, file_path)
-    echo_info(f"Finished downloading a file: {file_path}")
+    if session_bytes:
+        speed_str = _format_speed(session_bytes / elapsed)
+        echo_info(f"Finished downloading a file: {file_path} ({speed_str})")
+    else:
+        echo_info(f"Finished downloading a file: {file_path}")
     return file_path
 
 

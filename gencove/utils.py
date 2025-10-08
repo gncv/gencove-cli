@@ -62,31 +62,38 @@ def get_s3_client_refreshable(refresh_method):
     )
 
 
-def get_progress_bar(total_size, action):
+def get_progress_bar(total_size, action, show_speed=True):
     """Get progressbar.ProgressBar instance for file transfer.
 
     Args:
         total_size: int
         action: str that will be prepended to the progressbar.
             i.e "Uploading: " or "Downloading: "
+        show_speed: bool indicating if transfer speed should be shown
 
     Returns:
         progressbar.ProgressBar instance
     """
+    widgets = [
+        action,
+        progressbar.Percentage(),
+        " ",
+        progressbar.Bar(marker="#", left="[", right="]"),
+        " ",
+        progressbar.ETA(),
+        " ",
+        progressbar.Timer(),
+    ]
+    if show_speed:
+        widgets.extend(
+            [
+                " ",
+                progressbar.FileTransferSpeed(),
+            ]
+        )
     return progressbar.ProgressBar(
         max_value=total_size,
-        widgets=[
-            action,
-            progressbar.Percentage(),
-            " ",
-            progressbar.Bar(marker="#", left="[", right="]"),
-            " ",
-            progressbar.ETA(),
-            " ",
-            progressbar.Timer(),
-            " ",
-            progressbar.FileTransferSpeed(),
-        ],
+        widgets=widgets,
         redirect_stdout=True,
     )
 

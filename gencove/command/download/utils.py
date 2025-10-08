@@ -1,7 +1,9 @@
 """Download command utilities."""
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import os
 import re
+import threading
 from urllib.parse import parse_qs, urlparse
 
 import backoff
@@ -24,8 +26,22 @@ from .constants import (
     DEFAULT_FILENAME_TOKEN,
     FILENAME_RE,
     FILE_TYPES_MAPPER,
+    PARALLEL_DOWNLOAD_MAX_WORKERS,
+    PARALLEL_DOWNLOAD_MIN_SIZE,
+    PARALLEL_DOWNLOAD_PART_SIZE,
     FilePrefix,
 )
+
+
+class ParallelDownloadFallback(Exception):
+    """Raised when parallel download should fall back to sequential."""
+
+
+class SwitchToParallel(Exception):
+    """Raised when sequential download should switch to parallel."""
+
+    def __init__(self, total_size):
+        self.total_size = total_size
 
 
 def _get_prefix_parts(full_prefix):
@@ -156,6 +172,187 @@ def fatal_request_error(err=None):
     return not 400 <= err.response.status_code <= 600
 
 
+def _parallel_download(
+    file_path: str,
+    download_url: str,
+    total_size: int,
+    no_progress: bool,
+) -> str:
+    """Download the target into multiple byte ranges concurrently."""
+    file_path_tmp = f"{file_path}.tmp"
+    part_size = PARALLEL_DOWNLOAD_PART_SIZE
+    ranges = [
+        (start, min(start + part_size - 1, total_size - 1))
+        for start in range(0, total_size, part_size)
+    ]
+    workers = min(PARALLEL_DOWNLOAD_MAX_WORKERS, len(ranges))
+    if workers <= 1:
+        raise ParallelDownloadFallback(
+            "Parallel download requires more than one range."
+        )
+
+    echo_info(f"Downloading file to {file_path}")
+    echo_debug(
+        f"Using parallel download with {workers} workers across {len(ranges)} parts for "
+        f"{file_path}"
+    )
+
+    with open(file_path_tmp, "wb") as tmp_file:
+        tmp_file.truncate(total_size)
+
+    pbar = None
+    if not no_progress:
+        pbar = get_progress_bar(total_size, "Downloading: ")
+        pbar.start()
+
+    progress_lock = threading.Lock()
+    progress_bytes = 0
+
+    def update_progress(delta: int):
+        nonlocal progress_bytes
+        if no_progress:
+            return
+        with progress_lock:
+            progress_bytes += delta
+            if pbar:
+                pbar.update(min(progress_bytes, total_size))
+
+    def download_range(byte_range):
+        start, end = byte_range
+        headers = {"Range": f"bytes={start}-{end}"}
+        stream_params = dict(
+            stream=True,
+            allow_redirects=False,
+            headers=headers,
+            timeout=30,
+        )
+        expected = end - start + 1
+        written = 0
+        try:
+            with requests.get(download_url, **stream_params) as response:
+                response.raise_for_status()
+                if response.status_code != 206:
+                    raise ParallelDownloadFallback(
+                        f"Range request returned status {response.status_code}"
+                    )
+                with open(file_path_tmp, "r+b") as destination:
+                    destination.seek(start)
+                    for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
+                        if not chunk:
+                            continue
+                        destination.write(chunk)
+                        chunk_len = len(chunk)
+                        written += chunk_len
+                        update_progress(chunk_len)
+        except (requests.RequestException, OSError) as err:
+            raise ParallelDownloadFallback(
+                f"Range request failed for bytes {start}-{end}: {err}"
+            ) from err
+        if written != expected:
+            raise ParallelDownloadFallback(
+                f"Expected {expected} bytes for range {start}-{end}, "
+                f"received {written}"
+            )
+
+    executor = ThreadPoolExecutor(max_workers=workers)
+    futures = [executor.submit(download_range, byte_range) for byte_range in ranges]
+    raised_exception = None
+    try:
+        for future in as_completed(futures):
+            try:
+                future.result()
+            except ParallelDownloadFallback as err:
+                raised_exception = err
+                break
+            except Exception as err:  # pragma: no cover - delegate to backoff
+                raised_exception = ParallelDownloadFallback(str(err))
+                break
+    finally:
+        executor.shutdown(wait=True, cancel_futures=True)
+        if not no_progress and pbar:
+            pbar.finish()
+
+    if raised_exception:
+        try:
+            os.remove(file_path_tmp)
+        except FileNotFoundError:
+            pass
+        raise raised_exception
+
+    if os.path.exists(file_path):
+        echo_debug(f"Found old file under same name: {file_path}. Removing it.")
+        os.remove(file_path)
+    os.rename(file_path_tmp, file_path)
+    echo_info(f"Finished downloading a file: {file_path}")
+    return file_path
+
+
+def _download_sequential(
+    file_path: str,
+    download_url: str,
+    skip_existing: bool,
+    no_progress: bool,
+    allow_parallel_switch: bool = True,
+) -> str:
+    """Sequential download of target, used in case of parallel download fallback"""
+    file_path_tmp = f"{file_path}.tmp"
+    if os.path.exists(file_path_tmp):
+        file_mode = "ab"
+        headers = dict(Range=f"bytes={os.path.getsize(file_path_tmp)}-")
+        echo_info(f"Resuming previous download: {file_path}")
+    else:
+        file_mode = "wb"
+        headers = {}
+        echo_info(f"Downloading file to {file_path}")
+
+    stream_params = dict(
+        stream=True,
+        allow_redirects=False,
+        headers=headers,
+        timeout=30,
+    )
+
+    with requests.get(download_url, **stream_params) as req:
+        req.raise_for_status()
+        total = int(req.headers["content-length"])
+        if (
+            skip_existing
+            and os.path.isfile(file_path)
+            and os.path.getsize(file_path) == total
+        ):
+            echo_info(f"Skipping existing file: {file_path}")
+            return file_path
+
+        if (
+            allow_parallel_switch
+            and file_mode == "wb"
+            and total >= PARALLEL_DOWNLOAD_MIN_SIZE
+            and "bytes" in req.headers.get("accept-ranges", "").lower()
+        ):
+            req.close()
+            raise SwitchToParallel(total)
+
+        echo_debug(f"Starting to download file to: {file_path}")
+
+        with open(file_path_tmp, file_mode) as downloaded_file:
+            if not no_progress:
+                pbar = get_progress_bar(total, "Downloading: ")
+                pbar.start()
+            for chunk in req.iter_content(chunk_size=CHUNK_SIZE):
+                downloaded_file.write(chunk)
+                if not no_progress:
+                    pbar.update(pbar.value + len(chunk))
+            if not no_progress:
+                pbar.finish()
+
+    if os.path.exists(file_path):
+        echo_debug(f"Found old file under same name: {file_path}. Removing it.")
+        os.remove(file_path)
+    os.rename(file_path_tmp, file_path)
+    echo_info(f"Finished downloading a file: {file_path}")
+    return file_path
+
+
 @backoff.on_exception(
     backoff.expo,
     (
@@ -184,53 +381,39 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
         str(download_url) if isinstance(download_url, HttpUrl) else download_url
     )
     file_path_tmp = f"{file_path}.tmp"
+
     if os.path.exists(file_path_tmp):
-        file_mode = "ab"
-        headers = dict(Range=f"bytes={os.path.getsize(file_path_tmp)}-")
-        echo_info(f"Resuming previous download: {file_path}")
-    else:
-        file_mode = "wb"
-        headers = {}
-        echo_info(f"Downloading file to {file_path}")
+        return _download_sequential(
+            file_path,
+            download_url,
+            skip_existing=skip_existing,
+            no_progress=no_progress,
+        )
 
-    stream_params = dict(
-        stream=True, allow_redirects=False, headers=headers, timeout=30
-    )
-
-    with requests.get(download_url, **stream_params) as req:
-        req.raise_for_status()
-        total = int(req.headers["content-length"])
-        # pylint: disable=E0012,C0330
-        if (
-            skip_existing
-            and os.path.isfile(file_path)
-            and os.path.getsize(file_path) == total
-        ):
-            echo_info(f"Skipping existing file: {file_path}")
-            return file_path
-
-        echo_debug(f"Starting to download file to: {file_path}")
-
-        with open(file_path_tmp, file_mode) as downloaded_file:
-            if not no_progress:
-                pbar = get_progress_bar(
-                    int(req.headers["content-length"]), "Downloading: "
-                )
-                pbar.start()
-            for chunk in req.iter_content(chunk_size=CHUNK_SIZE):
-                downloaded_file.write(chunk)
-                if not no_progress:
-                    pbar.update(pbar.value + len(chunk))
-            if not no_progress:
-                pbar.finish()
-
-        # Cross-platform cross-python-version file overwriting
-        if os.path.exists(file_path):
-            echo_debug(f"Found old file under same name: {file_path}. Removing it.")
-            os.remove(file_path)
-        os.rename(file_path_tmp, file_path)
-        echo_info(f"Finished downloading a file: {file_path}")
-        return file_path
+    try:
+        return _download_sequential(
+            file_path,
+            download_url,
+            skip_existing=skip_existing,
+            no_progress=no_progress,
+        )
+    except SwitchToParallel as switch:
+        try:
+            return _parallel_download(
+                file_path,
+                download_url,
+                switch.total_size,
+                no_progress=no_progress,
+            )
+        except ParallelDownloadFallback as err:
+            echo_debug(f"Parallel download fallback for {file_path}: {err}")
+            return _download_sequential(
+                file_path,
+                download_url,
+                skip_existing=skip_existing,
+                no_progress=no_progress,
+                allow_parallel_switch=False,
+            )
 
 
 def save_metadata_file(path, api_client, sample_id, skip_existing=True):

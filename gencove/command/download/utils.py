@@ -266,7 +266,18 @@ def _download_sequential(
     resume_from,
     no_progress,
 ):
-    """Download file sequentially, consuming the provided response stream."""
+    """Download file sequentially, consuming the provided response stream.
+
+    Args:
+        response (requests.Response): Active streaming response object
+        file_path_tmp (str): Temporary file path used during download
+        total (int): Full size of the object in bytes
+        resume_from (int): Number of bytes already present on disk
+        no_progress (bool): Disable progress reporting when True
+
+    Returns:
+        None
+    """
     file_mode = "ab" if resume_from else "wb"
     progress = resume_from
     pbar = None
@@ -297,7 +308,19 @@ def _download_in_parallel(
     no_progress,
     request_kwargs_base,
 ):
-    """Download file by splitting into byte ranges and fetching in parallel."""
+    """Download file by splitting into byte ranges and fetching in parallel
+
+    Args:
+        download_url (str): URL of the object to download
+        file_path_tmp (str): Temporary file path used during download
+        total (int): Full size of the object in bytes
+        worker_count (int): Number of concurrent range requests
+        no_progress (bool): Disable progress reporting when True
+        request_kwargs_base (dict): Common keyword arguments for `requests.get`
+
+    Returns:
+        None
+    """
     with open(file_path_tmp, "wb") as tmp_file:
         tmp_file.truncate(total)
 
@@ -314,9 +337,10 @@ def _download_in_parallel(
         pbar.update(current)
 
     def fetch_range(start, end):
+        """Fetch range of bytes from the download URL and write to file"""
         expected = end - start + 1
         request_headers = {"Range": f"bytes={start}-{end}"}
-        request_kwargs = dict(request_kwargs_base)
+        request_kwargs = request_kwargs_base
         request_kwargs["headers"] = request_headers
         with requests.get(download_url, **request_kwargs) as resp:
             resp.raise_for_status()
@@ -346,13 +370,28 @@ def _download_in_parallel(
 
 
 def _determine_parallel_workers(total):
-    """Calculate how many workers to use based on object size."""
+    """Determine how many workers to use based on object size
+
+    Args:
+        total (int): Full size of the object in bytes
+
+    Returns:
+        int: Number of workers to spawn
+    """
     parts = max(1, (total + MIN_BYTES_PER_PART - 1) // MIN_BYTES_PER_PART)
     return min(MAX_PARALLEL_DOWNLOADS, parts)
 
 
 def _build_ranges(total, worker_count):
-    """Return a list of (start, end) byte ranges for the download."""
+    """Return a list of (start, end) byte ranges for the download
+
+    Args:
+        total (int): Full size of the object in bytes
+        worker_count (int): Number of ranges to generate
+
+    Returns:
+        list[tuple[int, int]]: Inclusive byte ranges for each worker
+    """
     part_size = (total + worker_count - 1) // worker_count
     ranges = []
     for index in range(worker_count):
@@ -365,7 +404,15 @@ def _build_ranges(total, worker_count):
 
 
 def _finalize_download(file_path_tmp, file_path):
-    """Replace destination file with freshly downloaded temp file."""
+    """Replace destination file with freshly downloaded temp file
+
+    Args:
+        file_path_tmp (str): Path to the partially downloaded file
+        file_path (str): Final destination path for the download
+
+    Returns:
+        None
+    """
     if os.path.exists(file_path):
         echo_debug(f"Found old file under same name: {file_path}. Removing it.")
         os.remove(file_path)
@@ -374,21 +421,36 @@ def _finalize_download(file_path_tmp, file_path):
 
 # pylint: disable=too-few-public-methods
 class _ThreadSafeCounter:
-    """Threadsafe counter to track aggregate progress."""
+    """Thread safe counter to track aggregate progress"""
 
     def __init__(self):
         self.value = 0
         self._lock = threading.Lock()
 
     def increment(self, amount):
-        """Increase counter by amount and return new total."""
+        """Increase counter by amount and return new total
+
+        Args:
+            amount (int): Number of bytes to add to the counter
+
+        Returns:
+            int: Updated total
+        """
         with self._lock:
             self.value += amount
             return self.value
 
 
 def _extract_total_size(headers, resume_from):
-    """Determine total size of the object based on response headers."""
+    """Determine total size of the object based on response headers
+
+    Args:
+        headers (Mapping[str, str]): Response headers returned by S3
+        resume_from (int): Bytes already written before resuming
+
+    Returns:
+        int: Total size of the object in bytes
+    """
     if "content-range" in headers:
         # format: bytes start-end/total
         _, _, total_str = headers["content-range"].partition("/")

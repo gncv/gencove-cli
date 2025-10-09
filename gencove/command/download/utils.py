@@ -230,6 +230,7 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
         else:
             echo_info(f"Downloading file to {file_path}")
             worker_count = _determine_parallel_workers(total)
+            echo_info(f"Using {worker_count} download workers")
             if worker_count == 1:
                 _download_sequential(
                     response,

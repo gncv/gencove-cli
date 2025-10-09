@@ -190,9 +190,9 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
         str(download_url) if isinstance(download_url, HttpUrl) else download_url
     )
     file_path_tmp = f"{file_path}.tmp"
-    request_kwargs_base = dict(stream=True, allow_redirects=False, timeout=30)
+    request_kwargs_base = {"stream": True, "allow_redirects": False, "timeout": 30}
     temp_size = os.path.getsize(file_path_tmp) if os.path.exists(file_path_tmp) else 0
-    request_kwargs = dict(request_kwargs_base)
+    request_kwargs = request_kwargs_base
     if temp_size:
         request_kwargs["headers"] = {"Range": f"bytes={temp_size}-"}
 
@@ -217,7 +217,6 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
             echo_info(f"Finished downloading a file: {file_path}")
             return file_path
 
-        echo_debug(f"Starting to download file to: {file_path}")
         if temp_size:
             echo_info(f"Resuming previous download: {file_path}")
             _download_sequential(
@@ -250,13 +249,13 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
                     request_kwargs_base,
                 )
                 _finalize_download(file_path_tmp, file_path)
-                echo_info(f"Finished downloading a file: {file_path}")
+                echo_info(f"Finished downloading file: {file_path}")
                 return file_path
     finally:
         response.close()
 
     _finalize_download(file_path_tmp, file_path)
-    echo_info(f"Finished downloading a file: {file_path}")
+    echo_info(f"Finished downloading file: {file_path}")
     return file_path
 
 

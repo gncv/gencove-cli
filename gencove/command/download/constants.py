@@ -84,6 +84,3 @@ FILE_TYPES_MAPPER = {}
 
 QC_FILE_TYPE = "qc"
 METADATA_FILE_TYPE = "metadata"
-
-# Use a large static buffer to accommodate high bandwidth-delay links
-DOWNLOAD_BUFFER_SIZE = 32 * 1024 * 1024  # 32 MiB

@@ -20,8 +20,8 @@ from gencove.models import SampleFile
 from gencove.utils import get_progress_bar
 
 from .constants import (
+    CHUNK_SIZE,
     DEFAULT_FILENAME_TOKEN,
-    DOWNLOAD_BUFFER_SIZE,
     FILENAME_RE,
     FILE_TYPES_MAPPER,
     FilePrefix,
@@ -217,16 +217,10 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
                     int(req.headers["content-length"]), "Downloading: "
                 )
                 pbar.start()
-            buffer = bytearray(DOWNLOAD_BUFFER_SIZE)
-            view = memoryview(buffer)
-            req.raw.decode_content = True
-            while True:
-                bytes_read = req.raw.readinto(buffer)
-                if not bytes_read:
-                    break
-                downloaded_file.write(view[:bytes_read])
+            for chunk in req.iter_content(chunk_size=CHUNK_SIZE):
+                downloaded_file.write(chunk)
                 if not no_progress:
-                    pbar.update(pbar.value + bytes_read)
+                    pbar.update(pbar.value + len(chunk))
             if not no_progress:
                 pbar.finish()
 

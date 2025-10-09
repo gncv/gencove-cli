@@ -303,19 +303,16 @@ def _download_in_parallel(
         tmp_file.truncate(total)
 
     pbar = None
-    progress_lock = threading.Lock()
-    downloaded = 0
+    progress = _ThreadSafeCounter()
     if not no_progress:
         pbar = get_progress_bar(total, "Downloading: ")
         pbar.start()
 
     def update_progress(amount):
-        nonlocal downloaded
         if not pbar:
             return
-        with progress_lock:
-            downloaded += amount
-            pbar.update(downloaded)
+        current = progress.increment(amount)
+        pbar.update(current)
 
     def fetch_range(start, end):
         expected = end - start + 1
@@ -374,6 +371,19 @@ def _finalize_download(file_path_tmp, file_path):
         echo_debug(f"Found old file under same name: {file_path}. Removing it.")
         os.remove(file_path)
     os.rename(file_path_tmp, file_path)
+
+
+class _ThreadSafeCounter:
+    """Threadsafe counter to track aggregate progress."""
+
+    def __init__(self):
+        self.value = 0
+        self._lock = threading.Lock()
+
+    def increment(self, amount):
+        with self._lock:
+            self.value += amount
+            return self.value
 
 
 def _extract_total_size(headers, resume_from):

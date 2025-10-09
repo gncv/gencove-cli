@@ -373,6 +373,7 @@ def _finalize_download(file_path_tmp, file_path):
     os.rename(file_path_tmp, file_path)
 
 
+# pylint: disable=too-few-public-methods
 class _ThreadSafeCounter:
     """Threadsafe counter to track aggregate progress."""
 
@@ -381,6 +382,7 @@ class _ThreadSafeCounter:
         self._lock = threading.Lock()
 
     def increment(self, amount):
+        """Increase counter by amount and return new total."""
         with self._lock:
             self.value += amount
             return self.value

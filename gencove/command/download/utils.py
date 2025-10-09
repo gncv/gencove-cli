@@ -2,6 +2,8 @@
 import json
 import os
 import re
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.parse import parse_qs, urlparse
 
 import backoff
@@ -26,6 +28,10 @@ from .constants import (
     FILE_TYPES_MAPPER,
     FilePrefix,
 )
+
+
+MAX_PARALLEL_DOWNLOADS = 8
+MIN_BYTES_PER_PART = 8 * 1024 * 1024  # 8 MB
 
 
 def _get_prefix_parts(full_prefix):
@@ -184,23 +190,17 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
         str(download_url) if isinstance(download_url, HttpUrl) else download_url
     )
     file_path_tmp = f"{file_path}.tmp"
-    if os.path.exists(file_path_tmp):
-        file_mode = "ab"
-        headers = dict(Range=f"bytes={os.path.getsize(file_path_tmp)}-")
-        echo_info(f"Resuming previous download: {file_path}")
-    else:
-        file_mode = "wb"
-        headers = {}
-        echo_info(f"Downloading file to {file_path}")
+    request_kwargs_base = dict(stream=True, allow_redirects=False, timeout=30)
+    temp_size = os.path.getsize(file_path_tmp) if os.path.exists(file_path_tmp) else 0
+    request_kwargs = dict(request_kwargs_base)
+    if temp_size:
+        request_kwargs["headers"] = {"Range": f"bytes={temp_size}-"}
 
-    stream_params = dict(
-        stream=True, allow_redirects=False, headers=headers, timeout=30
-    )
+    response = requests.get(download_url, **request_kwargs)
+    try:
+        response.raise_for_status()
+        total = _extract_total_size(response.headers, temp_size)
 
-    with requests.get(download_url, **stream_params) as req:
-        req.raise_for_status()
-        total = int(req.headers["content-length"])
-        # pylint: disable=E0012,C0330
         if (
             skip_existing
             and os.path.isfile(file_path)
@@ -209,28 +209,181 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
             echo_info(f"Skipping existing file: {file_path}")
             return file_path
 
+        if temp_size >= total and os.path.exists(file_path_tmp):
+            echo_debug(
+                "Temporary file already complete. Finalizing download without network."
+            )
+            _finalize_download(file_path_tmp, file_path)
+            echo_info(f"Finished downloading a file: {file_path}")
+            return file_path
+
         echo_debug(f"Starting to download file to: {file_path}")
-
-        with open(file_path_tmp, file_mode) as downloaded_file:
-            if not no_progress:
-                pbar = get_progress_bar(
-                    int(req.headers["content-length"]), "Downloading: "
+        if temp_size:
+            echo_info(f"Resuming previous download: {file_path}")
+            _download_sequential(
+                response,
+                file_path_tmp,
+                total,
+                temp_size,
+                no_progress,
+            )
+        else:
+            echo_info(f"Downloading file to {file_path}")
+            worker_count = _determine_parallel_workers(total)
+            if worker_count == 1:
+                _download_sequential(
+                    response,
+                    file_path_tmp,
+                    total,
+                    0,
+                    no_progress,
                 )
-                pbar.start()
-            for chunk in req.iter_content(chunk_size=CHUNK_SIZE):
-                downloaded_file.write(chunk)
-                if not no_progress:
-                    pbar.update(pbar.value + len(chunk))
-            if not no_progress:
-                pbar.finish()
+            else:
+                echo_debug(f"Using {worker_count} parallel range requests.")
+                response.close()
+                _download_in_parallel(
+                    download_url,
+                    file_path_tmp,
+                    total,
+                    worker_count,
+                    no_progress,
+                    request_kwargs_base,
+                )
+                _finalize_download(file_path_tmp, file_path)
+                echo_info(f"Finished downloading a file: {file_path}")
+                return file_path
+    finally:
+        response.close()
 
-        # Cross-platform cross-python-version file overwriting
-        if os.path.exists(file_path):
-            echo_debug(f"Found old file under same name: {file_path}. Removing it.")
-            os.remove(file_path)
-        os.rename(file_path_tmp, file_path)
-        echo_info(f"Finished downloading a file: {file_path}")
-        return file_path
+    _finalize_download(file_path_tmp, file_path)
+    echo_info(f"Finished downloading a file: {file_path}")
+    return file_path
+
+
+def _download_sequential(
+    response,
+    file_path_tmp,
+    total,
+    resume_from,
+    no_progress,
+):
+    """Download file sequentially, consuming the provided response stream."""
+    file_mode = "ab" if resume_from else "wb"
+    progress = resume_from
+    pbar = None
+    if not no_progress:
+        pbar = get_progress_bar(total, "Downloading: ")
+        pbar.start()
+        if resume_from:
+            pbar.update(resume_from)
+
+    with open(file_path_tmp, file_mode) as downloaded_file:
+        for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
+            if not chunk:
+                continue
+            downloaded_file.write(chunk)
+            progress += len(chunk)
+            if pbar:
+                pbar.update(progress)
+
+    if pbar:
+        pbar.finish()
+
+
+def _download_in_parallel(
+    download_url,
+    file_path_tmp,
+    total,
+    worker_count,
+    no_progress,
+    request_kwargs_base,
+):
+    """Download file by splitting into byte ranges and fetching in parallel."""
+    with open(file_path_tmp, "wb") as tmp_file:
+        tmp_file.truncate(total)
+
+    pbar = None
+    progress_lock = threading.Lock()
+    downloaded = 0
+    if not no_progress:
+        pbar = get_progress_bar(total, "Downloading: ")
+        pbar.start()
+
+    def update_progress(amount):
+        nonlocal downloaded
+        if not pbar:
+            return
+        with progress_lock:
+            downloaded += amount
+            pbar.update(downloaded)
+
+    def fetch_range(start, end):
+        expected = end - start + 1
+        request_headers = {"Range": f"bytes={start}-{end}"}
+        request_kwargs = dict(request_kwargs_base)
+        request_kwargs["headers"] = request_headers
+        with requests.get(download_url, **request_kwargs) as resp:
+            resp.raise_for_status()
+            bytes_written = 0
+            with open(file_path_tmp, "rb+") as part_file:
+                part_file.seek(start)
+                for chunk in resp.iter_content(chunk_size=CHUNK_SIZE):
+                    if not chunk:
+                        continue
+                    part_file.write(chunk)
+                    bytes_written += len(chunk)
+                    update_progress(len(chunk))
+            if bytes_written != expected:
+                raise requests.exceptions.ContentDecodingError(
+                    f"Incomplete range download for bytes {start}-{end} "
+                    f"(expected {expected}, got {bytes_written})"
+                )
+
+    ranges = _build_ranges(total, worker_count)
+    with ThreadPoolExecutor(max_workers=worker_count) as executor:
+        futures = [executor.submit(fetch_range, start, end) for start, end in ranges]
+        for future in as_completed(futures):
+            future.result()
+
+    if pbar:
+        pbar.finish()
+
+
+def _determine_parallel_workers(total):
+    """Calculate how many workers to use based on object size."""
+    parts = max(1, (total + MIN_BYTES_PER_PART - 1) // MIN_BYTES_PER_PART)
+    return min(MAX_PARALLEL_DOWNLOADS, parts)
+
+
+def _build_ranges(total, worker_count):
+    """Return a list of (start, end) byte ranges for the download."""
+    part_size = (total + worker_count - 1) // worker_count
+    ranges = []
+    for index in range(worker_count):
+        start = index * part_size
+        end = min(start + part_size, total) - 1
+        if start > end:
+            break
+        ranges.append((start, end))
+    return ranges
+
+
+def _finalize_download(file_path_tmp, file_path):
+    """Replace destination file with freshly downloaded temp file."""
+    if os.path.exists(file_path):
+        echo_debug(f"Found old file under same name: {file_path}. Removing it.")
+        os.remove(file_path)
+    os.rename(file_path_tmp, file_path)
+
+
+def _extract_total_size(headers, resume_from):
+    """Determine total size of the object based on response headers."""
+    if "content-range" in headers:
+        # format: bytes start-end/total
+        _, _, total_str = headers["content-range"].partition("/")
+        return int(total_str)
+    length = int(headers["content-length"])
+    return resume_from + length
 
 
 def save_metadata_file(path, api_client, sample_id, skip_existing=True):

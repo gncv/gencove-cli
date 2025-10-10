@@ -172,7 +172,9 @@ def fatal_request_error(err=None):
     max_time=MAX_RETRY_TIME_SECONDS,
     giveup=fatal_request_error,
 )
-def download_file(file_path, download_url, skip_existing=True, no_progress=False):
+def download_file(
+    file_path, download_url, skip_existing=True, no_progress=False, sequential=False
+):
     """Download a file to file system.
 
     Args:
@@ -181,6 +183,7 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
         download_url (str): url of the file to download
         skip_existing (bool): skip already downloaded files
         no_progress (bool): don't show progress bar
+        sequential (bool): download file sequentially instead of in parallel
 
     Returns:
         str : file path
@@ -229,7 +232,7 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
         else:
             echo_info(f"Downloading file to {file_path}")
             worker_count = _determine_parallel_workers(total)
-            if worker_count == 1:
+            if worker_count == 1 or sequential:
                 _download_sequential(
                     response,
                     file_path_tmp,

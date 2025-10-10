@@ -246,6 +246,7 @@ def test_sample_ids_provided(credentials, mocker, recording, sample_id_download,
                     ),
                     True,
                     False,
+                    False,
                 ),
                 call(
                     f"cli_test_data/mock-client-id/{MOCK_UUID}/r2.fastq.gz",
@@ -255,6 +256,7 @@ def test_sample_ids_provided(credentials, mocker, recording, sample_id_download,
                         host="example.com",
                     ),
                     True,
+                    False,
                     False,
                 ),
             ]
@@ -385,6 +387,7 @@ def test_create_checksum_file(credentials, mocker, recording, sample_id_download
                 ),
                 True,
                 False,
+                False,
             )
 
             mocked_get_file_checksum.assert_called_once_with(
@@ -460,6 +463,7 @@ def test_create_checksum_file_template(
                 ),
                 True,
                 False,
+                False,
             )
 
             mocked_get_file_checksum.assert_called_once_with(
@@ -525,6 +529,7 @@ def test_create_checksum_file_exception(
                     ),
                 ),
                 True,
+                False,
                 False,
             )
             file_path = f"cli_test_data/mock-client-id/{MOCK_UUID}/{filename}"
@@ -816,6 +821,7 @@ def test_download_no_progress(credentials, mocker, recording, sample_id_download
                         ),
                         True,
                         True,
+                        False,
                     ),
                     call(
                         f"cli_test_data/mock-client-id/{MOCK_UUID}/{MOCK_UUID}_R2.fastq.gz",  # noqa: E501 pylint: disable=line-too-long
@@ -828,12 +834,103 @@ def test_download_no_progress(credentials, mocker, recording, sample_id_download
                         ),
                         True,
                         True,
+                        False,
                     ),
                 ]
             )
             mocked_sample_details.assert_called_once()
             mocked_qc_metrics.assert_called_once()
             mocked_get_metadata.assert_called_once()
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_download_sequential(credentials, mocker, recording, sample_id_download, vcr):
+    """Test command downloads sequentially when requested"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        if not recording:
+            # Mock only if using the cassettes, since we mock the return value.
+            get_sample_details_response = get_vcr_response(
+                "/api/v2/samples/", vcr, operator.contains
+            )
+            mocked_sample_details = mocker.patch.object(
+                APIClient,
+                "get_sample_details",
+                return_value=SampleDetails(**get_sample_details_response),
+            )
+            get_sample_qc_metrics_response = get_vcr_response(
+                "/api/v2/sample-quality-controls/", vcr, operator.contains
+            )
+            mocked_qc_metrics = mocker.patch.object(
+                APIClient,
+                "get_sample_qc_metrics",
+                return_value=SampleQC(**get_sample_qc_metrics_response),
+            )
+            get_metadata_response = get_vcr_response(
+                "/api/v2/sample-metadata/", vcr, operator.contains
+            )
+            mocked_get_metadata = mocker.patch.object(
+                APIClient,
+                "get_metadata",
+                return_value=SampleMetadata(**get_metadata_response),
+            )
+        mocked_download_file = mocker.patch(
+            "gencove.command.download.main.download_file",
+            side_effect=download_file,
+        )
+
+        mocked_download_parallel = mocker.patch(
+            "gencove.command.download.utils._download_in_parallel",
+        )
+
+        res = runner.invoke(
+            download,
+            [
+                "cli_test_data",
+                "--sample-ids",
+                sample_id_download,
+                *credentials,
+                "--sequential",
+            ],
+        )
+        assert res.exit_code == 0
+        if not recording:
+            mocked_download_file.assert_has_calls(
+                [
+                    call(
+                        f"cli_test_data/mock-client-id/{MOCK_UUID}/{MOCK_UUID}_R1.fastq.gz",  # noqa: E501 pylint: disable=line-too-long
+                        HttpUrl(
+                            next(
+                                file["download_url"]
+                                for file in get_sample_details_response["files"]
+                                if file["file_type"] == "fastq-r1"
+                            ),
+                        ),
+                        True,
+                        False,
+                        True,
+                    ),
+                    call(
+                        f"cli_test_data/mock-client-id/{MOCK_UUID}/{MOCK_UUID}_R2.fastq.gz",  # noqa: E501 pylint: disable=line-too-long
+                        HttpUrl(
+                            next(
+                                file["download_url"]
+                                for file in get_sample_details_response["files"]
+                                if file["file_type"] == "fastq-r2"
+                            ),
+                        ),
+                        True,
+                        False,
+                        True,
+                    ),
+                ]
+            )
+            mocked_sample_details.assert_called_once()
+            mocked_qc_metrics.assert_called_once()
+            mocked_get_metadata.assert_called_once()
+
+            mocked_download_parallel.assert_not_called()
 
 
 @pytest.mark.vcr

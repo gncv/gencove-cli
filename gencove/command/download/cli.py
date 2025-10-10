@@ -66,6 +66,12 @@ from .main import Download
     is_flag=True,
     help="If specified, an additional checksum file will be downloaded for each deliverable.",  # noqa: E501 line too long pylint: disable=line-too-long
 )
+@click.option(
+    "--sequential",
+    is_flag=True,
+    help="If specified, download will be singled-threaded and download sequentially "
+    "rather than with parallel workers",  # noqa: E501 line too long pylint: disable=line-too-long
+)
 def download(  # pylint: disable=E0012,C0330,R0913
     destination,
     project_id,
@@ -80,6 +86,7 @@ def download(  # pylint: disable=E0012,C0330,R0913
     api_key,
     no_progress,
     checksums,
+    sequential,
 ):  # noqa: D413,D301,D412 # pylint: disable=C0301
     """Download deliverables of a project.
 
@@ -127,4 +134,5 @@ def download(  # pylint: disable=E0012,C0330,R0913
         download_urls,
         no_progress,
         checksums,
+        sequential,
     ).run()

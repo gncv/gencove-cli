@@ -836,6 +836,7 @@ def test_download_no_progress(credentials, mocker, recording, sample_id_download
             mocked_get_metadata.assert_called_once()
 
 
+@pytest.mark.vcr
 @assert_authorization
 def test_project_id_provided_skip_existing_qc_and_metadata(
     credentials, mocker, project_id_download, recording, vcr

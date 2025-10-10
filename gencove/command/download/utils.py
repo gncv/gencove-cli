@@ -239,6 +239,11 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
                 )
             else:
                 echo_debug(f"Using {worker_count} parallel workers")
+
+                # ensure temporary file exists with the expected size
+                with open(file_path_tmp, "wb") as tmp_file:
+                    tmp_file.truncate(total)
+
                 response.close()
                 _download_in_parallel(
                     download_url,
@@ -321,8 +326,9 @@ def _download_in_parallel(
     Returns:
         None
     """
-    with open(file_path_tmp, "wb") as tmp_file:
-        tmp_file.truncate(total)
+    if not os.path.exists(file_path_tmp):
+        with open(file_path_tmp, "wb") as tmp_file:
+            tmp_file.truncate(total)
 
     pbar = None
     progress = _ThreadSafeCounter()

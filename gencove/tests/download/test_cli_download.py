@@ -15,13 +15,12 @@ from gencove.cli import download
 from gencove.client import APIClient
 from gencove.command.base import Command
 from gencove.command.download.main import Download
-from gencove.command.download.utils import download_file
-from gencove.models import (
-    ProjectSamples,
-    SampleDetails,
-    SampleMetadata,
-    SampleQC,
+from gencove.command.download.utils import (
+    download_file,
+    _download_sequential,  # noqa
+    _finalize_download,  # noqa
 )
+from gencove.models import ProjectSamples, SampleDetails, SampleMetadata, SampleQC
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.download.vcr.filters import (
     filter_files_request,
@@ -843,6 +842,133 @@ def test_download_no_progress(credentials, mocker, recording, sample_id_download
 
 @pytest.mark.vcr
 @assert_authorization
+def test_download_sequential_branch(
+    credentials, mocker, recording, sample_id_download, vcr
+):
+    """Ensure downloads use sequential fallback when worker count is 1"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        mocked_sample_details = None
+        if not recording:
+            get_sample_details_response = get_vcr_response(
+                "/api/v2/samples/", vcr, operator.contains
+            )
+            mocked_sample_details = mocker.patch.object(
+                APIClient,
+                "get_sample_details",
+                return_value=SampleDetails(**get_sample_details_response),
+            )
+
+        # Explicitly force sequential download by returning 1 worker
+        mocker.patch(
+            "gencove.command.download.utils._determine_parallel_workers",
+            return_value=1,
+        )
+
+        parallel_fn = mocker.patch(
+            "gencove.command.download.utils._download_in_parallel",
+            side_effect=AssertionError("Parallel downloads should not be used"),
+        )
+        sequential_fn = mocker.patch(
+            "gencove.command.download.utils._download_sequential",
+            wraps=_download_sequential,
+        )
+        finalize_fn = mocker.patch(
+            "gencove.command.download.utils._finalize_download",
+            wraps=_finalize_download,
+        )
+        mocked_download_file = mocker.patch(
+            "gencove.command.download.main.download_file",
+            side_effect=download_file,
+        )
+
+        res = runner.invoke(
+            download,
+            [
+                "cli_test_data",
+                "--sample-ids",
+                sample_id_download,
+                *credentials,
+                "--file-types",
+                "fastq-r1",
+            ],
+        )
+
+        assert res.exit_code == 0
+        assert sequential_fn.called
+        parallel_fn.assert_not_called()
+        # Verify finalization is called (happens after sequential download)
+        assert finalize_fn.called
+
+        if not recording:
+            assert mocked_download_file.called
+            mocked_sample_details.assert_called_once()
+
+
+@pytest.mark.vcr()
+@assert_authorization
+def test_download_parallel_branch(
+    credentials, mocker, recording, sample_id_download, vcr
+):
+    """Ensure downloads use parallel download when workers > 1"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        mocked_sample_details = None
+        if not recording:
+            get_sample_details_response = get_vcr_response(
+                "/api/v2/samples/", vcr, operator.contains
+            )
+            mocked_sample_details = mocker.patch.object(
+                APIClient,
+                "get_sample_details",
+                return_value=SampleDetails(**get_sample_details_response),
+            )
+
+        # force parallel download by returning 2 workers
+        mocker.patch(
+            "gencove.command.download.utils._determine_parallel_workers",
+            return_value=2,
+        )
+
+        sequential_fn = mocker.patch(
+            "gencove.command.download.utils._download_sequential",
+            side_effect=AssertionError("Sequential download should not be used"),
+        )
+        parallel_fn = mocker.patch(
+            "gencove.command.download.utils._download_in_parallel",
+        )
+        finalize_fn = mocker.patch(
+            "gencove.command.download.utils._finalize_download",
+            wraps=_finalize_download,
+        )
+        mocked_download_file = mocker.patch(
+            "gencove.command.download.main.download_file",
+            side_effect=download_file,
+        )
+
+        res = runner.invoke(
+            download,
+            [
+                "cli_test_data",
+                "--sample-ids",
+                sample_id_download,
+                *credentials,
+                "--file-types",
+                "fastq-r1",
+            ],
+        )
+
+        assert res.exit_code == 0
+        assert parallel_fn.called
+        sequential_fn.assert_not_called()
+        assert finalize_fn.called
+
+        if not recording:
+            assert mocked_download_file.called
+            mocked_sample_details.assert_called_once()
+
+
+@assert_authorization
 def test_project_id_provided_skip_existing_qc_and_metadata(
     credentials, mocker, project_id_download, recording, vcr
 ):
@@ -898,6 +1024,7 @@ def test_project_id_provided_skip_existing_qc_and_metadata(
                 "--no-skip-existing",
             ],
         )
+        print(res.stdout)
         assert res.exit_code == 0
         if not recording:
             mocked_project_samples.assert_called_once()

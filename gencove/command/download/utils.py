@@ -206,7 +206,7 @@ def download_file(
     # worker during parallel download, then load this data upon resumption of task.
     # Number of threads used would also need to be stored.
     if temp_size and not sequential:
-        echo_info(f"Partially downloaded file detected, removing before proceeding")
+        echo_info("Partially downloaded file detected, removing before proceeding")
         os.remove(file_path_tmp)
         temp_size = 0
 

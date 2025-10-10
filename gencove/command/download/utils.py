@@ -200,6 +200,16 @@ def download_file(
         request_kwargs["headers"] = {"Range": f"bytes={temp_size}-"}
 
     response = requests.get(download_url, **request_kwargs)
+
+    # We need to remove partially the downloaded file before proceeding with parallel
+    # download. Would need to implement bookkeeping mechanism to track progress of each
+    # worker during parallel download, then load this data upon resumption of task.
+    # Number of threads used would also need to be stored.
+    if temp_size and not sequential:
+        echo_info(f"Partially downloaded file detected, removing before proceeding")
+        os.remove(file_path_tmp)
+        temp_size = 0
+
     try:
         response.raise_for_status()
         total = _extract_total_size(response.headers, temp_size)
@@ -220,7 +230,7 @@ def download_file(
             echo_info(f"Finished downloading a file: {file_path}")
             return file_path
 
-        if temp_size:
+        if temp_size and sequential:
             echo_info(f"Resuming previous download: {file_path}")
             _download_sequential(
                 response,

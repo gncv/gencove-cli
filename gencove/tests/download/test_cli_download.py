@@ -859,7 +859,7 @@ def test_download_sequential_branch(
                 return_value=SampleDetails(**get_sample_details_response),
             )
 
-        # Explicitly force sequential download by returning 1 worker
+        # force sequential download by returning 1 worker
         mocker.patch(
             "gencove.command.download.utils._determine_parallel_workers",
             return_value=1,
@@ -897,7 +897,6 @@ def test_download_sequential_branch(
         assert res.exit_code == 0
         assert sequential_fn.called
         parallel_fn.assert_not_called()
-        # Verify finalization is called (happens after sequential download)
         assert finalize_fn.called
 
         if not recording:

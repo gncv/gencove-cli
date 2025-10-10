@@ -72,7 +72,7 @@ from .main import Download
     help="If specified, download will be singled-threaded and download sequentially "
     "rather than with parallel workers",  # noqa: E501 line too long pylint: disable=line-too-long
 )
-def download(  # pylint: disable=E0012,C0330,R0913
+def download(  # pylint: disable=E0012,C0330,R0913,R0914
     destination,
     project_id,
     sample_ids,

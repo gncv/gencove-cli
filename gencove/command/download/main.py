@@ -57,7 +57,6 @@ class Download(Command):
         download_urls,
         no_progress,
         checksums,
-        sequential,
     ):
         super().__init__(credentials, options)
         self.download_to = download_to
@@ -70,7 +69,6 @@ class Download(Command):
         self.download_files = []
         self.no_progress = no_progress
         self.checksums = checksums
-        self.sequential = sequential
         self.in_retry = False  # track whether we are in a retry
 
     def initialize(self):
@@ -321,7 +319,6 @@ class Download(Command):
                     sample_file.download_url,
                     self.options.skip_existing,
                     self.no_progress,
-                    self.sequential,
                 )
                 if self.checksums:
                     try:

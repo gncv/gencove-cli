@@ -29,7 +29,6 @@ from .constants import (
     FilePrefix,
 )
 
-
 MAX_PARALLEL_DOWNLOADS = 8
 MIN_BYTES_PER_PART = 8 * 1024 * 1024  # 8 MB
 
@@ -191,25 +190,12 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
     )
     file_path_tmp = f"{file_path}.tmp"
     request_kwargs_base = {"stream": True, "allow_redirects": False, "timeout": 30}
-    temp_size = os.path.getsize(file_path_tmp) if os.path.exists(file_path_tmp) else 0
-    request_kwargs = request_kwargs_base
-    if temp_size:
-        request_kwargs["headers"] = {"Range": f"bytes={temp_size}-"}
 
-    response = requests.get(download_url, **request_kwargs)
-
-    # We need to remove partially the downloaded file before proceeding with parallel
-    # download. Would need to implement bookkeeping mechanism to track progress of each
-    # worker during parallel download, then load this data upon resumption of task.
-    # Number of threads used would also need to be stored.
-    if temp_size and not sequential:
-        echo_info("Partially downloaded file detected, removing before proceeding")
-        os.remove(file_path_tmp)
-        temp_size = 0
+    response = requests.get(download_url, **request_kwargs_base)
 
     try:
         response.raise_for_status()
-        total = _extract_total_size(response.headers, temp_size)
+        total = _extract_total_size(response.headers)
 
         if (
             skip_existing
@@ -219,90 +205,55 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
             echo_info(f"Skipping existing file: {file_path}")
             return file_path
 
-        if temp_size >= total and os.path.exists(file_path_tmp):
-            echo_debug(
-                "Temporary file already complete. Finalizing download without network."
-            )
-            _finalize_download(file_path_tmp, file_path)
-            echo_info(f"Finished downloading a file: {file_path}")
-            return file_path
+        echo_info(f"Downloading file to {file_path}")
+        worker_count = _determine_parallel_workers(total)
 
-        if temp_size and sequential:
-            echo_info(f"Resuming previous download: {file_path}")
-            _download_sequential(
-                response,
+        echo_debug(f"Using {worker_count} worker(s)")
+
+        if worker_count == 1:
+            # For small files or limited threads, consume the initial response stream
+            # instead of making additional range requests.
+            # this is primarily to maintain compatibility with older tests
+            _download_from_response(response, file_path_tmp, total, no_progress)
+        else:
+            with open(file_path_tmp, "wb") as tmp_file:
+                tmp_file.truncate(total)
+
+            response.close()
+            _download_in_parallel(
+                download_url,
                 file_path_tmp,
                 total,
-                temp_size,
+                worker_count,
                 no_progress,
+                request_kwargs_base,
             )
-        else:
-            echo_info(f"Downloading file to {file_path}")
-            worker_count = _determine_parallel_workers(total)
-            if worker_count == 1:
-                _download_sequential(
-                    response,
-                    file_path_tmp,
-                    total,
-                    0,
-                    no_progress,
-                )
-            else:
-                echo_debug(f"Using {worker_count} parallel workers")
-
-                # ensure temporary file exists with the expected size
-                with open(file_path_tmp, "wb") as tmp_file:
-                    tmp_file.truncate(total)
-
-                response.close()
-                _download_in_parallel(
-                    download_url,
-                    file_path_tmp,
-                    total,
-                    worker_count,
-                    no_progress,
-                    request_kwargs_base,
-                )
-                _finalize_download(file_path_tmp, file_path)
-                echo_info(f"Finished downloading file: {file_path}")
-                return file_path
+        _finalize_download(file_path_tmp, file_path)
+        echo_info(f"Finished downloading file: {file_path}")
+        return file_path
     finally:
         response.close()
 
-    _finalize_download(file_path_tmp, file_path)
-    echo_info(f"Finished downloading file: {file_path}")
-    return file_path
 
-
-def _download_sequential(
-    response,
-    file_path_tmp,
-    total,
-    resume_from,
-    no_progress,
-):
-    """Download file sequentially, consuming the provided response stream.
+def _download_from_response(response, file_path_tmp, total, no_progress):
+    """Download file by consuming response stream
 
     Args:
         response (requests.Response): Active streaming response object
         file_path_tmp (str): Temporary file path used during download
         total (int): Full size of the object in bytes
-        resume_from (int): Number of bytes already present on disk
         no_progress (bool): Disable progress reporting when True
 
     Returns:
         None
     """
-    file_mode = "ab" if resume_from else "wb"
-    progress = resume_from
+    progress = 0
     pbar = None
     if not no_progress:
         pbar = get_progress_bar(total, "Downloading: ")
         pbar.start()
-        if resume_from:
-            pbar.update(resume_from)
 
-    with open(file_path_tmp, file_mode) as downloaded_file:
+    with open(file_path_tmp, "wb") as downloaded_file:
         for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
             if not chunk:
                 continue
@@ -457,12 +408,11 @@ class _ThreadSafeCounter:
             return self.value
 
 
-def _extract_total_size(headers, resume_from):
+def _extract_total_size(headers):
     """Determine total size of the object based on response headers
 
     Args:
         headers (Mapping[str, str]): Response headers returned by S3
-        resume_from (int): Bytes already written before resuming
 
     Returns:
         int: Total size of the object in bytes
@@ -472,7 +422,7 @@ def _extract_total_size(headers, resume_from):
         _, _, total_str = headers["content-range"].partition("/")
         return int(total_str)
     length = int(headers["content-length"])
-    return resume_from + length
+    return length
 
 
 def save_metadata_file(path, api_client, sample_id, skip_existing=True):

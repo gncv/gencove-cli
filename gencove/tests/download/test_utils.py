@@ -25,7 +25,7 @@ from pydantic import HttpUrl
 
 def test_get_filename_from_download_url_with_query_param():
     """Test extracting filename from URL with response-content-disposition."""
-    url = "https://example.com/file.txt?response-content-disposition=attachment%3B+filename%3Dtest_file.fastq.gz"  # pylint: disable=line-too-long
+    url = "https://example.com/file.txt?response-content-disposition=attachment%3B+filename%3Dtest_file.fastq.gz"  # noqa E501 pylint: disable=line-too-long
     result = get_filename_from_download_url(url)
     assert result == "test_file.fastq.gz"
 

@@ -26,11 +26,12 @@ from .constants import (
     DEFAULT_FILENAME_TOKEN,
     FILENAME_RE,
     FILE_TYPES_MAPPER,
+    MEGABYTE,
     FilePrefix,
 )
 
 MAX_PARALLEL_DOWNLOADS = 8
-MIN_BYTES_PER_PART = 8 * 1024 * 1024  # 8 MB
+MIN_BYTES_PER_PART = 8 * MEGABYTE  # 8 MB
 
 
 def _get_prefix_parts(full_prefix):

@@ -15,11 +15,7 @@ from gencove.cli import download
 from gencove.client import APIClient
 from gencove.command.base import Command
 from gencove.command.download.main import Download
-from gencove.command.download.utils import (
-    download_file,
-    _download_in_parallel,
-    _download_from_response,
-)
+from gencove.command.download.utils import download_file
 from gencove.models import ProjectSamples, SampleDetails, SampleMetadata, SampleQC
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.download.vcr.filters import (

@@ -7,13 +7,13 @@ from click.testing import CliRunner
 
 from gencove.command.download.constants import MEGABYTE
 from gencove.command.download.utils import (
+    _ThreadSafeCounter,
     _build_ranges,
     _create_filepath,
     _determine_parallel_workers,
     _extract_total_size,
     _finalize_download,
     _get_prefix_parts,
-    _ThreadSafeCounter,
     deliverable_type_from_filename,
     get_download_template_format_params,
     get_filename_from_download_url,
@@ -25,7 +25,7 @@ from pydantic import HttpUrl
 
 def test_get_filename_from_download_url_with_query_param():
     """Test extracting filename from URL with response-content-disposition."""
-    url = "https://example.com/file.txt?response-content-disposition=attachment%3B+filename%3Dtest_file.fastq.gz"  # noqa
+    url = "https://example.com/file.txt?response-content-disposition=attachment%3B+filename%3Dtest_file.fastq.gz"  # pylint: disable=line-too-long
     result = get_filename_from_download_url(url)
     assert result == "test_file.fastq.gz"
 

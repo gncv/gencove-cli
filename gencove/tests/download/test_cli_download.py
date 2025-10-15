@@ -15,7 +15,11 @@ from gencove.cli import download
 from gencove.client import APIClient
 from gencove.command.base import Command
 from gencove.command.download.main import Download
-from gencove.command.download.utils import download_file
+from gencove.command.download.utils import (
+    download_file,
+    _download_in_parallel,
+    _download_from_response,
+)
 from gencove.models import ProjectSamples, SampleDetails, SampleMetadata, SampleQC
 from gencove.tests.decorators import assert_authorization
 from gencove.tests.download.vcr.filters import (
@@ -893,7 +897,6 @@ def test_project_id_provided_skip_existing_qc_and_metadata(
                 "--no-skip-existing",
             ],
         )
-        print(res.stdout)
         assert res.exit_code == 0
         if not recording:
             mocked_project_samples.assert_called_once()
@@ -1166,3 +1169,58 @@ def test_download_retry_skips_existing(
             assert any(retry_msg in msg for msg in debug_messages)
             assert os.path.exists(expected_path)
             assert len(download_attempts) > 0
+
+
+@pytest.mark.vcr
+@assert_authorization
+def test_parallel_download(credentials, mocker, recording, sample_id_download, vcr):
+    """Test parallel download for file triggering multiple workers"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        if not recording:
+            get_sample_details_response = get_vcr_response(
+                "/api/v2/samples/", vcr, operator.contains
+            )
+            sample_details_data = get_sample_details_response.copy()
+            sample_details_data["files"][0]["size"] = str(32 * 1024 * 1024)
+            mocked_sample_details = mocker.patch.object(
+                APIClient,
+                "get_sample_details",
+                return_value=SampleDetails(**sample_details_data),
+            )
+        mocked_download_file = mocker.patch(
+            "gencove.command.download.main.download_file",
+            side_effect=download_file,
+        )
+        mocker.patch(
+            "gencove.command.download.utils._determine_parallel_workers", return_value=2
+        )
+        mocked_parallel_download = mocker.patch(
+            "gencove.command.download.utils._download_in_parallel",
+        )
+        mocked_sequential_download = mocker.patch(
+            "gencove.command.download.utils._download_from_response",
+        )
+
+        res = runner.invoke(
+            download,
+            [
+                "cli_test_data",
+                "--sample-ids",
+                sample_id_download,
+                "--file-types",
+                "fastq-r1",
+                *credentials,
+            ],
+        )
+        assert res.exit_code == 0
+        if not recording:
+            mocked_sample_details.assert_called_once()
+            expected_path = (
+                f"cli_test_data/mock-client-id/{MOCK_UUID}/{MOCK_UUID}_R1.fastq.gz"
+            )
+            assert os.path.exists(expected_path)
+
+        mocked_sequential_download.assert_not_called()
+        mocked_download_file.assert_called_once()
+        mocked_parallel_download.assert_called_once()

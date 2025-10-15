@@ -1209,7 +1209,6 @@ def test_parallel_download(credentials, mocker, recording, sample_id_download, v
                 *credentials,
             ],
         )
-        print(res.stdout)
         assert res.exit_code == 0
         if not recording:
             mocked_sample_details.assert_called_once()

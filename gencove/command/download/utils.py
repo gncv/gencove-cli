@@ -26,8 +26,8 @@ from .constants import (
     DEFAULT_FILENAME_TOKEN,
     FILENAME_RE,
     FILE_TYPES_MAPPER,
-    MEGABYTE,
     FilePrefix,
+    MEGABYTE,
 )
 
 MAX_PARALLEL_DOWNLOADS = 8

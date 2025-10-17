@@ -2,8 +2,8 @@ name: Release Gencove CLI
 
 on:
   push:
-    branches:
-      - "feature/socket-buffer-size"
+    tags:
+      - "*.*.*"
 
 jobs:
   build:
@@ -84,7 +84,7 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          draft: true
+          draft: false
           prerelease: false
           files: |
             gencove-Linux.zip

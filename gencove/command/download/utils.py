@@ -235,6 +235,12 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
     finally:
         response.close()
 
+        # if there's a failure, tmp file remains
+        # this ensures it is always removed
+        if os.path.exists(file_path_tmp):
+            echo_info(f"Removing temporary file: {file_path_tmp}")
+            os.remove(file_path_tmp)
+
 
 def _download_from_response(response, file_path_tmp, total, no_progress):
     """Download file by consuming response stream

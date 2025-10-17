@@ -300,6 +300,8 @@ def _download_in_parallel(
 
     pbar = None
     progress = _ThreadSafeCounter()
+    cancel_event = threading.Event()
+
     if not no_progress:
         pbar = get_progress_bar(total, "Downloading: ")
         pbar.start()
@@ -322,6 +324,9 @@ def _download_in_parallel(
             with open(file_path_tmp, "rb+") as part_file:
                 part_file.seek(start)
                 for chunk in resp.iter_content(chunk_size=CHUNK_SIZE):
+                    # interrupt if cancel event detected
+                    if cancel_event.is_set():
+                        return
                     if not chunk:
                         continue
                     part_file.write(chunk)
@@ -334,10 +339,19 @@ def _download_in_parallel(
                 )
 
     ranges = _build_ranges(total, worker_count)
-    with ThreadPoolExecutor(max_workers=worker_count) as executor:
-        futures = [executor.submit(fetch_range, start, end) for start, end in ranges]
+    executor = ThreadPoolExecutor(max_workers=worker_count)
+    futures = [executor.submit(fetch_range, start, end) for start, end in ranges]
+    try:
         for future in as_completed(futures):
             future.result()
+    except KeyboardInterrupt:
+        cancel_event.set()
+        for future in futures:
+            future.cancel()
+        executor.shutdown(wait=False)
+        raise
+    finally:
+        executor.shutdown(wait=True)
 
     if pbar:
         pbar.finish()

@@ -273,7 +273,7 @@ def _download_from_response(response, file_path_tmp, total, no_progress):
         pbar.finish()
 
 
-def _download_in_parallel(
+def _download_in_parallel(  # pylint: disable=too-many-locals
     download_url,
     file_path_tmp,
     total,
@@ -314,6 +314,8 @@ def _download_in_parallel(
 
     def fetch_range(start, end):
         """Fetch range of bytes from the download URL and write to file"""
+        if cancel_event.is_set():
+            return
         expected = end - start + 1
         request_headers = {"Range": f"bytes={start}-{end}"}
         request_kwargs = request_kwargs_base
@@ -324,7 +326,6 @@ def _download_in_parallel(
             with open(file_path_tmp, "rb+") as part_file:
                 part_file.seek(start)
                 for chunk in resp.iter_content(chunk_size=CHUNK_SIZE):
-                    # interrupt if cancel event detected
                     if cancel_event.is_set():
                         return
                     if not chunk:

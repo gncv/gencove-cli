@@ -2,6 +2,8 @@
 import json
 import os
 import re
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.parse import parse_qs, urlparse
 
 import backoff
@@ -25,7 +27,11 @@ from .constants import (
     FILENAME_RE,
     FILE_TYPES_MAPPER,
     FilePrefix,
+    MEGABYTE,
 )
+
+MAX_PARALLEL_DOWNLOADS = 8
+MIN_BYTES_PER_PART = 8 * MEGABYTE  # 8 MB
 
 
 def _get_prefix_parts(full_prefix):
@@ -184,23 +190,14 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
         str(download_url) if isinstance(download_url, HttpUrl) else download_url
     )
     file_path_tmp = f"{file_path}.tmp"
-    if os.path.exists(file_path_tmp):
-        file_mode = "ab"
-        headers = dict(Range=f"bytes={os.path.getsize(file_path_tmp)}-")
-        echo_info(f"Resuming previous download: {file_path}")
-    else:
-        file_mode = "wb"
-        headers = {}
-        echo_info(f"Downloading file to {file_path}")
+    request_kwargs_base = {"stream": True, "allow_redirects": False, "timeout": 30}
 
-    stream_params = dict(
-        stream=True, allow_redirects=False, headers=headers, timeout=30
-    )
+    response = requests.get(download_url, **request_kwargs_base)
 
-    with requests.get(download_url, **stream_params) as req:
-        req.raise_for_status()
-        total = int(req.headers["content-length"])
-        # pylint: disable=E0012,C0330
+    try:
+        response.raise_for_status()
+        total = _extract_total_size(response.headers)
+
         if (
             skip_existing
             and os.path.isfile(file_path)
@@ -209,28 +206,245 @@ def download_file(file_path, download_url, skip_existing=True, no_progress=False
             echo_info(f"Skipping existing file: {file_path}")
             return file_path
 
-        echo_debug(f"Starting to download file to: {file_path}")
+        echo_info(f"Downloading file to {file_path}")
+        worker_count = _determine_parallel_workers(total)
 
-        with open(file_path_tmp, file_mode) as downloaded_file:
-            if not no_progress:
-                pbar = get_progress_bar(
-                    int(req.headers["content-length"]), "Downloading: "
-                )
-                pbar.start()
-            for chunk in req.iter_content(chunk_size=CHUNK_SIZE):
-                downloaded_file.write(chunk)
-                if not no_progress:
-                    pbar.update(pbar.value + len(chunk))
-            if not no_progress:
-                pbar.finish()
+        echo_debug(f"Using {worker_count} worker(s)")
 
-        # Cross-platform cross-python-version file overwriting
-        if os.path.exists(file_path):
-            echo_debug(f"Found old file under same name: {file_path}. Removing it.")
-            os.remove(file_path)
-        os.rename(file_path_tmp, file_path)
-        echo_info(f"Finished downloading a file: {file_path}")
+        if worker_count == 1:
+            # For small files or limited threads, consume the initial response stream
+            # instead of making additional range requests.
+            # this is primarily to maintain compatibility with older tests
+            _download_from_response(response, file_path_tmp, total, no_progress)
+        else:
+            with open(file_path_tmp, "wb") as tmp_file:
+                tmp_file.truncate(total)
+
+            response.close()
+            _download_in_parallel(
+                download_url,
+                file_path_tmp,
+                total,
+                worker_count,
+                no_progress,
+                request_kwargs_base,
+            )
+        _finalize_download(file_path_tmp, file_path)
+        echo_info(f"Finished downloading file: {file_path}")
         return file_path
+    finally:
+        response.close()
+
+        # if there's a failure, tmp file remains
+        # this ensures it is always removed
+        if os.path.exists(file_path_tmp):
+            echo_info(f"Removing temporary file: {file_path_tmp}")
+            os.remove(file_path_tmp)
+
+
+def _download_from_response(response, file_path_tmp, total, no_progress):
+    """Download file by consuming response stream
+
+    Args:
+        response (requests.Response): Active streaming response object
+        file_path_tmp (str): Temporary file path used during download
+        total (int): Full size of the object in bytes
+        no_progress (bool): Disable progress reporting when True
+
+    Returns:
+        None
+    """
+    progress = 0
+    pbar = None
+    if not no_progress:
+        pbar = get_progress_bar(total, "Downloading: ")
+        pbar.start()
+
+    with open(file_path_tmp, "wb") as downloaded_file:
+        for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
+            if not chunk:
+                continue
+            downloaded_file.write(chunk)
+            progress += len(chunk)
+            if pbar:
+                pbar.update(progress)
+
+    if pbar:
+        pbar.finish()
+
+
+def _download_in_parallel(  # pylint: disable=too-many-locals
+    download_url,
+    file_path_tmp,
+    total,
+    worker_count,
+    no_progress,
+    request_kwargs_base,
+):
+    """Download file by splitting into byte ranges and fetching in parallel
+
+    Args:
+        download_url (str): URL of the object to download
+        file_path_tmp (str): Temporary file path used during download
+        total (int): Full size of the object in bytes
+        worker_count (int): Number of concurrent range requests
+        no_progress (bool): Disable progress reporting when True
+        request_kwargs_base (dict): Common keyword arguments for `requests.get`
+
+    Returns:
+        None
+    """
+    if not os.path.exists(file_path_tmp):
+        with open(file_path_tmp, "wb") as tmp_file:
+            tmp_file.truncate(total)
+
+    pbar = None
+    progress = _ThreadSafeCounter()
+    cancel_event = threading.Event()
+
+    if not no_progress:
+        pbar = get_progress_bar(total, "Downloading: ")
+        pbar.start()
+
+    def update_progress(amount):
+        if not pbar:
+            return
+        current = progress.increment(amount)
+        pbar.update(current)
+
+    def fetch_range(start, end):
+        """Fetch range of bytes from the download URL and write to file"""
+        if cancel_event.is_set():
+            return
+        expected = end - start + 1
+        request_headers = {"Range": f"bytes={start}-{end}"}
+        request_kwargs = request_kwargs_base
+        request_kwargs["headers"] = request_headers
+        with requests.get(download_url, **request_kwargs) as resp:
+            resp.raise_for_status()
+            bytes_written = 0
+            with open(file_path_tmp, "rb+") as part_file:
+                part_file.seek(start)
+                for chunk in resp.iter_content(chunk_size=CHUNK_SIZE):
+                    if cancel_event.is_set():
+                        return
+                    if not chunk:
+                        continue
+                    part_file.write(chunk)
+                    bytes_written += len(chunk)
+                    update_progress(len(chunk))
+            if bytes_written != expected:
+                raise requests.exceptions.ContentDecodingError(
+                    f"Incomplete range download for bytes {start}-{end} "
+                    f"(expected {expected}, got {bytes_written})"
+                )
+
+    ranges = _build_ranges(total, worker_count)
+    executor = ThreadPoolExecutor(max_workers=worker_count)
+    futures = [executor.submit(fetch_range, start, end) for start, end in ranges]
+    try:
+        for future in as_completed(futures):
+            future.result()
+    except KeyboardInterrupt:
+        cancel_event.set()
+        for future in futures:
+            future.cancel()
+        executor.shutdown(wait=False)
+        raise
+    finally:
+        executor.shutdown(wait=True)
+
+    if pbar:
+        pbar.finish()
+
+
+def _determine_parallel_workers(total):
+    """Determine how many workers to use based on object size
+
+    Args:
+        total (int): Full size of the object in bytes
+
+    Returns:
+        int: Number of workers to spawn
+    """
+    parts = max(1, (total + MIN_BYTES_PER_PART - 1) // MIN_BYTES_PER_PART)
+    return min(MAX_PARALLEL_DOWNLOADS, parts)
+
+
+def _build_ranges(total, worker_count):
+    """Return a list of (start, end) byte ranges for the download
+
+    Args:
+        total (int): Full size of the object in bytes
+        worker_count (int): Number of ranges to generate
+
+    Returns:
+        list[tuple[int, int]]: Inclusive byte ranges for each worker
+    """
+    part_size = (total + worker_count - 1) // worker_count
+    ranges = []
+    for index in range(worker_count):
+        start = index * part_size
+        end = min(start + part_size, total) - 1
+        if start > end:
+            break
+        ranges.append((start, end))
+    return ranges
+
+
+def _finalize_download(file_path_tmp, file_path):
+    """Replace destination file with freshly downloaded temp file
+
+    Args:
+        file_path_tmp (str): Path to the partially downloaded file
+        file_path (str): Final destination path for the download
+
+    Returns:
+        None
+    """
+    if os.path.exists(file_path):
+        echo_debug(f"Found old file under same name: {file_path}. Removing it.")
+        os.remove(file_path)
+    os.rename(file_path_tmp, file_path)
+
+
+# pylint: disable=too-few-public-methods
+class _ThreadSafeCounter:
+    """Thread safe counter to track aggregate progress"""
+
+    def __init__(self):
+        self.value = 0
+        self._lock = threading.Lock()
+
+    def increment(self, amount):
+        """Increase counter by amount and return new total
+
+        Args:
+            amount (int): Number of bytes to add to the counter
+
+        Returns:
+            int: Updated total
+        """
+        with self._lock:
+            self.value += amount
+            return self.value
+
+
+def _extract_total_size(headers):
+    """Determine total size of the object based on response headers
+
+    Args:
+        headers (Mapping[str, str]): Response headers returned by S3
+
+    Returns:
+        int: Total size of the object in bytes
+    """
+    if "content-range" in headers:
+        # format: bytes start-end/total
+        _, _, total_str = headers["content-range"].partition("/")
+        return int(total_str)
+    length = int(headers["content-length"])
+    return length
 
 
 def save_metadata_file(path, api_client, sample_id, skip_existing=True):

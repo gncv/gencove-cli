@@ -95,11 +95,23 @@ def mock_binary_response(response):
     """Replace binary responses with a placeholder"""
     is_binary = "binary/octet-stream" in response["headers"].get("Content-Type", [])
     if is_binary:
-        response["body"]["string"] = b"""QUFBQkJC"""
+        content_range = response["headers"].get("Content-Range", [])
+        if content_range:
+            range_str = content_range[0]
+            if range_str.startswith("bytes "):
+                parts = range_str[6:].split("/")
+                byte_range = parts[0]  # "start-end"
+                start, end = map(int, byte_range.split("-"))
+                length = end - start + 1
+                mock_chunk = b"AAABBB" * ((length // 6) + 1)
+                response["body"]["string"] = mock_chunk[:length]
+                response["headers"]["Content-Length"] = [str(length)]
+        else:
+            response["body"]["string"] = b"""QUFBQkJC"""
+            if "Content-Length" in response["headers"]:
+                response["headers"]["Content-Length"] = ["123"]
         if "Content-Disposition" in response["headers"]:
             response["headers"]["Content-Disposition"] = ["attachment;"]
-        if "Content-Length" in response["headers"]:
-            response["headers"]["Content-Length"] = ["123"]
     return response
 
 

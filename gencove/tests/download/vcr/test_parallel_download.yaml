@@ -1,0 +1,255 @@
+interactions:
+- request:
+    body: '{"email": "email@example.com", "password": "mock_password"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 4.0.1
+      content-type:
+      - application/json
+    method: POST
+    uri: https://www.example.com/api/v2/jwt-create/
+  response:
+    body:
+      string: '{"refresh": "mock_refresh", "access": "mock_access"}'
+    headers:
+      Allow:
+      - POST, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '537'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Wed, 15 Oct 2025 15:10:56 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 4.0.1
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/file-types/
+  response:
+    body:
+      string: '{"meta": {"count": 76, "next": null, "previous": null}, "results":
+        [{"key": "alignment-bai", "description": ""}, {"key": "alignment-bam", "description":
+        ""}, {"key": "alignment-crai", "description": ""}, {"key": "alignment-cram",
+        "description": ""}, {"key": "alignment-csi", "description": ""}, {"key": "ancestry-json",
+        "description": ""}, {"key": "call_capture-csi", "description": ""}, {"key":
+        "call_capture-forced_csi", "description": ""}, {"key": "call_capture-forced_vcf",
+        "description": ""}, {"key": "call_capture-large_indel_calls_json", "description":
+        ""}, {"key": "call_capture-vcf", "description": ""}, {"key": "call_capture-vcf_pathogenic",
+        "description": ""}, {"key": "call_capture_v2-AM_png", "description": ""},
+        {"key": "call_capture_v2-APOB_3_png", "description": ""}, {"key": "call_capture_v2-Brachy_F3_png",
+        "description": ""}, {"key": "call_capture_v2-CA_png", "description": ""},
+        {"key": "call_capture_v2-DS_png", "description": ""}, {"key": "call_capture_v2-HH5_3_png",
+        "description": ""}, {"key": "call_capture_v2-HP_horn_png", "description":
+        ""}, {"key": "call_capture_v2-OS_R1_png", "description": ""}, {"key": "call_capture_v2-TH_outcast_R1_png",
+        "description": ""}, {"key": "call_capture_v2-TH_png", "description": ""},
+        {"key": "call_capture_v2-denovo_called", "description": ""}, {"key": "call_capture_v2-denovo_called_csi",
+        "description": ""}, {"key": "call_capture_v2-denovo_called_gvcf_csi", "description":
+        ""}, {"key": "call_capture_v2-denovo_called_gvcf_vcf", "description": ""},
+        {"key": "call_capture_v2-denovo_called_vcf", "description": ""}, {"key": "call_capture_v2-denovo_indexed_csi",
+        "description": ""}, {"key": "call_capture_v2-force_called", "description":
+        ""}, {"key": "call_capture_v2-force_called_csi", "description": ""}, {"key":
+        "call_capture_v2-force_called_large_indels_json", "description": ""}, {"key":
+        "call_capture_v2-force_called_vcf", "description": ""}, {"key": "call_capture_v2-force_indexed_csi",
+        "description": ""}, {"key": "call_capture_v2-image_based_genotype_json", "description":
+        ""}, {"key": "call_capture_v2-multiallelic_called_csi", "description": ""},
+        {"key": "call_capture_v2-multiallelic_called_vcf", "description": ""}, {"key":
+        "call_capture_v2-multiallelic_csi", "description": ""}, {"key": "call_capture_v2-multiallelic_vcf",
+        "description": ""}, {"key": "cnv-cnr", "description": ""}, {"key": "cnv-cns",
+        "description": ""}, {"key": "cnv-pdf", "description": ""}, {"key": "cnv-png",
+        "description": ""}, {"key": "fastq-r1", "description": ""}, {"key": "fastq-r2",
+        "description": ""}, {"key": "impute-csi", "description": ""}, {"key": "impute-csv_format_a",
+        "description": ""}, {"key": "impute-csv_format_a_vcf", "description": ""},
+        {"key": "impute-subset_csi", "description": ""}, {"key": "impute-subset_override_csi",
+        "description": ""}, {"key": "impute-subset_override_tbi", "description": ""},
+        {"key": "impute-subset_override_vcf", "description": ""}, {"key": "impute-subset_tbi",
+        "description": ""}, {"key": "impute-subset_vcf", "description": ""}, {"key":
+        "impute-tbi", "description": ""}, {"key": "impute-vcf", "description": ""},
+        {"key": "kraken-report", "description": ""}, {"key": "loh-bed", "description":
+        ""}, {"key": "sex-json", "description": ""}, {"key": "traits-json", "description":
+        ""}, {"key": "wgs-aligned", "description": ""}, {"key": "wgs-annotated", "description":
+        ""}, {"key": "wgs-annotated_indexed", "description": ""}, {"key": "wgs-called",
+        "description": ""}, {"key": "wgs-crai", "description": ""}, {"key": "wgs-cram",
+        "description": ""}, {"key": "wgs-evenness", "description": ""}, {"key": "wgs-filtered_called",
+        "description": ""}, {"key": "wgs-filtered_indexed", "description": ""}, {"key":
+        "wgs-gvcf", "description": ""}, {"key": "wgs-gvcf_indexed", "description":
+        ""}, {"key": "wgs-indexed", "description": ""}, {"key": "wgs-pathogenic",
+        "description": ""}, {"key": "wgs-pathogenic_indexed", "description": ""},
+        {"key": "wgs-sex_json", "description": ""}, {"key": "qc", "description": ""},
+        {"key": "metadata", "description": ""}]}'
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '3720'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Wed, 15 Oct 2025 15:10:56 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 4.0.1
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/samples/11111111-1111-1111-1111-111111111111
+  response:
+    body:
+      string: '{"id": "11111111-1111-1111-1111-111111111111", "project": "11111111-1111-1111-1111-111111111111",
+        "run": "11111111-1111-1111-1111-111111111111", "created": "2021-10-12T19:47:15.332776Z",
+        "modified": "2024-07-25T15:05:20Z", "hidden": false, "client_id": "mock-client-id",
+        "physical_id": "", "legacy_id": "", "last_status": {"id": "11111111-1111-1111-1111-111111111111",
+        "status": "succeeded", "note": "Set as succeeded otherwise file types endpoint
+        doesn''t return R2", "created": "2024-07-25T15:05:20Z"}, "archive_last_status":
+        {"id": "11111111-1111-1111-1111-111111111111", "status": "available", "created":
+        "2021-10-12 19:47:15.394485+00:00", "transition_cutoff": null}, "files": [{"id":
+        "11111111-1111-1111-1111-111111111111", "s3_path": "mock/r1.fastq.gz", "size":
+        null, "download_url": "https://example.com/r1.fastq.gz?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_R1.fastq.gz",
+        "file_type": "fastq-r1", "checksum_sha256": "", "shadow_mode": false}, {"id":
+        "11111111-1111-1111-1111-111111111111", "s3_path": "mock/r2.fastq.gz", "size":
+        null, "download_url": "https://example.com/r2.fastq.gz?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_R2.fastq.gz",
+        "file_type": "fastq-r2", "checksum_sha256": "111111111111111111111111111111111111111111111111111111111111111a",
+        "shadow_mode": false}]}'
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2644'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Wed, 15 Oct 2025 15:10:57 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+    method: GET
+    uri: https://s3.amazonaws.com/r1.fastq.gz?response-content-disposition=attachment%3B+filename%3D11111111-1111-1111-1111-111111111111_R1.fastq.gz
+  response:
+    body:
+      string: QUFBQkJC
+    headers:
+      Accept-Ranges:
+      - bytes
+      Content-Disposition:
+      - attachment;
+      Content-Length:
+      - '123'
+      Content-Type:
+      - binary/octet-stream
+      Date:
+      - Wed, 15 Oct 2025 15:10:58 GMT
+      ETag:
+      - '"6e023d8b8758f8f826152de77a3cc1d9"'
+      Last-Modified:
+      - Fri, 08 Jul 2022 13:38:34 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - mock_x-amz-id-2
+      x-amz-replication-status:
+      - COMPLETED
+      x-amz-request-id:
+      - mock_x-amz-request-id
+      x-amz-server-side-encryption:
+      - AES256
+      x-amz-version-id:
+      - mock_x-amz-version-id
+    status:
+      code: 200
+      message: OK
+version: 1

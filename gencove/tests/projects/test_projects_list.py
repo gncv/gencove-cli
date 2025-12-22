@@ -21,6 +21,7 @@ from gencove.client import (
 from gencove.command.projects.cli import list_projects
 from gencove.models import (
     PipelineCapabilities,
+    PipelineCapabilitiesSearch,
     Project,
     Projects,
 )
@@ -113,13 +114,13 @@ def test_list_projects_no_permission(mocker, credentials):
         ),
         return_value={"detail": "Not found"},
     )
-    mocked_get_pipeline_capabilities = mocker.patch.object(
-        APIClient, "get_pipeline_capabilities"
+    mocked_search_pipeline_capabilities_by_ids = mocker.patch.object(
+        APIClient, "search_pipeline_capabilities_by_ids"
     )
     res = runner.invoke(list_projects, credentials)
     assert res.exit_code == 1
     mocked_get_projects.assert_called_once()
-    mocked_get_pipeline_capabilities.assert_not_called()
+    mocked_search_pipeline_capabilities_by_ids.assert_not_called()
 
     output_line = io.BytesIO()
     sys.stdout = output_line
@@ -147,13 +148,13 @@ def test_list_projects_slow_response_retry_list(mocker, credentials):
         "list_projects",
         side_effect=APIClientTimeout("Could not connect to the api server"),
     )
-    mocked_get_pipeline_capabilities = mocker.patch.object(
-        APIClient, "get_pipeline_capabilities"
+    mocked_search_pipeline_capabilities_by_ids = mocker.patch.object(
+        APIClient, "search_pipeline_capabilities_by_ids"
     )
     res = runner.invoke(list_projects, credentials)
     assert res.exit_code == 1
     assert mocked_get_projects.call_count == 2
-    mocked_get_pipeline_capabilities.assert_not_called()
+    mocked_search_pipeline_capabilities_by_ids.assert_not_called()
 
 
 @pytest.mark.default_cassette("jwt-create.yaml")
@@ -180,6 +181,12 @@ def test_list_projects_slow_response_dump_log(mocker, credentials, dump_filename
     ]
     with runner.isolated_filesystem():
         res = runner.invoke(list_projects, credentials)
+        print(res.output)
+        if res.exception:
+            print(f"EXCEPTION: {res.exception}")
+            import traceback
+
+            traceback.print_tb(res.exc_info[2])
         assert res.exit_code == 1
         assert (
             f"Please attach the debug log file located in {dump_filename} to a bug report."  # noqa: E501  # pylint: disable=line-too-long
@@ -190,33 +197,42 @@ def test_list_projects_slow_response_dump_log(mocker, credentials, dump_filename
             for log in logs:
                 assert log in log_content
 
+    @pytest.mark.vcr
+    @assert_authorization
+    def test_list_projects_slow_response_retry_pipeline(
+        mocker, credentials, recording, vcr
+    ):
+        """Test projects slow repsonse retry on the pipeline capabilities."""
+        runner = CliRunner()
 
-@pytest.mark.vcr
-@assert_authorization
-def test_list_projects_slow_response_retry_pipeline(
-    mocker, credentials, recording, vcr
-):
-    """Test projects slow repsonse retry on the pipeline capabilities."""
-    runner = CliRunner()
-    if not recording:
-        # Mock list_projects only if using the cassettes, since we mock the
-        # return value.
-        list_projects_response = get_vcr_response("/api/v2/projects/", vcr)
         mocked_get_projects = mocker.patch.object(
             APIClient,
             "list_projects",
-            return_value=Projects(**list_projects_response),
+            return_value=Projects(
+                results=[
+                    Project(
+                        id=uuid4(),
+                        pipeline_capabilities=MOCKED_PIPELINE_CAPABILITY["id"],
+                    )
+                ],
+                meta=dict(next=None),
+            ),
         )
-    mocked_get_pipeline_capabilities = mocker.patch.object(
-        APIClient,
-        "get_pipeline_capabilities",
-        side_effect=APIClientTimeout("Could not connect to the api server"),
-    )
-    res = runner.invoke(list_projects, credentials)
-    assert res.exit_code == 1
-    if not recording:
+        mocked_search_pipeline_capabilities_by_ids = mocker.patch.object(
+            APIClient,
+            "search_pipeline_capabilities_by_ids",
+            side_effect=APIClientTimeout("Could not connect to the api server"),
+        )
+        res = runner.invoke(list_projects, credentials)
+        print(res.output)
+        if res.exception:
+            print(f"EXCEPTION: {res.exception}")
+            import traceback
+
+            traceback.print_tb(res.exc_info[2])
+        assert res.exit_code == 1
         mocked_get_projects.assert_called_once()
-    assert mocked_get_pipeline_capabilities.call_count == 3
+        assert mocked_search_pipeline_capabilities_by_ids.call_count == 3
 
 
 @pytest.mark.vcr
@@ -236,17 +252,19 @@ def test_list_projects(mocker, credentials, recording, vcr):
         get_pipeline_capabilities_response = get_vcr_response(
             "/api/v2/pipeline-capabilities/", vcr, operator.contains
         )
-        mocked_get_pipeline_capabilities = mocker.patch.object(
+        mocked_search_pipeline_capabilities_by_ids = mocker.patch.object(
             APIClient,
-            "get_pipeline_capabilities",
-            return_value=PipelineCapabilities(**get_pipeline_capabilities_response),
+            "search_pipeline_capabilities_by_ids",
+            return_value=PipelineCapabilitiesSearch(
+                **get_pipeline_capabilities_response
+            ),
         )
     res = runner.invoke(list_projects, credentials)
     assert res.exit_code == 0
     if not recording:
         mocked_get_projects.assert_called_once()
         projects = list_projects_response["results"]
-        assert mocked_get_pipeline_capabilities.call_count == len(projects)
+        assert mocked_search_pipeline_capabilities_by_ids.call_count == 1
         output_line = io.BytesIO()
         sys.stdout = output_line
         for project in projects:
@@ -257,7 +275,7 @@ def test_list_projects(mocker, credentials, recording, vcr):
                         str(project.created),
                         str(project.id),
                         project.name.replace("\t", " "),
-                        get_pipeline_capabilities_response["name"],
+                        get_pipeline_capabilities_response["results"][0]["name"],
                     ]
                 )
             )
@@ -281,10 +299,12 @@ def test_list_projects_include_hidden(mocker, credentials, recording, vcr):
         get_pipeline_capabilities_response = get_vcr_response(
             "/api/v2/pipeline-capabilities/", vcr, operator.contains
         )
-        mocked_get_pipeline_capabilities = mocker.patch.object(
+        mocked_search_pipeline_capabilities_by_ids = mocker.patch.object(
             APIClient,
-            "get_pipeline_capabilities",
-            return_value=PipelineCapabilities(**get_pipeline_capabilities_response),
+            "search_pipeline_capabilities_by_ids",
+            return_value=PipelineCapabilitiesSearch(
+                **get_pipeline_capabilities_response
+            ),
         )
     res = runner.invoke(list_projects, ["--hidden", *credentials])
     assert res.exit_code == 0
@@ -293,7 +313,7 @@ def test_list_projects_include_hidden(mocker, credentials, recording, vcr):
         projects = list_projects_response["results"]
         # at least one hidden project
         assert any(project["hidden"] for project in projects)
-        assert mocked_get_pipeline_capabilities.call_count == len(projects)
+        assert mocked_search_pipeline_capabilities_by_ids.call_count == 1
         output_line = io.BytesIO()
         sys.stdout = output_line
         for project in projects:
@@ -304,7 +324,7 @@ def test_list_projects_include_hidden(mocker, credentials, recording, vcr):
                         str(project.created),
                         str(project.id),
                         project.name.replace("\t", " "),
-                        get_pipeline_capabilities_response["name"],
+                        get_pipeline_capabilities_response["results"][0]["name"],
                     ]
                 )
             )
@@ -328,18 +348,20 @@ def test_list_projects_with_capabilities(mocker, credentials, recording, vcr):
         get_pipeline_capabilities_response = get_vcr_response(
             "/api/v2/pipeline-capabilities/", vcr, operator.contains
         )
-        mocked_get_pipeline_capabilities = mocker.patch.object(
+        mocked_search_pipeline_capabilities_by_ids = mocker.patch.object(
             APIClient,
-            "get_pipeline_capabilities",
-            return_value=PipelineCapabilities(**get_pipeline_capabilities_response),
+            "search_pipeline_capabilities_by_ids",
+            return_value=PipelineCapabilitiesSearch(
+                **get_pipeline_capabilities_response
+            ),
         )
     res = runner.invoke(list_projects, ["--include-capability", *credentials])
     assert res.exit_code == 0
     if not recording:
         mocked_get_projects.assert_called_once()
         projects = list_projects_response["results"]
-        assert mocked_get_pipeline_capabilities.call_count == len(projects)
-        assert "key" in get_pipeline_capabilities_response
+        assert mocked_search_pipeline_capabilities_by_ids.call_count == 1
+        assert "key" in get_pipeline_capabilities_response["results"][0]
         projects = res.output.splitlines()
         for project in projects:
             # Confirm # of columns is correct
@@ -360,7 +382,7 @@ MOCKED_PROJECTS_WITH_UNEXPECTED_KEYS = dict(
             "organization": str(uuid4()),
             "webhook_url": "",
             "sample_count": 1,
-            "pipeline_capabilities": str(uuid4()),
+            "pipeline_capabilities": MOCKED_PIPELINE_CAPABILITY["id"],
             "roles": {},
             **{"unexpected_key" + str(uuid4()): i for i in range(10)},
         }
@@ -382,15 +404,18 @@ def test_list_projects__with_unexpected_keys(mocker, credentials):
         "list_projects",
         return_value=Projects(**MOCKED_PROJECTS_WITH_UNEXPECTED_KEYS),
     )
-    mocked_get_pipeline_capabilities = mocker.patch.object(
+    mocked_search_pipeline_capabilities_by_ids = mocker.patch.object(
         APIClient,
-        "get_pipeline_capabilities",
-        return_value=PipelineCapabilities(**MOCKED_PIPELINE_CAPABILITY),
+        "search_pipeline_capabilities_by_ids",
+        return_value=PipelineCapabilitiesSearch(
+            meta=dict(next=None),
+            results=[PipelineCapabilities(**MOCKED_PIPELINE_CAPABILITY)],
+        ),
     )
     res = runner.invoke(list_projects, credentials)
     assert res.exit_code == 0
     mocked_get_projects.assert_called_once()
-    mocked_get_pipeline_capabilities.assert_called_once()
+    mocked_search_pipeline_capabilities_by_ids.assert_called_once()
 
     project = Project(**MOCKED_PROJECTS_WITH_UNEXPECTED_KEYS["results"][0])
     pipeline = PipelineCapabilities(**MOCKED_PIPELINE_CAPABILITY)

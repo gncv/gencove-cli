@@ -9,7 +9,7 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.5.2
+      - 4.1.0
       content-type:
       - application/json
     method: POST
@@ -29,13 +29,18 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Tue, 01 Aug 2023 18:46:29 GMT
+      - Mon, 22 Dec 2025 15:07:06 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
       Referrer-Policy:
       - same-origin
       Server:
       - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
       Vary:
-      - Accept, Cookie, Origin
+      - Accept, origin
       X-Content-Type-Options:
       - nosniff
       X-Frame-Options:
@@ -53,66 +58,132 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.5.2
+      - 4.1.0
       content-type:
       - application/json
     method: GET
-    uri: https://www.example.com/api/v2/projects/?offset=0&limit=200
+    uri: https://www.example.com/api/v2/projects/?hidden_status=visible&limit=200&offset=0
   response:
     body:
-      string: '{"meta": {"count": 6, "next": null, "previous": null}, "results": [{"id":
-        "11111111-1111-1111-1111-111111111111", "name": "mock name", "description":
+      string: '{"meta": {"count": 13, "next": null, "previous": null}, "results":
+        [{"id": "11111111-1111-1111-1111-111111111111", "name": "mock name", "description":
+        "", "created": "2025-06-25T15:59:08.732257Z", "modified": "2025-06-25T17:34:22.239080Z",
+        "hidden": false, "organization": "11111111-1111-1111-1111-111111111111", "organization_name":
+        "CLI Testing", "sample_count": 1, "hidden_sample_count": 0, "pipeline_capabilities":
+        "11111111-1111-1111-1111-111111111111", "project_modifications": [{"key":
+        "soft_qc", "value": false}, {"key": "loo", "value": false}, {"key": "downsample_to_bases_max",
+        "value": true}], "roles": {"organization": {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "owner"}}, "webhook_url": "", "is_shared": false, "locked": false},
+        {"id": "11111111-1111-1111-1111-111111111111", "name": "mock name", "description":
+        "", "created": "2025-06-25T15:58:51.747592Z", "modified": "2025-06-25T17:34:22.239080Z",
+        "hidden": false, "organization": "11111111-1111-1111-1111-111111111111", "organization_name":
+        "CLI Testing", "sample_count": 1, "hidden_sample_count": 0, "pipeline_capabilities":
+        "11111111-1111-1111-1111-111111111111", "project_modifications": [{"key":
+        "soft_qc", "value": false}, {"key": "loo", "value": false}, {"key": "downsample_to_bases_max",
+        "value": true}], "roles": {"organization": {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "owner"}}, "webhook_url": "", "is_shared": false, "locked": false},
+        {"id": "11111111-1111-1111-1111-111111111111", "name": "mock name", "description":
+        "", "created": "2025-02-16T21:29:46.715700Z", "modified": "2025-02-17T17:14:41.807696Z",
+        "hidden": false, "organization": "11111111-1111-1111-1111-111111111111", "organization_name":
+        "CLI Testing", "sample_count": 1, "hidden_sample_count": 0, "pipeline_capabilities":
+        "11111111-1111-1111-1111-111111111111", "project_modifications": [{"key":
+        "soft_qc", "value": false}], "roles": {"organization": {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "owner"}}, "webhook_url": "", "is_shared": false, "locked": false},
+        {"id": "11111111-1111-1111-1111-111111111111", "name": "mock name", "description":
+        "mock description", "created": "2024-09-20T17:17:07.021634Z", "modified":
+        "2024-09-20T18:40:26.949567Z", "hidden": false, "organization": "11111111-1111-1111-1111-111111111111",
+        "organization_name": "CLI Testing", "sample_count": 1, "hidden_sample_count":
+        0, "pipeline_capabilities": "11111111-1111-1111-1111-111111111111", "project_modifications":
+        [{"key": "soft_qc", "value": false}], "roles": {"organization": {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "owner"}}, "webhook_url": "", "is_shared": false, "locked": false},
+        {"id": "11111111-1111-1111-1111-111111111111", "name": "mock name", "description":
+        "", "created": "2024-04-11T14:08:50.600793Z", "modified": "2024-04-11T17:39:07.354887Z",
+        "hidden": false, "organization": "11111111-1111-1111-1111-111111111111", "organization_name":
+        "CLI Testing", "sample_count": 1, "hidden_sample_count": 0, "pipeline_capabilities":
+        "11111111-1111-1111-1111-111111111111", "project_modifications": [{"key":
+        "disable_qc", "value": false}], "roles": {"organization": {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "owner"}}, "webhook_url": "", "is_shared": false, "locked": true},
+        {"id": "11111111-1111-1111-1111-111111111111", "name": "mock name", "description":
+        "", "created": "2024-02-07T13:17:15.566394Z", "modified": "2024-02-07T13:17:15.566394Z",
+        "hidden": false, "organization": "11111111-1111-1111-1111-111111111111", "organization_name":
+        "CLI Testing", "sample_count": 1, "hidden_sample_count": 0, "pipeline_capabilities":
+        "11111111-1111-1111-1111-111111111111", "project_modifications": [{"key":
+        "disable_qc", "value": false}, {"key": "loo", "value": false}, {"key": "downsample_to_bases_max",
+        "value": true}], "roles": {"organization": {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "owner"}}, "webhook_url": "", "is_shared": false, "locked": true},
+        {"id": "11111111-1111-1111-1111-111111111111", "name": "mock name", "description":
+        "", "created": "2023-08-28T14:19:33.150733Z", "modified": "2023-08-28T14:19:33.150733Z",
+        "hidden": false, "organization": "11111111-1111-1111-1111-111111111111", "organization_name":
+        "CLI Testing", "sample_count": 1, "hidden_sample_count": 0, "pipeline_capabilities":
+        "11111111-1111-1111-1111-111111111111", "project_modifications": [{"key":
+        "disable_qc", "value": false}, {"key": "loo", "value": false}, {"key": "downsample_to_bases_max",
+        "value": true}], "roles": {"organization": {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "owner"}}, "webhook_url": "", "is_shared": false, "locked": true},
+        {"id": "11111111-1111-1111-1111-111111111111", "name": "mock name", "description":
         "", "created": "2023-07-27T20:13:56.088042Z", "modified": "2023-07-27T20:13:56.088042Z",
-        "organization": "11111111-1111-1111-1111-111111111111", "sample_count": 1,
-        "pipeline_capabilities": "11111111-1111-1111-1111-111111111111", "project_modifications":
-        [{"key": "disable_qc", "value": false}, {"key": "loo", "value": false}, {"key":
-        "downsample_to_bases_max", "value": true}], "roles": {"organization": {"id":
-        "11111111-1111-1111-1111-111111111111", "name": "owner"}}, "webhook_url":
-        ""}, {"id": "11111111-1111-1111-1111-111111111111", "name": "mock name", "description":
+        "hidden": false, "organization": "11111111-1111-1111-1111-111111111111", "organization_name":
+        "CLI Testing", "sample_count": 1, "hidden_sample_count": 0, "pipeline_capabilities":
+        "11111111-1111-1111-1111-111111111111", "project_modifications": [{"key":
+        "disable_qc", "value": false}, {"key": "loo", "value": false}, {"key": "downsample_to_bases_max",
+        "value": true}], "roles": {"organization": {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "owner"}}, "webhook_url": "", "is_shared": false, "locked": true},
+        {"id": "11111111-1111-1111-1111-111111111111", "name": "mock name", "description":
         "", "created": "2022-10-28T10:11:00.535336Z", "modified": "2022-10-28T10:11:00.535336Z",
-        "organization": "11111111-1111-1111-1111-111111111111", "sample_count": 1,
-        "pipeline_capabilities": "11111111-1111-1111-1111-111111111111", "project_modifications":
-        [], "roles": {"organization": {"id": "11111111-1111-1111-1111-111111111111",
-        "name": "owner"}}, "webhook_url": ""}, {"id": "11111111-1111-1111-1111-111111111111",
+        "hidden": false, "organization": "11111111-1111-1111-1111-111111111111", "organization_name":
+        "CLI Testing", "sample_count": 1, "hidden_sample_count": 0, "pipeline_capabilities":
+        "11111111-1111-1111-1111-111111111111", "project_modifications": [], "roles":
+        {"organization": {"id": "11111111-1111-1111-1111-111111111111", "name": "owner"}},
+        "webhook_url": "", "is_shared": false, "locked": true}, {"id": "11111111-1111-1111-1111-111111111111",
         "name": "mock name", "description": "", "created": "2022-09-15T19:01:54.759951Z",
-        "modified": "2022-09-15T19:01:54.759951Z", "organization": "11111111-1111-1111-1111-111111111111",
-        "sample_count": 1, "pipeline_capabilities": "11111111-1111-1111-1111-111111111111",
+        "modified": "2022-09-15T19:01:54.759951Z", "hidden": false, "organization":
+        "11111111-1111-1111-1111-111111111111", "organization_name": "CLI Testing",
+        "sample_count": 1, "hidden_sample_count": 0, "pipeline_capabilities": "11111111-1111-1111-1111-111111111111",
         "project_modifications": [], "roles": {"organization": {"id": "11111111-1111-1111-1111-111111111111",
-        "name": "owner"}}, "webhook_url": ""}, {"id": "11111111-1111-1111-1111-111111111111",
-        "name": "mock name", "description": "", "created": "2021-10-12T19:25:54.002841Z",
-        "modified": "2022-10-03T17:26:30.013220Z", "organization": "11111111-1111-1111-1111-111111111111",
-        "sample_count": 1, "pipeline_capabilities": "11111111-1111-1111-1111-111111111111",
-        "project_modifications": [], "roles": {"organization": {"id": "11111111-1111-1111-1111-111111111111",
-        "name": "owner"}}, "webhook_url": ""}, {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "owner"}}, "webhook_url": "", "is_shared": false, "locked": true},
+        {"id": "11111111-1111-1111-1111-111111111111", "name": "mock name", "description":
+        "", "created": "2021-10-12T19:25:54.002841Z", "modified": "2024-07-25T15:05:20Z",
+        "hidden": false, "organization": "11111111-1111-1111-1111-111111111111", "organization_name":
+        "CLI Testing", "sample_count": 1, "hidden_sample_count": 0, "pipeline_capabilities":
+        "11111111-1111-1111-1111-111111111111", "project_modifications": [], "roles":
+        {"organization": {"id": "11111111-1111-1111-1111-111111111111", "name": "owner"}},
+        "webhook_url": "", "is_shared": false, "locked": true}, {"id": "11111111-1111-1111-1111-111111111111",
         "name": "mock name", "description": "", "created": "2021-09-30T14:31:15.100721Z",
-        "modified": "2021-10-08T15:16:54.793841Z", "organization": "11111111-1111-1111-1111-111111111111",
-        "sample_count": 1, "pipeline_capabilities": "11111111-1111-1111-1111-111111111111",
+        "modified": "2021-10-08T15:16:54.793841Z", "hidden": false, "organization":
+        "11111111-1111-1111-1111-111111111111", "organization_name": "CLI Testing",
+        "sample_count": 1, "hidden_sample_count": 0, "pipeline_capabilities": "11111111-1111-1111-1111-111111111111",
         "project_modifications": [], "roles": {"organization": {"id": "11111111-1111-1111-1111-111111111111",
-        "name": "owner"}}, "webhook_url": ""}, {"id": "11111111-1111-1111-1111-111111111111",
-        "name": "mock name", "description": "", "created": "2021-09-09T19:29:57.970503Z",
-        "modified": "2023-06-14T13:10:31.549986Z", "organization": "11111111-1111-1111-1111-111111111111",
-        "sample_count": 1, "pipeline_capabilities": "11111111-1111-1111-1111-111111111111",
-        "project_modifications": [], "roles": {"organization": {"id": "11111111-1111-1111-1111-111111111111",
-        "name": "owner"}}, "webhook_url": ""}]}'
+        "name": "owner"}}, "webhook_url": "", "is_shared": false, "locked": true},
+        {"id": "11111111-1111-1111-1111-111111111111", "name": "mock name", "description":
+        "", "created": "2021-09-09T19:29:57.970503Z", "modified": "2023-06-14T13:10:31.549986Z",
+        "hidden": false, "organization": "11111111-1111-1111-1111-111111111111", "organization_name":
+        "CLI Testing", "sample_count": 1, "hidden_sample_count": 1, "pipeline_capabilities":
+        "11111111-1111-1111-1111-111111111111", "project_modifications": [], "roles":
+        {"organization": {"id": "11111111-1111-1111-1111-111111111111", "name": "owner"}},
+        "webhook_url": "", "is_shared": false, "locked": true}]}'
     headers:
       Allow:
       - GET, POST, HEAD, OPTIONS
       Connection:
       - keep-alive
       Content-Length:
-      - '2768'
+      - '7768'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Tue, 01 Aug 2023 18:46:29 GMT
+      - Mon, 22 Dec 2025 15:07:06 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
       Referrer-Policy:
       - same-origin
       Server:
       - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
       Vary:
-      - Accept, Cookie, Origin
+      - Accept, origin
       X-Content-Type-Options:
       - nosniff
       X-Frame-Options:
@@ -130,297 +201,124 @@ interactions:
       Connection:
       - keep-alive
       Gencove-cli-version:
-      - 2.5.2
+      - 4.1.0
       content-type:
       - application/json
     method: GET
-    uri: https://www.example.com/api/v2/pipeline-capabilities/11111111-1111-1111-1111-111111111111
+    uri: https://www.example.com/api/v2/pipeline-capabilities/?search=11111111-1111-1111-1111-111111111111%2C11111111-1111-1111-1111-111111111111%2C11111111-1111-1111-1111-111111111111%2C11111111-1111-1111-1111-111111111111%2C11111111-1111-1111-1111-111111111111%2C11111111-1111-1111-1111-111111111111%2C11111111-1111-1111-1111-111111111111%2C11111111-1111-1111-1111-111111111111%2C11111111-1111-1111-1111-111111111111%2C11111111-1111-1111-1111-111111111111%2C11111111-1111-1111-1111-111111111111&offset=0&limit=200
   response:
     body:
-      string: '{"id": "11111111-1111-1111-1111-111111111111", "name": "mock name",
-        "key": "web/human/g1k_v37/v4_0_0/base", "private": false, "merge_vcfs_enabled":
-        true, "supported_project_modifications": [{"key": "disable_qc", "value": false},
-        {"key": "loo", "value": false}, {"key": "downsample_to_bases_max", "value":
-        true}], "modifications_enabled": true, "species": "human", "pipeline_category":
-        "Human Genomics", "description_markdown": "#### Human low-pass GRCh37 v4.0
-        [0.1x-6x]\nConfiguration with duplicate sites removed (see [1000 Genomes website](https://www.internationalgenome.org/faq/why-are-there-duplicate-calls-in-the-phase3-call-set/)
-        for details) and sex chromosome karyotyping enabled. \nImputation additionally
-        now takes into account varying recombination rates across the genome. In particular,
-        a recombination map derived from the [HapMap II](https://docs.gencove.com/main/data-analysis-configurations/?h=human#human:~:text=from%20from%20the-,HapMap%20II,-project%20is%20used)
-        project is used to interpolate recombination rates across all sites in the
-        haplotype reference panel. This results in increased imputation accuracy.\nThe
-        CNV calling part of the pipeline now uses a panel of normals comprising 59
-        male normal samples. Previously, the CNV calling step did not normalize against
-        any normal human samples. \nUses [hs37-1kg](https://ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/reference/)
-        reference genome and [1000 Genomes Phase 3](https://www.internationalgenome.org/data/)
-        imputation reference panel with all sites with a minor allele count less than
-        three, with more than two alleles, or on the sex chromosomes removed. \nUses
-        ancestry reference panel based on 26 reference populations described [here](https://ancestry.gencove.com/?_gl=1*jktkp6*_ga*NzkwMTg0NDQyLjE2NjAyMjcwMTE.*_ga_4WPY9B677S*MTY3MTQ1NzU0OS4xOTkuMS4xNjcxNDc2MjEyLjUwLjAuMA..).
-        \nDeliverables include original FASTQ, aligned BAM (and index), imputed VCF
-        (and index), ancestry analysis & polygenic scores for coronary artery disease,
-        breast cancer and prostate cancer.", "datasets": {"reference_genome": "1000
-        Genomes reference genome v37"}, "steps": {"bases_max": 19800000000.0, "bases_min":
-        330000000.0, "snps_min": 5000000.0, "effective_coverage_min": 0.0, "fraction_contamination_max":
-        0.06}}'
-    headers:
-      Allow:
-      - GET, HEAD, OPTIONS
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '2266'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Date:
-      - Tue, 01 Aug 2023 18:46:30 GMT
-      Referrer-Policy:
-      - same-origin
-      Server:
-      - gunicorn
-      Vary:
-      - Accept, Cookie, Origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: OK
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Gencove-cli-version:
-      - 2.5.2
-      content-type:
-      - application/json
-    method: GET
-    uri: https://www.example.com/api/v2/pipeline-capabilities/11111111-1111-1111-1111-111111111111
-  response:
-    body:
-      string: '{"id": "11111111-1111-1111-1111-111111111111", "name": "mock name",
+      string: '{"meta": {"count": 11, "next": null, "previous": null}, "results":
+        [{"id": "11111111-1111-1111-1111-111111111111", "name": "mock name", "key":
+        "web/cow/ucd12/v3.3.6/6.0", "private": false, "merge_vcfs_enabled": true,
+        "supported_project_modifications": [], "modifications_enabled": false, "species":
+        "cow", "pipeline_category": null, "description_markdown": null, "datasets":
+        null, "steps": null}, {"id": "11111111-1111-1111-1111-111111111111", "name":
+        "mock name", "key": "web/cow/ucd12/v3.3.6/6.0", "private": false, "merge_vcfs_enabled":
+        true, "supported_project_modifications": [], "modifications_enabled": false,
+        "species": "cow", "pipeline_category": null, "description_markdown": null,
+        "datasets": null, "steps": null}, {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "mock name", "key": "web/cow/ucd12/v4.0.0c/6.0", "private": false,
+        "merge_vcfs_enabled": true, "supported_project_modifications": [], "modifications_enabled":
+        false, "species": "cow", "pipeline_category": null, "description_markdown":
+        null, "datasets": null, "steps": null}, {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "mock name", "key": "web/human/g1k_v37/v4_0_0/base", "private": false,
+        "merge_vcfs_enabled": true, "supported_project_modifications": [{"key": "disable_qc",
+        "value": false}, {"key": "loo", "value": false}, {"key": "downsample_to_bases_max",
+        "value": true}], "modifications_enabled": true, "species": "human", "pipeline_category":
+        "Human Genomics", "description_markdown": null, "datasets": null, "steps":
+        null}, {"id": "11111111-1111-1111-1111-111111111111", "name": "mock name",
         "key": "web/human/g1k_v38/v1_1_0/lowpass_v3_2", "private": false, "merge_vcfs_enabled":
         true, "supported_project_modifications": [], "modifications_enabled": false,
         "species": "human", "pipeline_category": null, "description_markdown": null,
-        "datasets": null, "steps": null}'
+        "datasets": null, "steps": null}, {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "mock name", "key": "web/human/g1k_v38/v1_2_2/base", "private": false,
+        "merge_vcfs_enabled": true, "supported_project_modifications": [{"key": "disable_qc",
+        "value": false}, {"key": "loo", "value": false}, {"key": "downsample_to_bases_max",
+        "value": true}], "modifications_enabled": true, "species": "human", "pipeline_category":
+        "Human Genomics", "description_markdown": null, "datasets": null, "steps":
+        null}, {"id": "11111111-1111-1111-1111-111111111111", "name": "mock name",
+        "key": "web/human/g1k_v38/v3_0_0/base", "private": false, "merge_vcfs_enabled":
+        true, "supported_project_modifications": [{"key": "disable_qc", "value": false},
+        {"key": "loo", "value": false}, {"key": "downsample_to_bases_max", "value":
+        true}], "modifications_enabled": true, "species": "human", "pipeline_category":
+        "Human Genomics", "description_markdown": null, "datasets": null, "steps":
+        null}, {"id": "11111111-1111-1111-1111-111111111111", "name": "mock name",
+        "key": "web/human/g1k_v38/v3_2_0/base", "private": false, "merge_vcfs_enabled":
+        true, "supported_project_modifications": [{"key": "soft_qc", "value": false},
+        {"key": "loo", "value": false}, {"key": "downsample_to_bases_max", "value":
+        true}], "modifications_enabled": true, "species": "human", "pipeline_category":
+        "Human Genomics", "description_markdown": "#### Human low-pass GRCh38 v6.1
+        [0.1x-6x]\nThis pipeline includes variant IDs annotated from gnomAD v4.0 for
+        chr1-22, X, Y, and MT IDs from dbSNP\nConfiguration with a new sex detection
+        QC metric and sex detection improvements.\nSex chromosome karyotyping enabled
+        \nAddition of Y chromosome and Mitochondrial genome (Y generated via lift
+        over from build GRCh37, while the Mt genome was ported directly as it is unchanged
+        between GRCh37 and GRCh38).\nReference genome: Updated reference genome can
+        be found [here](http://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz).\nThe
+        reference panel and associated data are [here](https://gnomad.broadinstitute.org/downloads#v3-hgdp-1kg-tutorials)
+        under the ''Phased haplotypes of HGDP+1KG dataset'' section, and the associated
+        publication is on [biorxiv](https://www.biorxiv.org/content/10.1101/2023.01.23.525248v3).\nThis
+        new imputation reference panel comprises the phased release of genotype calls
+        from 4091 individuals from the 1000 Genomes Project and the Human Genome Diversity
+        Project.\nAncestry reference panel: We provide an ancestry analysis based
+        on 26 reference populations described [here](https://ancestry.gencove.com/?_gl=1*3xnzly*_ga*NzkwMTg0NDQyLjE2NjAyMjcwMTE.*_ga_4WPY9B677S*MTY3MTQ1NzU0OS4xOTkuMS4xNjcxNTUwNTUyLjYwLjAuMA..).
+        \nDeliverables: original FASTQ, aligned BAM (and index), imputed VCF (and
+        index), ancestry analysis.", "datasets": {"reference_genome": "Version of
+        GRCh38 reference genome recommended for use by Heng Li (https://lh3.github.io/2017/11/13/which-human-reference-genome-to-use),
+        contains no ALT contigs"}, "steps": {"bases_max": 19800000000.0, "bases_min":
+        330000000.0, "snps_min": 5000000.0, "effective_coverage_min": 0.0, "fraction_contamination_max":
+        0.06}}, {"id": "11111111-1111-1111-1111-111111111111", "name": "mock name",
+        "key": "web/other/import_fastqs/v1_0_0/default", "private": false, "merge_vcfs_enabled":
+        false, "supported_project_modifications": [{"key": "soft_qc", "value": false}],
+        "modifications_enabled": true, "species": null, "pipeline_category": "Other",
+        "description_markdown": "#### Import FASTQs v1.0 [0.0x-\u221e]\nPipeline configuration
+        for storage of FASTQs within Gencove\nSee [here](https://docs.gencove.com/base/analysis/fastq-files/uploading-using-the-cli/)
+        for documentation on how to locally upload FASTQs using the Gencove CLI.\nSee
+        [here](https://docs.gencove.com/base/analysis/fastq-files/uploading-using-s3/)
+        for documentation on how to import FASTQs via S3.\nSee [here](https://docs.gencove.com/base/analysis/fastq-files/uploading-using-basespace/)
+        for documentation on how to automate FASTQ imports from BaseSpace.\n", "datasets":
+        {}, "steps": {"bases_min": 1}}, {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "mock name", "key": "web/other/import_fastqs/v1_0_0/default", "private":
+        false, "merge_vcfs_enabled": false, "supported_project_modifications": [{"key":
+        "soft_qc", "value": false}], "modifications_enabled": true, "species": null,
+        "pipeline_category": "Other", "description_markdown": "#### Import FASTQs
+        v1.0 [0.0x-\u221e]\nPipeline configuration for storage of FASTQs within Gencove\nSee
+        [here](https://docs.gencove.com/base/analysis/fastq-files/uploading-using-the-cli/)
+        for documentation on how to locally upload FASTQs using the Gencove CLI.\nSee
+        [here](https://docs.gencove.com/base/analysis/fastq-files/uploading-using-s3/)
+        for documentation on how to import FASTQs via S3.\nSee [here](https://docs.gencove.com/base/analysis/fastq-files/uploading-using-basespace/)
+        for documentation on how to automate FASTQ imports from BaseSpace.\n", "datasets":
+        {}, "steps": {"bases_min": 1}}, {"id": "11111111-1111-1111-1111-111111111111",
+        "name": "mock name", "key": "web/other/import_fastqs/v1_0_0/default", "private":
+        false, "merge_vcfs_enabled": false, "supported_project_modifications": [{"key":
+        "disable_qc", "value": false}], "modifications_enabled": true, "species":
+        null, "pipeline_category": "Other", "description_markdown": null, "datasets":
+        null, "steps": null}]}'
     headers:
       Allow:
       - GET, HEAD, OPTIONS
       Connection:
       - keep-alive
       Content-Length:
-      - '346'
+      - '7263'
       Content-Type:
       - application/json
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Tue, 01 Aug 2023 18:46:30 GMT
+      - Mon, 22 Dec 2025 15:07:07 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
       Referrer-Policy:
       - same-origin
       Server:
       - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
       Vary:
-      - Accept, Cookie, Origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: OK
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Gencove-cli-version:
-      - 2.5.2
-      content-type:
-      - application/json
-    method: GET
-    uri: https://www.example.com/api/v2/pipeline-capabilities/11111111-1111-1111-1111-111111111111
-  response:
-    body:
-      string: '{"id": "11111111-1111-1111-1111-111111111111", "name": "mock name",
-        "key": "web/cow/ucd12/v4.0.0c/6.0", "private": false, "merge_vcfs_enabled":
-        true, "supported_project_modifications": [], "modifications_enabled": false,
-        "species": "cow", "pipeline_category": null, "description_markdown": null,
-        "datasets": null, "steps": null}'
-    headers:
-      Allow:
-      - GET, HEAD, OPTIONS
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '326'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Date:
-      - Tue, 01 Aug 2023 18:46:31 GMT
-      Referrer-Policy:
-      - same-origin
-      Server:
-      - gunicorn
-      Vary:
-      - Accept, Cookie, Origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: OK
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Gencove-cli-version:
-      - 2.5.2
-      content-type:
-      - application/json
-    method: GET
-    uri: https://www.example.com/api/v2/pipeline-capabilities/11111111-1111-1111-1111-111111111111
-  response:
-    body:
-      string: '{"id": "11111111-1111-1111-1111-111111111111", "name": "mock name",
-        "key": "web/cow/ucd12/v3.3.6/6.0", "private": false, "merge_vcfs_enabled":
-        true, "supported_project_modifications": [], "modifications_enabled": false,
-        "species": "cow", "pipeline_category": null, "description_markdown": null,
-        "datasets": null, "steps": null}'
-    headers:
-      Allow:
-      - GET, HEAD, OPTIONS
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '325'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Date:
-      - Tue, 01 Aug 2023 18:46:31 GMT
-      Referrer-Policy:
-      - same-origin
-      Server:
-      - gunicorn
-      Vary:
-      - Accept, Cookie, Origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: OK
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Gencove-cli-version:
-      - 2.5.2
-      content-type:
-      - application/json
-    method: GET
-    uri: https://www.example.com/api/v2/pipeline-capabilities/11111111-1111-1111-1111-111111111111
-  response:
-    body:
-      string: '{"id": "11111111-1111-1111-1111-111111111111", "name": "mock name",
-        "key": "web/cow/ucd12/v3.3.6/6.0", "private": false, "merge_vcfs_enabled":
-        true, "supported_project_modifications": [], "modifications_enabled": false,
-        "species": "cow", "pipeline_category": null, "description_markdown": null,
-        "datasets": null, "steps": null}'
-    headers:
-      Allow:
-      - GET, HEAD, OPTIONS
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '325'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Date:
-      - Tue, 01 Aug 2023 18:46:32 GMT
-      Referrer-Policy:
-      - same-origin
-      Server:
-      - gunicorn
-      Vary:
-      - Accept, Cookie, Origin
-      X-Content-Type-Options:
-      - nosniff
-      X-Frame-Options:
-      - DENY
-    status:
-      code: 200
-      message: OK
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Gencove-cli-version:
-      - 2.5.2
-      content-type:
-      - application/json
-    method: GET
-    uri: https://www.example.com/api/v2/pipeline-capabilities/11111111-1111-1111-1111-111111111111
-  response:
-    body:
-      string: '{"id": "11111111-1111-1111-1111-111111111111", "name": "mock name",
-        "key": "web/cow/ucd12/v4.0.0c/6.0", "private": false, "merge_vcfs_enabled":
-        true, "supported_project_modifications": [], "modifications_enabled": false,
-        "species": "cow", "pipeline_category": null, "description_markdown": null,
-        "datasets": null, "steps": null}'
-    headers:
-      Allow:
-      - GET, HEAD, OPTIONS
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '326'
-      Content-Type:
-      - application/json
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Date:
-      - Tue, 01 Aug 2023 18:46:32 GMT
-      Referrer-Policy:
-      - same-origin
-      Server:
-      - gunicorn
-      Vary:
-      - Accept, Cookie, Origin
+      - Accept, origin
       X-Content-Type-Options:
       - nosniff
       X-Frame-Options:

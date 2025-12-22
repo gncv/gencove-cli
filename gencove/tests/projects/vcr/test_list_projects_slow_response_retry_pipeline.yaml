@@ -93,4 +93,57 @@ interactions:
     status:
       code: 200
       message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Gencove-cli-version:
+      - 4.1.0
+      content-type:
+      - application/json
+    method: GET
+    uri: https://www.example.com/api/v2/projects/?hidden_status=visible&limit=200&offset=0
+  response:
+    body:
+      string: '{"detail": "Given token not valid for any token type", "code": "token_not_valid",
+        "messages": [{"token_class": "AccessToken", "token_type": "access", "message":
+        "Token is invalid or expired"}]}'
+    headers:
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '183'
+      Content-Type:
+      - application/json
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Mon, 22 Dec 2025 14:52:58 GMT
+      Permissions-Policy:
+      - camera=(), encrypted-media=(), geolocation=(), microphone=(), payment=(),
+        usb=()
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Strict-Transport-Security:
+      - max-age=63072000
+      Vary:
+      - Accept, origin
+      WWW-Authenticate:
+      - Bearer realm="api"
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 401
+      message: Unauthorized
 version: 1

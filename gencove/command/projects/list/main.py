@@ -106,7 +106,8 @@ class List(Command):
         for pipeline_capabilities_id in range(0, len(pipeline_capabilities_ids), 50):
             resp = self.search_pipeline_capabilities_by_ids(
                 pipeline_capabilities_ids[
-                    pipeline_capabilities_id : pipeline_capabilities_id + 50
+                    pipeline_capabilities_id : pipeline_capabilities_id  # noqa: E203
+                    + 50
                 ],
                 next_link=next_link,
             )

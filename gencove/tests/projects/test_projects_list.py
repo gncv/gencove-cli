@@ -181,12 +181,6 @@ def test_list_projects_slow_response_dump_log(mocker, credentials, dump_filename
     ]
     with runner.isolated_filesystem():
         res = runner.invoke(list_projects, credentials)
-        print(res.output)
-        if res.exception:
-            print(f"EXCEPTION: {res.exception}")
-            import traceback
-
-            traceback.print_tb(res.exc_info[2])
         assert res.exit_code == 1
         assert (
             f"Please attach the debug log file located in {dump_filename} to a bug report."  # noqa: E501  # pylint: disable=line-too-long
@@ -199,7 +193,7 @@ def test_list_projects_slow_response_dump_log(mocker, credentials, dump_filename
 
     @pytest.mark.vcr
     @assert_authorization
-    def test_list_projects_slow_response_retry_pipeline(
+    def test_list_projects_slow_response_retry_pipeline(  # noqa: unused-argument
         mocker, credentials, recording, vcr
     ):
         """Test projects slow repsonse retry on the pipeline capabilities."""
@@ -224,12 +218,6 @@ def test_list_projects_slow_response_dump_log(mocker, credentials, dump_filename
             side_effect=APIClientTimeout("Could not connect to the api server"),
         )
         res = runner.invoke(list_projects, credentials)
-        print(res.output)
-        if res.exception:
-            print(f"EXCEPTION: {res.exception}")
-            import traceback
-
-            traceback.print_tb(res.exc_info[2])
         assert res.exit_code == 1
         mocked_get_projects.assert_called_once()
         assert mocked_search_pipeline_capabilities_by_ids.call_count == 3

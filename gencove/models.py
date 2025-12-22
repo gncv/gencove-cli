@@ -226,6 +226,13 @@ class Projects(BaseModel):
     results: Optional[List[Project]] = None
 
 
+class PipelineCapabilitiesSearch(BaseModel):
+    """PipelineCapabilitiesSearch model"""
+
+    meta: ResponseMeta
+    results: Optional[List[PipelineCapabilities]] = None
+
+
 class BatchType(BaseModel):
     """BatchType model"""
 

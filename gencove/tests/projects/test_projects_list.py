@@ -193,8 +193,8 @@ def test_list_projects_slow_response_dump_log(mocker, credentials, dump_filename
 
     @pytest.mark.vcr
     @assert_authorization
-    def test_list_projects_slow_response_retry_pipeline(  # noqa: unused-argument
-        mocker, credentials, recording, vcr
+    def test_list_projects_slow_response_retry_pipeline(
+        mocker, credentials, recording, vcr  # noqa: unused-argument
     ):
         """Test projects slow repsonse retry on the pipeline capabilities."""
         runner = CliRunner()

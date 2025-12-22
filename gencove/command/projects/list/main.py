@@ -99,7 +99,7 @@ class List(Command):
                 uuid replaced with PipelineCapability
         """
         pipeline_capabilities_ids = list(
-            set([str(project.pipeline_capabilities) for project in projects])
+            {str(project.pipeline_capabilities) for project in projects}
         )
         pipeline_capabilities = []
         next_link = None

@@ -49,6 +49,7 @@ from gencove.models import (  # noqa: I101, I100
     OrganizationUser,
     OrganizationUsers,
     PipelineCapabilities,
+    PipelineCapabilitiesSearch,
     PipelineDetail,
     Pipelines,
     Project,
@@ -620,7 +621,9 @@ class APIClient:
             model=SampleSheet,
         )
 
-    def list_projects(self, next_link=None, hidden_status=HiddenStatus.VISIBLE.value):
+    def list_projects(
+        self, next_link=None, hidden_status=HiddenStatus.VISIBLE.value, limit=20
+    ):
         """Fetch projects.
 
         Args:
@@ -628,6 +631,7 @@ class APIClient:
                 response['meta']['next'].
             hidden_status (str, optional, default 'visible'): filter projects by
                 hidden status. One of HiddenStatus.
+            limit (int, optional, default 20): limit the number of projects returned
         Returns:
             api response (dict):
                 {
@@ -640,7 +644,7 @@ class APIClient:
                 }
         """
         params = self._add_query_params(
-            next_link, query_params={"hidden_status": hidden_status}
+            next_link, query_params={"hidden_status": hidden_status, "limit": limit}
         )
         return self._get(
             self.endpoints.PROJECTS.value,
@@ -662,6 +666,35 @@ class APIClient:
             self.endpoints.PIPELINE_CAPABILITES.value.format(id=pipeline_id),
             authorized=True,
             model=PipelineCapabilities,
+        )
+        return resp
+
+    def search_pipeline_capabilities_by_ids(self, pipeline_ids, next_link=None):
+        """Search pipeline capabilities by ids.
+
+        Args:
+            pipeline_ids (list of str:uuid): pipeline ids
+            next_link (str, optional): url from previous
+                response['meta']['next'].
+        Returns:
+            api response (dict):
+                {
+                    "meta": {
+                        "count": int,
+                        "next": str,
+                        "previous": optional[str],
+                    },
+                    "results": [...]
+                }
+        """
+        params = self._add_query_params(
+            next_link, query_params={"search": ",".join(pipeline_ids)}
+        )
+        resp = self._get(
+            self.endpoints.PIPELINE_CAPABILITES_SEARCH.value,
+            authorized=True,
+            model=PipelineCapabilitiesSearch,
+            query_params=params,
         )
         return resp
 

@@ -28,20 +28,20 @@ class List(Command):
     def execute(self):
         self.echo_debug("Retrieving projects")
 
+        projects = []
         try:
-            for projects in self.get_paginated_projects():
-                if not projects:
+            for projects_page in self.get_paginated_projects():
+                if not projects_page:
                     self.echo_debug("No projects were found.")
                     return
+                projects.extend(projects_page)
 
-                augmented_projects = (
-                    self.augment_projects_with_pipeline_capabilities(  # noqa: E501
-                        projects
-                    )
-                )
+            augmented_projects = self.augment_projects_with_pipeline_capabilities(
+                projects
+            )  # noqa: E501
 
-                for project in augmented_projects:
-                    self.echo_data(get_line(project, self.include_capability))
+            for project in augmented_projects:
+                self.echo_data(get_line(project, self.include_capability))
         except APIClientError as err:
             if err.status_code == 404:
                 self.echo_error("No projects found.")
@@ -82,9 +82,11 @@ class List(Command):
         max_tries=3,
         max_time=30,
     )
-    def get_pipeline_capabilities(self, pipeline_id):
-        """Get pipeline capabilities."""
-        return self.api_client.get_pipeline_capabilities(pipeline_id)
+    def search_pipeline_capabilities_by_ids(self, pipeline_ids, next_link=None):
+        """Search pipeline capabilities by ids."""
+        return self.api_client.search_pipeline_capabilities_by_ids(
+            pipeline_ids, next_link
+        )
 
     def augment_projects_with_pipeline_capabilities(self, projects):
         """Fetch pipeline capabilities and append it to the project.
@@ -96,10 +98,28 @@ class List(Command):
             list[Project]: same list of projects with pipeline capabilities
                 uuid replaced with PipelineCapability
         """
-        for project in projects:
-            pipeline_capabilities = self.get_pipeline_capabilities(
-                project.pipeline_capabilities
+        pipeline_capabilities_ids = list(
+            {str(project.pipeline_capabilities) for project in projects}
+        )
+        pipeline_capabilities = []
+        next_link = None
+        for pipeline_capabilities_id in range(0, len(pipeline_capabilities_ids), 50):
+            resp = self.search_pipeline_capabilities_by_ids(
+                pipeline_capabilities_ids[
+                    pipeline_capabilities_id : pipeline_capabilities_id  # noqa: E203
+                    + 50
+                ],
+                next_link=next_link,
             )
+            pipeline_capabilities.extend(resp.results)
+            next_link = resp.meta.next
+
+        pipeline_capabilities_dict = {
+            capability.id: capability for capability in pipeline_capabilities
+        }
+        for project in projects:
             project_dict = dict(project)
-            project_dict["pipeline_capabilities"] = pipeline_capabilities
+            project_dict["pipeline_capabilities"] = pipeline_capabilities_dict[
+                project.pipeline_capabilities
+            ]
             yield Project(**project_dict)

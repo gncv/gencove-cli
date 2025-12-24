@@ -24,6 +24,7 @@ class ApiEndpoints(Enum):
     SAMPLE_SHEET = "/api/v2/sample-sheet/"
     PROJECTS = "/api/v2/projects/"
     PIPELINE_CAPABILITES = "/api/v2/pipeline-capabilities/{id}"
+    PIPELINE_CAPABILITES_SEARCH = "/api/v2/pipeline-capabilities/"
     PROJECT_BATCH_TYPES = "/api/v2/project-batch-types/{id}"
     PROJECT_BATCHES = "/api/v2/project-batches/{id}"
     PROJECT_SAMPLE_MANIFESTS = "/api/v2/project-sample-manifests/{id}"

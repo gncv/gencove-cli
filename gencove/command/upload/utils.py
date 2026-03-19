@@ -11,6 +11,7 @@ from boto3.s3.transfer import TransferConfig
 
 from botocore.exceptions import ClientError
 
+from gencove.client import APIClientError
 from gencove.exceptions import ValidationError
 from gencove.logger import echo_debug, echo_info
 from gencove.utils import CHUNK_SIZE, get_progress_bar
@@ -164,18 +165,18 @@ def get_get_upload_details_retry_predicate(resp):
     return not resp.last_status
 
 
-def get_upload_details_give_up_predicate(exc: Exception):
+def get_upload_details_give_up_predicate(exc: APIClientError):
     """
     Decide if we should give up trying to get upload details when exception
     is raised.
 
     Args:
-        exc (Exception): Exception raised.
+        exc (APIClientError): Exception raised.
 
     Returns:
         bool: True for giving up, False to continue.
     """
-    return getattr(exc, "status_code", None) in [400]
+    return exc.status_code in [400]
 
 
 def post_fastq_url_giveup(exc: Exception):

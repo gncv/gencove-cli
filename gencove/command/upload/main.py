@@ -42,6 +42,8 @@ from .utils import (
     get_upload_details_give_up_predicate,
     looks_like_url,
     parse_fastqs_map_file,
+    post_fastq_url_giveup,
+    post_fastq_url_on_backoff,
     seek_files_to_upload,
     upload_file,
     upload_multi_file,
@@ -207,6 +209,13 @@ class Upload(Command):
 
         self.echo_info("All files were successfully processed.")
 
+    @backoff.on_exception(
+        backoff.expo,
+        APIClientError,
+        max_time=600,
+        giveup=post_fastq_url_giveup,
+        on_backoff=post_fastq_url_on_backoff,
+    )
     def post_fastq_url(self, key, fastqs):
         """Post FASTQ URL to API endpoint"""
         client_id, r_notation = key

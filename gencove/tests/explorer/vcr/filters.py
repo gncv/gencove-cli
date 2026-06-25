@@ -89,13 +89,3 @@ def filter_data_credentials_response(response, json_response):
     if "email" in json_response:
         json_response["email"] = "email@example.com"
     return response, json_response
-
-
-@parse_response_to_json
-def filter_explorer_access_url_response(response, json_response):
-    """Filter url response."""
-    if "url" in json_response:
-        json_response[
-            "url"
-        ] = "https://mock-url.com/gncv-explorer/signin?access_token=123"
-    return response, json_response

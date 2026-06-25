@@ -489,13 +489,6 @@ class ExplorerShellSessionCredentials(BaseModel):
     network_activity_ssm_document_name: Optional[str] = None
 
 
-class ExplorerAccessURL(BaseModel):
-    """ExplorerAccessURL model"""
-
-    url: str
-    access_token_expiration: Optional[int] = None
-
-
 class OrganizationDetails(GencoveBaseModel):
     """OrganizationDetails model"""
 

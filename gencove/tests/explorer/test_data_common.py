@@ -13,6 +13,7 @@ import pytest
 from gencove.command.explorer.data.common import (  # noqa: I100
     ExplorerDataCredentials,
     GencoveExplorerManager,
+    parse_extra_namespaces,
     request_is_from_explorer,
 )
 from gencove.models import OrganizationUser
@@ -227,6 +228,49 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
             == f"s3://gencove-explorer-{self.org_id_short}/users/None/files/"  # noqa: E501 pylint: disable=line-too-long
         )  # noqa: E501
 
+    def _manager_with_extra_namespaces(self, value):
+        """Build a manager with EXPLORER_EXTRA_NAMESPACES set to ``value``."""
+        with patch.dict(os.environ, {"EXPLORER_EXTRA_NAMESPACES": value}):
+            return GencoveExplorerManager(
+                aws_session_credentials=self.mock_aws_credentials,
+                user_id=self.user_id,
+                organization_id=self.organization_id,
+                organization_users=self.organization_users,
+            )
+
+    def test_no_extra_namespace_by_default(self):
+        """Without the env var only the built-in namespaces exist"""
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("EXPLORER_EXTRA_NAMESPACES", None)
+            manager = GencoveExplorerManager(
+                aws_session_credentials=self.mock_aws_credentials,
+                user_id=self.user_id,
+                organization_id=self.organization_id,
+                organization_users=self.organization_users,
+            )
+        assert set(manager.NAMESPACE_KEYS) == {"users", "org", "gencove"}
+
+    def test_extra_namespace_in_keys(self):
+        """Extra namespaces from EXPLORER_EXTRA_NAMESPACES appear in NAMESPACE_KEYS"""
+        manager = self._manager_with_extra_namespaces(
+            "av=s3://gencove-explorer-5acc61261ccb/shared/files"
+        )
+        assert "av" in manager.NAMESPACE_KEYS
+        assert (
+            manager.NAMESPACES["av"]
+            == "s3://gencove-explorer-5acc61261ccb/shared/files"
+        )
+
+    def test_translate_extra_namespace_path(self):
+        """e://av/<x> resolves to the configured s3 prefix"""
+        manager = self._manager_with_extra_namespaces(
+            "av=s3://gencove-explorer-5acc61261ccb/shared/files"
+        )
+        assert (
+            manager.translate_path_to_s3_path("e://av/dataset.csv")
+            == "s3://gencove-explorer-5acc61261ccb/shared/files/dataset.csv"
+        )
+
     @patch("gencove.command.explorer.data.common.GencoveExplorerManager.list_users")
     def test_list_users(self, mock_list_users):
         """Test list_users()"""
@@ -380,3 +424,49 @@ class TestRequestIsFromExplorerInstance(TestCase):
             mock_boto3.side_effect = Exception("AWS error")
 
             assert request_is_from_explorer() is False
+
+
+class TestParseExtraNamespaces(TestCase):
+    """Test parse_extra_namespaces()"""
+
+    def test_single_pair(self):
+        """A single name=s3uri pair is parsed"""
+        assert parse_extra_namespaces(
+            "av=s3://gencove-explorer-5acc61261ccb/shared/files"
+        ) == {"av": "s3://gencove-explorer-5acc61261ccb/shared/files"}
+
+    def test_multiple_pairs(self):
+        """Multiple ;-separated pairs are parsed"""
+        assert parse_extra_namespaces(
+            "av=s3://bucket-a/shared/files;bv=s3://bucket-b/shared/files"
+        ) == {
+            "av": "s3://bucket-a/shared/files",
+            "bv": "s3://bucket-b/shared/files",
+        }
+
+    def test_trailing_slash_stripped(self):
+        """A trailing slash on the URI is dropped"""
+        assert parse_extra_namespaces("av=s3://bucket-a/shared/files/") == {
+            "av": "s3://bucket-a/shared/files"
+        }
+
+    def test_reserved_names_skipped(self):
+        """Entries colliding with reserved namespaces are skipped"""
+        assert parse_extra_namespaces(
+            "org=s3://evil/bucket;av=s3://bucket-a/x",
+            reserved=("users", "org", "gencove"),
+        ) == {"av": "s3://bucket-a/x"}
+
+    def test_non_s3_uri_skipped(self):
+        """Non-s3:// URIs are skipped"""
+        assert parse_extra_namespaces("av=e://not-s3") == {}
+        assert parse_extra_namespaces("av=/local/path") == {}
+
+    def test_malformed_entries_skipped(self):
+        """Malformed entries (no '=', empty name, empty uri) are skipped"""
+        assert parse_extra_namespaces("noequals;=s3://x;av=") == {}
+
+    def test_empty_and_none(self):
+        """Empty string and None yield an empty dict"""
+        assert parse_extra_namespaces("") == {}
+        assert parse_extra_namespaces(None) == {}

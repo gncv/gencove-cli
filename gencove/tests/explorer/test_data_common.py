@@ -426,47 +426,50 @@ class TestRequestIsFromExplorerInstance(TestCase):
             assert request_is_from_explorer() is False
 
 
-class TestParseExtraNamespaces(TestCase):
-    """Test parse_extra_namespaces()"""
+def test_parse_extra_namespaces__single_pair():
+    """A single name=s3uri pair is parsed"""
+    assert parse_extra_namespaces(
+        "av=s3://gencove-explorer-5acc61261ccb/shared/files"
+    ) == {"av": "s3://gencove-explorer-5acc61261ccb/shared/files"}
 
-    def test_single_pair(self):
-        """A single name=s3uri pair is parsed"""
-        assert parse_extra_namespaces(
-            "av=s3://gencove-explorer-5acc61261ccb/shared/files"
-        ) == {"av": "s3://gencove-explorer-5acc61261ccb/shared/files"}
 
-    def test_multiple_pairs(self):
-        """Multiple ;-separated pairs are parsed"""
-        assert parse_extra_namespaces(
-            "av=s3://bucket-a/shared/files;bv=s3://bucket-b/shared/files"
-        ) == {
-            "av": "s3://bucket-a/shared/files",
-            "bv": "s3://bucket-b/shared/files",
-        }
+def test_parse_extra_namespaces__multiple_pairs():
+    """Multiple ;-separated pairs are parsed"""
+    assert parse_extra_namespaces(
+        "av=s3://bucket-a/shared/files;bv=s3://bucket-b/shared/files"
+    ) == {
+        "av": "s3://bucket-a/shared/files",
+        "bv": "s3://bucket-b/shared/files",
+    }
 
-    def test_trailing_slash_stripped(self):
-        """A trailing slash on the URI is dropped"""
-        assert parse_extra_namespaces("av=s3://bucket-a/shared/files/") == {
-            "av": "s3://bucket-a/shared/files"
-        }
 
-    def test_reserved_names_skipped(self):
-        """Entries colliding with reserved namespaces are skipped"""
-        assert parse_extra_namespaces(
-            "org=s3://evil/bucket;av=s3://bucket-a/x",
-            reserved=("users", "org", "gencove"),
-        ) == {"av": "s3://bucket-a/x"}
+def test_parse_extra_namespaces__trailing_slash_stripped():
+    """A trailing slash on the URI is dropped"""
+    assert parse_extra_namespaces("av=s3://bucket-a/shared/files/") == {
+        "av": "s3://bucket-a/shared/files"
+    }
 
-    def test_non_s3_uri_skipped(self):
-        """Non-s3:// URIs are skipped"""
-        assert parse_extra_namespaces("av=e://not-s3") == {}
-        assert parse_extra_namespaces("av=/local/path") == {}
 
-    def test_malformed_entries_skipped(self):
-        """Malformed entries (no '=', empty name, empty uri) are skipped"""
-        assert parse_extra_namespaces("noequals;=s3://x;av=") == {}
+def test_parse_extra_namespaces__reserved_names_skipped():
+    """Entries colliding with reserved namespaces are skipped"""
+    assert parse_extra_namespaces(
+        "org=s3://evil/bucket;av=s3://bucket-a/x",
+        reserved=("users", "org", "gencove"),
+    ) == {"av": "s3://bucket-a/x"}
 
-    def test_empty_and_none(self):
-        """Empty string and None yield an empty dict"""
-        assert parse_extra_namespaces("") == {}
-        assert parse_extra_namespaces(None) == {}
+
+def test_parse_extra_namespaces__non_s3_uri_skipped():
+    """Non-s3:// URIs are skipped"""
+    assert not parse_extra_namespaces("av=e://not-s3")
+    assert not parse_extra_namespaces("av=/local/path")
+
+
+def test_parse_extra_namespaces__malformed_entries_skipped():
+    """Malformed entries (no '=', empty name, empty uri) are skipped"""
+    assert not parse_extra_namespaces("noequals;=s3://x;av=")
+
+
+def test_parse_extra_namespaces__empty_and_none():
+    """Empty string and None yield an empty dict"""
+    assert not parse_extra_namespaces("")
+    assert not parse_extra_namespaces(None)

@@ -67,12 +67,15 @@ class TestGencoveExplorerManager:  # pylint: disable=too-many-public-methods
             token="mock_token",
             region_name="mock_region",
         )
-        self.explorer_manager = GencoveExplorerManager(
-            aws_session_credentials=self.mock_aws_credentials,
-            user_id=self.user_id,
-            organization_id=self.organization_id,
-            organization_users=self.organization_users,
-        )
+        # Build the base manager with no extra namespaces so tests are isolated
+        # from any EXPLORER_EXTRA_NAMESPACES set in CI or a local environment.
+        with patch.dict(os.environ, {"EXPLORER_EXTRA_NAMESPACES": ""}):
+            self.explorer_manager = GencoveExplorerManager(
+                aws_session_credentials=self.mock_aws_credentials,
+                user_id=self.user_id,
+                organization_id=self.organization_id,
+                organization_users=self.organization_users,
+            )
 
     def test_bucket_name(self):
         """Test bucket_name"""

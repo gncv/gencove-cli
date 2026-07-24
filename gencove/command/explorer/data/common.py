@@ -55,6 +55,15 @@ class GencoveExplorerManager:  # pylint: disable=too-many-instance-attributes,to
             self.ORG: self.data_org_s3_prefix,
             self.GENCOVE: self.data_gencove_s3_prefix,
         }
+        # Extra org-specific namespaces (e.g. e://av) are injected via the
+        # EXPLORER_EXTRA_NAMESPACES env var (set through SSM per organization),
+        # so nothing org-specific is hardcoded here.
+        self.NAMESPACES.update(
+            parse_extra_namespaces(
+                os.environ.get("EXPLORER_EXTRA_NAMESPACES", ""),
+                reserved=self.NAMESPACES.keys(),
+            )
+        )
         self.NAMESPACE_KEYS: Tuple = tuple(self.NAMESPACES.keys())
         # pylint: enable=invalid-name
 
@@ -488,3 +497,31 @@ def is_valid_email(input_string) -> bool:
     """
     pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
     return bool(re.match(pattern, input_string))
+
+
+def parse_extra_namespaces(raw: Optional[str], reserved=()) -> dict:
+    """Parse the ``EXPLORER_EXTRA_NAMESPACES`` env var into ``{name: s3_prefix}``.
+
+    The value is a ``;``-separated list of ``name=s3uri`` pairs, e.g.
+    ``av=s3://gencove-explorer-5acc61261ccb/shared/files``. This lets an
+    organization expose extra ``e://`` namespaces (delivered via SSM) without
+    hardcoding any org id or bucket in the CLI.
+
+    Entries are skipped when the name is empty, collides with a reserved
+    namespace (``users``/``org``/``gencove``), or the URI is not an ``s3://`` URI.
+    A trailing ``/`` on the URI is dropped for consistency with the built-in
+    namespaces.
+    """
+    reserved = set(reserved)
+    namespaces: dict = {}
+    for pair in (raw or "").split(";"):
+        pair = pair.strip()
+        if not pair or "=" not in pair:
+            continue
+        name, _, uri = pair.partition("=")
+        name = name.strip()
+        uri = uri.strip().rstrip("/")
+        if not name or name in reserved or not uri.startswith("s3://"):
+            continue
+        namespaces[name] = uri
+    return namespaces

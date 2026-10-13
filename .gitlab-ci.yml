@@ -99,6 +99,35 @@ python313_user_pass:
   except:
     - tags
 
+python314_api_key:
+  image: ghcr.io/astral-sh/uv:python3.14-bookworm-slim
+  stage: test
+  script: uv run tox -e py314-api_key
+  except:
+    - tags
+
+python314_user_pass:
+  image: ghcr.io/astral-sh/uv:python3.14-bookworm-slim
+  stage: test
+  script: uv run tox -e py314-user_pass
+  except:
+    - tags
+
+# uv has no final 3.15 image yet, switch to python3.15-trixie-slim once published
+python315_api_key:
+  image: ghcr.io/astral-sh/uv:python3.15-rc-trixie-slim
+  stage: test
+  script: uv run tox -e py315-api_key
+  except:
+    - tags
+
+python315_user_pass:
+  image: ghcr.io/astral-sh/uv:python3.15-rc-trixie-slim
+  stage: test
+  script: uv run tox -e py315-user_pass
+  except:
+    - tags
+
 black:
   stage: test
   script: uv run tox -e black_checker

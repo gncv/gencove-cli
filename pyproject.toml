@@ -20,6 +20,8 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
 ]
 dependencies = [
     "python-dateutil>=2.2.0",
@@ -29,7 +31,7 @@ dependencies = [
     "boto3>=1.17.97",
     "progressbar2==3.55.0",
     "backoff<=2.2.1",
-    "pydantic==2.10.3",
+    "pydantic>=2.10.3,<3",
     "click-default-group>=1.2.4",
 ]
 dynamic = ["version"]
@@ -61,10 +63,10 @@ dev = [
     "pbr==6.1.0",
 ]
 test = [
-    "pytest==7.0.1",
+    "pytest==8.4.2",
     "pytest-mock==3.6.1",
     "pytest-cov==3.0.0",
-    "pytest-xdist==2.5.0",
+    "pytest-xdist==3.8.0",
     "pytest-recording==0.12.1",
     "vcrpy==4.1.1",
     "faker==14.0.0",

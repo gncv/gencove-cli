@@ -15,6 +15,7 @@ from gencove.command.download.utils import (
     _finalize_download,
     _get_prefix_parts,
     deliverable_type_from_filename,
+    format_download_template,
     get_download_template_format_params,
     get_filename_from_download_url,
 )
@@ -235,3 +236,33 @@ def test_get_download_template_format_params_with_special_chars():
         result[DownloadTemplateParts.GENCOVE_ID.value]
         == "11111111-1111-1111-1111-111111111111"
     )
+
+
+def test_format_download_template():
+    """Test filling sample ids into download template."""
+    result = format_download_template(
+        "{client_id}/{gencove_id}/{default_filename}",
+        "test_client",
+        "test_gencove_id",
+    )
+    assert result == "test_client/test_gencove_id/{default_filename}"
+
+
+def test_format_download_template_empty_client_id():
+    """Test that empty client id doesn't make the path absolute."""
+    result = format_download_template(
+        "{client_id}/{gencove_id}/{default_filename}",
+        "",
+        "test_gencove_id",
+    )
+    assert result == "test_gencove_id/{default_filename}"
+
+
+def test_format_download_template_empty_client_id_keeps_literal_slashes():
+    """Test that only segments emptied by a token are dropped."""
+    result = format_download_template(
+        "/data/{client_id}/{gencove_id}/{file_type}.{file_extension}",
+        "",
+        "test_gencove_id",
+    )
+    assert result == "/data/test_gencove_id/{file_type}.{file_extension}"

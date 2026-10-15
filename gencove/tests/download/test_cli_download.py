@@ -331,6 +331,72 @@ def test_sample_ids_provided_no_qc_file(
 
 
 @pytest.mark.vcr
+@pytest.mark.default_cassette("test_sample_ids_provided_no_qc_file.yaml")
+@assert_authorization
+def test_sample_ids_provided_empty_client_id(
+    credentials, mocker, recording, sample_id_download, vcr
+):
+    """Check that a sample without client id is saved inside download dir."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        mocker.patch.object(
+            APIClient,
+            "get_sample_details",
+            return_value=SampleDetails(
+                **{
+                    "id": sample_id_download,
+                    "client_id": "",
+                    "last_status": {
+                        "id": str(uuid4()),
+                        "status": "succeeded",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                    },
+                    "archive_last_status": {
+                        "id": str(uuid4()),
+                        "status": "available",
+                        "created": "2020-07-28T12:46:22.719862Z",
+                        "transition_cutoff": "2020-08-28T12:46:22.719862Z",
+                    },
+                    "files": [],
+                }
+            ),
+        )
+        if not recording:
+            # Mock only if using the cassettes, since we mock the return value.
+            get_sample_qc_metrics_response = get_vcr_response(
+                "/api/v2/sample-quality-controls/", vcr, operator.contains
+            )
+            mocker.patch.object(
+                APIClient,
+                "get_sample_qc_metrics",
+                return_value=SampleQC(**get_sample_qc_metrics_response),
+            )
+            get_metadata_response = get_vcr_response(
+                "/api/v2/sample-metadata/", vcr, operator.contains
+            )
+            mocker.patch.object(
+                APIClient,
+                "get_metadata",
+                return_value=SampleMetadata(**get_metadata_response),
+            )
+        res = runner.invoke(
+            download,
+            [
+                "cli_test_data",
+                "--sample-ids",
+                sample_id_download,
+                *credentials,
+            ],
+        )
+        assert res.exit_code == 0
+        sample_dir = os.path.join("cli_test_data", sample_id_download)
+        assert os.path.exists(os.path.join(sample_dir, f"{sample_id_download}_qc.json"))
+        assert os.path.exists(
+            os.path.join(sample_dir, f"{sample_id_download}_metadata.json")
+        )
+
+
+@pytest.mark.vcr
 @assert_authorization
 def test_create_checksum_file(credentials, mocker, recording, sample_id_download, vcr):
     """Check checksums flag."""

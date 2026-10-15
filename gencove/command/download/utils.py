@@ -529,3 +529,28 @@ def get_download_template_format_params(client_id, gencove_id):
         DownloadTemplateParts.FILE_EXTENSION.value: f"{{{DownloadTemplateParts.FILE_EXTENSION.value}}}",  # noqa: E501  # pylint: disable=line-too-long
         DownloadTemplateParts.DEFAULT_FILENAME.value: f"{{{DownloadTemplateParts.DEFAULT_FILENAME.value}}}",  # noqa: E501  # pylint: disable=line-too-long
     }
+
+
+def format_download_template(download_template, client_id, gencove_id):
+    """Fill sample ids into download template.
+
+    Path segments that end up empty because a token was empty (e.g. a sample
+    without a client id) are dropped. Otherwise the default template would
+    turn into an absolute path and escape the download directory.
+
+    Args:
+        download_template (str): download template
+        client_id (str): sample client id
+        gencove_id (str): sample gencove id
+
+    Returns:
+        str: file path with prefix
+    """
+    format_params = get_download_template_format_params(client_id, gencove_id)
+    segments = []
+    for segment in download_template.split("/"):
+        formatted_segment = segment.format(**format_params)
+        if segment and not formatted_segment:
+            continue
+        segments.append(formatted_segment)
+    return "/".join(segments)

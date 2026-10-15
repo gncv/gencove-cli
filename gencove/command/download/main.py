@@ -24,7 +24,7 @@ from .utils import (
     build_file_path,
     download_file,
     fatal_process_sample_error,
-    get_download_template_format_params,
+    format_download_template,
     save_metadata_file,
     save_qc_file,
 )
@@ -259,8 +259,8 @@ class Download(Command):
 
         file_types_re = re.compile("|".join(self.filters.file_types), re.IGNORECASE)
 
-        file_with_prefix = self.options.download_template.format(
-            **get_download_template_format_params(sample.client_id, sample.id)
+        file_with_prefix = format_download_template(
+            self.options.download_template, sample.client_id, sample.id
         )
         self.echo_debug(f"file path with prefix is: {file_with_prefix}")
         if all(
